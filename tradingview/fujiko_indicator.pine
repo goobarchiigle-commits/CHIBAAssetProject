@@ -1,0 +1,249 @@
+// ============================================================
+// フジコ投資法 v4.0 インジケーター
+// 参考: 株おじさん「シン・フジコ投資法（ver.4.0）」
+//       https://note.com/kabu_ojisan/n/nd7688198c814
+//
+// 表示内容:
+//   [メイン画面]
+//     ・MA50 / MA150 / MA200 （SEPAの基準ライン）
+//     ・STARCバンド          （ボラティリティ）
+//     ・タートルズS1/S2レベル （エントリー・エグジット基準）
+//     ・エース/キングマーク   （SEPAシグナル）
+//     ・買い/売りシグナル矢印
+//
+//   [サブ画面]
+//     ・RSR                  （相対強度: 0〜100、70以上が条件）
+//     ・RSRモメンタム        （プラス上昇=濃いピンク、マイナス=青）
+//     ・SEPAスコアバー       （0〜8の条件達成数）
+//
+// 使い方:
+//   1. TradingView → インジケーター → パインスクリプト → 貼り付けて保存
+//   2. 日本株チャートに追加（日足推奨）
+//   3. ベンチマークはデフォルトでTOPIX（変更可能）
+//   4. エース（★）かキング（★★）マークが出た銘柄を監視
+//   5. RSRモメンタムが濃いピンクに変わったタイミングで買い検討
+// ============================================================
+
+//@version=5
+indicator("フジコ投資法 v4.0", shorttitle="FUJIKO_v4", overlay=true,
+          max_labels_count=500, max_lines_count=200)
+
+// ============================================================
+// ── 設定グループ ──
+// ============================================================
+
+// SEPAグループ
+g_sepa = "━━ SEPA条件 ━━"
+sepa_min  = input.int(6,   "エントリー最低SEPA条件数（エース=6 / キング=8）",
+                      minval=1, maxval=8, group=g_sepa)
+show_sepa = input.bool(true, "SEPA条件バーを表示",  group=g_sepa)
+
+// MAグループ
+g_ma   = "━━ 移動平均 ━━"
+ma50_c  = input.color(color.new(color.blue,   0),  "MA50色",  group=g_ma)
+ma150_c = input.color(color.new(color.orange,  0), "MA150色", group=g_ma)
+ma200_c = input.color(color.new(color.red,     0), "MA200色", group=g_ma)
+
+// RSRグループ
+g_rsr   = "━━ RSR設定 ━━"
+bm_sym  = input.symbol("TSE:TOPIX", "ベンチマーク（TOPIX推奨）", group=g_rsr)
+rsr_thr = input.float(70.0, "RSR閾値（条件8）", minval=0, maxval=100, group=g_rsr)
+mom_per = input.int(21, "RSRモメンタム期間（日）", minval=1, group=g_rsr)
+
+// タートルズグループ
+g_tur   = "━━ タートルズ ━━"
+s1_e    = input.int(20, "S1エントリー期間（日）", group=g_tur)
+s1_x    = input.int(10, "S1エグジット期間（日）", group=g_tur)
+s2_e    = input.int(55, "S2エントリー期間（日）", group=g_tur)
+s2_x    = input.int(20, "S2エグジット期間（日）", group=g_tur)
+show_s2 = input.bool(false, "S2レベルを表示", group=g_tur)
+
+// STARCグループ
+g_starc  = "━━ STARCバンド ━━"
+st_ma    = input.int(20,  "STARC MA期間",     group=g_starc)
+st_atr   = input.int(10,  "STARC ATR期間",    group=g_starc)
+st_mult  = input.float(1.5, "STARC ATR倍率",  group=g_starc)
+show_sta = input.bool(true, "STARCバンドを表示", group=g_starc)
+
+// ============================================================
+// ── 移動平均 ──
+// ============================================================
+ma50  = ta.sma(close, 50)
+ma150 = ta.sma(close, 150)
+ma200 = ta.sma(close, 200)
+
+plot(ma50,  "MA50",  color=ma50_c,  linewidth=1)
+plot(ma150, "MA150", color=ma150_c, linewidth=1)
+plot(ma200, "MA200", color=ma200_c, linewidth=2)
+
+// ============================================================
+// ── STARCバンド ──
+// ============================================================
+starc_base  = ta.sma(close, st_ma)
+atr_val     = ta.atr(st_atr)
+starc_upper = starc_base + atr_val * st_mult
+starc_lower = starc_base - atr_val * st_mult
+
+p_su = plot(show_sta ? starc_upper : na, "STARC上限",
+            color=color.new(color.purple, 60), linewidth=1, style=plot.style_line)
+p_sl = plot(show_sta ? starc_lower : na, "STARC下限",
+            color=color.new(color.purple, 60), linewidth=1, style=plot.style_line)
+fill(p_su, p_sl, color=color.new(color.purple, 88), title="STARCバンド背景")
+
+// ============================================================
+// ── タートルズS1 / S2 ──
+// ============================================================
+// 先読みリーク防止: [1]で前日確定値を参照
+s1_high = ta.highest(high, s1_e)[1]
+s1_low  = ta.lowest(low,  s1_x)[1]
+s2_high = ta.highest(high, s2_e)[1]
+s2_low  = ta.lowest(low,  s2_x)[1]
+
+plot(s1_high, "S1エントリー高値",
+     color=color.new(color.green, 40), linewidth=1, style=plot.style_stepline)
+plot(s1_low,  "S1エグジット安値",
+     color=color.new(color.red,   40), linewidth=1, style=plot.style_stepline)
+plot(show_s2 ? s2_high : na, "S2エントリー高値",
+     color=color.new(color.green, 70), linewidth=1, style=plot.style_stepline)
+plot(show_s2 ? s2_low  : na, "S2エグジット安値",
+     color=color.new(color.red,   70), linewidth=1, style=plot.style_stepline)
+
+// ============================================================
+// ── RSR計算（vs TOPIX: IBD式加重12ヶ月リターン）──
+// ============================================================
+// 先読みリーク防止: lookahead=barmerge.lookahead_off（デフォルト）
+bm = request.security(bm_sym, timeframe.period, close,
+                       lookahead=barmerge.lookahead_off)
+
+// IBD式加重複合リターン
+_comp(src) =>
+    r1 = nz((src / src[63])  - 1)
+    r2 = nz((src[63]  / src[126]) - 1)
+    r3 = nz((src[126] / src[189]) - 1)
+    r4 = nz((src[189] / src[252]) - 1)
+    0.4 * r1 + 0.2 * r2 + 0.2 * r3 + 0.2 * r4
+
+stock_comp = _comp(close)
+bench_comp = _comp(bm)
+
+// 超過リターン → 0〜100スケールのRSR
+// 超過 +20% → RSR≈70、+40% → RSR≈90、-20% → RSR≈30
+relative = stock_comp - bench_comp
+rsr      = math.max(0.0, math.min(100.0, 50.0 + relative * 100.0))
+
+// RSRモメンタム（21日変化）
+rsr_mom      = rsr - rsr[mom_per]
+rsr_mom_prev = rsr_mom[1]
+rsr_rising   = rsr_mom > rsr_mom_prev
+
+// ============================================================
+// ── SEPA 8条件 ──
+// ============================================================
+_52w_high = ta.highest(high, 252)
+_52w_low  = ta.lowest(low,  252)
+
+c1 = close > ma150 and close > ma200    // 株価 > MA150 & MA200
+c2 = ma150 > ma200                       // MA150 > MA200
+c3 = ma200 > ma200[21]                   // MA200が1ヶ月以上上昇
+c4 = ta.rising(ma50, 1)                  // MA50上昇中
+c5 = close > ma50                        // 株価 > MA50
+c6 = close >= _52w_low  * 1.30           // 52週安値から+30%以上
+c7 = close >= _52w_high * 0.75           // 52週高値から-25%以内
+c8 = rsr >= rsr_thr                      // RSR >= 70
+
+sepa_n  = (c1?1:0)+(c2?1:0)+(c3?1:0)+(c4?1:0)+(c5?1:0)+(c6?1:0)+(c7?1:0)+(c8?1:0)
+is_ace  = sepa_n >= sepa_min             // エース（6条件以上）
+is_king = sepa_n == 8                    // キング（全条件）
+
+// ============================================================
+// ── フジコシグナル ──
+// ============================================================
+// 買いシグナル: エース以上 + RSRモメンタム正かつ上昇 + S1ブレイク
+buy_sig  = is_ace and rsr_mom > 0 and rsr_rising and close > s1_high
+
+// 売りシグナル: RSRモメンタム負かつ下降（「必ず売り」）または S1下限割れ
+sell_sig = (rsr_mom < 0 and not rsr_rising) or (close < s1_low)
+
+// ============================================================
+// ── エース / キングマーク ──
+// ============================================================
+// キングマーク（全8条件）
+if is_king and not is_king[1]
+    label.new(bar_index, high * 1.002,
+              "★★ KING", color=color.new(color.gold, 0),
+              textcolor=color.white, style=label.style_label_down, size=size.small)
+
+// エースマーク（6〜7条件）
+if is_ace and not is_king and not (is_ace[1] and not is_king[1])
+    label.new(bar_index, high * 1.001,
+              "★ ACE", color=color.new(color.orange, 10),
+              textcolor=color.white, style=label.style_label_down, size=size.tiny)
+
+// ============================================================
+// ── 買い / 売りシグナル矢印 ──
+// ============================================================
+plotshape(buy_sig  and not buy_sig[1],  "買いシグナル", shape.triangleup,
+          location.belowbar, color.new(color.lime, 0),  size=size.normal)
+plotshape(sell_sig and not sell_sig[1], "売りシグナル", shape.triangledown,
+          location.abovebar, color.new(color.red,  0),  size=size.normal)
+
+// ============================================================
+// ── 背景色（第2ステージ識別）──
+// ============================================================
+// 株価 > MA200 かつ MA200上昇 = 第2ステージ候補
+stage2_bg = close > ma200 and ma200 > ma200[21]
+bgcolor(stage2_bg ? color.new(color.green, 95) : na, title="第2ステージ背景")
+
+// ============================================================
+// ── サブ画面: RSR + RSRモメンタム + SEPAスコア ──
+// ============================================================
+
+// RSR ライン
+rsr_plot = plot(rsr, "RSR", color=color.new(color.blue, 0),
+                linewidth=2, display=display.pane)
+
+// RSR基準線
+hline(rsr_thr, "RSR閾値",  color=color.new(color.red,  30), linestyle=hline.style_dashed)
+hline(50,      "RSR=50",   color=color.new(color.gray, 50), linestyle=hline.style_dotted)
+
+// RSRモメンタム ヒストグラム
+mom_col = rsr_mom >= 0
+    ? (rsr_rising ? color.new(#FF1493, 0) : color.new(#FF69B4, 40))  // 正: 濃いピンク/淡いピンク
+    : (not rsr_rising ? color.new(#4169E1, 0) : color.new(#87CEEB, 40)) // 負: 濃い青/淡い青
+plot(rsr_mom, "RSRモメンタム", color=mom_col,
+     style=plot.style_histogram, linewidth=2, display=display.pane)
+
+hline(0, "モメンタム=0", color=color.new(color.black, 40), linestyle=hline.style_solid)
+
+// SEPAスコアバー（0〜8）
+sepa_col = is_king ? color.gold : is_ace ? color.orange : color.new(color.gray, 50)
+plot(show_sepa ? sepa_n : na, "SEPAスコア",
+     color=sepa_col, style=plot.style_columns,
+     linewidth=1, display=display.pane)
+
+// ============================================================
+// ── テーブル（現在のSEPA条件達成状況）──
+// ============================================================
+var tbl = table.new(position.top_right, 2, 10,
+                    bgcolor=color.new(color.black, 70),
+                    border_width=1)
+
+if barstate.islast
+    table.cell(tbl, 0, 0, "SEPA条件",  text_color=color.white, text_size=size.small)
+    table.cell(tbl, 1, 0, str.tostring(sepa_n) + " / 8",
+               text_color=is_king ? color.gold : is_ace ? color.orange : color.gray,
+               text_size=size.small)
+
+    _row(row, label, cond) =>
+        table.cell(tbl, 0, row, label, text_color=color.white, text_size=size.tiny)
+        table.cell(tbl, 1, row, cond ? "✓" : "✗",
+                   text_color=cond ? color.lime : color.red, text_size=size.tiny)
+
+    _row(1, "①株価>MA150&200", c1)
+    _row(2, "②MA150>MA200",    c2)
+    _row(3, "③MA200上昇1ヶ月", c3)
+    _row(4, "④MA50上昇中",     c4)
+    _row(5, "⑤株価>MA50",      c5)
+    _row(6, "⑥52週安値+30%",   c6)
+    _row(7, "⑦52週高値-25%",   c7)
+    _row(8, "⑧RSR≥70",        c8)
