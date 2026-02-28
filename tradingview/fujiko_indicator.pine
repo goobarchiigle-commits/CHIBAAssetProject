@@ -167,10 +167,18 @@ if is_ace and not is_king and not (is_ace[1] and not is_king[1])
     label.new(bar_index, high * 1.001, "★ ACE", xloc.bar_index, yloc.price, color.new(color.orange, 10), label.style_label_down, color.white, size.tiny)
 
 // ============================================================
-// ── 買い / 売りシグナル矢印 ──
+// ── 買い / 売りシグナル矢印（ポジション状態管理）──
 // ============================================================
-plotshape(buy_sig  and not buy_sig[1],  "買いシグナル", shape.triangleup,   location.belowbar, color.new(color.lime, 0), size=size.normal)
-plotshape(sell_sig and not sell_sig[1], "売りシグナル", shape.triangledown, location.abovebar, color.new(color.red,  0), size=size.normal)
+// ポジションを持っているときのみ売りシグナルを表示
+var in_trade = false
+prev_trade   = in_trade          // このバー冒頭の状態を保存
+if buy_sig  and not in_trade
+    in_trade := true
+if sell_sig and in_trade
+    in_trade := false
+
+plotshape(buy_sig  and not buy_sig[1]  and not prev_trade, "買いシグナル", shape.triangleup,   location.belowbar, color.new(color.lime, 0), size=size.normal)
+plotshape(sell_sig and not sell_sig[1] and     prev_trade, "売りシグナル", shape.triangledown, location.abovebar, color.new(color.red,  0), size=size.normal)
 
 // ============================================================
 // ── 背景色（第2ステージ識別）──
@@ -203,16 +211,18 @@ plot(show_sepa ? sepa_n : na, "SEPAスコア", color=sepa_col, style=plot.style_
 // ============================================================
 // ── テーブル（現在のSEPA条件達成状況）──
 // ============================================================
-var tbl = table.new(position.top_right, 2, 10, bgcolor=color.new(color.black, 70), border_width=1)
+var tbl = table.new(position.top_right, 2, 9, bgcolor=color.new(color.black, 55), border_width=1, border_color=color.new(color.gray, 40), frame_width=2, frame_color=color.new(color.gray, 20))
 
 // 関数定義はトップレベルに置く（ifブロック内では定義不可）
 _row(row, lbl, cond) =>
-    table.cell(tbl, 0, row, lbl, text_color=color.white, text_size=size.tiny)
-    table.cell(tbl, 1, row, cond ? "✓" : "✗", text_color=cond ? color.lime : color.red, text_size=size.tiny)
+    bg = cond ? color.new(color.green, 75) : color.new(color.red, 82)
+    table.cell(tbl, 0, row, lbl,               bgcolor=bg, text_color=color.white,                           text_size=size.small)
+    table.cell(tbl, 1, row, cond ? "✓" : "✗", bgcolor=bg, text_color=cond ? color.new(color.lime, 0) : color.new(color.red, 10), text_size=size.small)
 
 if barstate.islast
-    table.cell(tbl, 0, 0, "SEPA条件",  text_color=color.white, text_size=size.small)
-    table.cell(tbl, 1, 0, str.tostring(sepa_n) + " / 8", text_color=is_king ? color.new(#FFD700, 0) : is_ace ? color.orange : color.gray, text_size=size.small)
+    hdr_col = is_king ? color.new(#FFD700, 0) : is_ace ? color.orange : color.silver
+    table.cell(tbl, 0, 0, "SEPA条件",                    bgcolor=color.new(color.black, 30), text_color=color.white,  text_size=size.normal)
+    table.cell(tbl, 1, 0, str.tostring(sepa_n) + " / 8", bgcolor=color.new(color.black, 30), text_color=hdr_col,      text_size=size.normal)
 
     _row(1, "①株価>MA150&200", c1)
     _row(2, "②MA150>MA200",    c2)
