@@ -160,7 +160,7 @@ sell_sig = (rsr_mom < 0 and not rsr_rising) or (close < s1_low)
 // ============================================================
 // キングマーク（全8条件）
 if is_king and not is_king[1]
-    label.new(bar_index, high * 1.002, "★★ KING", xloc.bar_index, yloc.price, color.new(color.gold, 0), label.style_label_down, color.white, size.small)
+    label.new(bar_index, high * 1.002, "★★ KING", xloc.bar_index, yloc.price, color.new(#FFD700, 0), label.style_label_down, color.white, size.small)
 
 // エースマーク（6〜7条件）
 if is_ace and not is_king and not (is_ace[1] and not is_king[1])
@@ -197,7 +197,7 @@ plot(rsr_mom, "RSRモメンタム", color=mom_col, style=plot.style_histogram, l
 hline(0, "モメンタム=0", color=color.new(color.black, 40), linestyle=hline.style_solid)
 
 // SEPAスコアバー（0〜8）
-sepa_col = is_king ? color.gold : is_ace ? color.orange : color.new(color.gray, 50)
+sepa_col = is_king ? color.new(#FFD700, 0) : is_ace ? color.orange : color.new(color.gray, 50)
 plot(show_sepa ? sepa_n : na, "SEPAスコア", color=sepa_col, style=plot.style_columns, linewidth=1, display=display.pane)
 
 // ============================================================
@@ -212,7 +212,7 @@ _row(row, lbl, cond) =>
 
 if barstate.islast
     table.cell(tbl, 0, 0, "SEPA条件",  text_color=color.white, text_size=size.small)
-    table.cell(tbl, 1, 0, str.tostring(sepa_n) + " / 8", text_color=is_king ? color.gold : is_ace ? color.orange : color.gray, text_size=size.small)
+    table.cell(tbl, 1, 0, str.tostring(sepa_n) + " / 8", text_color=is_king ? color.new(#FFD700, 0) : is_ace ? color.orange : color.gray, text_size=size.small)
 
     _row(1, "①株価>MA150&200", c1)
     _row(2, "②MA150>MA200",    c2)
