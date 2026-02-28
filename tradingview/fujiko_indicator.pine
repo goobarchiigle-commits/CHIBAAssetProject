@@ -25,8 +25,7 @@
 // ============================================================
 
 //@version=5
-indicator("フジコ投資法 v4.0", shorttitle="FUJIKO_v4", overlay=true,
-          max_labels_count=500, max_lines_count=200)
+indicator("フジコ投資法 v4.0", shorttitle="FUJIKO_v4", overlay=true, max_labels_count=500, max_lines_count=200)
 
 // ============================================================
 // ── 設定グループ ──
@@ -34,8 +33,7 @@ indicator("フジコ投資法 v4.0", shorttitle="FUJIKO_v4", overlay=true,
 
 // SEPAグループ
 g_sepa = "━━ SEPA条件 ━━"
-sepa_min  = input.int(6,   "エントリー最低SEPA条件数（エース=6 / キング=8）",
-                      minval=1, maxval=8, group=g_sepa)
+sepa_min  = input.int(6, "エントリー最低SEPA条件数（エース=6 / キング=8）", minval=1, maxval=8, group=g_sepa)
 show_sepa = input.bool(true, "SEPA条件バーを表示",  group=g_sepa)
 
 // MAグループ
@@ -84,10 +82,8 @@ atr_val     = ta.atr(st_atr)
 starc_upper = starc_base + atr_val * st_mult
 starc_lower = starc_base - atr_val * st_mult
 
-p_su = plot(show_sta ? starc_upper : na, "STARC上限",
-            color=color.new(color.purple, 60), linewidth=1, style=plot.style_line)
-p_sl = plot(show_sta ? starc_lower : na, "STARC下限",
-            color=color.new(color.purple, 60), linewidth=1, style=plot.style_line)
+p_su = plot(show_sta ? starc_upper : na, "STARC上限", color=color.new(color.purple, 60), linewidth=1, style=plot.style_line)
+p_sl = plot(show_sta ? starc_lower : na, "STARC下限", color=color.new(color.purple, 60), linewidth=1, style=plot.style_line)
 fill(p_su, p_sl, color=color.new(color.purple, 88), title="STARCバンド背景")
 
 // ============================================================
@@ -99,21 +95,16 @@ s1_low  = ta.lowest(low,  s1_x)[1]
 s2_high = ta.highest(high, s2_e)[1]
 s2_low  = ta.lowest(low,  s2_x)[1]
 
-plot(s1_high, "S1エントリー高値",
-     color=color.new(color.green, 40), linewidth=1, style=plot.style_stepline)
-plot(s1_low,  "S1エグジット安値",
-     color=color.new(color.red,   40), linewidth=1, style=plot.style_stepline)
-plot(show_s2 ? s2_high : na, "S2エントリー高値",
-     color=color.new(color.green, 70), linewidth=1, style=plot.style_stepline)
-plot(show_s2 ? s2_low  : na, "S2エグジット安値",
-     color=color.new(color.red,   70), linewidth=1, style=plot.style_stepline)
+plot(s1_high, "S1エントリー高値", color=color.new(color.green, 40), linewidth=1, style=plot.style_stepline)
+plot(s1_low,  "S1エグジット安値", color=color.new(color.red,   40), linewidth=1, style=plot.style_stepline)
+plot(show_s2 ? s2_high : na, "S2エントリー高値", color=color.new(color.green, 70), linewidth=1, style=plot.style_stepline)
+plot(show_s2 ? s2_low  : na, "S2エグジット安値", color=color.new(color.red,   70), linewidth=1, style=plot.style_stepline)
 
 // ============================================================
 // ── RSR計算（vs TOPIX: IBD式加重12ヶ月リターン）──
 // ============================================================
 // 先読みリーク防止: lookahead=barmerge.lookahead_off（デフォルト）
-bm = request.security(bm_sym, timeframe.period, close,
-                       lookahead=barmerge.lookahead_off)
+bm = request.security(bm_sym, timeframe.period, close, lookahead=barmerge.lookahead_off)
 
 // IBD式加重複合リターン
 _comp(src) =>
@@ -169,23 +160,17 @@ sell_sig = (rsr_mom < 0 and not rsr_rising) or (close < s1_low)
 // ============================================================
 // キングマーク（全8条件）
 if is_king and not is_king[1]
-    label.new(bar_index, high * 1.002,
-              "★★ KING", color=color.new(color.gold, 0),
-              textcolor=color.white, style=label.style_label_down, size=size.small)
+    label.new(bar_index, high * 1.002, "★★ KING", color=color.new(color.gold, 0), textcolor=color.white, style=label.style_label_down, size=size.small)
 
 // エースマーク（6〜7条件）
 if is_ace and not is_king and not (is_ace[1] and not is_king[1])
-    label.new(bar_index, high * 1.001,
-              "★ ACE", color=color.new(color.orange, 10),
-              textcolor=color.white, style=label.style_label_down, size=size.tiny)
+    label.new(bar_index, high * 1.001, "★ ACE", color=color.new(color.orange, 10), textcolor=color.white, style=label.style_label_down, size=size.tiny)
 
 // ============================================================
 // ── 買い / 売りシグナル矢印 ──
 // ============================================================
-plotshape(buy_sig  and not buy_sig[1],  "買いシグナル", shape.triangleup,
-          location.belowbar, color.new(color.lime, 0),  size=size.normal)
-plotshape(sell_sig and not sell_sig[1], "売りシグナル", shape.triangledown,
-          location.abovebar, color.new(color.red,  0),  size=size.normal)
+plotshape(buy_sig  and not buy_sig[1],  "買いシグナル", shape.triangleup,   location.belowbar, color.new(color.lime, 0), size=size.normal)
+plotshape(sell_sig and not sell_sig[1], "売りシグナル", shape.triangledown, location.abovebar, color.new(color.red,  0), size=size.normal)
 
 // ============================================================
 // ── 背景色（第2ステージ識別）──
@@ -199,45 +184,34 @@ bgcolor(stage2_bg ? color.new(color.green, 95) : na, title="第2ステージ背�
 // ============================================================
 
 // RSR ライン
-rsr_plot = plot(rsr, "RSR", color=color.new(color.blue, 0),
-                linewidth=2, display=display.pane)
+rsr_plot = plot(rsr, "RSR", color=color.new(color.blue, 0), linewidth=2, display=display.pane)
 
 // RSR基準線
 hline(rsr_thr, "RSR閾値",  color=color.new(color.red,  30), linestyle=hline.style_dashed)
 hline(50,      "RSR=50",   color=color.new(color.gray, 50), linestyle=hline.style_dotted)
 
 // RSRモメンタム ヒストグラム
-mom_col = rsr_mom >= 0
-    ? (rsr_rising ? color.new(#FF1493, 0) : color.new(#FF69B4, 40))  // 正: 濃いピンク/淡いピンク
-    : (not rsr_rising ? color.new(#4169E1, 0) : color.new(#87CEEB, 40)) // 負: 濃い青/淡い青
-plot(rsr_mom, "RSRモメンタム", color=mom_col,
-     style=plot.style_histogram, linewidth=2, display=display.pane)
+mom_col = rsr_mom >= 0 ? (rsr_rising ? color.new(#FF1493, 0) : color.new(#FF69B4, 40)) : (not rsr_rising ? color.new(#4169E1, 0) : color.new(#87CEEB, 40))
+plot(rsr_mom, "RSRモメンタム", color=mom_col, style=plot.style_histogram, linewidth=2, display=display.pane)
 
 hline(0, "モメンタム=0", color=color.new(color.black, 40), linestyle=hline.style_solid)
 
 // SEPAスコアバー（0〜8）
 sepa_col = is_king ? color.gold : is_ace ? color.orange : color.new(color.gray, 50)
-plot(show_sepa ? sepa_n : na, "SEPAスコア",
-     color=sepa_col, style=plot.style_columns,
-     linewidth=1, display=display.pane)
+plot(show_sepa ? sepa_n : na, "SEPAスコア", color=sepa_col, style=plot.style_columns, linewidth=1, display=display.pane)
 
 // ============================================================
 // ── テーブル（現在のSEPA条件達成状況）──
 // ============================================================
-var tbl = table.new(position.top_right, 2, 10,
-                    bgcolor=color.new(color.black, 70),
-                    border_width=1)
+var tbl = table.new(position.top_right, 2, 10, bgcolor=color.new(color.black, 70), border_width=1)
 
 if barstate.islast
     table.cell(tbl, 0, 0, "SEPA条件",  text_color=color.white, text_size=size.small)
-    table.cell(tbl, 1, 0, str.tostring(sepa_n) + " / 8",
-               text_color=is_king ? color.gold : is_ace ? color.orange : color.gray,
-               text_size=size.small)
+    table.cell(tbl, 1, 0, str.tostring(sepa_n) + " / 8", text_color=is_king ? color.gold : is_ace ? color.orange : color.gray, text_size=size.small)
 
     _row(row, label, cond) =>
         table.cell(tbl, 0, row, label, text_color=color.white, text_size=size.tiny)
-        table.cell(tbl, 1, row, cond ? "✓" : "✗",
-                   text_color=cond ? color.lime : color.red, text_size=size.tiny)
+        table.cell(tbl, 1, row, cond ? "✓" : "✗", text_color=cond ? color.lime : color.red, text_size=size.tiny)
 
     _row(1, "①株価>MA150&200", c1)
     _row(2, "②MA150>MA200",    c2)
