@@ -205,13 +205,14 @@ plot(show_sepa ? sepa_n : na, "SEPAスコア", color=sepa_col, style=plot.style_
 // ============================================================
 var tbl = table.new(position.top_right, 2, 10, bgcolor=color.new(color.black, 70), border_width=1)
 
+// 関数定義はトップレベルに置く（ifブロック内では定義不可）
+_row(row, lbl, cond) =>
+    table.cell(tbl, 0, row, lbl, text_color=color.white, text_size=size.tiny)
+    table.cell(tbl, 1, row, cond ? "✓" : "✗", text_color=cond ? color.lime : color.red, text_size=size.tiny)
+
 if barstate.islast
     table.cell(tbl, 0, 0, "SEPA条件",  text_color=color.white, text_size=size.small)
     table.cell(tbl, 1, 0, str.tostring(sepa_n) + " / 8", text_color=is_king ? color.gold : is_ace ? color.orange : color.gray, text_size=size.small)
-
-    _row(row, label, cond) =>
-        table.cell(tbl, 0, row, label, text_color=color.white, text_size=size.tiny)
-        table.cell(tbl, 1, row, cond ? "✓" : "✗", text_color=cond ? color.lime : color.red, text_size=size.tiny)
 
     _row(1, "①株価>MA150&200", c1)
     _row(2, "②MA150>MA200",    c2)
