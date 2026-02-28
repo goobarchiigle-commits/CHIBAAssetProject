@@ -1,0 +1,21 @@
+# --- kabuステーション API ---
+requests>=2.31.0
+websocket-client>=1.7.0
+
+# --- 株価データ取得 ---
+jquants-api-client>=1.5.0
+yfinance>=0.2.40
+
+# --- データ処理・分析 ---
+pandas>=2.2.0
+numpy>=1.26.0
+
+# --- 可視化 ---
+matplotlib>=3.8.0
+mplfinance>=0.12.10b0
+
+# --- 機械学習 ---
+scikit-learn>=1.4.0
+
+# --- 環境変数管理（CLAUDE.md ルール3準拠） ---
+python-dotenv>=1.0.0

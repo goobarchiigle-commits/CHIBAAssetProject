@@ -1,0 +1,40 @@
+# === 機密情報（CLAUDE.md ルール3：絶対にコミット禁止）===
+.env
+*.env
+.env.local
+.env.*.local
+# テンプレートは共有可（.env.example は除外しない）
+
+# === Python ===
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# === 仮想環境 ===
+venv/
+.venv/
+env/
+ENV/
+
+# === データファイル（大容量・機密の可能性）===
+data/*.csv
+data/*.parquet
+data/*.feather
+data/*.pkl
+data/*.h5
+
+# === Jupyter ===
+.ipynb_checkpoints/
+*.ipynb
+
+# === IDE / OS ===
+.vscode/
+.idea/
+*.DS_Store
+Thumbs.db
