@@ -1,5 +1,5 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-03-16
+# Single Source of Truth / 最終更新: 2026-03-18
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
 
 ---
@@ -106,14 +106,45 @@
 
 ---
 
+## 完了した研究（2026-03-17〜18）
+
+### ✅ 朝のルーティン自動化（2026-03-17）
+- `morning_dryrun.bat`（8:30）/ `morning_live.bat`（9:00）作成
+- Windowsタスクスケジューラ登録（平日自動実行・StartWhenAvailable=True）
+- `signal_bridge.py` バグ修正: `dropna(how="all")` → `dropna(subset=["Close"])`
+  - 原因: yfinanceが直近営業日のCloseをNaNで返しRSR全体がnanになる問題
+
+### ✅ 段階型DDリスク制御バックテスト（2026-03-17）
+**スクリプト**: `backtest/portfolio_dd_control.py`（新規）
+**結果**: `results/dd_control_2026-03-17.json`
+
+G27+V2のMaxDD=-7.53%は全スキーム閾値未満 → 758日ロック問題はV2移行で実質解消済み
+
+**ストレステスト**: `backtest/portfolio_stress_test.py`（新規）
+**結果**: `results/stress_test_2026-03-17.json`
+- 2.0x時: 案AC(-12%entry_stop/-6%DD-only解除)が1508日ロック
+- **重要**: entry_stop解除にDD条件のみは禁止。必ず「30〜60営業日 OR TOPIX>MA200」を追加すること
+
+### ✅ 資本効率最大化バックテスト（2026-03-17）
+**スクリプト**: `backtest/portfolio_capital_efficiency.py`（新規）
+**結果**: `results/capital_efficiency_2026-03-17.json`
+
+| 機能 | CAGR変化 | 評価 |
+|---|---|---|
+| ① ランキング加重（RSR順位加重, max_pos_weight=0.40） | +16.66%→+18.92%（+2.26pp） | ✅ 採用推奨 |
+| ② MIN_POSITIONS=3（補完エントリー） | -6.85pp（稼働率も低下） | ❌ 廃止 |
+| ③ 強制ローテーション（diff=5） | ±0（0回/年） | △ Phase 3以降で再評価 |
+
+---
+
 ## 次の研究タスク（優先順）
 
 | 優先度 | タスク | 根拠 |
 |---|---|---|
-| **1** | Top2/セクター + entry_stop_only + G27比較バックテスト（全期間） | CB改善×再現性ユニバースの組み合わせ効果未測定 |
-| **2** | 3382.T（小売）除外効果バックテスト | 勝率18%・Sharpe-1.24は明確な損失源 |
-| **3** | 2025年実運用OOS検証 | バイアス排除の唯一の方法 |
-| **4** | 1.5xレバレッジ実務検討 | MaxDD-10%なら-15%以内、CAGR+24.7% |
+| **1** | ①ランキング加重を`run_live_signal.py`に統合 | CAGR+2.26ppの改善をPhase 2実運用に反映 |
+| **2** | 案AC修正版（entry_stop解除に時間条件追加）再検証 | DD-only解除の自己ロック問題を修正 |
+| **3** | Top2/セクター + entry_stop_only + G27比較バックテスト | CB改善×再現性ユニバースの組み合わせ効果未測定 |
+| **4** | 2025年実運用OOS検証 | バイアス排除の唯一の方法 |
 
 ---
 
