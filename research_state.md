@@ -1,5 +1,5 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-03-18
+# Single Source of Truth / 最終更新: 2026-03-18（entry_stop v5 / ファイル整理）
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
 
 ---
@@ -108,6 +108,41 @@
 
 ## 完了した研究（2026-03-17〜18）
 
+### ✅ entry_stop v5 実装・バックテスト（2026-03-18）
+**スクリプト**: `backtest/portfolio_entry_stop_v5.py`
+**結果**: `results/entry_stop_v5_2026-03-18.json`
+
+4段階ステートマシン（NORMAL/CAUTION/WARNING/ALERT）で段階的リスク制御を実装。
+ヒステリシス・段階的復帰・縮小継続・回復速度制御・2x専用パラメータの5点を統合。
+
+| シナリオ | CAGR | MaxDD | Calmar | avg_scale | NORMAL% |
+|---|---|---|---|---|---|
+| ベースライン | +13.65% | -5.67% | 2.408 | 1.000 | 100% |
+| v5 段階EXP+ヒステリシス（vel/z無） | +13.09% | -5.67% | **2.309** | **0.968** | **93.6%** |
+| v5 フル 1x | +12.20% | -5.93% | 2.057 | 0.830 | 76.1% |
+| v5 フル 2x | +13.00% | -5.32% | **2.444** | 0.823 | 76.3% |
+
+**採用判定**:
+- `v5 段階EXP+ヒステリシス`（vel/z無）: avg_scale=0.968・NORMAL=93.6% → **稼働率毀損ほぼなし・保守採用候補**
+- `v5 フル 2x`: Calmar=2.444（ベースライン超え）→ レバレッジ運用時に有効
+- `v5 フル 1x`: Z-score初期誤発火（DD=-0.45%でWARNING）→ v6で `dd_abs>1%` 下限フィルター追加が必要
+
+**v2〜v4の教訓**（archive済み）:
+- v2: 永久ロックアウト問題（局所回復率に未対応）
+- v3: -6%閾値で1xは未発動（V2のMaxDD=-5.67%が閾値未満）
+- v4: velocity=2%で過敏発火 → avg_exp=0.555まで低下（採用不可）
+
+### ✅ ファイル整理（2026-03-18）
+- `backtest/archive/` に旧版・実験済み30ファイルを移動（削除せず保管）
+- `results/archive/` に entry_stop v2〜v4結果を移動
+- `archive/` にルートの不要スクリプト6ファイルを移動
+- `backtest/` 現役ファイルを11本に整理
+
+### ✅ kabuステーション API認証修正（2026-03-18）
+- Web側でAPIパスワード変更後はkabuステーションの再起動が必要（仕様確認）
+- `.env` の `KABU_API_PASSWORD` を新パスワードに更新済み
+- 本日の売買: 保有2銘柄（5401.T 100株 / 5411.T 200株）を正しく認識、発注なし（全HOLD）
+
 ### ✅ 朝のルーティン自動化（2026-03-17）
 - `morning_dryrun.bat`（8:30）/ `morning_live.bat`（9:00）作成
 - Windowsタスクスケジューラ登録（平日自動実行・StartWhenAvailable=True）
@@ -141,43 +176,54 @@ G27+V2のMaxDD=-7.53%は全スキーム閾値未満 → 758日ロック問題は
 
 | 優先度 | タスク | 根拠 |
 |---|---|---|
-| **1** | ①ランキング加重を`run_live_signal.py`に統合 | CAGR+2.26ppの改善をPhase 2実運用に反映 |
-| **2** | 案AC修正版（entry_stop解除に時間条件追加）再検証 | DD-only解除の自己ロック問題を修正 |
+| **1** | entry_stop v6: Z-scoreに `dd_abs>1%` 下限フィルター追加 | v5 フル 1xの誤発火修正 → Calmar改善期待 |
+| **2** | ①ランキング加重を`run_live_signal.py`に統合 | CAGR+2.26ppの改善をPhase 2実運用に反映 |
 | **3** | Top2/セクター + entry_stop_only + G27比較バックテスト | CB改善×再現性ユニバースの組み合わせ効果未測定 |
 | **4** | 2025年実運用OOS検証 | バイアス排除の唯一の方法 |
 
 ---
 
-## ファイル構成
+## ファイル構成（2026-03-18 整理済み）
 
 ```
 asset_simulation/
-├── research_state.md          ← このファイル（Single Source of Truth）
+├── research_state.md              ← このファイル（Single Source of Truth）
+├── run_live_signal.py             ← ★実運用エントリーポイント（V2設定）
+├── run_morning_signal.py          ← 朝のシグナル生成
+├── morning_dryrun.bat / morning_live.bat  ← タスクスケジューラ用
 ├── configs/
-│   ├── strategy.yaml          ← 戦略・ポートフォリオパラメータ
-│   └── universe.yaml          ← 銘柄ユニバース設定
+│   ├── strategy.yaml              ← 戦略・ポートフォリオパラメータ
+│   └── universe.yaml              ← 銘柄ユニバース設定
+├── backtest/                      ← 現役スクリプト（11本）
+│   ├── engine.py                  ← コアバックテストエンジン
+│   ├── portfolio_engine.py        ← ポートフォリオエンジン
+│   ├── portfolio_v2.py            ← ★最良バックテスト（Calmar=2.656）
+│   ├── portfolio_entry_stop_v5.py ← ★最新entry_stop（4段階ステートマシン）
+│   ├── portfolio_cross_validate.py← 3重クロス検証
+│   ├── fujiko_strategy.py         ← フジコ法（単一銘柄）
+│   ├── mean_reversion_strategy.py ← 平均回帰戦略
+│   ├── rsr.py                     ← RSR計算
+│   ├── strategy.py                ← 基底戦略クラス
+│   ├── universe_builder.py        ← ユニバース構築
+│   └── archive/                   ← 旧版・実験済み（30本・削除せず保管）
 ├── results/
-│   ├── backtest_summary.json  ← 全バックテスト結果サマリー
-│   └── universe_expansion.json ← ⏳ 作成待ち
+│   ├── backtest_summary.json      ← 全バックテスト結果サマリー
+│   ├── entry_stop_v5_2026-03-18.json ← entry_stop v5結果
+│   ├── capital_efficiency_2026-03-17.json
+│   ├── dd_control_2026-03-17.json
+│   ├── stress_test_2026-03-17.json
+│   └── archive/                   ← 旧版結果（v2〜v4）
 ├── research_log/
-│   ├── 2026-03-15.md          ← 頑健性検証ログ
-│   └── 2026-03-16.md          ← CB問題・セクター分析ログ
-├── backtest/
-│   ├── portfolio_v2.py        ← 最良バックテスト（Calmar=2.656）
-│   ├── portfolio_cross_validate.py ← 3重クロス検証
-│   ├── robustness_analysis.py ← 頑健性総合検証（2026-03-15新規）
-│   ├── universe_expansion.py  ← ユニバース拡張検証（2026-03-15新規）
-│   ├── advanced_analysis.py   ← Ex-ante Universe検証（2026-03-16新規）
-│   ├── walk_forward_universe.py ← ウォークフォワード過学習検証（2026-03-16新規）
-│   ├── sector_filter_universe.py ← セクターフィルターユニバース（2026-03-16新規）
-│   ├── cb_sector_analysis.py  ← CB改善・Top-N仮説（2026-03-16新規）
-│   └── ...
+│   ├── 2026-03-15.md              ← 頑健性検証ログ
+│   ├── 2026-03-16.md              ← CB問題・セクター分析ログ
+│   └── 2026-03-17.md              ← 自動化・DDリスク制御ログ
 ├── kabusapi/
-│   ├── client.py              ← kabuステーション APIクライアント
-│   └── signal_bridge.py       ← シグナル→発注ブリッジ
-├── run_live_signal.py         ← ★実運用エントリーポイント（V2設定）
-└── data/
-    └── signals/               ← 発注シグナルJSON（.gitignore対象）
+│   ├── client.py                  ← kabuステーション APIクライアント
+│   └── signal_bridge.py           ← シグナル→発注ブリッジ
+├── archive/                       ← ルートの不要スクリプト（6本）
+└── data/                          ← .gitignore対象
+    ├── signals/                   ← 発注シグナルJSON
+    └── logs/                      ← 実行ログ
 ```
 
 ---

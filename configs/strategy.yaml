@@ -1,0 +1,53 @@
+# strategy.yaml — 戦略パラメータ設定（Single Source of Truth）
+# 最終更新: 2026-03-15
+# ベースライン: V2設定 (Calmar=2.656)
+
+fujiko:
+  min_sepa: 6           # SEPA条件の最低達成数（8条件中）
+  min_rsr: 70.0         # RSR最低閾値（感度分析で70がベスト）
+  mom_period: 21        # RSRモメンタム計算期間（感度分析で21がベスト）
+  turtle_entry: 20      # タートル・エントリー（20日高値ブレイク）
+  turtle_exit: 10       # タートル・エグジット（10日安値割れ）
+  use_turtle_entry: true
+
+mean_reversion:
+  rsi_period: 5
+  rsi_entry: 25.0       # RSI<25でエントリー
+  rsi_exit: 65.0        # RSI>65でエグジット
+  ma_long: 200          # 200日MA（トレンドフィルター）
+  stop_loss_pct: 0.07   # 7%ストップロス
+  max_hold_days: 10     # 最大保有日数
+
+# セクター別戦略割り当て
+sector_strategy:
+  フジコ法: [海運, 機械, 電機精密, 商社, 電機, 食品, 情報通信, 小売, 医薬品, 不動産]
+  平均回帰: [ガス, 鉄鋼, 銀行, 保険, 輸送機器, 化学, 陸運, 石油]
+
+portfolio:
+  capital: 2_000_000          # 初期資本（円）
+  max_positions: 3            # 最大同時保有銘柄数 ← 拡張検証中
+  min_sectors: 1              # 最低セクター数（制約なし）
+  max_single_weight: 0.25     # 1銘柄最大ウェイト（25%）
+  max_dd_limit: 0.15          # サーキットブレーカー（-15%）
+  vol_target: 0.0             # 0=均等ウェイト（ボラ調整なし）
+  use_idm: false              # IDM（Carver分散乗数）不使用
+
+costs:
+  slippage_rate: 0.001        # スリッページ 0.1%
+  commission_rate: 0.00055    # 手数料 0.055%（auカブコム ワンクリック株）
+  min_commission: 99          # 最低手数料 99円
+
+# entry_stop 改修版パラメータ（portfolio_entry_stop_v2.py 用）
+# 注: V2設定（27銘柄 2018-2024）ではMaxDD=-5.67% のため -10%閾値は発動しない
+#     実運用で -10% DDに達した際に以下の制御が働く
+entry_stop:
+  entry_stop_dd: 0.10          # -10%でentry_stop発動（新規エントリー禁止）
+  additional_dd_limit: 0.05    # entry_stop中さらに-5%DDで部分クローズ起動
+  partial_close_ratio: 0.30    # 部分クローズ比率（各ポジションの30%を決済）
+  entry_stop_release_ratio: 0.70  # DD が entry_stop_dd × 0.7 まで回復で dd_recovered=True
+  entry_stop_max_days: 20      # 最大在停日数（AND条件の日数側）
+  trend_ma_short: 10           # トレンド判定: equity 短期MA
+  trend_ma_long: 30            # トレンド判定: equity 長期MA
+  cooldown_days: 3             # 解除後N日間は再発動しない
+  just_released_days: 5        # 解除後N日間はポジションサイズを縮小
+  just_released_scale: 0.50    # 縮小比率（50%）

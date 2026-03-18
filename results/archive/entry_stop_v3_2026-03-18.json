@@ -1,0 +1,421 @@
+{
+  "run_date": "2026-03-18",
+  "period": "2018-01-01~2024-12-31",
+  "capital": 2000000,
+  "scenarios": [
+    {
+      "label": "v2旧方式（peak-based / no-timeout）",
+      "eff_dd_pct": 6.0,
+      "cagr_pct": 13.65,
+      "max_dd_pct": -5.67,
+      "calmar": 2.408,
+      "sharpe": 1.853,
+      "win_rate_pct": 67.5,
+      "es_count": 0,
+      "partial_count": 0,
+      "avg_lock_days": 0.0,
+      "max_lock_days": 0,
+      "bankrupt": false,
+      "es_events": []
+    },
+    {
+      "label": "v3改善（local-recovery / hard45d）1x",
+      "eff_dd_pct": 6.0,
+      "cagr_pct": 13.65,
+      "max_dd_pct": -5.67,
+      "calmar": 2.408,
+      "sharpe": 1.853,
+      "win_rate_pct": 67.5,
+      "es_count": 0,
+      "partial_count": 0,
+      "avg_lock_days": 0.0,
+      "max_lock_days": 0,
+      "bankrupt": false,
+      "es_events": []
+    },
+    {
+      "label": "v3改善（local-recovery / hard45d）2x ←実効-4.2%",
+      "eff_dd_pct": 4.2,
+      "cagr_pct": 7.97,
+      "max_dd_pct": -7.66,
+      "calmar": 1.039,
+      "sharpe": 1.11,
+      "win_rate_pct": 61.7,
+      "es_count": 24,
+      "partial_count": 0,
+      "avg_lock_days": 34.0,
+      "max_lock_days": 45,
+      "bankrupt": false,
+      "es_events": [
+        {
+          "activate_date": "2018-10-25",
+          "activate_dd": -4.64,
+          "release_date": "2018-12-26",
+          "release_dd": -4.74,
+          "days_in_stop": 45,
+          "release_reason": "hard_timeout"
+        },
+        {
+          "activate_date": "2018-12-31",
+          "activate_dd": -4.74,
+          "release_date": "2019-03-08",
+          "release_dd": -4.74,
+          "days_in_stop": 45,
+          "release_reason": "hard_timeout"
+        },
+        {
+          "activate_date": "2019-03-13",
+          "activate_dd": -4.94,
+          "release_date": "2019-04-17",
+          "release_dd": -3.73,
+          "days_in_stop": 25,
+          "release_reason": "rec+days"
+        },
+        {
+          "activate_date": "2019-05-07",
+          "activate_dd": -4.91,
+          "release_date": "2019-07-08",
+          "release_dd": -4.24,
+          "days_in_stop": 45,
+          "release_reason": "hard_timeout"
+        },
+        {
+          "activate_date": "2019-07-12",
+          "activate_dd": -4.28,
+          "release_date": "2019-09-17",
+          "release_dd": -3.6,
+          "days_in_stop": 45,
+          "release_reason": "hard_timeout"
+        },
+        {
+          "activate_date": "2020-03-03",
+          "activate_dd": -4.36,
+          "release_date": "2020-05-11",
+          "release_dd": -5.49,
+          "days_in_stop": 45,
+          "release_reason": "hard_timeout"
+        },
+        {
+          "activate_date": "2020-05-14",
+          "activate_dd": -5.49,
+          "release_date": "2020-07-15",
+          "release_dd": -5.49,
+          "days_in_stop": 45,
+          "release_reason": "hard_timeout"
+        },
+        {
+          "activate_date": "2020-07-20",
+          "activate_dd": -5.16,
+          "release_date": "2020-09-25",
+          "release_dd": -6.01,
+          "days_in_stop": 45,
+          "release_reason": "hard_timeout"
+        },
+        {
+          "activate_date": "2020-09-30",
+          "activate_dd": -6.38,
+          "release_date": "2020-11-25",
+          "release_dd": -4.39,
+          "days_in_stop": 38,
+          "release_reason": "rec+days"
+        },
+        {
+          "activate_date": "2020-11-30",
+          "activate_dd": -4.5,
+          "release_date": "2020-12-25",
+          "release_dd": -3.1,
+          "days_in_stop": 20,
+          "release_reason": "rec+days"
+        },
+        {
+          "activate_date": "2021-03-24",
+          "activate_dd": -5.0,
+          "release_date": "2021-03-26",
+          "release_dd": -1.88,
+          "days_in_stop": 3,
+          "release_reason": "rec+trend"
+        },
+        {
+          "activate_date": "2021-08-20",
+          "activate_dd": -4.41,
+          "release_date": "2021-09-03",
+          "release_dd": -0.62,
+          "days_in_stop": 11,
+          "release_reason": "rec+trend"
+        },
+        {
+          "activate_date": "2021-11-30",
+          "activate_dd": -4.64,
+          "release_date": "2021-12-23",
+          "release_dd": -2.45,
+          "days_in_stop": 18,
+          "release_reason": "rec+trend"
+        },
+        {
+          "activate_date": "2022-03-02",
+          "activate_dd": -4.98,
+          "release_date": "2022-05-10",
+          "release_dd": -5.81,
+          "days_in_stop": 45,
+          "release_reason": "hard_timeout"
+        },
+        {
+          "activate_date": "2022-05-13",
+          "activate_dd": -5.19,
+          "release_date": "2022-06-01",
+          "release_dd": -3.49,
+          "days_in_stop": 14,
+          "release_reason": "rec+trend"
+        },
+        {
+          "activate_date": "2022-06-15",
+          "activate_dd": -4.25,
+          "release_date": "2022-08-18",
+          "release_dd": -4.97,
+          "days_in_stop": 45,
+          "release_reason": "hard_timeout"
+        },
+        {
+          "activate_date": "2022-08-23",
+          "activate_dd": -5.1,
+          "release_date": "2022-10-27",
+          "release_dd": -5.26,
+          "days_in_stop": 45,
+          "release_reason": "hard_timeout"
+        },
+        {
+          "activate_date": "2022-11-01",
+          "activate_dd": -5.11,
+          "release_date": "2023-01-06",
+          "release_dd": -4.81,
+          "days_in_stop": 45,
+          "release_reason": "hard_timeout"
+        },
+        {
+          "activate_date": "2023-01-12",
+          "activate_dd": -4.43,
+          "release_date": "2023-02-24",
+          "release_dd": -2.76,
+          "days_in_stop": 31,
+          "release_reason": "rec+days"
+        },
+        {
+          "activate_date": "2023-03-15",
+          "activate_dd": -4.23,
+          "release_date": "2023-05-22",
+          "release_dd": -5.14,
+          "days_in_stop": 45,
+          "release_reason": "hard_timeout"
+        },
+        {
+          "activate_date": "2023-05-25",
+          "activate_dd": -5.35,
+          "release_date": "2023-06-16",
+          "release_dd": -3.72,
+          "days_in_stop": 17,
+          "release_reason": "rec+trend"
+        },
+        {
+          "activate_date": "2024-08-02",
+          "activate_dd": -4.91,
+          "release_date": "2024-10-08",
+          "release_dd": -7.26,
+          "days_in_stop": 45,
+          "release_reason": "hard_timeout"
+        },
+        {
+          "activate_date": "2024-10-11",
+          "activate_dd": -7.28,
+          "release_date": "2024-12-16",
+          "release_dd": -7.45,
+          "days_in_stop": 45,
+          "release_reason": "hard_timeout"
+        },
+        {
+          "activate_date": "2024-12-19",
+          "activate_dd": -7.42,
+          "release_date": "N/A(未解除)",
+          "release_dd": -7.43,
+          "days_in_stop": 8,
+          "release_reason": "未解除"
+        }
+      ]
+    },
+    {
+      "label": "ストレス（-4%閾値 / hard30d）1x",
+      "eff_dd_pct": 4.0,
+      "cagr_pct": 11.3,
+      "max_dd_pct": -5.88,
+      "calmar": 1.921,
+      "sharpe": 1.561,
+      "win_rate_pct": 65.7,
+      "es_count": 20,
+      "partial_count": 0,
+      "avg_lock_days": 20.9,
+      "max_lock_days": 30,
+      "bankrupt": false,
+      "es_events": [
+        {
+          "activate_date": "2018-10-25",
+          "activate_dd": -4.14,
+          "release_date": "2018-12-05",
+          "release_dd": -4.23,
+          "days_in_stop": 30,
+          "release_reason": "hard_timeout"
+        },
+        {
+          "activate_date": "2018-12-10",
+          "activate_dd": -4.23,
+          "release_date": "2019-01-24",
+          "release_dd": -4.23,
+          "days_in_stop": 30,
+          "release_reason": "hard_timeout"
+        },
+        {
+          "activate_date": "2019-01-29",
+          "activate_dd": -4.05,
+          "release_date": "2019-02-04",
+          "release_dd": -2.53,
+          "days_in_stop": 5,
+          "release_reason": "rec+trend"
+        },
+        {
+          "activate_date": "2020-03-04",
+          "activate_dd": -4.2,
+          "release_date": "2020-04-15",
+          "release_dd": -4.85,
+          "days_in_stop": 30,
+          "release_reason": "hard_timeout"
+        },
+        {
+          "activate_date": "2020-04-20",
+          "activate_dd": -4.85,
+          "release_date": "2020-06-04",
+          "release_dd": -4.85,
+          "days_in_stop": 30,
+          "release_reason": "hard_timeout"
+        },
+        {
+          "activate_date": "2020-06-09",
+          "activate_dd": -4.43,
+          "release_date": "2020-07-20",
+          "release_dd": -5.58,
+          "days_in_stop": 30,
+          "release_reason": "hard_timeout"
+        },
+        {
+          "activate_date": "2020-07-27",
+          "activate_dd": -5.61,
+          "release_date": "2020-09-07",
+          "release_dd": -5.74,
+          "days_in_stop": 30,
+          "release_reason": "hard_timeout"
+        },
+        {
+          "activate_date": "2020-09-10",
+          "activate_dd": -4.54,
+          "release_date": "2020-10-09",
+          "release_dd": -3.65,
+          "days_in_stop": 19,
+          "release_reason": "rec+days"
+        },
+        {
+          "activate_date": "2020-10-14",
+          "activate_dd": -4.04,
+          "release_date": "2020-10-21",
+          "release_dd": -2.66,
+          "days_in_stop": 6,
+          "release_reason": "rec+trend"
+        },
+        {
+          "activate_date": "2020-10-30",
+          "activate_dd": -4.06,
+          "release_date": "2020-11-04",
+          "release_dd": -2.84,
+          "days_in_stop": 3,
+          "release_reason": "rec+trend"
+        },
+        {
+          "activate_date": "2021-03-24",
+          "activate_dd": -4.38,
+          "release_date": "2021-03-25",
+          "release_dd": -3.12,
+          "days_in_stop": 2,
+          "release_reason": "rec+trend"
+        },
+        {
+          "activate_date": "2022-03-07",
+          "activate_dd": -4.59,
+          "release_date": "2022-03-18",
+          "release_dd": -4.02,
+          "days_in_stop": 10,
+          "release_reason": "rec+days"
+        },
+        {
+          "activate_date": "2022-04-06",
+          "activate_dd": -4.41,
+          "release_date": "2022-04-15",
+          "release_dd": -2.43,
+          "days_in_stop": 8,
+          "release_reason": "rec+trend"
+        },
+        {
+          "activate_date": "2022-06-20",
+          "activate_dd": -4.16,
+          "release_date": "2022-08-01",
+          "release_dd": -3.6,
+          "days_in_stop": 30,
+          "release_reason": "hard_timeout"
+        },
+        {
+          "activate_date": "2022-09-02",
+          "activate_dd": -4.14,
+          "release_date": "2022-10-18",
+          "release_dd": -4.14,
+          "days_in_stop": 30,
+          "release_reason": "hard_timeout"
+        },
+        {
+          "activate_date": "2022-10-21",
+          "activate_dd": -4.14,
+          "release_date": "2022-12-05",
+          "release_dd": -3.85,
+          "days_in_stop": 30,
+          "release_reason": "hard_timeout"
+        },
+        {
+          "activate_date": "2024-08-05",
+          "activate_dd": -5.65,
+          "release_date": "2024-09-17",
+          "release_dd": -5.69,
+          "days_in_stop": 30,
+          "release_reason": "hard_timeout"
+        },
+        {
+          "activate_date": "2024-09-20",
+          "activate_dd": -5.63,
+          "release_date": "2024-11-05",
+          "release_dd": -5.29,
+          "days_in_stop": 30,
+          "release_reason": "hard_timeout"
+        },
+        {
+          "activate_date": "2024-11-08",
+          "activate_dd": -5.29,
+          "release_date": "2024-12-19",
+          "release_dd": -5.29,
+          "days_in_stop": 30,
+          "release_reason": "hard_timeout"
+        },
+        {
+          "activate_date": "2024-12-24",
+          "activate_dd": -5.29,
+          "release_date": "N/A(未解除)",
+          "release_dd": -5.29,
+          "days_in_stop": 5,
+          "release_reason": "未解除"
+        }
+      ]
+    }
+  ]
+}
