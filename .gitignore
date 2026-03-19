@@ -22,12 +22,14 @@ venv/
 env/
 ENV/
 
-# === データファイル（大容量・機密の可能性）===
-data/*.csv
-data/*.parquet
-data/*.feather
-data/*.pkl
-data/*.h5
+# === データファイル（CLAUDE.md: data/ 以下はすべてコミット禁止）===
+data/
+
+# === 実運用ランタイム（order_lock.json など。再起動後に再生成）===
+runtime/
+
+# === ライブ運用ログ（ローカルのみ保管）===
+logs/
 
 # === Jupyter ===
 .ipynb_checkpoints/

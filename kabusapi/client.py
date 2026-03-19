@@ -34,11 +34,11 @@ BASE_URL = f"http://localhost:{_PORT}/kabusapi"
 
 # 取引所コード
 class Exchange:
-    TSE   = 1   # 東証
+    TSE   = 1   # 東証（板情報取得用）
     NSE   = 3   # 名証
     FSE   = 5   # 福証
     SSE   = 6   # 札証
-    SOR   = 9   # SOR（最良執行）
+    SOR   = 9   # SOR（最良執行）← sendorder には必ずこれを使う
 
 # 売買区分
 class Side:
@@ -83,15 +83,18 @@ class Board:
 
     @classmethod
     def from_response(cls, data: dict) -> "Board":
+        def _f(key: str, default: float = 0.0) -> float:
+            v = data.get(key)
+            return float(v) if v is not None else default
         return cls(
             symbol        = data.get("Symbol", ""),
             symbol_name   = data.get("SymbolName", ""),
             exchange      = data.get("Exchange", 0),
-            current_price = data.get("CurrentPrice", 0.0),
-            bid_price     = data.get("BidPrice", 0.0),
-            ask_price     = data.get("AskPrice", 0.0),
-            trading_volume= data.get("TradingVolume", 0.0),
-            trading_value = data.get("TradingValue", 0.0),
+            current_price = _f("CurrentPrice"),
+            bid_price     = _f("BidPrice"),
+            ask_price     = _f("AskPrice"),
+            trading_volume= _f("TradingVolume"),
+            trading_value = _f("TradingValue"),
             raw           = data,
         )
 
@@ -109,9 +112,11 @@ class OrderResult:
 
     @classmethod
     def from_response(cls, data: dict) -> "OrderResult":
+        # kabuステーションAPIは "Result" キーで返す（"ResultCode" は旧仕様）
+        result_code = data.get("Result", data.get("ResultCode", -1))
         return cls(
             order_id    = data.get("OrderId", ""),
-            result_code = data.get("ResultCode", -1),
+            result_code = result_code,
             raw         = data,
         )
 
@@ -194,9 +199,9 @@ class KabuClient:
     def send_order(
         self,
         symbol:      str,
-        exchange:    int,
-        side:        str,
-        qty:         int,
+        exchange:    int  = 9,  # SOR（最良執行）: TSE=1はsendorderで拒否される
+        side:        str  = Side.BUY,
+        qty:         int  = 100,
         order_type:  int  = OrderType.MARKET,
         price:       float = 0.0,
         cash_margin: int  = CashMargin.CASH,
@@ -233,8 +238,8 @@ class KabuClient:
             "Side":            side,
             "CashMargin":      cash_margin,
             "DelivType":       2,            # 2=お預り金
-            "FundType":        "  ",
-            "AccountType":     self._account_type,
+            "FundType":        "AA",         # AA=特定預り（特定口座）
+            "AccountType":     self._account_type,  # 4=特定口座
             "Qty":             qty,
             "FrontOrderType":  order_type,
             "Price":           price,
@@ -278,6 +283,25 @@ class KabuClient:
         if only_open:
             params["product"] = "0"
         resp = self._session.get(f"{BASE_URL}/orders", params=params)
+        resp.raise_for_status()
+        return resp.json() or []
+
+    def get_filled_orders(self) -> list[dict]:
+        """
+        約定済み注文一覧を取得する（state=5: 完了）。
+
+        kabuステーション API パラメータ:
+          product: 1=株式
+          state:   5=完了（全部約定 / 訂正取消後約定）
+          details: true=約定明細を含む
+
+        Returns:
+            約定済み注文リスト（各要素に Details: [{Price, Qty, ...}] が含まれる）
+        """
+        resp = self._session.get(
+            f"{BASE_URL}/orders",
+            params={"product": "1", "state": "5", "details": "true"},
+        )
         resp.raise_for_status()
         return resp.json() or []
 

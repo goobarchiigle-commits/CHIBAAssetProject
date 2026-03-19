@@ -6,11 +6,11 @@ run_live_signal.py
   - バックテスト: 2018-2024、初期資本200万円
   - V2シナリオ（RSR>70 + 均等ウェイト + 29銘柄）:
       CAGR=+16.26% / MaxDD=-6.12% / Calmar=2.656 / Sharpe=1.693
-  - 旧設定 D_IDM_sec1: CAGR=+13.19% / MaxDD=-5.90% / Calmar=2.235
-  - スクリプト: backtest/portfolio_v2.py
+  - 2026-03-19 TEMPORAL選定に更新（銘柄選択バイアス除去）:
+      Sharpe=1.070 / CAGR=+9.98% / MaxDD=-10.62%（真の性能推定値）
 
 【パラメータ（V2）】
-  - 宇宙   : G宇宙29銘柄（27銘柄 + 6857.T アドバンテスト + 6594.T ニデック）
+  - 宇宙   : LIVE_UNIVERSE_FILE で指定（configs/universe/2026Q1_temporal24.json）
   - min_rsr : 70（旧75から緩和）
   - max_pos : 3
   - min_sec : 1（セクター制約なし）
@@ -28,7 +28,7 @@ run_live_signal.py
   python run_live_signal.py --live --yes
 
 【CLAUDE.md ルール3 確認】
-  .env に KABU_API_PASSWORD / KABU_TRADE_PASSWORD が設定されていること。
+  .env に KABU_API_PASSWORD / KABU_TRADE_PASSWORD / LIVE_UNIVERSE_FILE が設定されていること。
 """
 
 import sys
@@ -52,41 +52,281 @@ logging.basicConfig(
 logger = logging.getLogger("live_signal")
 
 # ------------------------------------------------------------------ #
-# V2推奨設定 Calmar 2.656 達成パラメータ（29銘柄 / RSR>70 / 均等ウェイト）
+# .env 読み込み（python-dotenv があれば使用、なければ手動パース）
 # ------------------------------------------------------------------ #
-G29_UNIVERSE: dict[str, str] = {
-    # --- 既存27銘柄（Sharpe>0.30 / MaxDD<30% スクリーニング済み）---
-    "8035.T": "電機精密",   # 東京エレクトロン
-    "6645.T": "電機精密",   # オムロン
-    "6702.T": "電機",       # 富士通
-    "6501.T": "電機",       # 日立製作所
-    "6762.T": "電機精密",   # TDK
-    "6920.T": "電機精密",   # レーザーテック
-    "7203.T": "輸送機器",   # トヨタ自動車
-    "7201.T": "輸送機器",   # 日産自動車
-    "9432.T": "情報通信",   # NTT
-    "8306.T": "銀行",       # 三菱UFJ
-    "8411.T": "銀行",       # みずほFG
-    "8309.T": "銀行",       # 三井住友トラスト
-    "7182.T": "銀行",       # ゆうちょ銀行
-    "8725.T": "保険",       # MS&AD
-    "8058.T": "商社",       # 三菱商事
-    "8053.T": "商社",       # 住友商事
-    "8002.T": "商社",       # 丸紅
-    "8001.T": "商社",       # 伊藤忠商事
-    "4021.T": "化学",       # 日産化学
-    "2914.T": "食品",       # JT
-    "7011.T": "機械",       # 三菱重工業
-    "3382.T": "小売",       # セブン&アイ
-    "5401.T": "鉄鋼",       # 日本製鉄
-    "5411.T": "鉄鋼",       # JFEスチール
-    "9531.T": "ガス",       # 東京ガス
-    "9101.T": "海運",       # 日本郵船
-    "9104.T": "海運",       # 商船三井
-    # --- V2追加2銘柄（Calmar +31%改善の主因）---
-    "6857.T": "電機精密",   # アドバンテスト（半導体テスト装置）Sharpe=0.468
-    "6594.T": "電機精密",   # ニデック（精密モーター）Sharpe=0.639, MaxDD=-6.5%
-}
+def _load_dotenv() -> None:
+    try:
+        from dotenv import load_dotenv
+        load_dotenv()
+    except ImportError:
+        env_path = Path(__file__).parent / ".env"
+        if env_path.exists():
+            for line in env_path.read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if line and not line.startswith("#") and "=" in line:
+                    k, _, v = line.partition("=")
+                    os.environ.setdefault(k.strip(), v.strip())
+
+_load_dotenv()
+
+# ------------------------------------------------------------------ #
+# 安全設計定数（取引所の過剰発注監視対策）
+# ------------------------------------------------------------------ #
+MAX_DAILY_ORDERS   = 20   # 1日の発注上限（BUY + SELL 合計）
+MAX_SYMBOL_ORDERS  = 2    # 1銘柄あたりの1日の発注上限
+MAX_OPEN_POSITIONS = 10   # ポートフォリオ最大保有銘柄数（ハードキャップ）
+MIN_UNIVERSE_SIZE  = 10   # ユニバース最小銘柄数（これを下回ったら起動しない）
+
+# ------------------------------------------------------------------ #
+# ユニバースファイルのロード（LIVE_UNIVERSE_FILE 環境変数から）
+# ------------------------------------------------------------------ #
+def load_universe() -> tuple[dict[str, str], dict]:
+    """
+    環境変数 LIVE_UNIVERSE_FILE で指定された JSON ファイルからユニバースを読み込む。
+
+    Returns:
+        (tickers, meta): tickers = {symbol: sector}, meta = JSONのメタ情報
+
+    Raises:
+        RuntimeError: 環境変数未設定・ファイル不存在・銘柄数不足
+    """
+    universe_file = os.environ.get("LIVE_UNIVERSE_FILE")
+    if not universe_file:
+        raise RuntimeError(
+            "LIVE_UNIVERSE_FILE が設定されていません。\n"
+            ".env に LIVE_UNIVERSE_FILE=configs/universe/2026Q1_temporal24.json を追加してください。"
+        )
+
+    file_path = Path(universe_file)
+    if not file_path.exists():
+        raise RuntimeError(
+            f"ユニバースファイルが見つかりません: {file_path}\n"
+            "パスを確認してください。"
+        )
+
+    data = json.loads(file_path.read_text(encoding="utf-8"))
+
+    symbols: dict[str, str] = data.get("symbols", {})
+    if len(symbols) < MIN_UNIVERSE_SIZE:
+        raise RuntimeError(
+            f"ユニバース銘柄数 {len(symbols)} < 最小要件 {MIN_UNIVERSE_SIZE}。\n"
+            "ファイルが壊れている可能性があります。起動を中止します。"
+        )
+
+    meta = {k: v for k, v in data.items() if k != "symbols"}
+    return symbols, meta
+
+
+# ------------------------------------------------------------------ #
+# 株価上限フィルター（シグナル生成前に適用）
+# ------------------------------------------------------------------ #
+MAX_ALLOCATION = int(os.environ.get("MAX_POSITION_YEN", 500_000))
+LOT_SIZE       = 100   # 東証標準単元株数
+
+def filter_universe_by_price(
+    tickers:      dict[str, str],
+    max_alloc:    int,
+    held_symbols: set[str],
+) -> tuple[dict[str, str], list[tuple[str, float, float]]]:
+    """
+    現在株価に基づきBUY不可能な銘柄をユニバースから除外する。
+
+    Args:
+        tickers:      {symbol: sector} のユニバース辞書
+        max_alloc:    1銘柄への最大配分額（円）
+        held_symbols: 保有中銘柄のset — SELL シグナルが必要なため価格問わず残す
+
+    Returns:
+        (filtered, skipped):
+            filtered = {symbol: sector}（価格フィルター通過分）
+            skipped  = [(symbol, price, cost), ...]（除外分）
+
+    注意:
+        API 負荷を抑えるため period="3d" の軽量取得のみ行う。
+        価格取得失敗時は保守的に残す（シグナル生成側でスキップされる）。
+    """
+    import yfinance as yf
+    import warnings
+    warnings.filterwarnings("ignore")
+
+    syms = list(tickers.keys())
+    # 3日分だけ取得（終値だけ欲しい。600日取得は bridge 内で行う）
+    raw = yf.download(syms, period="3d", progress=False, group_by="ticker")
+
+    filtered: dict[str, str] = {}
+    skipped:  list[tuple[str, float, float]] = []
+
+    for sym, sector in tickers.items():
+        # 保有中は価格関係なく残す（SELL シグナルを殺さない）
+        if sym in held_symbols:
+            filtered[sym] = sector
+            continue
+
+        # 最新終値を取得
+        try:
+            if len(syms) == 1:
+                price = float(raw["Close"].dropna().iloc[-1])
+            else:
+                price = float(raw[sym]["Close"].dropna().iloc[-1])
+        except (KeyError, IndexError, TypeError, ValueError):
+            filtered[sym] = sector   # 取得失敗 → 保守的に残す
+            continue
+
+        cost = price * LOT_SIZE
+        if cost <= max_alloc:
+            filtered[sym] = sector
+        else:
+            skipped.append((sym, price, cost))
+
+    return filtered, skipped
+
+
+# ------------------------------------------------------------------ #
+# 1. 二重発注防止 — オーダーロックファイル
+# ------------------------------------------------------------------ #
+ORDER_LOCK_FILE = Path("runtime/order_lock.json")
+
+def _load_order_lock() -> dict:
+    if not ORDER_LOCK_FILE.exists():
+        return {}
+    try:
+        return json.loads(ORDER_LOCK_FILE.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+def _save_order_lock(data: dict) -> None:
+    ORDER_LOCK_FILE.parent.mkdir(parents=True, exist_ok=True)
+    ORDER_LOCK_FILE.write_text(
+        json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+
+def already_ordered_today(symbol: str) -> bool:
+    """当日すでに発注済みか確認する（BUY/SELL 問わず）。"""
+    today = datetime.now(JST).date().isoformat()
+    return _load_order_lock().get(today, {}).get(symbol, False)
+
+def mark_ordered(symbol: str, side: str) -> None:
+    """発注成功後にロックを書き込む。"""
+    today = datetime.now(JST).date().isoformat()
+    lock = _load_order_lock()
+    lock.setdefault(today, {})[symbol] = side   # "BUY" / "SELL" を記録
+    _save_order_lock(lock)
+
+
+# ------------------------------------------------------------------ #
+# 当日の発注件数カウント（MAX_DAILY_ORDERS / MAX_SYMBOL_ORDERS チェック用）
+# ------------------------------------------------------------------ #
+def _count_today_orders(signal_dir: str) -> tuple[int, dict[str, int]]:
+    """
+    data/signals/ 内の当日 executed ファイルを集計し
+    (total_orders, per_symbol_count) を返す。
+    """
+    today_str    = datetime.now(JST).strftime("%Y%m%d")
+    signal_path  = Path(signal_dir)
+    total        = 0
+    per_symbol: dict[str, int] = {}
+
+    if not signal_path.exists():
+        return 0, {}
+
+    for f in signal_path.glob(f"signal_{today_str}*_executed.json"):
+        try:
+            data = json.loads(f.read_text(encoding="utf-8"))
+            for o in data.get("orders", []):
+                sym = o.get("symbol", "")
+                total += 1
+                per_symbol[sym] = per_symbol.get(sym, 0) + 1
+        except Exception:
+            pass  # 壊れたファイルはスキップ
+
+    return total, per_symbol
+
+
+# ------------------------------------------------------------------ #
+# 2. API障害耐性 — リトライ付き発注
+# ------------------------------------------------------------------ #
+MAX_RETRY   = 3
+RETRY_SLEEP = 3   # 秒
+
+def _send_orders_with_retry(bridge, orders: list) -> list[dict]:
+    """
+    _send_orders() を最大 MAX_RETRY 回リトライする。
+    成功した発注のロックマークも書き込む。
+
+    Returns:
+        send_results: [{symbol, side, qty, order_id, success, ...}, ...]
+    """
+    import time
+    last_exc = None
+    for attempt in range(1, MAX_RETRY + 1):
+        try:
+            results = bridge._send_orders(orders)
+            # 成功した注文をロックファイルに記録
+            for r in results:
+                if r.get("success"):
+                    mark_ordered(r["symbol"], r["side"])
+            return results
+        except Exception as e:
+            last_exc = e
+            if attempt < MAX_RETRY:
+                logger.warning(
+                    "発注エラー（試行 %d/%d）: %s — %d秒後にリトライ",
+                    attempt, MAX_RETRY, e, RETRY_SLEEP,
+                )
+                time.sleep(RETRY_SLEEP)
+            else:
+                logger.error("発注失敗（%d回試行後）: %s", MAX_RETRY, e)
+    raise RuntimeError(f"発注 {MAX_RETRY}回失敗: {last_exc}") from last_exc
+
+
+# ------------------------------------------------------------------ #
+# 3. ライブ運用監視ログ
+# ------------------------------------------------------------------ #
+LIVE_LOG_DIR = Path("logs/live")
+
+def save_live_logs(run_id: str, result, send_results: list) -> None:
+    """
+    logs/live/YYYYMMDD_signals.json  — 全銘柄シグナル
+    logs/live/YYYYMMDD_orders.json   — 発注+約定結果
+
+    同日に複数回実行された場合はリスト末尾に追記（上書きしない）。
+    """
+    LIVE_LOG_DIR.mkdir(parents=True, exist_ok=True)
+
+    # --- signals ---
+    sig_path = LIVE_LOG_DIR / f"{run_id}_signals.json"
+    runs: list = []
+    if sig_path.exists():
+        try:
+            runs = json.loads(sig_path.read_text(encoding="utf-8"))
+        except Exception:
+            runs = []
+    runs.append({
+        "run_at":  datetime.now(JST).strftime("%Y-%m-%dT%H:%M:%S%z"),
+        "signals": result.signals,
+    })
+    sig_path.write_text(json.dumps(runs, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    # --- orders ---
+    ord_path = LIVE_LOG_DIR / f"{run_id}_orders.json"
+    runs_ord: list = []
+    if ord_path.exists():
+        try:
+            runs_ord = json.loads(ord_path.read_text(encoding="utf-8"))
+        except Exception:
+            runs_ord = []
+    runs_ord.append({
+        "run_at":       datetime.now(JST).strftime("%Y-%m-%dT%H:%M:%S%z"),
+        "orders":       result.orders,
+        "send_results": send_results,
+    })
+    ord_path.write_text(json.dumps(runs_ord, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    logger.info("ライブログ保存: %s / %s", sig_path, ord_path)
+
+# G29_UNIVERSE は廃止。load_universe() で configs/universe/*.json から読み込む。
+# 後方互換用として参照のみ残す（直接使用禁止）
+_LEGACY_G29_UNIVERSE_REMOVED = True
 
 FUJIKO_PARAMS = dict(
     min_sepa         = 6,
@@ -112,13 +352,17 @@ def parse_args() -> argparse.Namespace:
     return p.parse_args()
 
 
-def print_banner(live: bool) -> None:
-    mode = "🔴 LIVE（実発注）" if live else "🟡 DRY RUN（発注なし）"
+def print_banner(live: bool, universe: dict[str, str], universe_meta: dict) -> None:
+    mode    = "LIVE（実発注）" if live else "DRY RUN（発注なし）"
+    version = universe_meta.get("version", "unknown")
+    created = universe_meta.get("created_at", "?")
     print("=" * 64)
-    print("  フジコ法 V2推奨設定シグナル確認（Calmar=2.656設定）")
-    print(f"  実行日時 : {datetime.now(JST).strftime('%Y-%m-%d %H:%M:%S JST')}")
-    print(f"  モード   : {mode}")
-    print(f"  宇宙     : G宇宙 {len(G29_UNIVERSE)}銘柄 / max_pos={MAX_POS} / min_sectors={MIN_SECTORS} / min_rsr=70")
+    print("  フジコ法シグナル確認スクリプト")
+    print(f"  実行日時       : {datetime.now(JST).strftime('%Y-%m-%d %H:%M:%S JST')}")
+    print(f"  モード         : {mode}")
+    print(f"  ユニバース     : {len(universe)}銘柄 (v={version}, created={created})")
+    print(f"  ポートフォリオ : max_pos={MAX_POS} / min_sectors={MIN_SECTORS} / min_rsr=70")
+    print(f"  安全設計       : MAX_DAILY={MAX_DAILY_ORDERS} / MAX_PER_SYM={MAX_SYMBOL_ORDERS} / MAX_OPEN={MAX_OPEN_POSITIONS}")
     print("=" * 64)
 
 
@@ -203,18 +447,40 @@ def save_signal_json(result, output_dir: str) -> Path:
 
 def main() -> int:
     args = parse_args()
-    print_banner(args.live)
+
+    # ---- ユニバースロード（起動時チェック） ----
+    try:
+        LIVE_UNIVERSE, universe_meta = load_universe()
+    except RuntimeError as e:
+        print(f"[FATAL] ユニバースロードエラー:\n  {e}", file=sys.stderr)
+        return 1
+
+    print_banner(args.live, LIVE_UNIVERSE, universe_meta)
 
     import warnings
     warnings.filterwarnings("ignore")
 
+    # ---- 株価上限フィルター（シグナル生成前） ----
+    # 保有中銘柄は API 接続前のため空集合で保守的に処理する。
+    # 将来買った高額株が値上がりした場合への備えだが、
+    # 高額株はこのフィルターで BUY 除外されるため事実上発生しない。
+    logger.info("株価上限フィルター適用中（上限: ¥%s/単元）...", f"{MAX_ALLOCATION:,}")
+    LIVE_UNIVERSE, price_skipped = filter_universe_by_price(
+        LIVE_UNIVERSE, MAX_ALLOCATION, held_symbols=set()
+    )
+    if price_skipped:
+        print(f"\n[価格フィルター] {len(price_skipped)}銘柄を除外（¥{MAX_ALLOCATION:,}/単元超）:")
+        for sym, price, cost in price_skipped:
+            print(f"  ✗ {sym:<8} ¥{price:>8,.0f}/株  1単元=¥{cost:>9,.0f}  > 上限¥{MAX_ALLOCATION:,}")
+    logger.info("フィルター後ユニバース: %d銘柄", len(LIVE_UNIVERSE))
+
     from kabusapi.signal_bridge import SignalBridge
 
     bridge = SignalBridge(
-        universe_tickers = G29_UNIVERSE,
+        universe_tickers = LIVE_UNIVERSE,
         fujiko_params    = FUJIKO_PARAMS,
         capital          = CAPITAL,
-        max_positions    = MAX_POS,
+        max_positions    = min(MAX_POS, MAX_OPEN_POSITIONS),  # ハードキャップ適用
         max_dd_limit     = MAX_DD_LIMIT,
         min_sectors      = MIN_SECTORS,
         live             = args.live,
@@ -249,6 +515,49 @@ def main() -> int:
         print("\n発注なし。終了します。")
         return 0
 
+    run_id = datetime.now(JST).strftime("%Y%m%d")
+
+    # ----------------------------------------------------------------
+    # 発注前安全チェック（3層）
+    # 1. オーダーロック（銘柄単位の当日重複チェック）
+    # 2. MAX_SYMBOL_ORDERS / MAX_DAILY_ORDERS（数量上限）
+    # ----------------------------------------------------------------
+    today_total, today_per_sym = _count_today_orders(args.output_dir)
+    blocked = []
+    filtered_orders = []
+
+    for o in order_objects:
+        sym = o.symbol
+        # 層1: ロックファイルチェック（スクリプト再起動による二重発注を防ぐ）
+        if already_ordered_today(sym):
+            blocked.append(f"{sym}: 当日発注済み（ロックファイルで確認）")
+            continue
+        # 層2: 件数上限チェック
+        sym_count = today_per_sym.get(sym, 0)
+        if today_total + len(filtered_orders) >= MAX_DAILY_ORDERS:
+            blocked.append(f"{sym}: 本日の発注上限({MAX_DAILY_ORDERS}件)に到達")
+        elif sym_count >= MAX_SYMBOL_ORDERS:
+            blocked.append(
+                f"{sym}: 銘柄別上限({MAX_SYMBOL_ORDERS}件/日)に到達（本日既に{sym_count}件）"
+            )
+        else:
+            filtered_orders.append(o)
+
+    if blocked:
+        print("\n[安全設計] 以下の注文は除外されました:")
+        for msg in blocked:
+            print(f"  ⚠ {msg}")
+        if not filtered_orders:
+            print("発注可能な注文がありません。終了します。")
+            # シグナルログは発注なしでも保存
+            if not args.no_save:
+                save_live_logs(run_id, result, [])
+            return 0
+        order_objects = filtered_orders
+
+    if today_total > 0:
+        print(f"\n[安全設計] 本日の発注履歴: 合計{today_total}件 / 上限{MAX_DAILY_ORDERS}件")
+
     order_dicts = result.orders
     if not args.yes:
         confirmed = confirm_live_orders(order_dicts)
@@ -267,8 +576,18 @@ def main() -> int:
         print("  → 待機完了。発注を開始します。")
     # ──────────────────────────────────────────────────────────────────
 
-    print("\n発注中...")
-    send_results = bridge._send_orders(order_objects)
+    # ----------------------------------------------------------------
+    # 発注実行（リトライ付き）
+    # ----------------------------------------------------------------
+    print(f"\n発注中（最大{MAX_RETRY}回リトライ）...")
+    try:
+        send_results = _send_orders_with_retry(bridge, order_objects)
+    except RuntimeError as e:
+        logger.error("発注中断: %s", e)
+        print(f"\n[FATAL] 発注失敗: {e}")
+        if not args.no_save:
+            save_live_logs(run_id, result, [{"error": str(e)}])
+        return 1
 
     print("\n=== 発注結果 ===")
     for r in send_results:
@@ -276,14 +595,25 @@ def main() -> int:
         order_id = r.get("order_id", r.get("error", ""))
         print(f"  {r['side']} {r['symbol']} {r['qty']}株 → {status}  ({order_id})")
 
+    # ----------------------------------------------------------------
+    # ログ保存（data/signals/ + logs/live/）
+    # ----------------------------------------------------------------
     result_dict = json.loads(result.to_json())
     result_dict["send_results"] = send_results
     if not args.no_save:
-        saved_path = Path(args.output_dir) / f"signal_{datetime.now(JST).strftime('%Y%m%d_%H%M%S')}_executed.json"
+        # 既存: data/signals/*_executed.json（audit trail）
+        saved_path = (
+            Path(args.output_dir)
+            / f"signal_{datetime.now(JST).strftime('%Y%m%d_%H%M%S')}_executed.json"
+        )
+        saved_path.parent.mkdir(parents=True, exist_ok=True)
         saved_path.write_text(
             json.dumps(result_dict, ensure_ascii=False, indent=2), encoding="utf-8"
         )
         print(f"\n💾 発注結果保存: {saved_path}")
+        # 新規: logs/live/YYYYMMDD_*.json（分析用構造化ログ）
+        save_live_logs(run_id, result, send_results)
+        print(f"📋 ライブログ: logs/live/{run_id}_orders.json")
 
     return 0
 
