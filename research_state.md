@@ -1,5 +1,5 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-03-19（TEMPORALユニバース本番反映・月次P&L評価スクリプト完成）
+# Single Source of Truth / 最終更新: 2026-03-19（entry_stop v6 全バリアント検証・凍結決定）
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
 
 ---
@@ -232,14 +232,54 @@ G27+V2のMaxDD=-7.53%は全スキーム閾値未満 → 758日ロック問題は
 
 ---
 
+## 完了した研究（2026-03-19 追記）
+
+### ✅ entry_stop v6 開発・凍結決定（2026-03-19）
+**スクリプト**: `backtest/portfolio_entry_stop_v6.py`（新規）
+**結果**: `results/entry_stop_v6_2026-03-19.json`
+**対象ユニバース**: TEMPORAL 24銘柄（avg_exposure 2018=0.082、2019-24=0.45〜0.68、全体=0.510）
+
+#### 開発経緯・全バリアント結果
+
+| バリアント | CAGR | Calmar | NORMAL% | avg_scale | 問題点 |
+|---|---|---|---|---|---|
+| ベースライン（entry_stop なし） | +4.18% | 0.398 | 100% | 1.000 | — |
+| v5互換（z-scoreのみ） | -0.07% | -0.009 | 15.4% | — | z-score誤発火28x（DD微小時）|
+| v6（3条件: z+dd_abs+vel） | -0.35% | -0.047 | 16.7% | — | z発火24x・std小さすぎ |
+| v6b（中央値フロア） | -0.35% | -0.047 | 16.7% | — | フロアも bootstrap汚染 |
+| **v6c（regime-gate）** | **-0.89%** | **-0.116** | **12.5%** | **0.321** | velocity ロック（2018 exposure=0.082）|
+| v6d（exposure調整DD） | -0.45% | -0.120 | 12.3% | 0.125 | raw_dd/-3.7%→effective_dd=-15%でALERT33x |
+
+#### 根本原因（構造的不適合）
+
+```
+TEMPORAL 2018: avg_exposure = 0.082（91.8%キャッシュ）
+→ DD=-3.7%は「リスク資産の実損失ではなく稼働不足」
+→ velocity trigger（2018 Oct）→ WARNING → 新規BUY制限 → 回復遅延 → 7年間ロック
+→ exposure調整も逆効果（floor=0.25: raw_dd/0.25 → effective_dd増幅）
+```
+
+#### ✅ 最終決定: entry_stop を TEMPORAL 1x で完全凍結
+
+```
+根拠: entry_stop は「十分にデプロイされたポートフォリオ（avg_exposure>0.45）」
+      の過剰リスクを制御するツールとして設計されている。
+      TEMPORAL 1x の低稼働率（初期 avg_exposure=0.082）は entry_stop の適用前提
+      を満たしておらず、どのバリアント（v6a〜v6d）もベースラインを大幅に下回った。
+
+再評価条件: avg_exposure > 0.45 が安定的に維持される場合（Phase 3以降の資本拡大時）
+```
+
+---
+
 ## 次の研究タスク（優先順）
 
 | 優先度 | タスク | 根拠 |
 |---|---|---|
 | ~~1~~（完了） | ~~TEMPORALユニバースを `run_live_signal.py` に反映~~ | 2026-03-19 完了 |
 | ~~2~~（完了） | ~~`scripts/monthly_pnl.py` Phase 2評価スクリプト作成~~ | 2026-03-19 完了・動作確認済み |
-| **1** | entry_stop v6: Z-scoreに `dd_abs>1%` 下限フィルター追加 | v5 フル 1xの誤発火修正 → Calmar改善期待 |
-| **2** | 2025年実運用OOS検証 | バイアス排除の唯一の方法 |
+| ~~3~~（完了・凍結）| ~~entry_stop v6~~ | 2026-03-19 全バリアント失敗→凍結決定 |
+| **1** | 2025年実運用OOS検証 | バイアス排除の唯一の方法 |
 | 保留 | Top2/セクター + entry_stop_only + CB改善 | strategy exploration。現在は validation 優先のため後回し |
 
 ---
@@ -259,7 +299,8 @@ asset_simulation/
 │   ├── engine.py                  ← コアバックテストエンジン
 │   ├── portfolio_engine.py        ← ポートフォリオエンジン
 │   ├── portfolio_v2.py            ← ★最良バックテスト（Calmar=2.656）
-│   ├── portfolio_entry_stop_v5.py ← ★最新entry_stop（4段階ステートマシン）
+│   ├── portfolio_entry_stop_v5.py ← entry_stop v5（4段階ステートマシン）
+│   ├── portfolio_entry_stop_v6.py ← entry_stop v6（TEMPORAL非対応のため凍結）
 │   ├── portfolio_cross_validate.py← 3重クロス検証
 │   ├── fujiko_strategy.py         ← フジコ法（単一銘柄）
 │   ├── mean_reversion_strategy.py ← 平均回帰戦略
@@ -270,6 +311,7 @@ asset_simulation/
 ├── results/
 │   ├── backtest_summary.json      ← 全バックテスト結果サマリー
 │   ├── entry_stop_v5_2026-03-18.json ← entry_stop v5結果
+│   ├── entry_stop_v6_2026-03-19.json ← entry_stop v6結果（全バリアント・凍結）
 │   ├── capital_efficiency_2026-03-17.json
 │   ├── dd_control_2026-03-17.json
 │   ├── stress_test_2026-03-17.json
