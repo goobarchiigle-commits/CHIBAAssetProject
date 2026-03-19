@@ -1,0 +1,26 @@
+{
+  "run_date": "2026-03-19",
+  "universe": "configs/universe/2026Q1_temporal24.json",
+  "is_period": "2018-01-01/2024-12-31",
+  "oos_period": "2025-01-01/2025-12-31",
+  "IS": {
+    "sharpe": 0.387,
+    "cagr": 3.56,
+    "max_dd": -12.21,
+    "calmar": 0.292,
+    "avg_exposure": 0.756
+  },
+  "OOS_2025": {
+    "sharpe": -2.646,
+    "cagr": -11.7,
+    "max_dd": -11.31,
+    "calmar": -1.035,
+    "avg_exposure": 0.222,
+    "trades_per_month": 0.0,
+    "days_to_recover": 243.0
+  },
+  "diagnosis": {
+    "phase1_ok": false,
+    "sharpe_range": "warn_low"
+  }
+}
