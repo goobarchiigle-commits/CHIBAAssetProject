@@ -80,17 +80,21 @@ class BacktestEngine:
 
     def __init__(
         self,
-        prices:   pd.DataFrame,
-        strategy: "BaseStrategy",
-        capital:  float    = 1_000_000,
-        cost:     TradeCost = None,
-        symbol:   str      = "N/A",
+        prices:          pd.DataFrame,
+        strategy:        "BaseStrategy",
+        capital:         float     = 1_000_000,
+        cost:            TradeCost = None,
+        symbol:          str       = "N/A",
+        take_profit_pct: float     = None,
+        max_hold_days:   int       = None,
     ) -> None:
-        self.prices   = prices.sort_index()
-        self.strategy = strategy
-        self.capital  = capital
-        self.cost     = cost or TradeCost()
-        self.symbol   = symbol
+        self.prices          = prices.sort_index()
+        self.strategy        = strategy
+        self.capital         = capital
+        self.cost            = cost or TradeCost()
+        self.symbol          = symbol
+        self.take_profit_pct = take_profit_pct
+        self.max_hold_days   = max_hold_days
 
     # ------------------------------------------------------------------ #
     # 実行
@@ -103,10 +107,11 @@ class BacktestEngine:
           各ステップ i では prices.iloc[:i+1] のみを strategy に渡す。
           シグナルが返っても実際の約定は次足の始値で行う（execution_price）。
         """
-        prices  = self.prices
-        cash    = self.capital
-        holding = 0        # 保有株数
-        avg_cost = 0.0     # 平均取得単価
+        prices    = self.prices
+        cash      = self.capital
+        holding   = 0        # 保有株数
+        avg_cost  = 0.0     # 平均取得単価
+        entry_bar = -1       # 買い約定バーのインデックス
 
         equity_curve: list[float] = []
         trades:       list[Trade] = []
@@ -114,9 +119,49 @@ class BacktestEngine:
         for i in range(len(prices)):
             row = prices.iloc[i]
 
+            # --- TP チェック（当日の High で判定、当日中に約定）---
+            tp_fired = False
+            if holding > 0 and self.take_profit_pct is not None:
+                tp_price = avg_cost * (1 + self.take_profit_pct)
+                if row["High"] >= tp_price:
+                    tp_fired    = True
+                    exec_price  = tp_price * (1 - self.cost.slippage_rate)
+                    trade_value = holding * exec_price
+                    commission  = max(
+                        trade_value * self.cost.commission_rate,
+                        self.cost.min_commission,
+                    )
+                    pnl  = (exec_price - avg_cost) * holding - commission
+                    cash += trade_value - commission
+                    trades.append(Trade(
+                        date   = prices.index[i],
+                        symbol = self.symbol,
+                        side   = "SELL_TP",
+                        qty    = holding,
+                        price  = exec_price,
+                        cost   = commission,
+                        pnl    = pnl,
+                    ))
+                    holding   = 0
+                    avg_cost  = 0.0
+                    entry_bar = -1
+
+            # --- 時間制限チェック（翌足始値で約定）---
+            time_exit = (
+                not tp_fired
+                and holding > 0
+                and self.max_hold_days is not None
+                and (i - entry_bar) >= self.max_hold_days
+            )
+
             # --- 先読みリーク防止: i+1 以降のデータは渡さない ---
             past_data = prices.iloc[: i + 1]
-            signal = self.strategy.generate_signal(past_data)
+            if tp_fired:
+                signal = 0
+            elif time_exit:
+                signal = -1
+            else:
+                signal = self.strategy.generate_signal(past_data)
             # signal: +1 = 買い / -1 = 売り / 0 = 何もしない
 
             # 約定は「次の足の始値」を使用
@@ -144,9 +189,10 @@ class BacktestEngine:
                     )
                     total_cost = trade_value + commission
                     if total_cost <= cash:
-                        cash     -= total_cost
-                        holding   = qty
-                        avg_cost  = exec_price
+                        cash      -= total_cost
+                        holding    = qty
+                        avg_cost   = exec_price
+                        entry_bar  = i + 1   # 翌足で約定
                         trades.append(Trade(
                             date   = prices.index[i + 1] if i + 1 < len(prices) else prices.index[i],
                             symbol = self.symbol,
@@ -156,7 +202,7 @@ class BacktestEngine:
                             cost   = commission,
                         ))
 
-            # --- 売り ---
+            # --- 売り（戦略シグナル or 時間制限）---
             elif signal == -1 and holding > 0:
                 trade_value = holding * exec_price
                 commission  = max(
@@ -174,8 +220,9 @@ class BacktestEngine:
                     cost   = commission,
                     pnl    = pnl,
                 ))
-                holding  = 0
-                avg_cost = 0.0
+                holding   = 0
+                avg_cost  = 0.0
+                entry_bar = -1
 
             # 資産評価額（現金 + 時価）
             market_value = holding * row["Close"]
@@ -355,11 +402,11 @@ class BacktestResult:
 
     @property
     def num_trades(self) -> int:
-        return sum(1 for t in self.trades if t.side == "SELL")
+        return sum(1 for t in self.trades if t.side.startswith("SELL"))
 
     @property
     def win_rate(self) -> float:
-        sell_trades = [t for t in self.trades if t.side == "SELL"]
+        sell_trades = [t for t in self.trades if t.side.startswith("SELL")]
         if not sell_trades:
             return 0.0
         wins = sum(1 for t in sell_trades if t.pnl > 0)

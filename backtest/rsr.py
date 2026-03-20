@@ -73,6 +73,148 @@ def calc_universe_rsr(universe_prices: dict[str, pd.Series]) -> pd.DataFrame:
 
 
 # ------------------------------------------------------------------ #
+# Clenow (2015) ボラティリティ調整モメンタムスコア
+# ------------------------------------------------------------------ #
+def calc_clenow_score(price: pd.Series, window: int = 90) -> float:
+    """
+    Clenow「Stocks on the Move」式スコアを計算する。
+
+    Score = 年率換算指数回帰スロープ × R²
+
+    特徴:
+      - コツコツ上昇する銘柄（高R²）を優遇
+      - 急騰・急落銘柄（大ギャップ）を除外
+      - 下降トレンドは0を返す
+
+    Args:
+        price:  Close価格Series
+        window: 回帰ウィンドウ（デフォルト90営業日）
+
+    Returns:
+        スコア（高いほど「スムーズな上昇トレンド」）
+        除外条件に当てはまる場合は 0.0
+    """
+    if len(price) < window + 1:
+        return 0.0
+
+    p = price.iloc[-window:]
+
+    # ギャップフィルター: 過去90日に15%超の単日変動があれば除外
+    max_gap = float(p.pct_change().abs().max())
+    if max_gap > 0.15:
+        return 0.0
+
+    # 指数回帰（対数価格に線形回帰 → 指数的トレンドを捉える）
+    x = np.arange(len(p))
+    y = np.log(p.values.astype(float))
+    n = len(x)
+    sx = x.sum(); sy = y.sum()
+    sxx = (x * x).sum(); sxy = (x * y).sum()
+    slope = (n * sxy - sx * sy) / (n * sxx - sx * sx)
+
+    # R²（決定係数）
+    y_mean = sy / n
+    y_hat  = slope * x + (sy - slope * sx) / n
+    ss_res = ((y - y_hat) ** 2).sum()
+    ss_tot = ((y - y_mean) ** 2).sum()
+    r_sq   = 1.0 - ss_res / ss_tot if ss_tot > 0 else 0.0
+
+    # 年率換算スロープ（%）
+    annualized_slope = (np.exp(slope * 252) - 1) * 100
+
+    # 下降トレンドは0
+    if annualized_slope <= 0:
+        return 0.0
+
+    return float(annualized_slope * r_sq)
+
+
+def calc_universe_clenow(
+    universe_prices: dict[str, pd.Series],
+    window: int = 90,
+) -> pd.DataFrame:
+    """
+    ユニバース全銘柄のClenowスコアをローリング計算する。
+
+    Args:
+        universe_prices: {symbol: Close価格Series}
+        window:          回帰ウィンドウ（デフォルト90日）
+
+    Returns:
+        各銘柄のClenowスコアを列に持つDataFrame
+    """
+    result = {}
+    for sym, prices in universe_prices.items():
+        scores = []
+        idx    = []
+        for i in range(window, len(prices)):
+            sub   = prices.iloc[:i + 1]
+            score = calc_clenow_score(sub, window=window)
+            scores.append(score)
+            idx.append(prices.index[i])
+        result[sym] = pd.Series(scores, index=idx)
+    return pd.DataFrame(result).fillna(0.0)
+
+
+# ------------------------------------------------------------------ #
+# FIP (Frog in the Pan) フィルター — Quantitative Momentum (Gray/Vogel)
+# ------------------------------------------------------------------ #
+def calc_fip_ratio(price: pd.Series, window: int = 252) -> float:
+    """
+    FIP（Frog in the Pan）比率を計算する。
+
+    Gray & Vogel「Quantitative Momentum」の知見:
+      「コツコツと小さな上昇を積み重ねた銘柄（高FIP）は
+       急騰銘柄（低FIP）より高いリスク調整後リターンを示す」
+
+    FIP比率 = 過去window日間の正リターン日数 / 全取引日数
+
+    判定目安:
+      FIP > 0.52  → "コツコツ型" = 優良モメンタム銘柄
+      FIP < 0.48  → "急騰型"     = 反転リスク高
+
+    Args:
+        price:  Close価格Series
+        window: 計算ウィンドウ（デフォルト252営業日=12ヶ月）
+
+    Returns:
+        FIP比率（0〜1）。データ不足の場合は 0.5
+    """
+    if len(price) < window + 1:
+        return 0.5
+    returns = price.iloc[-window:].pct_change().dropna()
+    if len(returns) == 0:
+        return 0.5
+    return float((returns > 0).sum() / len(returns))
+
+
+def calc_universe_fip(
+    universe_prices: dict[str, pd.Series],
+    window: int = 252,
+) -> pd.DataFrame:
+    """
+    ユニバース全銘柄のFIP比率をローリング計算する。
+
+    Args:
+        universe_prices: {symbol: Close価格Series}
+        window:          計算ウィンドウ（デフォルト252日=12ヶ月）
+
+    Returns:
+        各銘柄のFIP比率を列に持つDataFrame（0〜1スケール）
+    """
+    result = {}
+    for sym, prices in universe_prices.items():
+        fip_list = []
+        idx      = []
+        for i in range(window, len(prices)):
+            sub = prices.iloc[:i + 1]
+            fip_list.append(calc_fip_ratio(sub, window=window))
+            idx.append(prices.index[i])
+        result[sym] = pd.Series(fip_list, index=idx)
+    return pd.DataFrame(result).fillna(0.5)
+
+
+# ------------------------------------------------------------------ #
 # 単一銘柄RSR（ベンチマーク比較・単体分析用）
 # ------------------------------------------------------------------ #
 def calc_rsr_vs_benchmark(

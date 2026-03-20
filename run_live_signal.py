@@ -334,7 +334,7 @@ FUJIKO_PARAMS = dict(
     min_rsr          = 0.0,
     mom_period       = 21,
     turtle_entry     = 20,
-    turtle_exit      = 10,
+    turtle_exit      = 20,
     use_turtle_entry = True,
 )
 

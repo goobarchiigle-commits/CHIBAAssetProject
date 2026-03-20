@@ -170,7 +170,7 @@ def screen_new_stocks(new_universe: dict, rsr_uni: pd.DataFrame,
         rule = SECTOR_STRATEGY.get(sector, "dynamic")
         if rule == "fujiko":
             strat = FujikoStrategy(rsr_series=rsr_s, min_sepa=6, min_rsr=70.0,
-                                   mom_period=21, turtle_entry=20, turtle_exit=10,
+                                   mom_period=21, turtle_entry=20, turtle_exit=20,
                                    use_turtle_entry=True)
         else:
             strat = MeanReversionStrategy(**MR_PARAMS)
@@ -199,7 +199,7 @@ def build_strats(universe: dict, rsr_uni: pd.DataFrame, df_sel: pd.DataFrame,
             base = MeanReversionStrategy(**MR_PARAMS)
         else:
             base = FujikoStrategy(rsr_series=rsr_s, min_sepa=6, min_rsr=min_rsr,
-                                  mom_period=21, turtle_entry=20, turtle_exit=10,
+                                  mom_period=21, turtle_entry=20, turtle_exit=20,
                                   use_turtle_entry=True)
         strat_dict[sym] = EarningsProtectedStrategy(base) if use_ep else base
     return strat_dict

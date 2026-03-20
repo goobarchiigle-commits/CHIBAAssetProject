@@ -1,0 +1,27 @@
+{
+  "generated_at": "2026-03-20T16:54:26",
+  "period": "2018-01-01/2024-12-31",
+  "A_equal": {
+    "CAGR%": 5.05,
+    "MaxDD%": -14.23,
+    "Calmar": 0.355,
+    "Sharpe": 0.525,
+    "avg_exposure": 0.882,
+    "position_size_var": 0.00165,
+    "avg_positions": 1.63,
+    "n_trades": 287,
+    "win_rate%": 51.6
+  },
+  "B_atr": {
+    "CAGR%": 2.48,
+    "MaxDD%": -11.45,
+    "Calmar": 0.216,
+    "Sharpe": 0.352,
+    "avg_exposure": 0.881,
+    "position_size_var": 0.00127,
+    "avg_positions": 1.5,
+    "n_trades": 271,
+    "win_rate%": 50.9
+  },
+  "verdict": "→ A(均等配分) 継続: ATR逆数配分による改善なし"
+}

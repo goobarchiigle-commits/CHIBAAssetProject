@@ -74,7 +74,7 @@ def make_strategy(sym: str, sector: str, rsr_uni: pd.DataFrame):
         return MeanReversionStrategy(**MR_PARAMS)
     return FujikoStrategy(
         rsr_series=rsr_s, min_sepa=6, min_rsr=70.0,
-        mom_period=21, turtle_entry=20, turtle_exit=10,
+        mom_period=21, turtle_entry=20, turtle_exit=20,
         use_turtle_entry=True,
     )
 
@@ -226,13 +226,19 @@ def main():
     #   これは「モデルの構造は固定・パラメータは変更なし」であり真のOOSを保つ。
     FULL_END = "2025-12-31"
 
+    # RSRユニバース = TEMPORAL24 固定（research = live = identical）
+    # ★ 設計方針: RSR計算・売買対象ともに同一の24銘柄を使う。
+    #   これにより研究環境とライブ環境のRSRパーセンタイルが完全一致する。
+
     print(f"\n[2/5] 通しデータ取得 ({IS_START}〜{FULL_END})...")
     univ_full = download_universe(fixed_tickers, start=IS_START, end=FULL_END, verbose=False)
-    print(f"  取得完了: {len(univ_full)} 銘柄")
+    print(f"  取得完了: {len(univ_full)} 銘柄（RSR計算 = 売買対象 = TEMPORAL24）")
 
-    # RSR: 2018-2025の全データで計算（各日付は前日データのみ参照 = look-aheadなし）
+    # RSR: TEMPORAL24の24銘柄で計算
     prices_full = {sym: info["df"]["Close"] for sym, info in univ_full.items()}
     rsr_full    = calc_universe_rsr(prices_full)
+    print(f"  RSR計算完了: {rsr_full.shape[1]} 銘柄ベース（固定）")
+
     strat_full  = {sym: make_strategy(sym, univ_full[sym]["sector"], rsr_full) for sym in univ_full}
 
     # ----------------------------------------------------------------

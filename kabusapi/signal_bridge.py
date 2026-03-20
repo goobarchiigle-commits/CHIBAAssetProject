@@ -72,19 +72,23 @@ def select_top_k(
 
 
 def _trading_days_held(entry_date_str: str, today: pd.Timestamp) -> int:
-    """entry_date から today までの営業日数（entry 当日 = 0）"""
+    """entry_date から today までの営業日数（entry 当日 = 0）。JPX 祝日対応。"""
     try:
+        from market.jpx_calendar import JPXCalendar
         entry_ts = pd.Timestamp(entry_date_str)
         if today <= entry_ts:
             return 0
-        return max(0, len(pd.bdate_range(entry_ts, today)) - 1)
+        cal = JPXCalendar()
+        return max(0, cal.trading_days_between(entry_ts, today) - 1)
     except Exception:
         return 0
 
 
 def _add_trading_days(start: pd.Timestamp, n: int) -> pd.Timestamp:
-    """start から n 営業日後の日付を返す"""
-    return pd.bdate_range(start, periods=n + 1)[-1]
+    """start から n 営業日後の日付を返す。JPX 祝日対応。"""
+    from market.jpx_calendar import JPXCalendar
+    cal = JPXCalendar()
+    return cal.add_trading_days(start, n)
 
 
 # ------------------------------------------------------------------ #
@@ -679,6 +683,10 @@ class SignalBridge:
 
         if cb_active:
             warnings.append("サーキットブレーカー発動中: 新規 BUY を全停止（SELL のみ実行）")
+            logger.warning(
+                "ENTRY BLOCKED BY CB: BUY 全停止中。"
+                " BUY シグナルが出ても発注しません。SELL のみ実行します。"
+            )
 
         # --- 1. 売り注文（保有中 かつ -1 シグナル） ---
         for sig in signals:
@@ -699,6 +707,12 @@ class SignalBridge:
                 ))
 
         if cb_active:
+            blocked_buys = [s.symbol for s in signals if s.signal == 1 and not s.currently_holding]
+            if blocked_buys:
+                logger.warning(
+                    "ENTRY BLOCKED BY CB: 以下 %d 銘柄の BUY をスキップ → %s",
+                    len(blocked_buys), blocked_buys,
+                )
             return orders, warnings  # CB 中は SELL のみ
 
         # 売り後の回収資金を加算

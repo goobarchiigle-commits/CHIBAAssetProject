@@ -122,7 +122,7 @@ def make_strategy(sym: str, sector: str, rsr_uni: pd.DataFrame, min_rsr: float =
         return MeanReversionStrategy(**MR_PARAMS)
     return FujikoStrategy(
         rsr_series=rsr_s, min_sepa=6, min_rsr=min_rsr,
-        mom_period=21, turtle_entry=20, turtle_exit=10,
+        mom_period=21, turtle_entry=20, turtle_exit=20,
         use_turtle_entry=True,
     )
 

@@ -626,7 +626,7 @@ def build_strategies(universe: dict, rsr_uni: pd.DataFrame, sym_to_strat: dict) 
         else:
             strats[sym] = FujikoStrategy(
                 rsr_series=rsr_s, min_sepa=6, min_rsr=70.0,
-                mom_period=21, turtle_entry=20, turtle_exit=10,
+                mom_period=21, turtle_entry=20, turtle_exit=20,
                 use_turtle_entry=True,
             )
     return strats
