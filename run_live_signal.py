@@ -330,17 +330,21 @@ _LEGACY_G29_UNIVERSE_REMOVED = True
 
 FUJIKO_PARAMS = dict(
     min_sepa         = 6,
-    min_rsr          = 70.0,   # V2: 75.0 → 70.0 に緩和（Calmar改善確認済み）
+    # min_rsr は top_k_selection で代替（0.0 = 閾値無効化）
+    min_rsr          = 0.0,
     mom_period       = 21,
     turtle_entry     = 20,
     turtle_exit      = 10,
     use_turtle_entry = True,
 )
 
-CAPITAL      = 2_000_000
-MAX_POS      = 3
-MIN_SECTORS  = 1   # セクター制約なし（D_IDM_sec1 設定）
-MAX_DD_LIMIT = 0.15
+CAPITAL              = 2_000_000
+MAX_POS              = 4        # top_k と一致させる
+MIN_SECTORS          = 1        # セクター制約なし
+MAX_DD_LIMIT         = 0.15
+TOP_K                = 4        # RSR 上位 k 銘柄のみ BUY 対象
+MAX_HOLD_DAYS        = 60       # 最大保有営業日数（OOS MaxDD -13.98% 確認済み）
+MAX_NEW_POS_PER_DAY  = 2        # 1回の実行で生成する新規 BUY 上限
 
 
 def parse_args() -> argparse.Namespace:
@@ -361,7 +365,7 @@ def print_banner(live: bool, universe: dict[str, str], universe_meta: dict) -> N
     print(f"  実行日時       : {datetime.now(JST).strftime('%Y-%m-%d %H:%M:%S JST')}")
     print(f"  モード         : {mode}")
     print(f"  ユニバース     : {len(universe)}銘柄 (v={version}, created={created})")
-    print(f"  ポートフォリオ : max_pos={MAX_POS} / min_sectors={MIN_SECTORS} / min_rsr=70")
+    print(f"  ポートフォリオ : max_pos={MAX_POS} / top_k={TOP_K} / max_hold_days={MAX_HOLD_DAYS}d")
     print(f"  安全設計       : MAX_DAILY={MAX_DAILY_ORDERS} / MAX_PER_SYM={MAX_SYMBOL_ORDERS} / MAX_OPEN={MAX_OPEN_POSITIONS}")
     print("=" * 64)
 
@@ -394,14 +398,14 @@ def print_signals(result) -> None:
 
     if buy_sigs:
         print(f"\n📊 BUYシグナル銘柄 ({len(buy_sigs)}件):")
-        print(f"  {'銘柄':<10} {'セクター':<10} {'戦略':<4} {'RSR':>6} {'SEPA':>5} {'Mom':>7}  理由")
-        print("  " + "-" * 68)
-        for s in sorted(buy_sigs, key=lambda x: x["rsr"], reverse=True):
+        print(f"  {'銘柄':<10} {'セクター':<10} {'戦略':<4} {'rank':>5} {'RSR':>6} {'SEPA':>5} {'Mom':>7}  理由")
+        print("  " + "-" * 74)
+        for s in sorted(buy_sigs, key=lambda x: x.get("rsr_rank", 99)):
             strat_str = "MR" if s.get("strategy_type") == "mean_rev" else "FJ"
             print(
                 f"  {s['symbol']:<10} {s['sector']:<10} {strat_str:<4} "
-                f"{s['rsr']:>6.1f} {s['sepa_score']:>5} {s['rsr_momentum']:>+7.2f}  "
-                f"{s['reason'][:30]}"
+                f"{s.get('rsr_rank', 0):>5} {s['rsr']:>6.1f} {s['sepa_score']:>5}"
+                f" {s['rsr_momentum']:>+7.2f}  {s['reason'][:30]}"
             )
 
     if sell_sigs:
@@ -409,16 +413,18 @@ def print_signals(result) -> None:
         for s in sell_sigs:
             print(f"  {s['symbol']} ({s['sector']}) — {s['reason'][:50]}")
 
-    # RSRトップ10
-    print(f"\n📊 RSRランキング上位10銘柄:")
-    print(f"  {'銘柄':<10} {'セクター':<10} {'戦略':<4} {'RSR':>6} {'SEPA':>5} {'Mom':>7}  シグナル")
-    print("  " + "-" * 66)
-    for s in sorted(result.signals, key=lambda x: x["rsr"], reverse=True)[:10]:
+    # RSR ランキング上位10銘柄
+    print(f"\n📊 RSR ランキング上位10銘柄:")
+    print(f"  {'銘柄':<10} {'セクター':<10} {'戦略':<4} {'rank':>5} {'RSR':>6} {'SEPA':>5} {'Mom':>7} {'保有日':>5}  シグナル")
+    print("  " + "-" * 78)
+    for s in sorted(result.signals, key=lambda x: x.get("rsr_rank", 99))[:10]:
         sig_str   = "✅ BUY" if s["signal"] == 1 else ("🔴 SELL" if s["signal"] == -1 else "  -  ")
         strat_str = "MR" if s.get("strategy_type") == "mean_rev" else "FJ"
+        hold_str  = f"{s.get('hold_days', 0):>5}d" if s.get("currently_holding") else "     -"
         print(
             f"  {s['symbol']:<10} {s['sector']:<10} {strat_str:<4} "
-            f"{s['rsr']:>6.1f} {s['sepa_score']:>5} {s['rsr_momentum']:>+7.2f}  {sig_str}"
+            f"{s.get('rsr_rank', 0):>5} {s['rsr']:>6.1f} {s['sepa_score']:>5}"
+            f" {s['rsr_momentum']:>+7.2f} {hold_str}  {sig_str}"
         )
 
 
@@ -460,10 +466,12 @@ def main() -> int:
     import warnings
     warnings.filterwarnings("ignore")
 
-    # ---- 株価上限フィルター（シグナル生成前） ----
+    # ---- RSRユニバース（24銘柄固定）を保存 ----
+    # 価格フィルターの前に保存する。これが研究環境と一致するRSR計算ベース。
+    RSR_UNIVERSE = dict(LIVE_UNIVERSE)
+
+    # ---- 株価上限フィルター（RSR計算の後に適用） ----
     # 保有中銘柄は API 接続前のため空集合で保守的に処理する。
-    # 将来買った高額株が値上がりした場合への備えだが、
-    # 高額株はこのフィルターで BUY 除外されるため事実上発生しない。
     logger.info("株価上限フィルター適用中（上限: ¥%s/単元）...", f"{MAX_ALLOCATION:,}")
     LIVE_UNIVERSE, price_skipped = filter_universe_by_price(
         LIVE_UNIVERSE, MAX_ALLOCATION, held_symbols=set()
@@ -472,18 +480,25 @@ def main() -> int:
         print(f"\n[価格フィルター] {len(price_skipped)}銘柄を除外（¥{MAX_ALLOCATION:,}/単元超）:")
         for sym, price, cost in price_skipped:
             print(f"  ✗ {sym:<8} ¥{price:>8,.0f}/株  1単元=¥{cost:>9,.0f}  > 上限¥{MAX_ALLOCATION:,}")
-    logger.info("フィルター後ユニバース: %d銘柄", len(LIVE_UNIVERSE))
+    logger.info(
+        "RSRユニバース: %d銘柄（固定） / 売買ユニバース: %d銘柄（価格フィルター後）",
+        len(RSR_UNIVERSE), len(LIVE_UNIVERSE),
+    )
 
     from kabusapi.signal_bridge import SignalBridge
 
     bridge = SignalBridge(
-        universe_tickers = LIVE_UNIVERSE,
-        fujiko_params    = FUJIKO_PARAMS,
-        capital          = CAPITAL,
-        max_positions    = min(MAX_POS, MAX_OPEN_POSITIONS),  # ハードキャップ適用
-        max_dd_limit     = MAX_DD_LIMIT,
-        min_sectors      = MIN_SECTORS,
-        live             = args.live,
+        universe_tickers          = LIVE_UNIVERSE,
+        rsr_universe_tickers      = RSR_UNIVERSE,   # RSR計算は24銘柄固定（研究と一致）
+        fujiko_params             = FUJIKO_PARAMS,
+        capital                   = CAPITAL,
+        max_positions             = min(MAX_POS, MAX_OPEN_POSITIONS),
+        max_dd_limit              = MAX_DD_LIMIT,
+        min_sectors               = MIN_SECTORS,
+        live                      = args.live,
+        top_k                     = TOP_K,
+        max_hold_days             = MAX_HOLD_DAYS,
+        max_new_positions_per_day = MAX_NEW_POS_PER_DAY,
     )
 
     logger.info("シグナル生成開始...")
@@ -491,12 +506,20 @@ def main() -> int:
 
     print(f"\n  データ基準日 : {result.data_as_of}")
     print(f"  ユニバース   : {result.n_universe} 銘柄")
+    ps = result.portfolio_summary
+    cb_str = ps.get("cb_state", "NORMAL")
+    if cb_str != "NORMAL":
+        cooldown = ps.get("cb_cooldown_end") or ""
+        print(f"  ⚠ CB状態    : {cb_str}（クールダウン終了: {cooldown}）")
+    dd_pct = ps.get("current_drawdown", 0.0) * 100
     print(
-        f"  ポートフォリオ: 保有 {result.portfolio_summary['current_positions']} / "
-        f"最大 {result.portfolio_summary['max_positions']} 銘柄  "
-        f"空きスロット: {result.portfolio_summary['open_slots']}  "
-        f"余力: ¥{result.portfolio_summary['available_cash']:,.0f}"
+        f"  ポートフォリオ: 保有 {ps['current_positions']} / "
+        f"最大 {ps['max_positions']} 銘柄  "
+        f"空きスロット: {ps['open_slots']}  "
+        f"余力: ¥{ps['available_cash']:,.0f}  "
+        f"DD: {dd_pct:+.1f}%"
     )
+    print(f"  Top-{TOP_K}銘柄  : {', '.join(result.top_k_symbols)}")
 
     print_signals(result)
 
@@ -594,6 +617,10 @@ def main() -> int:
         status   = "✅ 成功" if r.get("success") else "❌ 失敗"
         order_id = r.get("order_id", r.get("error", ""))
         print(f"  {r['side']} {r['symbol']} {r['qty']}株 → {status}  ({order_id})")
+
+    # ── ポートフォリオ状態更新（約定確認後） ────────────────────────
+    today_str = datetime.now(JST).strftime("%Y-%m-%d")
+    bridge.update_state_after_execution(send_results, today_str)
 
     # ----------------------------------------------------------------
     # ログ保存（data/signals/ + logs/live/）

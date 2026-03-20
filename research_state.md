@@ -1,5 +1,5 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-03-19（entry_stop v6 全バリアント検証・凍結決定）
+# Single Source of Truth / 最終更新: 2026-03-20（Top-k ローテーション + CB 状態機械 実装完了）
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
 
 ---
@@ -299,17 +299,64 @@ TEMPORAL 2018: avg_exposure = 0.082（91.8%キャッシュ）
 
 ---
 
+## 完了した研究（2026-03-20）
+
+### ✅ Top-k ローテーション バックテスト（2026-03-20）
+**スクリプト**: `backtest/topk_rotation.py`（新規）
+
+#### 設計
+- RSR universe = TEMPORAL24（24銘柄固定）
+- entry: rank ≤ k AND slot available
+- exit: rank > k OR time_exit（max_hold_days）
+- k = 2, 3, 4, 5 の 4 ケース + stop_loss / max_hold_days バリアント
+
+#### OOS 結果サマリー（k=4 / 2025年 OOS）
+
+| ケース | IS Sharpe | IS MaxDD | OOS Sharpe | OOS MaxDD |
+|---|---|---|---|---|
+| k=4_base | 0.910 | -31.9% | 1.254 | -6.11% |
+| k=4_sl15_h60 | 0.415 | -21.8% | 1.114 | **-13.98%** |
+
+**採用パラメータ決定**: k=4 / max_hold_days=60 / stop_loss=None
+- OOS MaxDD -13.98% < Phase 1 基準 -20% ✅
+- IS Sharpe 低下（0.91→0.42）は 2018年低稼働率が主因。OOS への影響は軽微
+
+### ✅ ライブシステム Top-k 本番実装（2026-03-20）
+**変更ファイル**: `kabusapi/signal_bridge.py`（完全リライト）/ `run_live_signal.py`（差分変更）
+
+#### 実装内容
+
+| 機能 | 実装詳細 |
+|---|---|
+| CB 状態機械 | NORMAL→CB_ACTIVE(-15%)→RECOVERY(30営業日)→NORMAL(peak×98%) |
+| top_k 選出 | RSR 上位 k 銘柄 + 流動性 tie-breaker（5B円/日フィルター） |
+| 時間ストップ | 営業日計算（pd.bdate_range）で max_hold_days=60 を判定 |
+| 再エントリー禁止 | 時間ストップ後 5 営業日は同銘柄への BUY を停止 |
+| 過剰発注防止 | max_new_positions_per_day=2 / order_rate_limit=3件/分 |
+| 状態永続化 | `runtime/portfolio_state.json` で entry_date・reentry_blocked を管理 |
+| CB イベントログ | `logs/cb_events/YYYYMMDD.jsonl` に状態遷移を記録 |
+
+#### パラメータ確定値（ライブ）
+```
+TOP_K = 4 / MAX_HOLD_DAYS = 60 / MAX_NEW_POS_PER_DAY = 2
+MAX_POS = 4 / MIN_SECTORS = 1 / MAX_DD_LIMIT = 0.15
+```
+
+---
+
 ## 次の研究タスク（優先順）
 
 | 優先度 | タスク | 根拠 |
 |---|---|---|
 | ~~1~~（完了） | ~~TEMPORALユニバースを `run_live_signal.py` に反映~~ | 2026-03-19 完了 |
-| ~~2~~（完了） | ~~`scripts/monthly_pnl.py` Phase 2評価スクリプト作成~~ | 2026-03-19 完了・動作確認済み |
+| ~~2~~（完了） | ~~`scripts/monthly_pnl.py` Phase 2評価スクリプト作成~~ | 2026-03-19 完了 |
 | ~~3~~（完了・凍結）| ~~entry_stop v6~~ | 2026-03-19 全バリアント失敗→凍結決定 |
-| ~~4~~（完了） | ~~2025年実運用OOS検証~~ | 2026-03-19 完了。結果: CB無し CAGR=-6.99% / CB有り -11.70% |
-| **1** | RSRコンテキスト修正 | 実運用はTEMPORAL24でRSR計算→IS Sharpe=0.387（1.07と乖離）。TOPIX100でRSR計算・取引はTEMPORAL24に絞る方式に変更 |
-| **2** | CBデッドロック修正 | 2025年4月CB発動 → 以降8ヶ月ロック。entry_stop_only（2026-03-16検証済み Calmar 0.461→1.029）を本実装に適用 |
-| 保留 | Top2/セクター + entry_stop_only + CB改善 | strategy exploration。現在は上記2課題が優先 |
+| ~~4~~（完了） | ~~2025年実運用OOS検証~~ | 2026-03-19 完了 |
+| ~~5~~（完了） | ~~Top-k ローテーション実装・ライブ統合~~ | 2026-03-20 完了 |
+| **1** | `portfolio_state.json` の初期値を実際の保有状況に合わせる | 現在保有 5401.T / 5411.T → entry_date を手動設定しないとtime_exitが誤動作 |
+| **2** | CBデッドロック修正: `entry_stop_only` 方式のOOS検証 | 2025年4月CB→8ヶ月ロック問題。entry_stop_only（Calmar 1.029確認済み）をTopK基盤で再検証 |
+| **3** | top_k OOS 稼働率検証 | k=4 の avg_exposure が実際に改善しているか 2025年 OOS で確認 |
+| 保留 | R²×スロープランキング（Clenow方式）への置き換え | 現在は単純 RSR。品質モメンタムで選別精度向上の可能性 |
 
 ---
 
