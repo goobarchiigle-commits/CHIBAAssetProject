@@ -513,13 +513,19 @@ class SignalBridge:
             len(liquidity), len(rsr_prices), f"{MIN_DAILY_VALUE_YEN:,.0f}",
         )
 
-        # ── Top-k 選出（保有中銘柄は流動性問わずランク計算に含む） ──
+        # ── Top-k 選出（売買ユニバース内から選出・RSRスコアはTOPIX100コンテキスト） ──
+        # RSRスコアはTOPIX100で正規化済みだが、top_k候補はTEMPORAL24に限定する。
+        # こうすることでバックテストと同じ「TEMPORAL24内のRSR順位上位k銘柄」をBUY対象にできる。
+        trade_syms = set(self.universe_tickers.keys())
         rsr_for_rank = rsr_latest[
-            rsr_latest.index.isin(liquidity)
-            | rsr_latest.index.isin(current_positions)
+            (rsr_latest.index.isin(liquidity) | rsr_latest.index.isin(current_positions))
+            & rsr_latest.index.isin(trade_syms)
         ]
         top_k_syms = select_top_k(rsr_for_rank, k=self.top_k, liquidity=liquidity)
-        logger.info("Top-%d 選出: %s", self.top_k, top_k_syms)
+        logger.info(
+            "Top-%d 選出（TEMPORAL24内）: %s",
+            self.top_k, top_k_syms,
+        )
 
         # RSR 順位マップ（全銘柄、1=最高）
         rsr_rank_map: dict[str, int] = {

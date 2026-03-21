@@ -1,5 +1,5 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-03-20（Top-k ローテーション + CB 状態機械 実装完了）
+# Single Source of Truth / 最終更新: 2026-03-21（RSRコンテキスト修正 + exit=20正式適用 + exposure実測）
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
 
 ---
@@ -21,21 +21,25 @@
 
 ---
 
-## 現在の最良戦略（V2設定）
+## 現在の最良戦略（V2設定 / RSRコンテキスト修正後）
 
 **スクリプト**: `run_live_signal.py`（実運用）/ `backtest/portfolio_v2.py`（バックテスト）
 
-| 指標 | 値 |
-|---|---|
-| CAGR | +16.26% |
-| Sharpe | 1.693 |
-| MaxDD | -6.12% |
-| Calmar | 2.656 |
-| 平均保有銘柄数 | 1.6 |
-| 資本稼働率 | **約17%**（= 83%キャッシュ ← 最大の課題） |
+| 指標 | 修正前（旧） | 修正後（現在） |
+|---|---|---|
+| CAGR | +16.26% | **+16.74%** |
+| Sharpe | 1.693 | **1.685** |
+| MaxDD | -6.12% | -9.68% |
+| Calmar | 2.656 | **1.729** |
+| 平均保有銘柄数 | 1.60 | 1.93 |
+| avg_exposure | 約17%（推定） | **31.5%** |
+| exposure p50 | — | 29.5% |
+| exposure p90 | — | 64.7% |
 
-**パラメータ**: `configs/strategy.yaml` 参照
-**ユニバース**: `configs/universe.yaml` 参照（G29_V2: 29銘柄）
+> **注意**: 旧Calmar=2.656はRSRを24銘柄内で計算していたため過大評価。修正後Calmar=1.729が実態に近い性能。
+
+**パラメータ**: `configs/strategy.yaml` 参照（`turtle_exit: 20` 確定済み）
+**ユニバース**: `configs/universe/2026Q1_temporal24.json`（24銘柄・実運用）/ RSRコンテキスト: TOPIX100（77銘柄）
 
 ---
 
@@ -383,9 +387,10 @@ MAX_POS = 4 / MIN_SECTORS = 1 / MAX_DD_LIMIT = 0.15
 | ~~3~~（完了・凍結）| ~~entry_stop v6~~ | 2026-03-19 全バリアント失敗→凍結決定 |
 | ~~4~~（完了） | ~~2025年実運用OOS検証~~ | 2026-03-19 完了 |
 | ~~5~~（完了） | ~~Top-k ローテーション実装・ライブ統合~~ | 2026-03-20 完了 |
-| **1** | `portfolio_state.json` の初期値を実際の保有状況に合わせる | 現在保有 5401.T / 5411.T → entry_date を手動設定しないとtime_exitが誤動作 |
-| **2** | CBデッドロック修正: `entry_stop_only` 方式のOOS検証 | 2025年4月CB→8ヶ月ロック問題。entry_stop_only（Calmar 1.029確認済み）をTopK基盤で再検証 |
-| **3** | top_k OOS 稼働率検証 | k=4 の avg_exposure が実際に改善しているか 2025年 OOS で確認 |
+| ~~6~~（完了） | ~~RSRコンテキスト修正・exit=20正式適用・exposure実測~~ | 2026-03-21 完了 |
+| **1** | `min_rsr` 感度分析（60/65/70/75）→ exposure vs Calmar のトレードオフ測定 | avg_exposure=31.5%が低い。RSRフィルター緩和でエントリー頻度を上げる候補 |
+| **2** | `portfolio_state.json` の初期値を実際の保有状況に合わせる | 現在保有 5401.T / 5411.T → entry_date を手動設定しないとtime_exitが誤動作 |
+| **3** | CBデッドロック修正: `entry_stop_only` 方式のOOS検証 | 2025年4月CB→8ヶ月ロック問題。entry_stop_only（Calmar 1.029確認済み）をTopK基盤で再検証 |
 | 保留 | R²×スロープランキング（Clenow方式）への置き換え | 現在は単純 RSR。品質モメンタムで選別精度向上の可能性 |
 
 ---

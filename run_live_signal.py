@@ -337,6 +337,12 @@ FUJIKO_PARAMS = dict(
     turtle_exit      = 20,
     use_turtle_entry = True,
 )
+logger.info(
+    "戦略パラメータ: turtle_entry=%d exit_lookback=%d min_sepa=%d",
+    FUJIKO_PARAMS["turtle_entry"],
+    FUJIKO_PARAMS["turtle_exit"],
+    FUJIKO_PARAMS["min_sepa"],
+)
 
 CAPITAL              = 2_000_000
 MAX_POS              = 4        # top_k と一致させる
@@ -466,9 +472,26 @@ def main() -> int:
     import warnings
     warnings.filterwarnings("ignore")
 
-    # ---- RSRユニバース（24銘柄固定）を保存 ----
-    # 価格フィルターの前に保存する。これが研究環境と一致するRSR計算ベース。
-    RSR_UNIVERSE = dict(LIVE_UNIVERSE)
+    # ---- RSRユニバース（TOPIX100）を設定 ----
+    # RSRスコアはTOPIX100コンテキスト（74銘柄）で計算する。
+    # これにより「TEMPORAL24内の相対ランク」ではなく「市場全体での相対強度」を正確に計測できる。
+    # 売買対象は引き続きTEMPORAL24のみ（LIVE_UNIVERSE）。
+    _rsr_universe_file = os.environ.get("RSR_UNIVERSE_FILE")
+    if _rsr_universe_file:
+        import pandas as _pd_rsr
+        _rsr_df = _pd_rsr.read_csv(_rsr_universe_file)
+        RSR_UNIVERSE: dict[str, str] = {
+            sym: "不明" for sym in _rsr_df["symbol"].astype(str).tolist()
+        }
+    else:
+        from backtest.universe_builder import TOPIX100_TICKERS
+        RSR_UNIVERSE = dict(TOPIX100_TICKERS)
+
+    logger.info(
+        "RSR context size=%d trade_universe=%d",
+        len(RSR_UNIVERSE),
+        len(LIVE_UNIVERSE),
+    )
 
     # ---- 株価上限フィルター（RSR計算の後に適用） ----
     # 保有中銘柄は API 接続前のため空集合で保守的に処理する。
@@ -481,7 +504,7 @@ def main() -> int:
         for sym, price, cost in price_skipped:
             print(f"  ✗ {sym:<8} ¥{price:>8,.0f}/株  1単元=¥{cost:>9,.0f}  > 上限¥{MAX_ALLOCATION:,}")
     logger.info(
-        "RSRユニバース: %d銘柄（固定） / 売買ユニバース: %d銘柄（価格フィルター後）",
+        "RSRユニバース: %d銘柄（TOPIX100固定） / 売買ユニバース: %d銘柄（価格フィルター後）",
         len(RSR_UNIVERSE), len(LIVE_UNIVERSE),
     )
 

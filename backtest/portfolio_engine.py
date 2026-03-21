@@ -459,6 +459,7 @@ class PortfolioEngine:
                     })
 
             # 5. 記録
+            exposure = mkt_value / port_value if port_value > 0 else 0.0
             equity_records.append({
                 "date":          date,
                 "value":         port_value,
@@ -468,6 +469,7 @@ class PortfolioEngine:
                 "cb_active":     cb_active,
                 "sectors_held":  "|".join(sorted(sector_held)),
                 "regime_ok":     self._market_regime_ok(date),
+                "exposure":      exposure,
             })
 
         rec_df = pd.DataFrame(equity_records).set_index("date")
@@ -478,6 +480,7 @@ class PortfolioEngine:
             n_sectors       = rec_df["n_sectors"],
             cb_active       = rec_df["cb_active"],
             regime_ok       = rec_df["regime_ok"],
+            exposure_series = rec_df["exposure"],
             trades          = pd.DataFrame(trades),
             initial_capital = self.capital,
             strategy_name   = next(iter(self.strategies.values())).name,
@@ -497,6 +500,7 @@ class PortfolioResult:
     n_sectors:       pd.Series
     cb_active:       pd.Series
     regime_ok:       pd.Series
+    exposure_series: pd.Series   # 日次 投資額/総資産（0〜1）
     trades:          pd.DataFrame
     initial_capital: float
     strategy_name:   str
@@ -568,6 +572,10 @@ class PortfolioResult:
         regime_pct = self.regime_ok.mean() * 100
         print(f" 市場上昇期間 : {regime_pct:>8.1f}% （絶対モメンタムOK日）")
         print(f" Calmar比     : {self.cagr / abs(self.max_drawdown) if self.max_drawdown != 0 else float('inf'):>9.3f}")
+        avg_exp = self.exposure_series.mean()
+        p10_exp = self.exposure_series.quantile(0.1)
+        p90_exp = self.exposure_series.quantile(0.9)
+        print(f" 平均エクスポージャー: {avg_exp*100:>5.1f}%  (p10={p10_exp*100:.1f}%  p90={p90_exp*100:.1f}%)")
         print("=" * width)
 
     def plot(self, save_path: str = None) -> None:
