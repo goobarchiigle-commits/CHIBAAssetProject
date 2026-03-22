@@ -1,5 +1,5 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-03-21（RSRコンテキスト修正 + exit=20正式適用 + exposure実測）
+# Single Source of Truth / 最終更新: 2026-03-22（min_rsr感度分析 + SEPA感度分析 + Step3 OOS検証完了）
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
 
 ---
@@ -21,25 +21,40 @@
 
 ---
 
-## 現在の最良戦略（V2設定 / RSRコンテキスト修正後）
+## 現在の最良戦略（Step3 OOS検証済み / 2026-03-22確定）
 
-**スクリプト**: `run_live_signal.py`（実運用）/ `backtest/portfolio_v2.py`（バックテスト）
+### バックテスト確定設定（V2アーキテクチャ / portfolio_v2.py / step3_final_validation.py）
 
-| 指標 | 修正前（旧） | 修正後（現在） |
-|---|---|---|
-| CAGR | +16.26% | **+16.74%** |
-| Sharpe | 1.693 | **1.685** |
-| MaxDD | -6.12% | -9.68% |
-| Calmar | 2.656 | **1.729** |
-| 平均保有銘柄数 | 1.60 | 1.93 |
-| avg_exposure | 約17%（推定） | **31.5%** |
-| exposure p50 | — | 29.5% |
-| exposure p90 | — | 64.7% |
+| 指標 | 値 |
+|---|---|
+| CAGR | **+16.51%** |
+| Sharpe | **1.616** |
+| MaxDD | **-9.19%** |
+| Calmar | **1.796** |
+| 平均保有銘柄数 | 1.91 |
+| avg_exposure | 32.7% |
+| 負け年 | 1/7（2018: -2.0%のみ） |
+| WF OOS/IS比 | 1.10（5セグメント・過学習なし） |
 
-> **注意**: 旧Calmar=2.656はRSRを24銘柄内で計算していたため過大評価。修正後Calmar=1.729が実態に近い性能。
+**確定パラメータ（変更禁止）**:
+- `min_rsr = 75.0`（感度分析60/65/70/75で最良）
+- `min_sepa = 6`（3〜5と同等以上、SEPA自体はボトルネックでなかった）
+- `max_positions = 3`（4で悪化）
+- 均等ウェイト（vol_target=0, use_idm=False）
+- ユニバース: V2固定29銘柄（tickers_27 + 6857.T + 6594.T）
 
-**パラメータ**: `configs/strategy.yaml` 参照（`turtle_exit: 20` 確定済み）
-**ユニバース**: `configs/universe/2026Q1_temporal24.json`（24銘柄・実運用）/ RSRコンテキスト: TOPIX100（77銘柄）
+### 実運用設定（別アーキテクチャ / run_live_signal.py）
+- `top_k = 4`（min_rsr=0.0、ランク方式でRSR閾値を代替）
+- ユニバース: TEMPORAL24（2015-2017選定 / 2018-2024評価）
+- 真の性能推定: Sharpe=1.070 / CAGR=+9.98% / MaxDD=-10.62%
+- ⚠ バックテスト確定設定とは別アーキテクチャ。`min_rsr`を直接変更しないこと
+
+### エントリーファンネル構造（確認済み）
+```
+Universe(16銘柄フジコ対象) → RSR通過(6.2/日) → SEPA通過(5.8/日) → シグナル(0.4/日)
+ボトルネック: RSRモメンタム+Turtle（SEPA後94%脱落）= 戦略の設計通り
+zero_exp≈19% = 下降相場での意図的待機（Feature）
+```
 
 ---
 
