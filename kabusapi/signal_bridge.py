@@ -233,8 +233,8 @@ class SignalBridge:
         self.order_rate_interval_sec   = 60.0 / max(1, order_rate_limit_per_min)
         self._state_file               = portfolio_state_file or PORTFOLIO_STATE_FILE
 
-        # top_k モード: min_rsr を 0 に設定（ランクで代替）
-        self._fujiko_params_live = {**fujiko_params, "min_rsr": 0.0}
+        # min_rsr はパラメータをそのまま使う（research と同じ閾値フィルター）
+        self._fujiko_params_live = {**fujiko_params}
 
         self._client = None
         try:
@@ -482,7 +482,9 @@ class SignalBridge:
         today     = pd.Timestamp.now().normalize()
         today_str = today.strftime("%Y-%m-%d")
 
-        # ── RSR 計算（24 銘柄固定ユニバース） ──────────────────────────
+        # ── RSR 計算（42銘柄統一コンテキスト） ──────────────────────────
+        # research / live / backtest で同一の母集団を使うことで
+        # RSR percentile の意味を統一する（母集団が変わると別指標になる）
         rsr_prices = {
             sym: info["df"]["Close"]
             for sym, info in universe_raw.items()
@@ -492,7 +494,7 @@ class SignalBridge:
         rsr_latest   = rsr_universe.iloc[-1]   # 最新スナップショット
 
         logger.info(
-            "RSR ユニバース: %d 銘柄（期待値=24。変化したら異常）",
+            "RSR コンテキスト: %d 銘柄（統一42銘柄）",
             len(rsr_prices),
         )
 
@@ -513,19 +515,9 @@ class SignalBridge:
             len(liquidity), len(rsr_prices), f"{MIN_DAILY_VALUE_YEN:,.0f}",
         )
 
-        # ── Top-k 選出（売買ユニバース内から選出・RSRスコアはTOPIX100コンテキスト） ──
-        # RSRスコアはTOPIX100で正規化済みだが、top_k候補はTEMPORAL24に限定する。
-        # こうすることでバックテストと同じ「TEMPORAL24内のRSR順位上位k銘柄」をBUY対象にできる。
-        trade_syms = set(self.universe_tickers.keys())
-        rsr_for_rank = rsr_latest[
-            (rsr_latest.index.isin(liquidity) | rsr_latest.index.isin(current_positions))
-            & rsr_latest.index.isin(trade_syms)
-        ]
-        top_k_syms = select_top_k(rsr_for_rank, k=self.top_k, liquidity=liquidity)
-        logger.info(
-            "Top-%d 選出（TEMPORAL24内）: %s",
-            self.top_k, top_k_syms,
-        )
+        # ── min_rsr 閾値（research と同じ filter-first アーキテクチャ） ──────
+        # top_k は最後にBUY候補をRSR順にソートして絞るために使う（一次フィルターではない）
+        min_rsr_threshold = self._fujiko_params_live.get("min_rsr", 75.0)
 
         # RSR 順位マップ（全銘柄、1=最高）
         rsr_rank_map: dict[str, int] = {
@@ -571,7 +563,7 @@ class SignalBridge:
                 hold_td      = _trading_days_held(pos_entry_dates[sym], today)
                 is_time_exit = hold_td >= self.max_hold_days
 
-            # ── FujikoStrategy（min_rsr=0 で RSR 閾値を無効化） ──────
+            # ── FujikoStrategy（min_rsr=75 で研究と同じ閾値フィルター） ────
             fujiko_strat = FujikoStrategy(
                 rsr_series       = rsr,
                 benchmark_prices = bench_prices,
@@ -583,9 +575,9 @@ class SignalBridge:
             mr_strat = MeanReversionStrategy(**MR_PARAMS)
             m_signal = mr_strat.generate_signal(df)
 
-            # ── Top-k + 時間ストップ override ───────────────────────
-            in_top_k     = sym in top_k_syms
-            is_rank_exit = currently_holding and not in_top_k
+            # ── filter-first アーキテクチャ（research と同じ） ───────────
+            # 優先順位: 時間ストップ > RSR低下エグジット > 再エントリー禁止 > 戦略シグナル
+            is_rank_exit = currently_holding and rsr_now < min_rsr_threshold
 
             if is_time_exit:
                 signal_int    = -1
@@ -599,12 +591,20 @@ class SignalBridge:
                 signal_int    = -1
                 strategy_type = "fujiko"
                 reason = (
-                    f"SELL[ランク圏外]: RSR={rsr_now:.1f} rank={rsr_rank}"
-                    f"（top{self.top_k}外）"
+                    f"SELL[RSR低下]: RSR={rsr_now:.1f} < 閾値{min_rsr_threshold:.0f}"
+                    f" rank={rsr_rank}"
                 )
 
-            elif in_top_k and sym not in active_blocked:
-                # Top-k 内: セクター別ロジックを適用
+            elif sym in active_blocked:
+                signal_int    = 0
+                strategy_type = "fujiko"
+                reason = (
+                    f"HOLD[再エントリー禁止〜{reentry_blocked[sym]}]:"
+                    f" rank={rsr_rank} RSR={rsr_now:.1f}"
+                )
+
+            else:
+                # 全銘柄で戦略を実行（FujikoStrategy が RSR≥min_rsr, SEPA, breakout を内部フィルター）
                 rule = SECTOR_STRATEGY.get(sector, "dynamic")
                 if rule == "fujiko":
                     signal_int, strategy_type = f_signal, "fujiko"
@@ -624,30 +624,18 @@ class SignalBridge:
                 strat_label = "フジコ法" if strategy_type == "fujiko" else "平均回帰"
                 if signal_int == 1:
                     reason = (
-                        f"BUY[{strat_label}]: rank={rsr_rank} top{self.top_k}"
-                        f" SEPA={sepa_now} RSR={rsr_now:.1f} mom={mom_now:+.1f}"
+                        f"BUY[{strat_label}]: RSR={rsr_now:.1f} rank={rsr_rank}"
+                        f" SEPA={sepa_now} mom={mom_now:+.1f}"
                     )
                 elif signal_int == -1:
                     reason = (
-                        f"SELL[{strat_label}]: rank={rsr_rank}"
-                        f" RSR={rsr_now:.1f} mom={mom_now:+.1f}"
+                        f"SELL[{strat_label}]: RSR={rsr_now:.1f} mom={mom_now:+.1f}"
                     )
                 else:
                     reason = (
-                        f"HOLD: rank={rsr_rank} top{self.top_k}"
-                        f" SEPA={sepa_now} RSR={rsr_now:.1f} ({strat_label})"
+                        f"HOLD: RSR={rsr_now:.1f} rank={rsr_rank}"
+                        f" SEPA={sepa_now} ({strat_label})"
                     )
-
-            else:
-                signal_int    = 0
-                strategy_type = "fujiko"
-                if sym in active_blocked:
-                    reason = (
-                        f"HOLD[再エントリー禁止〜{reentry_blocked[sym]}]:"
-                        f" rank={rsr_rank} RSR={rsr_now:.1f}"
-                    )
-                else:
-                    reason = f"HOLD: rank={rsr_rank}（top{self.top_k}外） RSR={rsr_now:.1f}"
 
             signals.append(StockSignal(
                 symbol            = sym,
@@ -662,6 +650,17 @@ class SignalBridge:
                 reason            = reason,
                 strategy_type     = strategy_type,
             ))
+
+        # BUY 候補を RSR 降順でソートして top_k 個に絞る（eligible.sort → eligible[:top_k]）
+        buy_eligible = sorted(
+            [(s.rsr, s.symbol) for s in signals if s.signal == 1 and not s.currently_holding],
+            reverse=True,
+        )
+        top_k_syms = [sym for _, sym in buy_eligible[:self.top_k]]
+        logger.info(
+            "BUY 候補（RSR順）: %s → top%d = %s",
+            [sym for _, sym in buy_eligible], self.top_k, top_k_syms,
+        )
 
         return signals, top_k_syms
 
@@ -955,6 +954,16 @@ class SignalBridge:
         orders, order_warnings = self._build_orders(
             signals, universe_raw, current_positions, available_cash,
             cb_active=cb_active,
+        )
+
+        # 6b. LIVE_STATE サマリーログ（戦略停止 / 市場悪化 / フィルター過剰 の切り分け用）
+        _buy_cands = [s for s in signals if s.signal == 1 and not s.currently_holding]
+        _entries   = [o for o in orders if o.side == "BUY"]
+        _exposure  = 1.0 - available_cash / max(1.0, current_equity)
+        logger.info(
+            "LIVE_STATE candidates=%d ranked=%d entries=%d positions=%d exposure=%.3f",
+            len(_buy_cands), len(top_k_syms), len(_entries),
+            len(current_positions), _exposure,
         )
 
         # 7. 結果オブジェクト構築

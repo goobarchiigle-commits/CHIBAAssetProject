@@ -4,18 +4,18 @@
   "is_period": "2018-01-01/2024-12-31",
   "oos_period": "2025-01-01/2025-12-31",
   "IS": {
-    "sharpe": 0.387,
-    "cagr": 3.56,
-    "max_dd": -12.21,
-    "calmar": 0.292,
-    "avg_exposure": 0.756
+    "sharpe": 0.606,
+    "cagr": 5.82,
+    "max_dd": -11.31,
+    "calmar": 0.514,
+    "avg_exposure": 0.754
   },
   "OOS_2025": {
-    "sharpe": -2.646,
-    "cagr": -11.7,
-    "max_dd": -11.31,
-    "calmar": -1.035,
-    "avg_exposure": 0.222,
+    "sharpe": -0.267,
+    "cagr": -2.42,
+    "max_dd": -6.09,
+    "calmar": -0.397,
+    "avg_exposure": 0.848,
     "trades_per_month": 0.0,
     "days_to_recover": 243.0
   },

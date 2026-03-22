@@ -330,8 +330,7 @@ _LEGACY_G29_UNIVERSE_REMOVED = True
 
 FUJIKO_PARAMS = dict(
     min_sepa         = 6,
-    # min_rsr は top_k_selection で代替（0.0 = 閾値無効化）
-    min_rsr          = 0.0,
+    min_rsr          = 75.0,   # research 確定値（filter-first アーキテクチャ）
     mom_period       = 21,
     turtle_entry     = 20,
     turtle_exit      = 20,
@@ -472,20 +471,20 @@ def main() -> int:
     import warnings
     warnings.filterwarnings("ignore")
 
-    # ---- RSRユニバース（TOPIX100）を設定 ----
-    # RSRスコアはTOPIX100コンテキスト（74銘柄）で計算する。
-    # これにより「TEMPORAL24内の相対ランク」ではなく「市場全体での相対強度」を正確に計測できる。
-    # 売買対象は引き続きTEMPORAL24のみ（LIVE_UNIVERSE）。
-    _rsr_universe_file = os.environ.get("RSR_UNIVERSE_FILE")
-    if _rsr_universe_file:
-        import pandas as _pd_rsr
-        _rsr_df = _pd_rsr.read_csv(_rsr_universe_file)
-        RSR_UNIVERSE: dict[str, str] = {
-            sym: "不明" for sym in _rsr_df["symbol"].astype(str).tolist()
-        }
-    else:
-        from backtest.universe_builder import TOPIX100_TICKERS
-        RSR_UNIVERSE = dict(TOPIX100_TICKERS)
+    # ---- RSRユニバース（42銘柄統一コンテキスト）を設定 ----
+    # research / live / backtest で同一の母集団を使い RSR percentile を統一する。
+    # RSR は cross-sectional factor なので母集団が変わると別指標になる。
+    # 環境変数 RSR_UNIVERSE_FILE で上書き可能。デフォルトは configs/rsr_universe_42.csv。
+    _rsr_universe_file = os.environ.get(
+        "RSR_UNIVERSE_FILE",
+        str(Path(__file__).parent / "configs" / "rsr_universe_42.csv"),
+    )
+    import pandas as _pd_rsr
+    _rsr_df = _pd_rsr.read_csv(_rsr_universe_file)
+    RSR_UNIVERSE: dict[str, str] = {
+        row["symbol"]: row.get("sector", "不明")
+        for _, row in _rsr_df.iterrows()
+    }
 
     logger.info(
         "RSR context size=%d trade_universe=%d",

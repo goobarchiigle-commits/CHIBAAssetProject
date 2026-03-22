@@ -1,0 +1,81 @@
+{
+  "date": "2026-03-15",
+  "script": "backtest/universe_expansion.py",
+  "period": "2018-2024",
+  "hypothesis": "CAGRのボトルネックは戦略品質でなく資本稼働率（83%キャッシュ）",
+
+  "results": {
+    "A_screened_27_p3": {
+      "label": "現行（27銘柄/スクリーニング済み/max_pos=3）",
+      "n_stocks": 27, "max_positions": 3, "screening": true,
+      "cagr": 0.158, "sharpe": 1.666, "max_dd": -0.078, "calmar": 2.020,
+      "avg_positions": 1.77, "zero_pos_days_pct": 0.210, "capital_utilization": 0.590, "n_trades": 264
+    },
+    "B_74_p3": {
+      "label": "74銘柄/スクリーニングなし/max_pos=3",
+      "n_stocks": 76, "max_positions": 3, "screening": false,
+      "cagr": 0.097, "sharpe": 0.870, "max_dd": -0.132, "calmar": 0.731,
+      "avg_positions": 2.39, "zero_pos_days_pct": 0.143, "capital_utilization": 0.798, "n_trades": 391
+    },
+    "B_74_p5": {
+      "label": "74銘柄/スクリーニングなし/max_pos=5",
+      "n_stocks": 76, "max_positions": 5, "screening": false,
+      "cagr": 0.074, "sharpe": 0.706, "max_dd": -0.150, "calmar": 0.493,
+      "avg_positions": 3.59, "zero_pos_days_pct": 0.150, "capital_utilization": 0.718, "n_trades": 592
+    },
+    "B_74_p8": {
+      "label": "74銘柄/スクリーニングなし/max_pos=8",
+      "n_stocks": 76, "max_positions": 8, "screening": false,
+      "cagr": 0.068, "sharpe": 0.848, "max_dd": -0.118, "calmar": 0.571,
+      "avg_positions": 4.06, "zero_pos_days_pct": 0.164, "capital_utilization": 0.507, "n_trades": 693
+    },
+    "C_83_p3": {
+      "label": "拡張83銘柄/スクリーニングなし/max_pos=3",
+      "n_stocks": 83, "max_positions": 3, "screening": false,
+      "cagr": -0.003, "sharpe": -0.007, "max_dd": -0.154, "calmar": -0.020,
+      "avg_positions": 0.50, "zero_pos_days_pct": 0.811, "capital_utilization": 0.166, "n_trades": 83
+    },
+    "C_83_p5": {
+      "label": "拡張83銘柄/スクリーニングなし/max_pos=5",
+      "n_stocks": 83, "max_positions": 5, "screening": false,
+      "cagr": -0.020, "sharpe": -0.340, "max_dd": -0.171, "calmar": -0.120,
+      "avg_positions": 0.74, "zero_pos_days_pct": 0.814, "capital_utilization": 0.149, "n_trades": 140
+    },
+    "C_83_p8": {
+      "label": "拡張83銘柄/スクリーニングなし/max_pos=8",
+      "n_stocks": 83, "max_positions": 8, "screening": false,
+      "cagr": 0.078, "sharpe": 0.869, "max_dd": -0.120, "calmar": 0.648,
+      "avg_positions": 4.32, "zero_pos_days_pct": 0.157, "capital_utilization": 0.540, "n_trades": 741
+    }
+  },
+
+  "walk_forward_B74_p5": {
+    "windows": [
+      {"is": "2018-2019", "oos": "2020", "is_sharpe": 0.385, "oos_sharpe": 2.622, "ratio": 6.81},
+      {"is": "2019-2020", "oos": "2021", "is_sharpe": 0.306, "oos_sharpe": 0.226, "ratio": 0.74},
+      {"is": "2020-2021", "oos": "2022", "is_sharpe": 1.056, "oos_sharpe": 1.360, "ratio": 1.29},
+      {"is": "2021-2022", "oos": "2023", "is_sharpe": 0.353, "oos_sharpe": 1.923, "ratio": 5.44},
+      {"is": "2022-2023", "oos": "2024", "is_sharpe": 1.274, "oos_sharpe": 1.797, "ratio": 1.41}
+    ],
+    "oos_is_avg": 3.14,
+    "verdict": "過学習なし"
+  },
+
+  "sector_entry_count_B74_p5": {
+    "電機": 86, "商社": 73, "電機精密": 52, "銀行": 47, "化学": 43,
+    "輸送機器": 39, "医薬品": 37, "情報通信": 36, "食品": 28, "保険": 24,
+    "機械": 21, "鉄鋼": 18, "海運": 18, "不動産": 16, "陸運": 15,
+    "小売": 13, "石油": 10, "レジャー": 7, "ガス": 5, "ゲーム": 4, "サービス": 4
+  },
+
+  "key_findings": [
+    "スクリーニング廃止でCAGRが15.8%→7.4%に大幅低下（仮説は不成立）",
+    "74銘柄フル投入で平均保有は1.77→3.59銘柄に増加、資本稼働率も59%→72%に改善",
+    "しかしフジコ法シグナルが苦手な銘柄（ガス・鉄鋼・銀行等）にも発動し品質が希薄化",
+    "C拡張83銘柄では追加7銘柄のRSR/SEPAシグナルが機能せずCAGRがマイナスに転落",
+    "WFA OOS/IS=3.14は過学習がないことを示すが、絶対パフォーマンスは低い",
+    "結論: スクリーニングは単純なバックテスト過学習ではなく、戦略と銘柄の相性フィルターとして機能していた"
+  ],
+
+  "revised_hypothesis": "スクリーニングの問題は『in-sample選択バイアス』より『フィルター基準の適切性』。Sharpe>0.3による選択を『ファンダメンタル基準＋セクター適性』に置き換えることが次の研究課題。"
+}

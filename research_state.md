@@ -1,5 +1,5 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-03-22（min_rsr感度分析 + SEPA感度分析 + Step3 OOS検証完了）
+# Single Source of Truth / 最終更新: 2026-03-22（ローリング選定ユニバース構築 + ライブ等価バックテスト OOS検証完了）
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
 
 ---
@@ -393,6 +393,83 @@ MAX_POS = 4 / MIN_SECTORS = 1 / MAX_DD_LIMIT = 0.15
 
 ---
 
+## 完了した研究（2026-03-22）
+
+### ✅ RSRコンテキスト不一致の診断・修正（2026-03-22）
+
+**問題**: ライブ avg_exposure = 8.3% （研究値 32.7% の1/4）
+
+**根本原因チェーン**:
+1. RSRコンテキスト3方向ミスマッチ: ライブ=77銘柄 / 研究=42銘柄 / バックテスト=24銘柄 → RSRパーセンタイル非比較
+2. アーキテクチャ不一致: ライブは top_k-first（閾値なし）、研究は filter-first（RSR≥75 閾値）
+3. G27 = in-sample選定（2018-2024データで選定した銘柄を2018-2024で評価）→ Sharpe過大評価
+
+**修正内容**:
+
+| ファイル | 変更内容 |
+|---|---|
+| `configs/rsr_universe_42.csv` | **新規作成**: 42銘柄統一RSRコンテキスト（G27 + 15追加） |
+| `run_live_signal.py` | RSR universe を TOPIX100→42銘柄CSVに変更、min_rsr=75.0に修正 |
+| `kabusapi/signal_bridge.py` | min_rsr強制0化を削除、filter-firstアーキテクチャに修正、LIVE_STATEロギング追加 |
+| `analysis/live_exposure_report.py` | **新規作成**: Phase2 exposure モニタリングレポート |
+| `backtest/live_equivalent.py` | **新規作成**: 42銘柄RSRコンテキスト + filter-first + --rolling フラグ |
+
+### ✅ ローリング選定ユニバース構築（2026-03-22）
+
+**スクリプト**: `backtest/rolling_universe.py`（新規）
+**出力**: `configs/rolling_universe.json`
+
+**設計**:
+- 3年 train → 1年 OOS、7フォールド（2015-2017→2018 〜 2021-2023→2024）
+- スクリーニング基準: Sharpe>0.3 AND MaxDD<30% ← G27と同一閾値だがOOS
+- RSR: trainウィンドウ内のTOPIX100コンテキストで計算（テストデータ混入なし）
+
+**結果**:
+| フォールド | train期間 | OOS年 | 選定銘柄数 |
+|---|---|---|---|
+| 1 | 2015-2017 | 2018 | 26 |
+| 2 | 2016-2018 | 2019 | 15 |
+| 3 | 2017-2019 | 2020 | 9 |
+| 4 | 2018-2020 | 2021 | 15 |
+| 5 | 2019-2021 | 2022 | 22 |
+| 6 | 2020-2022 | 2023 | 26 |
+| 7 | 2021-2023 | 2024 | 30 |
+| **平均** | — | — | **20.4** |
+
+延べユニーク銘柄: 59（TOPIX100から76銘柄取得成功、9613.Tは上場廃止でスキップ）
+
+### ✅ ローリングOOS ライブ等価バックテスト（2026-03-22）
+
+**スクリプト**: `backtest/live_equivalent.py --rolling`
+**スクリプト**: `backtest/topk_sweep.py`（topk_live_equivalent.py の sweep用ラッパー）
+
+#### 結果
+
+| 指標 | Rolling OOS | G27 IS（参考） | IS→OOS保持率 |
+|---|---|---|---|
+| Sharpe | **0.942** | 1.693 | **55.6%** |
+| CAGR | **+7.55%** | +16.26% | — |
+| MaxDD | -9.29% | -6.12% | — |
+| Calmar | 0.813 | 2.656 | — |
+| avg_exposure | 19.7% | 32.7% | — |
+| avg_candidates | 0.20/日 | — | — |
+| 取引数 | 204 | — | — |
+| 勝率 | 52.5% | — | — |
+
+#### 解釈
+
+- **✅ OOS Sharpe = 0.942 > Phase1基準 0.5**: 戦略はルックアヘッドバイアスなしで機能する
+- **⚠ avg_exposure = 19.7%（目標25-35%）**: 候補頻度不足の構造的問題は残存
+- **⚠ avg_candidates = 0.20/日（目標0.3/日）**: RSR≥75閾値通過銘柄が少ない
+- **IS→OOS Sharpe保持率 55.6%**: G27 in-sample選定バイアスの大きさを定量確認。TEMPORALのIS/OS=1.07/0.942=1.14と整合
+- **2020年銘柄数9が exposure 低い年に相当する可能性が高い**
+
+#### 次のアクション（確認中）
+- ライブアーキテクチャへの適用前に **paper trade 2週間** 実施
+- min_rsr 閾値緩和（75→70）の exposure vs Sharpe トレードオフ検証
+
+---
+
 ## 次の研究タスク（優先順）
 
 | 優先度 | タスク | 根拠 |
@@ -403,9 +480,10 @@ MAX_POS = 4 / MIN_SECTORS = 1 / MAX_DD_LIMIT = 0.15
 | ~~4~~（完了） | ~~2025年実運用OOS検証~~ | 2026-03-19 完了 |
 | ~~5~~（完了） | ~~Top-k ローテーション実装・ライブ統合~~ | 2026-03-20 完了 |
 | ~~6~~（完了） | ~~RSRコンテキスト修正・exit=20正式適用・exposure実測~~ | 2026-03-21 完了 |
-| **1** | `min_rsr` 感度分析（60/65/70/75）→ exposure vs Calmar のトレードオフ測定 | avg_exposure=31.5%が低い。RSRフィルター緩和でエントリー頻度を上げる候補 |
-| **2** | `portfolio_state.json` の初期値を実際の保有状況に合わせる | 現在保有 5401.T / 5411.T → entry_date を手動設定しないとtime_exitが誤動作 |
-| **3** | CBデッドロック修正: `entry_stop_only` 方式のOOS検証 | 2025年4月CB→8ヶ月ロック問題。entry_stop_only（Calmar 1.029確認済み）をTopK基盤で再検証 |
+| ~~7~~（完了） | ~~ローリング選定ユニバース構築 + OOS等価バックテスト~~ | 2026-03-22 完了 |
+| **1** | **min_rsr 閾値 75→70 で exposure改善検証** | OOS Sharpe=0.942維持のまま avg_exposure を25%以上に改善できるか確認 |
+| **2** | **paper trade 2週間**: filter-first + 42銘柄RSR での実シグナル観察 | ライブ適用前の検証。シグナル頻度・候補数を実測 |
+| **3** | `portfolio_state.json` の初期値を実際の保有状況に合わせる | 現在保有 5401.T / 5411.T → entry_date を手動設定しないとtime_exitが誤動作 |
 | 保留 | R²×スロープランキング（Clenow方式）への置き換え | 現在は単純 RSR。品質モメンタムで選別精度向上の可能性 |
 
 ---
