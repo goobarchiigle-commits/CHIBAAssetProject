@@ -130,6 +130,7 @@ def run_backtest(
     max_single_weight:        float = MAX_SINGLE_WEIGHT,
     max_new_positions_per_day: int  = MAX_NEW_PER_DAY,
     use_rolling:              bool  = False,   # True: ローリング選定ユニバースを使用
+    use_broad_rsr:            bool  = False,   # True: RSR context = TOPIX100全件(~76), False: 年別選定銘柄
     verbose:                  bool  = True,
 ) -> dict:
     """
@@ -138,9 +139,14 @@ def run_backtest(
     use_rolling=False: TEMPORAL24 固定ユニバース（デフォルト）
     use_rolling=True : ローリング選定ユニバース（look-ahead bias 除去版）
 
-    ローリングモードでの RSR コンテキスト:
-      各年の選定銘柄そのものを RSR コンテキストとして使用。
-      → context サイズは 25〜40（42 固定よりも動的だが均質）
+    RSR コンテキスト設計:
+      use_broad_rsr=False（デフォルト）:
+        ローリングモード: 各年の選定銘柄のみでRSRパーセンタイルを計算
+        → context サイズ 9〜30（分布が薄く、min_rsr=75の閾値が実質的に緩くなる）
+      use_broad_rsr=True（推奨実験）:
+        Ranking universe = TOPIX100全件（~76銘柄）でRSR計算
+        Trading universe = ローリング選定銘柄（20〜30銘柄）
+        → cross-sectional alpha が強化される（プロ設計）
 
     Returns: 性能指標の辞書
     """
@@ -176,22 +182,37 @@ def run_backtest(
 
     # ---- 3. RSR 計算 ----
     if use_rolling:
-        # ローリングモード: 年別 RSR（各年の選定銘柄をコンテキストとして使用）
+        # ローリングモード: 年別 RSR
         if verbose:
-            print("[3/4] RSR 計算（年別コンテキスト）...")
+            ctx_label = "TOPIX100全件(broad)" if use_broad_rsr else "年別選定銘柄(narrow)"
+            print(f"[3/4] RSR 計算（{ctx_label}コンテキスト）...")
         rsr_by_year: dict[int, pd.DataFrame] = {}
-        for yr, yr_syms in rolling_univs.items():
-            yr_prices = {
+
+        if use_broad_rsr:
+            # Ranking universe = 全ダウンロード済み銘柄（~76）でRSR計算
+            # → 各年共通の広いコンテキストで RSR パーセンタイルを計算
+            broad_prices = {
                 sym: universe_raw[sym]["df"]["Close"]
-                for sym in yr_syms
-                if sym in universe_raw
+                for sym in universe_raw
             }
-            if yr_prices:
-                rsr_by_year[yr] = calc_universe_rsr(yr_prices)
-        rsr_df = None   # ローリングモードでは使わない
-        if verbose:
-            for yr, df in rsr_by_year.items():
-                print(f"  {yr}: RSR context={df.shape[1]}銘柄")
+            rsr_broad = calc_universe_rsr(broad_prices)
+            for yr in rolling_univs:
+                rsr_by_year[yr] = rsr_broad   # 全年同じ広いコンテキストを使う
+            if verbose:
+                print(f"  全年共通: RSR context={rsr_broad.shape[1]}銘柄（TOPIX100 broad）")
+        else:
+            # Ranking universe = 各年の選定銘柄のみ（従来動作）
+            for yr, yr_syms in rolling_univs.items():
+                yr_prices = {
+                    sym: universe_raw[sym]["df"]["Close"]
+                    for sym in yr_syms
+                    if sym in universe_raw
+                }
+                if yr_prices:
+                    rsr_by_year[yr] = calc_universe_rsr(yr_prices)
+            if verbose:
+                for yr, df in rsr_by_year.items():
+                    print(f"  {yr}: RSR context={df.shape[1]}銘柄")
     else:
         # 固定モード: 42銘柄コンテキスト
         if verbose:
@@ -257,6 +278,7 @@ def run_backtest(
     exposure_list: list[float]         = []
     pos_list:      list[float]         = []
     cand_list:     list[int]           = []   # 1日のBUY候補数
+    hhi_list:      list[float]         = []   # Herfindahl 集中度
     trades:        list[dict]          = []
     cb_active      = False
     peak_equity    = float(capital)
@@ -304,6 +326,18 @@ def run_backtest(
             peak_equity = cur_equity
         dd = (cur_equity - peak_equity) / peak_equity
         cb_active = dd < -MAX_DD_LIMIT
+
+        # HHI（保有時のみ計算）
+        if positions:
+            weights = [
+                pos.qty * float(universe_raw[sym]["df"].loc[date, "Close"])
+                / max(1.0, cur_equity)
+                for sym, pos in positions.items()
+                if sym in universe_raw and date in universe_raw[sym]["df"].index
+            ]
+            hhi_list.append(sum(w * w for w in weights))
+        else:
+            hhi_list.append(0.0)
 
         # ── シグナル生成（filter-first） ─────────────────────────────
         sell_signals: list[tuple]  = []   # (sym, reason)
@@ -424,6 +458,11 @@ def run_backtest(
     avg_candidates = float(np.mean(cand_list))
     zero_exp_rate  = sum(1 for e in exposure_list if e == 0) / max(1, len(exposure_list)) * 100
 
+    # HHI（保有日のみ）
+    hhi_invested   = [h for h in hhi_list if h > 0]
+    avg_hhi        = float(np.mean(hhi_invested)) if hhi_invested else 0.0
+    max_hhi        = float(np.max(hhi_invested))  if hhi_invested else 0.0
+
     sells      = [t for t in trades if t["side"] == "SELL" and t["pnl"] is not None]
     win_rate   = sum(1 for t in sells if t["pnl"] > 0) / max(1, len(sells))
 
@@ -438,6 +477,8 @@ def run_backtest(
         "zero_exp_rate": zero_exp_rate,
         "trade_count":   len(sells),
         "win_rate":      win_rate,
+        "avg_hhi":       avg_hhi,
+        "max_hhi":       max_hhi,
         "equity_curve":  eq,
     }
 
@@ -464,9 +505,13 @@ def main() -> int:
     p.add_argument("--min-rsr", type=float, default=MIN_RSR)
     p.add_argument("--rolling", action="store_true",
                    help="ローリング選定ユニバースを使用（look-ahead bias 除去）")
+    p.add_argument("--broad-rsr", action="store_true",
+                   help="RSR context を TOPIX100全件(~76銘柄)に拡大（ranking/trading 分離）")
     args = p.parse_args()
 
     mode = "ローリング選定" if args.rolling else "TEMPORAL24 固定"
+    if args.rolling and args.broad_rsr:
+        mode += " / broad RSR(~76)"
     print("=" * 64)
     print(f"  ライブ等価バックテスト（{mode} / filter-first）")
     print(f"  期間: {args.start} 〜 {args.end}  /  初期資本: ¥{CAPITAL:,}")
@@ -474,7 +519,8 @@ def main() -> int:
     print("=" * 64)
 
     m = run_backtest(start=args.start, end=args.end,
-                     min_rsr=args.min_rsr, use_rolling=args.rolling, verbose=True)
+                     min_rsr=args.min_rsr, use_rolling=args.rolling,
+                     use_broad_rsr=args.broad_rsr, verbose=True)
 
     print(f"\n  CAGR      {m['cagr']:>+8.2%}")
     print(f"  Sharpe    {m['sharpe']:>8.3f}")

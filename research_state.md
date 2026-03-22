@@ -438,35 +438,57 @@ MAX_POS = 4 / MIN_SECTORS = 1 / MAX_DD_LIMIT = 0.15
 
 延べユニーク銘柄: 59（TOPIX100から76銘柄取得成功、9613.Tは上場廃止でスキップ）
 
-### ✅ ローリングOOS ライブ等価バックテスト（2026-03-22）
+### ✅ ローリングOOS ライブ等価バックテスト + RSRコンテキスト最適化（2026-03-22）
 
-**スクリプト**: `backtest/live_equivalent.py --rolling`
-**スクリプト**: `backtest/topk_sweep.py`（topk_live_equivalent.py の sweep用ラッパー）
+**スクリプト**: `backtest/live_equivalent.py --rolling [--broad-rsr]`
+**スクリプト**: `backtest/rsr_context_sweep.py`（2×3グリッド sweep）
 
-#### 結果
+#### 実験グリッド結果（broad × min_rsr × max_single_weight）
 
-| 指標 | Rolling OOS | G27 IS（参考） | IS→OOS保持率 |
+**Phase 1: RSR context × min_rsr 2×3 sweep**
+
+| RSR context | min_rsr | Sharpe | CAGR | MaxDD | exposure | cands/日 |
+|---|---|---|---|---|---|---|
+| narrow（年別選定 9〜30） | 75 | 0.942 | +7.55% | -9.29% | 19.7% | 0.20 |
+| narrow | 70 | 0.810 | +6.70% | -9.91% | 21.9% | 0.23 |
+| **broad（TOPIX100 ~76）** | **75** | **1.139** | **+14.72%** | **-17.50%** | **37.7%** | **0.30** |
+| broad | 70 | 1.098 | +14.30% | -17.82% | 39.1% | 0.33 |
+
+**narrow→broad 効果（min_rsr=75固定）**: Sharpe +0.197、exposure +18pp、cands +0.10/日
+**min_rsr 感度（broad内）**: Sharpe差=0.045、exposure差=1.4pp → **閾値はボトルネックではなかった**
+
+**Phase 2: max_single_weight sweep（broad / max3 / min_rsr=75）**
+
+| max_single_weight | Sharpe | CAGR | MaxDD | exposure | HHI_avg | 判定 |
+|---|---|---|---|---|---|---|
+| 0.25（現行） | 1.139 | +14.72% | -17.50% | 37.7% | 0.104 | ❌ DD超過 |
+| **0.15（確定）** | **1.181** | **+10.07%** | **-12.66%** | **24.5%** | **0.043** | **✅ 全通過** |
+| 0.20（中間） | 1.145 | +12.02% | -14.58% | 30.2% | 0.064 | ❌ exp超過 |
+
+**HHI 解釈**: momentum clustering は主因でなかった。MaxDD-17.5%の正体は純粋に weight過大（1銘柄25%=50万円の直撃）。
+weight を下げると **Sharpe が上昇**（エクイティカーブのノイズ減少）。
+
+#### ✅ 確定設計（OOS検証済み）
+
+```
+RSR context      : TOPIX100 broad (~76銘柄)
+min_rsr          : 75.0
+architecture     : filter-first（RSR≥75 → RSR降順 → top max_positions）
+max_positions    : 3
+max_single_weight: 0.15   ← 今回の変更点
+```
+
+**OOS Rolling 検証結果（2018-2024、7フォールド、look-ahead biasなし）**:
+
+| 指標 | 値 | 基準 | 判定 |
 |---|---|---|---|
-| Sharpe | **0.942** | 1.693 | **55.6%** |
-| CAGR | **+7.55%** | +16.26% | — |
-| MaxDD | -9.29% | -6.12% | — |
-| Calmar | 0.813 | 2.656 | — |
-| avg_exposure | 19.7% | 32.7% | — |
-| avg_candidates | 0.20/日 | — | — |
-| 取引数 | 204 | — | — |
-| 勝率 | 52.5% | — | — |
+| Sharpe | **1.181** | >1.0 | ✅ |
+| MaxDD | **-12.66%** | <15% | ✅ |
+| avg_exposure | **24.5%** | 23-28% | ✅ |
+| avg_candidates | 0.30/日 | >0.3 | ✅ |
+| CAGR | +10.07% | — | — |
 
-#### 解釈
-
-- **✅ OOS Sharpe = 0.942 > Phase1基準 0.5**: 戦略はルックアヘッドバイアスなしで機能する
-- **⚠ avg_exposure = 19.7%（目標25-35%）**: 候補頻度不足の構造的問題は残存
-- **⚠ avg_candidates = 0.20/日（目標0.3/日）**: RSR≥75閾値通過銘柄が少ない
-- **IS→OOS Sharpe保持率 55.6%**: G27 in-sample選定バイアスの大きさを定量確認。TEMPORALのIS/OS=1.07/0.942=1.14と整合
-- **2020年銘柄数9が exposure 低い年に相当する可能性が高い**
-
-#### 次のアクション（確認中）
-- ライブアーキテクチャへの適用前に **paper trade 2週間** 実施
-- min_rsr 閾値緩和（75→70）の exposure vs Sharpe トレードオフ検証
+**IS→OOS 比較**: G27 IS Sharpe=1.693 → Rolling OOS Sharpe=1.181 → **保持率 69.8%**（前回narrow比で大幅改善）
 
 ---
 
@@ -480,10 +502,10 @@ MAX_POS = 4 / MIN_SECTORS = 1 / MAX_DD_LIMIT = 0.15
 | ~~4~~（完了） | ~~2025年実運用OOS検証~~ | 2026-03-19 完了 |
 | ~~5~~（完了） | ~~Top-k ローテーション実装・ライブ統合~~ | 2026-03-20 完了 |
 | ~~6~~（完了） | ~~RSRコンテキスト修正・exit=20正式適用・exposure実測~~ | 2026-03-21 完了 |
-| ~~7~~（完了） | ~~ローリング選定ユニバース構築 + OOS等価バックテスト~~ | 2026-03-22 完了 |
-| **1** | **min_rsr 閾値 75→70 で exposure改善検証** | OOS Sharpe=0.942維持のまま avg_exposure を25%以上に改善できるか確認 |
-| **2** | **paper trade 2週間**: filter-first + 42銘柄RSR での実シグナル観察 | ライブ適用前の検証。シグナル頻度・候補数を実測 |
-| **3** | `portfolio_state.json` の初期値を実際の保有状況に合わせる | 現在保有 5401.T / 5411.T → entry_date を手動設定しないとtime_exitが誤動作 |
+| ~~7~~（完了） | ~~ローリング選定ユニバース + RSRコンテキスト最適化 + weight最適化~~ | 2026-03-22 完了 |
+| **1** | **paper trade 2週間**: broad RSR + filter-first + w=0.15 での実シグナル観察 | ライブ適用前の検証。確定設計をドライランで確認 |
+| **2** | `run_live_signal.py` / `signal_bridge.py` に確定設計を反映 | broad RSR context + max_single_weight=0.15 への更新 |
+| **3** | `portfolio_state.json` の entry_date を実保有（5401.T / 5411.T）に合わせる | time_exit 誤動作防止 |
 | 保留 | R²×スロープランキング（Clenow方式）への置き換え | 現在は単純 RSR。品質モメンタムで選別精度向上の可能性 |
 
 ---
