@@ -496,9 +496,17 @@ class SignalBridge:
         rsr_universe = calc_universe_rsr(rsr_prices)
         rsr_latest   = rsr_universe.iloc[-1]   # 最新スナップショット
 
+        # Step 2 (観測バイアス): RSRコンテキスト全体の通過数を記録
+        # 売買ユニバースが RSR42 の部分集合のため、強い銘柄が価格フィルターで
+        # 除外されると diag_rsr_pass が低いまま固定される問題を検出する。
+        # rsr_pass_tradeable_ratio = diag_rsr_pass / _rsr_pass_context_total
+        # 0.6 以下 → 高 RSR 銘柄の多くが売買不可（価格 or 流動性フィルターで除外）
+        _min_rsr_for_ctx = self._fujiko_params_live.get("min_rsr", 75.0)
+        _rsr_pass_context_total = int((rsr_latest >= _min_rsr_for_ctx).sum())
+
         logger.info(
-            "RSR コンテキスト: %d 銘柄（統一42銘柄）",
-            len(rsr_prices),
+            "RSR コンテキスト: %d 銘柄（統一42銘柄）context_pass=%d",
+            len(rsr_prices), _rsr_pass_context_total,
         )
 
         # ── 流動性スコア（Volume × Close の 20 日平均） ───────────────
@@ -1233,8 +1241,10 @@ class SignalBridge:
             pass
 
         # Step 3: RSR Top10 ランキング安定性（昨日との重複率）+ Top10滞在半減期
-        _top10_overlap      = None
+        _top10_overlap        = None
         _rsr_leader_half_life = None
+        _rsr_leader_hl_slope  = None   # log-linear slope（回転判定補助）
+        _rsr_leader_hl_r2     = None   # R²（<0.2 = fit不安定 → half-life無効）
         _top10_today = [e["symbol"] for e in _diag.get("rsr_distribution", [])[:10]]
         try:
             _rsr_dist_path_tmp = _diag_dir / "rsr_distribution.jsonl"
@@ -1266,9 +1276,21 @@ class SignalBridge:
                         _ema    = _s_ret.ewm(span=min(10, len(_s_ret)), adjust=False).mean()
                         _y      = np.log(np.maximum(_ema.values, 1e-6))
                         _x      = np.arange(len(_y), dtype=float)
-                        _slope  = float(np.polyfit(_x, _y, 1)[0])
+                        _coeffs    = np.polyfit(_x, _y, 1)
+                        _slope     = float(_coeffs[0])
+                        _intercept = float(_coeffs[1])
+                        # R²計算: fit が不安定な場合（R²<0.2）は half-life を無効扱い
+                        _y_pred = _slope * _x + _intercept
+                        _ss_tot = float(np.sum((_y - np.mean(_y)) ** 2))
+                        _ss_res = float(np.sum((_y - _y_pred) ** 2))
+                        _r2     = round(1.0 - _ss_res / _ss_tot, 3) if _ss_tot > 1e-10 else 0.0
+                        _rsr_leader_hl_slope = round(_slope, 5)
+                        _rsr_leader_hl_r2    = _r2
                         if _slope >= 0:
                             _rsr_leader_half_life = 99.0
+                        elif _r2 < 0.2:
+                            # フィットが不安定（R²<0.2）→ half-life は計算しても信頼できない
+                            _rsr_leader_half_life = None  # 4/8判定では hl_latest=0 扱い
                         else:
                             _rsr_leader_half_life = round(-_math.log(2) / _slope, 1)
                     elif _retentions:
@@ -1300,8 +1322,10 @@ class SignalBridge:
             "signals_per_week":        _signals_per_week,
             # Step 3: RSR Top10 ランキング安定性（理想 overlap 4〜7）
             "top10_overlap":           _top10_overlap,
-            # Top10滞在半減期（>20日=強トレンド / <8日=回転相場）
+            # Top10滞在半減期（>12日=リーダー持続 / <8日=回転相場 / None=R²<0.2で信頼不可）
             "rsr_leader_half_life":    _rsr_leader_half_life,
+            "rsr_leader_hl_slope":     _rsr_leader_hl_slope,   # log-linear decay slope
+            "rsr_leader_hl_r2":        _rsr_leader_hl_r2,      # R²: <0.2=half-life無効
             "topk_count":              _diag["topk_count"],
             "positions":               len(current_positions),
             "exposure":                round(_exposure, 4),
@@ -1318,7 +1342,14 @@ class SignalBridge:
             # False Breakout診断（entry後5日以内 かつ -2ATR到達）
             "failed_breakout_count":   _diag.get("failed_breakout", 0),
             "failed_breakout_rate":    round(_diag.get("failed_breakout", 0) / max(1, len(current_positions)), 3) if current_positions else 0.0,
-            # 供給上限診断: RSR通過銘柄のうちブレイク直前の割合（>0.4=供給十分 / <0.2=停滞）
+            # Step 1 (観測バイアス): bo_pressure_raw = near_breakout_count の絶対値
+            # bo_rate は RSR供給増加で希薄化するが、raw は市場圧力を直接反映する先行指標
+            "bo_pressure_raw":           _diag.get("near_breakout", 0),
+            # Step 2 (観測バイアス): RSRコンテキスト全体の通過数と売買可能割合
+            # 0.6以下 → 強い銘柄が価格/流動性フィルターで除外されている（候補ゼロの構造的原因）
+            "rsr_pass_context_total":    _rsr_pass_context_total,
+            "rsr_pass_tradeable_ratio":  round(_diag["rsr_pass"] / max(1, _rsr_pass_context_total), 3) if _rsr_pass_context_total > 0 else None,
+            # 供給上限診断: RSR通過銘柄のうちブレイク直前の割合（>0.25=十分 / <0.2=停滞）
             "breakout_opportunity_rate": round(_diag.get("near_breakout", 0) / max(1, _diag.get("rsr_pass", 1)), 3) if _diag.get("rsr_pass", 0) > 0 else None,
             # MTFフィルター診断: RSR通過のうち週足弱い割合（0.2〜0.4が理想 / 0.05以下ならMTF意味なし）
             "mtf_filtered_candidates": _diag.get("mtf_filtered", 0),

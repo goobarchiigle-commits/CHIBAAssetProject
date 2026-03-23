@@ -236,7 +236,14 @@ def _supply_trend(metrics: pd.DataFrame, since: pd.Timestamp | None) -> None:
         print(f"\n  RSR通過 平均: {avg_pass:.1f}/日  目安: ≥3/日（supply十分）")
     if "near_breakout_count" in df.columns:
         avg_near = df["near_breakout_count"].mean()
-        print(f"  近接銘柄 平均: {avg_near:.1f}/日  ＞3なら近く候補が増える見込み")
+        avg_raw  = df["bo_pressure_raw"].mean() if "bo_pressure_raw" in df.columns else avg_near
+        print(f"  近接銘柄(bo_pressure_raw) 平均: {avg_raw:.1f}/日  ＞3なら近く候補が増える見込み（bo_rateより先行）")
+    if "rsr_pass_tradeable_ratio" in df.columns:
+        tr_latest = df["rsr_pass_tradeable_ratio"].dropna()
+        if not tr_latest.empty:
+            tr_v = float(tr_latest.iloc[-1])
+            tr_label = "正常" if tr_v >= 0.6 else "⚠ 構造的ブロック（強い銘柄が価格/流動性で除外）"
+            print(f"  RSR通過→売買可能割合（最新）: {tr_v:.1%}  → {tr_label}  (目安: ≥60%)")
     if "rsr_dispersion" in df.columns:
         avg_disp = df["rsr_dispersion"].dropna().mean()
         state = "強トレンド相場" if avg_disp > 10 else ("普通" if avg_disp >= 6 else "横ばい相場")
@@ -251,8 +258,14 @@ def _supply_trend(metrics: pd.DataFrame, since: pd.Timestamp | None) -> None:
         hl_latest = df["rsr_leader_half_life"].dropna()
         if not hl_latest.empty:
             hl_v = float(hl_latest.iloc[-1])
+            # R²で信頼性を表示（<0.2 = half-lifeは信頼不可）
+            r2_v = None
+            if "rsr_leader_hl_r2" in df.columns:
+                r2_s = df["rsr_leader_hl_r2"].dropna()
+                r2_v = float(r2_s.iloc[-1]) if not r2_s.empty else None
             hl_label = "強トレンド" if hl_v > 20 else ("通常" if hl_v >= 8 else "回転相場")
-            print(f"  RSRリーダー半減期: {hl_v:.1f}日  → {hl_label}  (目安: >20=強 / <8=回転)")
+            r2_str = f"  R²={r2_v:.2f}{'（信頼不可）' if r2_v is not None and r2_v < 0.2 else ''}" if r2_v is not None else ""
+            print(f"  RSRリーダー半減期: {hl_v:.1f}日  → {hl_label}  (目安: >12=持続 / <8=回転){r2_str}")
     if "mtf_filter_rate" in df.columns:
         mtf_latest = df["mtf_filter_rate"].dropna()
         if not mtf_latest.empty:
