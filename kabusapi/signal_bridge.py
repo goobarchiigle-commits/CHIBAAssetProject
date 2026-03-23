@@ -1053,6 +1053,39 @@ class SignalBridge:
             _above_ma200 = None
             _bench_vs_ma = None
 
+        # Step 2: 週次シグナル密度（直近5営業日の日別 candidate_count 合計）
+        # 1日に複数回実行しても日ごとに1回分のみカウント（当日の最新値を使用）
+        _signals_per_week = None
+        try:
+            if _diag_path.exists():
+                _all_lines = [_json.loads(l) for l in _diag_path.read_text(encoding="utf-8").splitlines() if l.strip()]
+                # 日別に最新エントリーを取得
+                _by_date: dict[str, int] = {}
+                for _e in _all_lines:
+                    _by_date[_e["date"]] = _e.get("candidate_count", 0)
+                # 今日を含む直近5営業日
+                _today_dt = pd.Timestamp(today_str)
+                _recent_dates = sorted(_by_date.keys())[-5:]
+                _signals_per_week = sum(_by_date[d] for d in _recent_dates)
+        except Exception:
+            pass
+
+        # Step 3: RSR Top10 ランキング安定性（昨日との重複率）
+        _top10_overlap = None
+        _top10_today = [e["symbol"] for e in _diag.get("rsr_distribution", [])[:10]]
+        try:
+            _rsr_dist_path_tmp = _diag_dir / "rsr_distribution.jsonl"
+            if _rsr_dist_path_tmp.exists():
+                _dist_lines = _rsr_dist_path_tmp.read_text(encoding="utf-8").splitlines()
+                # 同日の記録は除いて直近1件を取得
+                _prev_entries = [l for l in _dist_lines if l.strip() and f'"date": "{today_str}"' not in l]
+                if _prev_entries:
+                    _prev = _json.loads(_prev_entries[-1])
+                    _top10_yesterday = [e["symbol"] for e in _prev.get("top20", [])[:10]]
+                    _top10_overlap = len(set(_top10_today) & set(_top10_yesterday))
+        except Exception:
+            pass
+
         _metrics   = {
             "date":                    today_str,
             "run_at":                  now.strftime("%Y-%m-%dT%H:%M:%S%z"),
@@ -1061,13 +1094,17 @@ class SignalBridge:
             "candidate_count":         _diag["buy_candidates"], # 最終BUY候補数（全フィルター通過後）
             "blocked_by_rsr":          _diag["blocked_rsr"],    # RSR未達でブロック
             "blocked_by_breakout":     _diag["blocked_breakout"],  # Turtleブレイクアウト未達でブロック
-            # Step 2: supply ceiling（RSRは足りているか？）
-            "rsr_gt70_count":          _diag["rsr_gt70"],   # RSR>70 銘柄数
-            "rsr_gt60_count":          _diag["rsr_gt60"],   # RSR>60 銘柄数（閾値引き下げ参考）
-            "rsr_gt50_count":          _diag["rsr_gt50"],   # RSR>50 銘柄数
-            # Step 3: Turtle期間比較（追加通過候補数）
-            "bo15_extra":              _diag["bo15_extra"],  # 15日なら追加でBUY候補になる数
-            "bo10_extra":              _diag["bo10_extra"],  # 10日なら追加でBUY候補になる数
+            # supply ceiling（RSRは足りているか？）
+            "rsr_gt70_count":          _diag["rsr_gt70"],
+            "rsr_gt60_count":          _diag["rsr_gt60"],
+            "rsr_gt50_count":          _diag["rsr_gt50"],
+            # Turtle期間比較
+            "bo15_extra":              _diag["bo15_extra"],
+            "bo10_extra":              _diag["bo10_extra"],
+            # Step 2: 週次シグナル密度（理想 2〜6/週）
+            "signals_per_week":        _signals_per_week,
+            # Step 3: RSR Top10 ランキング安定性（理想 overlap 4〜7）
+            "top10_overlap":           _top10_overlap,
             "topk_count":              _diag["topk_count"],
             "positions":               len(current_positions),
             "exposure":                round(_exposure, 4),
