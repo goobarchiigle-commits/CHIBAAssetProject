@@ -1,5 +1,5 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-03-23（運用評価フェーズ移行 / 週次レポート完成）
+# Single Source of Truth / 最終更新: 2026-03-23（統計取得フェーズ完成 / 全ログ・判断基盤確立）
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
 
 ---
@@ -619,11 +619,61 @@ python research/weekly_report.py --since 2026-04-01
 - BUY: date/symbol/sector/qty/price/entry_regime
 - SELL: 上記 + pnl/pnl_pct/hold_days/entry_price/entry_date
 
+### 完了: 観察期間中の並列改善（2026-03-23 同日実装）
+
+#### `signal_bridge.py` 追加ログ（全フィールド一覧）
+| フィールド | 説明 | 目安 |
+|---|---|---|
+| `trend_market` | bull/neutral/bear（MA50 vs MA200） | — |
+| `trend_strength` | (MA50-MA200)/MA200 | >0.05=強 / <-0.02=下落 |
+| `near_breakout_count` | 20日高値2%以内の銘柄数 | ≥3で近くシグナル増加見込み |
+| `rsr_dispersion` | Top20 RSRのstd | >10=強相場 / <5=横ばい |
+| `failed_breakout_count/rate` | entry後5日以内 -2ATR 到達 | ベースライン記録中 |
+| `breakout_opportunity_rate` | near_breakout / rsr_pass | >0.4=十分 / <0.2=停滞 |
+| `mtf_filtered_candidates` | RSR通過かつ週足MA20弱の数 | 診断のみ（フィルターしない） |
+| `mtf_filter_rate` | 上記 / rsr_pass | 0.2〜0.4=MTF有効 / <0.05=意味なし |
+| `rsr_leader_half_life` | Top10滞在半減期（日） | >20=強 / <8=回転相場 |
+| `top10_overlap` | 昨日との Top10 重複数 | 4〜7=安定 |
+| `signals_per_week` | 直近5日BUY候補合計 | 2〜6=健全 |
+
+#### `logs/trades.jsonl`（実発注成功時に自動記録）
+- BUY: date/symbol/sector/qty/price/atr20/entry_regime
+- SELL: 上記 + pnl/pnl_pct/hold_days/entry_price/entry_date
+
+#### `backtest/mtf_comparison.py`（新規）
+```bash
+python -m backtest.mtf_comparison
+```
+Baseline vs MTF-A(weekly_ma20) vs MTF-B(weekly_cross) を自動比較。
+採用基準: **Sharpe差 ≥ 0 かつ false_breakout_rate差 ≤ -0.02**
+
+#### `research/weekly_report.py` 出力項目
+- 週次: 取引数 / 勝率 / 期待値 / signals_per_week
+- 月次: PnL / **regime別成績** / trend_strength 推移
+- 供給診断: rsr_pass / near_breakout / rsr_dispersion / trend_strength / rsr_leader_half_life / mtf_filter_rate
+- **4/8 判断ロジック（自動出力）**: ケースA/B/C を自動判定して推奨アクションを表示
+
 ### ロードマップ（今後の優先順位）
-1. **RSR42観察期間中（〜2026-04-08）**: weekly_report で供給診断と市場レジームを監視
-2. **Step 2: MTF実戦検証**: weekly_close > weekly_ma20 でフォールスブレイクアウト削減
-3. **Step 3: RSR改良**: RSR×RSRスロープの複合スコア（ピーク銘柄除外）
-4. **全市場ユニバース研究** → 空売り
+
+**〜2026-04-08（観察期間）**:
+- 毎朝 `run_live_signal.py` 実行でログ蓄積
+- 週1回 `python research/weekly_report.py` で4/8判断条件の充足度を確認
+- `python -m backtest.mtf_comparison` を今すぐ実行可能（バックテスト期間で事前検証）
+
+**4/8以降（判断基準）**:
+
+| ケース | 条件 | アクション |
+|---|---|---|
+| A（理想） | rsr_pass≥4 AND bo_rate≥0.35 AND disp≥8 | MTF導入（backtest検証済みなら即適用） |
+| B（supply不足） | rsr_pass≥6 AND candidates<1 | Donchian hybrid 検討 |
+| C（相場停滞） | trend_strength<-0.02 AND disp<5 | **何もしない** |
+| それ以外 | 条件未満 | 観察継続 |
+
+**中長期ロードマップ**:
+1. MTF実運用適用（4/8判断後）
+2. RSR×RSRスロープ複合スコア（ピーク銘柄除外）
+3. 全市場ユニバース研究
+4. 空売り
 
 ---
 
