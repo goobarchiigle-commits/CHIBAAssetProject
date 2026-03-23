@@ -503,62 +503,111 @@ max_single_weight: 0.15   ← 今回の変更点
 | ~~5~~（完了） | ~~Top-k ローテーション実装・ライブ統合~~ | 2026-03-20 完了 |
 | ~~6~~（完了） | ~~RSRコンテキスト修正・exit=20正式適用・exposure実測~~ | 2026-03-21 完了 |
 | ~~7~~（完了） | ~~ローリング選定ユニバース + RSRコンテキスト最適化 + weight最適化~~ | 2026-03-22 完了 |
-| **1** | **paper trade 2週間**: broad RSR + filter-first + w=0.15 での実シグナル観察 | ライブ適用前の検証。確定設計をドライランで確認 |
-| **2** | `run_live_signal.py` / `signal_bridge.py` に確定設計を反映 | broad RSR context + max_single_weight=0.15 への更新 |
-| **3** | `portfolio_state.json` の entry_date を実保有（5401.T / 5411.T）に合わせる | time_exit 誤動作防止 |
+| ~~1~~（完了） | ~~paper trade 2週間: broad RSR + filter-first + w=0.15~~ | 2026-03-23 診断ログ追加で代替 |
+| ~~2~~（完了） | ~~`run_live_signal.py` / `signal_bridge.py` に確定設計を反映~~ | 2026-03-23: MAX_POS=3, TOP_K=3, max_single_weight=0.15 適用済み |
+| ~~3~~（完了） | ~~価格フィルター上限引き上げ~~ | 2026-03-23: ¥500,000 → ¥600,000（8002.T 評価可能に） |
+| **1** | **10営業日 paper trade 観察**: `logs/diagnostics/metrics.jsonl` で avg_candidates / exposure を集計 | 2026-03-23〜。RSR閾値調整の判断材料 |
+| **2** | RSR閾値テスト: min_rsr=75→70 への変更検討 | 10日分ログで avg_blocked_rsr > 10/day が続いた場合 |
+| **3** | ranking universe 拡張テスト（TOPIX500プロキシ） | RSR閾値調整後も exposure < 20% が続く場合 |
 | 保留 | R²×スロープランキング（Clenow方式）への置き換え | 現在は単純 RSR。品質モメンタムで選別精度向上の可能性 |
+
+### 2026-03-23 診断結果（3本並行テスト）
+
+**根本原因特定**: 価格フィルターが RSR上位銘柄を全員除外していた
+
+| 銘柄 | RSR(42ctx) | 状態 |
+|---|---|---|
+| 6920.T | 95.2 | ¥3,193,000 → 除外継続（上限超過） |
+| 8002.T | 81.0 | ¥515,600 → **上限引き上げで評価可能に** |
+| 8035.T | 78.6 | ¥3,794,000 → 除外継続（上限超過） |
+
+**市場レジーム**: TOPIX +11.89% vs 200MA → 強気相場確認（弱気ではない）
+**RSR期間感度**: IBD式が最良（42日/ブレンドは悪化）
+**ユニバースバイアス**: 軽微（300銘柄に拡張でも+1銘柄のみ）
 
 ---
 
-## ファイル構成（2026-03-18 整理済み）
+## ファイル構成（2026-03-23 整理済み）
 
 ```
 asset_simulation/
 ├── research_state.md              ← このファイル（Single Source of Truth）
-├── run_live_signal.py             ← ★実運用エントリーポイント（V2設定）
-├── run_morning_signal.py          ← 朝のシグナル生成
-├── morning_dryrun.bat / morning_live.bat  ← タスクスケジューラ用
-├── configs/
-│   ├── strategy.yaml              ← 戦略・ポートフォリオパラメータ
-│   └── universe.yaml              ← 銘柄ユニバース設定
-├── backtest/                      ← 現役スクリプト（11本）
-│   ├── engine.py                  ← コアバックテストエンジン
-│   ├── portfolio_engine.py        ← ポートフォリオエンジン
-│   ├── portfolio_v2.py            ← ★最良バックテスト（Calmar=2.656）
-│   ├── portfolio_entry_stop_v5.py ← entry_stop v5（4段階ステートマシン）
-│   ├── portfolio_entry_stop_v6.py ← entry_stop v6（TEMPORAL非対応のため凍結）
-│   ├── portfolio_cross_validate.py← 3重クロス検証
-│   ├── fujiko_strategy.py         ← フジコ法（単一銘柄）
+│
+├── ★ 実運用（毎朝実行）
+│   ├── run_live_signal.py         ← 朝のシグナル生成・発注（--live で実発注）
+│   └── run_morning_signal.py      ← run_live_signal の簡易ラッパー
+│
+├── kabusapi/                      ← kabuステーション API 連携
+│   ├── client.py                  ← APIクライアント
+│   └── signal_bridge.py           ← シグナル→発注ブリッジ（診断ログ機能付き）
+│
+├── backtest/                      ← バックテスト（現役のみ）
+│   ├── fujiko_strategy.py         ← ★フジコ法コア戦略
 │   ├── mean_reversion_strategy.py ← 平均回帰戦略
-│   ├── rsr.py                     ← RSR計算
+│   ├── rsr.py                     ← RSR計算（IBD式・パーセンタイルランク）
+│   ├── engine.py                  ← バックテストエンジン基盤
+│   ├── portfolio_engine.py        ← ポートフォリオエンジン
+│   ├── portfolio_v2.py            ← ★現行最良バックテスト（Calmar=2.656）
+│   ├── portfolio_cross_validate.py← 3重クロス検証
+│   ├── live_equivalent.py         ← ライブ等価バックテスト（OOS検証用）
+│   ├── topk_live_equivalent.py    ← Top-k ローテーション等価
+│   ├── step3_final_validation.py  ← Phase2移行判定検証（OOS/IS比 確認）
+│   ├── oos_2025.py                ← 2025年OOS検証
+│   ├── portfolio_temporal_separation.py ← TEMPORALユニバース分離検証
+│   ├── rolling_universe.py        ← ローリング選定ユニバース
+│   ├── universe_builder.py        ← ユニバース構築ユーティリティ
 │   ├── strategy.py                ← 基底戦略クラス
-│   ├── universe_builder.py        ← ユニバース構築
-│   └── archive/                   ← 旧版・実験済み（30本・削除せず保管）
-├── results/
-│   ├── backtest_summary.json      ← 全バックテスト結果サマリー
-│   ├── entry_stop_v5_2026-03-18.json ← entry_stop v5結果
-│   ├── entry_stop_v6_2026-03-19.json ← entry_stop v6結果（全バリアント・凍結）
-│   ├── capital_efficiency_2026-03-17.json
-│   ├── dd_control_2026-03-17.json
-│   ├── stress_test_2026-03-17.json
-│   └── archive/                   ← 旧版結果（v2〜v4）
-├── scripts/
-│   └── monthly_pnl.py             ← ★Phase 2評価スクリプト（月次P&L・FIFO・Phase2判定）
-├── research_log/
-│   ├── 2026-03-15.md              ← 頑健性検証ログ
-│   ├── 2026-03-16.md              ← CB問題・セクター分析ログ
-│   ├── 2026-03-17.md              ← 自動化・DDリスク制御ログ
-│   └── 2026-03-19.md              ← バイアス定量化・TEMPORALユニバース・P&L評価スクリプト
-├── kabusapi/
-│   ├── client.py                  ← kabuステーション APIクライアント（get_filled_orders追加済み）
-│   └── signal_bridge.py           ← シグナル→発注ブリッジ
-├── configs/universe/
-│   └── 2026Q1_temporal24.json     ← ★実行ユニバース（24銘柄・2015-17選択・.env指定）
-├── runtime/                       ← .gitignore対象（order_lock.json等）
-├── logs/live/                     ← .gitignore対象（発注ログ・fills/キャッシュ）
-├── archive/                       ← ルートの不要スクリプト（6本）
-└── data/                          ← .gitignore対象
-    └── signals/                   ← 発注シグナルJSON
+│   └── archive/                   ← 旧版・実験済み（削除せず保管）
+│
+├── diagnostics/                   ← 運用診断スクリプト
+│   ├── rsr_universe_test.py       ← RSR母集団テスト（42 vs 300銘柄コンテキスト比較）
+│   ├── rsr_period_test.py         ← RSR期間感度テスト（IBD63 vs 42日 vs ブレンド）
+│   ├── exposure_root_cause.py     ← exposure 低下の原因分析
+│   ├── exposure_report.py         ← exposure レポート生成
+│   ├── live_exposure_report.py    ← ライブ運用 exposure 分析
+│   ├── daily_state_logger.py      ← 日次状態ログ
+│   ├── pnl_vs_holding.py          ← PnL vs 保有日数分析
+│   ├── rank_stability.py          ← RSRランク安定性分析
+│   └── turtle_exit_sweep.py       ← タートルズエグジット期間 sweep
+│
+├── configs/                       ← 設定ファイル
+│   ├── strategy.yaml              ← 戦略・ポートフォリオパラメータ（確定値）
+│   ├── universe.yaml              ← 銘柄ユニバース設定（参考）
+│   ├── rsr_universe_42.csv        ← RSR計算コンテキスト（42銘柄）
+│   ├── rolling_universe.json      ← ローリング選定ユニバース定義
+│   └── universe/
+│       └── 2026Q1_temporal24.json ← ★実行ユニバース（24銘柄・.env で指定）
+│
+├── results/                       ← バックテスト結果 JSON
+│   ├── backtest_summary.json      ← ★全バックテスト結果サマリー（参照メイン）
+│   ├── oos_2025_2026-03-19.json   ← 2025年OOS検証結果
+│   ├── entry_stop_v5_2026-03-18.json ← entry_stop v5（失敗）
+│   ├── entry_stop_v6_2026-03-19.json ← entry_stop v6（失敗・凍結）
+│   └── archive/                   ← 旧版結果
+│
+├── logs/                          ← 各種ログ（.gitignore対象）
+│   ├── diagnostics/               ← 運用診断ログ（日次蓄積）
+│   │   ├── metrics.jsonl          ← ★日次メトリクス（candidates/exposure/blocked_rsr等）
+│   │   ├── rsr_distribution.jsonl ← RSR分布ログ（閾値最適化用）
+│   │   ├── rsr_universe_test_YYYY-MM-DD.json ← 母集団テスト結果
+│   │   └── rsr_period_test_YYYY-MM-DD.json   ← 期間感度テスト結果
+│   ├── live/                      ← 実発注ログ（YYYYMMDD_signals/orders.json）
+│   └── research/                  ← 過去の研究実行ログ（.log ファイル）
+│
+├── runtime/                       ← 実行時状態（.gitignore対象）
+│   ├── portfolio_state.json       ← 保有状態・CB状態・entry_date
+│   └── order_lock.json            ← 二重発注防止ロック
+│
+├── scripts/                       ← 定期実行スクリプト
+│   └── monthly_pnl.py             ← Phase 2月次P&L評価（FIFO・Phase2判定）
+│
+├── agents/                        ← 将来のマルチエージェント構成（仕様書）
+│   ├── 01_監督.md / 02_分析.md / 03_批判.md / 04_設計.md / 05_総括.md
+│   └── outputs/
+│
+├── portfolio/ execution/ market/ risk/  ← ライブラリモジュール
+├── archive/                       ← ルート旧版スクリプト
+└── data/                          ← .gitignore対象（yfinanceキャッシュ・シグナルJSON）
 ```
 
 ---
@@ -571,7 +620,7 @@ asset_simulation/
 | 銘柄選択バイアス | 現行27銘柄はin-sample screeningで選定（改善中） |
 | SELL/BUY非対称 | SELL=当日終値/BUY=翌日始値。CAGR差≈0.2%（許容範囲） |
 | キャッシュ比率 | 平均83%キャッシュ → 資本効率が低い（改善中） |
-| 株価上限 | 資本200万×25%=50万 → 株価5,000円以下の銘柄のみ購入可能 |
+| 株価上限 | 資本200万×15%=30万 → ~~¥500,000/単元以下~~ → **2026-03-23に¥600,000に引き上げ**（8002.T等が評価可能に） |
 
 ---
 

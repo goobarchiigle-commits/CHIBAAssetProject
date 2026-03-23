@@ -534,6 +534,13 @@ class SignalBridge:
         # ── 保有エントリー日マップ ───────────────────────────────────
         pos_entry_dates: dict[str, str] = portfolio_state.get("position_entry_dates", {})
 
+        # ── 診断カウンター ────────────────────────────────────────
+        diag_total        = 0   # 非保有・非ブロック銘柄数（BUY候補の母数）
+        diag_rsr_pass     = 0   # RSR閾値通過数
+        diag_blocked_rsr  = 0   # RSRで弾かれた数
+        diag_blocked_bo   = 0   # RSR通過後にBreakout/SEPA/momentumで弾かれた数
+        diag_rsr_dist: list[dict] = []   # RSR分布（全非保有銘柄）
+
         # ── シグナル生成ループ ───────────────────────────────────────
         signals: list[StockSignal] = []
 
@@ -546,8 +553,8 @@ class SignalBridge:
             rsr    = rsr_universe[sym] if sym in rsr_universe.columns else None
 
             rsr_now  = float(rsr.iloc[-1])  if rsr is not None and not rsr.empty  else 0.0
-            mom      = calc_rsr_momentum(rsr, self.fujiko_params.get("mom_period", 21))
-            mom_now  = float(mom.iloc[-1])  if rsr is not None and not mom.empty  else 0.0
+            mom      = calc_rsr_momentum(rsr, self.fujiko_params.get("mom_period", 21)) if rsr is not None else None
+            mom_now  = float(mom.iloc[-1])  if mom is not None and not mom.empty  else 0.0
             sepa_df  = calc_sepa(df, rsr if rsr is not None else pd.Series(50.0, index=df.index))
             sepa_now = int(sepa_df["sepa_score"].iloc[-1])
             rsr_rank = rsr_rank_map.get(sym, 99)
@@ -637,6 +644,17 @@ class SignalBridge:
                         f" SEPA={sepa_now} ({strat_label})"
                     )
 
+            # ── 診断カウント（非保有・非ブロック銘柄のみ集計） ────────
+            if not currently_holding and not is_time_exit and not is_rank_exit and sym not in active_blocked:
+                diag_total += 1
+                diag_rsr_dist.append({"symbol": sym, "rsr": round(rsr_now, 1)})
+                if rsr_now >= min_rsr_threshold:
+                    diag_rsr_pass += 1
+                    if signal_int == 0:
+                        diag_blocked_bo += 1   # RSR通過済みなのにBUYにならない = Breakout/SEPA/Mom
+                else:
+                    diag_blocked_rsr += 1
+
             signals.append(StockSignal(
                 symbol            = sym,
                 sector            = sector,
@@ -662,7 +680,23 @@ class SignalBridge:
             [sym for _, sym in buy_eligible], self.top_k, top_k_syms,
         )
 
-        return signals, top_k_syms
+        rsr_dist_sorted = sorted(diag_rsr_dist, key=lambda x: x["rsr"], reverse=True)
+        diagnostics = {
+            "universe_size":      diag_total,
+            "rsr_pass":           diag_rsr_pass,
+            "blocked_rsr":        diag_blocked_rsr,
+            "blocked_breakout":   diag_blocked_bo,
+            "buy_candidates":     len(buy_eligible),
+            "topk_count":         len(top_k_syms),
+            "rsr_distribution":   rsr_dist_sorted[:20],
+        }
+        logger.info(
+            "DIAG universe=%d rsr_pass=%d blocked_rsr=%d blocked_breakout=%d candidates=%d topk=%d",
+            diag_total, diag_rsr_pass, diag_blocked_rsr, diag_blocked_bo,
+            len(buy_eligible), len(top_k_syms),
+        )
+
+        return signals, top_k_syms, diagnostics
 
     # ------------------------------------------------------------------ #
     # 注文生成
@@ -939,7 +973,7 @@ class SignalBridge:
 
         # 5. シグナル生成（Top-k + 時間ストップ）
         logger.info("シグナル生成中（%d 銘柄）...", len(self.universe_tickers))
-        signals, top_k_syms = self._generate_all_signals(
+        signals, top_k_syms, _diag = self._generate_all_signals(
             universe_raw, bench_prices, current_positions, portfolio_state
         )
 
@@ -965,6 +999,58 @@ class SignalBridge:
             len(_buy_cands), len(top_k_syms), len(_entries),
             len(current_positions), _exposure,
         )
+
+        # 6c. 運用診断メトリクス → logs/diagnostics/metrics.jsonl に日次追記
+        import json as _json
+        from pathlib import Path as _Path
+        _diag_dir  = _Path("logs/diagnostics")
+        _diag_dir.mkdir(parents=True, exist_ok=True)
+        _diag_path = _diag_dir / "metrics.jsonl"
+        # 市場レジーム（TOPIX ETF 1306.T の 200日MA比較）
+        try:
+            _bench_close = bench_prices.dropna()
+            _ma200       = float(_bench_close.rolling(200).mean().iloc[-1])
+            _bench_last  = float(_bench_close.iloc[-1])
+            _above_ma200 = bool(_bench_last > _ma200)
+            _bench_vs_ma = round((_bench_last / _ma200 - 1) * 100, 2)  # %
+        except Exception:
+            _above_ma200 = None
+            _bench_vs_ma = None
+
+        _metrics   = {
+            "date":                    today_str,
+            "run_at":                  now.strftime("%Y-%m-%dT%H:%M:%S%z"),
+            "candidate_count":         _diag["rsr_pass"],
+            "topk_count":              _diag["topk_count"],
+            "positions":               len(current_positions),
+            "exposure":                round(_exposure, 4),
+            "cash_ratio":              round(available_cash / max(1.0, current_equity), 4),
+            "signals_blocked_rsr":     _diag["blocked_rsr"],
+            "signals_blocked_breakout": _diag["blocked_breakout"],
+            "universe_size":           _diag["universe_size"],
+            "buy_candidates":          _diag["buy_candidates"],
+            "market_above_ma200":      _above_ma200,
+            "topix_vs_ma200_pct":      _bench_vs_ma,
+        }
+        with _diag_path.open("a", encoding="utf-8") as _f:
+            _f.write(_json.dumps(_metrics, ensure_ascii=False) + "\n")
+        logger.info("診断メトリクス保存: %s", _diag_path)
+
+        # RSR分布ログ → logs/diagnostics/rsr_distribution.jsonl
+        _rsr_dist_path = _diag_dir / "rsr_distribution.jsonl"
+        _rsr_dist_entry = {
+            "date":            today_str,
+            "run_at":          now.strftime("%Y-%m-%dT%H:%M:%S%z"),
+            "min_rsr_threshold": self._fujiko_params_live.get("min_rsr", 75.0),
+            "top20":           _diag.get("rsr_distribution", []),
+            "threshold_zone":  [  # 閾値±5のゾーンにいる銘柄（最適点特定用）
+                e for e in _diag.get("rsr_distribution", [])
+                if abs(e["rsr"] - self._fujiko_params_live.get("min_rsr", 75.0)) <= 10
+            ],
+        }
+        with _rsr_dist_path.open("a", encoding="utf-8") as _f:
+            _f.write(_json.dumps(_rsr_dist_entry, ensure_ascii=False) + "\n")
+        logger.info("RSR分布ログ保存: %s", _rsr_dist_path)
 
         # 7. 結果オブジェクト構築
         equity_peak = float(portfolio_state.get("equity_peak", self.capital))

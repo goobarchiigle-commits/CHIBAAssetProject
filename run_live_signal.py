@@ -120,7 +120,7 @@ def load_universe() -> tuple[dict[str, str], dict]:
 # ------------------------------------------------------------------ #
 # 株価上限フィルター（シグナル生成前に適用）
 # ------------------------------------------------------------------ #
-MAX_ALLOCATION = int(os.environ.get("MAX_POSITION_YEN", 500_000))
+MAX_ALLOCATION = int(os.environ.get("MAX_POSITION_YEN", 600_000))
 LOT_SIZE       = 100   # 東証標準単元株数
 
 def filter_universe_by_price(
@@ -344,10 +344,11 @@ logger.info(
 )
 
 CAPITAL              = 2_000_000
-MAX_POS              = 4        # top_k と一致させる
+MAX_POS              = 3        # top_k と一致させる（確定設計 2026-03-23）
+MAX_SINGLE_WEIGHT    = 0.15     # 1銘柄最大ウェイト（確定設計: 25%→15%でMaxDD改善）
 MIN_SECTORS          = 1        # セクター制約なし
 MAX_DD_LIMIT         = 0.15
-TOP_K                = 4        # RSR 上位 k 銘柄のみ BUY 対象
+TOP_K                = 3        # RSR 上位 k 銘柄のみ BUY 対象（確定設計 2026-03-23）
 MAX_HOLD_DAYS        = 60       # 最大保有営業日数（OOS MaxDD -13.98% 確認済み）
 MAX_NEW_POS_PER_DAY  = 2        # 1回の実行で生成する新規 BUY 上限
 
@@ -515,6 +516,7 @@ def main() -> int:
         fujiko_params             = FUJIKO_PARAMS,
         capital                   = CAPITAL,
         max_positions             = min(MAX_POS, MAX_OPEN_POSITIONS),
+        max_single_weight         = MAX_SINGLE_WEIGHT,
         max_dd_limit              = MAX_DD_LIMIT,
         min_sectors               = MIN_SECTORS,
         live                      = args.live,
