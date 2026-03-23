@@ -202,8 +202,8 @@ def _supply_trend(metrics: pd.DataFrame, since: pd.Timestamp | None) -> None:
                    "candidate_count" if "candidate_count" in df.columns else None)
     cand_col     = "candidate_count"  # 最終BUY候補（新形式）
 
-    print(f"\n  {'日付':>12} {'RSR通過':>7} {'候補':>5} {'近接':>5} {'分散':>7} {'Regime':>8} {'TOPIX%':>8}")
-    print("  " + "-" * 60)
+    print(f"\n  {'日付':>12} {'RSR通過':>7} {'候補':>5} {'近接':>5} {'分散':>7} {'Regime':>8} {'強度':>7} {'半減期':>7} {'MTF率':>7}")
+    print("  " + "-" * 72)
     for _, row in df.iterrows():
         rsr_pass      = int(row.get(rsr_pass_col, 0)) if rsr_pass_col else "-"
         cands         = int(row.get(cand_col, 0)) if cand_col in row else "-"
@@ -212,8 +212,12 @@ def _supply_trend(metrics: pd.DataFrame, since: pd.Timestamp | None) -> None:
         rsr_disp      = row.get("rsr_dispersion", None)
         disp_str      = f"{rsr_disp:>7.1f}" if pd.notna(rsr_disp) else "      -"
         regime        = row.get("trend_market", "-") or "-"
-        topix_pct     = row.get("topix_vs_ma200_pct", None)
-        topix_str     = f"{topix_pct:>+8.1f}%" if pd.notna(topix_pct) else "       -"
+        ts            = row.get("trend_strength", None)
+        ts_str        = f"{ts:>+7.3f}" if pd.notna(ts) else "      -"
+        hl            = row.get("rsr_leader_half_life", None)
+        hl_str        = f"{hl:>7.1f}" if pd.notna(hl) else "      -"
+        mtf_r         = row.get("mtf_filter_rate", None)
+        mtf_str       = f"{mtf_r:>7.2f}" if pd.notna(mtf_r) else "      -"
         print(
             f"  {str(row['date'].date()):>12}"
             f" {rsr_pass:>7}"
@@ -221,7 +225,9 @@ def _supply_trend(metrics: pd.DataFrame, since: pd.Timestamp | None) -> None:
             f"{near_bo_str}"
             f"{disp_str}"
             f" {regime:>8}"
-            f"{topix_str}"
+            f"{ts_str}"
+            f"{hl_str}"
+            f"{mtf_str}"
         )
 
     # 要約統計
@@ -235,9 +241,107 @@ def _supply_trend(metrics: pd.DataFrame, since: pd.Timestamp | None) -> None:
         avg_disp = df["rsr_dispersion"].dropna().mean()
         state = "強トレンド相場" if avg_disp > 10 else ("普通" if avg_disp >= 6 else "横ばい相場")
         print(f"  RSR分散 平均: {avg_disp:.1f}  → {state}  (目安: >10=強い / <5=横ばい)")
+    if "trend_strength" in df.columns:
+        ts_latest = df["trend_strength"].dropna()
+        if not ts_latest.empty:
+            ts_v = float(ts_latest.iloc[-1])
+            ts_label = "強トレンド" if ts_v > 0.05 else ("通常" if ts_v > 0.02 else ("横ばい" if ts_v > -0.02 else "下落"))
+            print(f"  トレンド強度（最新）: {ts_v:+.3f}  → {ts_label}  (目安: >0.05=強 / <-0.02=下落)")
+    if "rsr_leader_half_life" in df.columns:
+        hl_latest = df["rsr_leader_half_life"].dropna()
+        if not hl_latest.empty:
+            hl_v = float(hl_latest.iloc[-1])
+            hl_label = "強トレンド" if hl_v > 20 else ("通常" if hl_v >= 8 else "回転相場")
+            print(f"  RSRリーダー半減期: {hl_v:.1f}日  → {hl_label}  (目安: >20=強 / <8=回転)")
+    if "mtf_filter_rate" in df.columns:
+        mtf_latest = df["mtf_filter_rate"].dropna()
+        if not mtf_latest.empty:
+            mtf_v = float(mtf_latest.iloc[-1])
+            mtf_label = "MTF有効" if 0.2 <= mtf_v <= 0.4 else ("MTF過剰フィルター" if mtf_v > 0.4 else "MTF意味なし（週足整合）")
+            print(f"  MTFフィルター率: {mtf_v:.2f}  → {mtf_label}  (目安: 0.2〜0.4=理想 / <0.05=意味なし)")
 
 
 # ── メイン ────────────────────────────────────────────────────────────
+
+def _judgment_auto(metrics: pd.DataFrame) -> None:
+    """4/8 判断ロジック（直近データから自動判定）"""
+    if metrics.empty:
+        print("  メトリクスデータ不足（判断不可）")
+        return
+
+    df = metrics.sort_values("date")
+    last = df.iloc[-1]  # 最新1行
+
+    # 直近10日平均
+    last10 = df.tail(10)
+    rsr_pass_col = "rsr_pass_count" if "rsr_pass_count" in df.columns else (
+                   "candidate_count" if "candidate_count" in df.columns else None)
+
+    rsr_pass_avg  = float(last10[rsr_pass_col].mean())  if rsr_pass_col else 0.0
+    bo_rate_avg   = float(last10["breakout_opportunity_rate"].mean()) if "breakout_opportunity_rate" in last10 else None
+    rsr_disp_avg  = float(last10["rsr_dispersion"].dropna().mean())   if "rsr_dispersion" in last10 else None
+    fb_rate_avg   = float(last10["failed_breakout_rate"].mean())      if "failed_breakout_rate" in last10 else None
+    ts_latest     = float(last.get("trend_strength", 0) or 0)
+    hl_latest     = float(last.get("rsr_leader_half_life", 0) or 0)
+    regime        = str(last.get("trend_market", "unknown") or "unknown")
+
+    print(f"\n  直近10日平均:")
+    print(f"    rsr_pass_count          = {rsr_pass_avg:.1f}  (目安 ≥4)")
+    print(f"    breakout_opportunity_rate = {bo_rate_avg:.2f}  (目安 ≥0.35)" if bo_rate_avg is not None else "    breakout_opportunity_rate = N/A")
+    print(f"    rsr_dispersion          = {rsr_disp_avg:.1f}  (目安 ≥8)"  if rsr_disp_avg is not None else "    rsr_dispersion = N/A")
+    print(f"    failed_breakout_rate    = {fb_rate_avg:.3f}  (ベースライン記録中)" if fb_rate_avg is not None else "    failed_breakout_rate = N/A")
+    print(f"  最新:")
+    print(f"    trend_strength   = {ts_latest:+.3f}  (目安 >0.05=強 / <-0.02=下落)")
+    print(f"    rsr_leader_hl    = {hl_latest:.1f}日  (目安 >20=強 / <8=回転)")
+    print(f"    trend_market     = {regime}")
+
+    # ── 判断 ──
+    print(f"\n  ── 4/8 判断 ──")
+
+    # ケースC（相場停滞）を最優先チェック
+    if ts_latest < -0.02 and (rsr_disp_avg is not None and rsr_disp_avg < 5):
+        print("  ⚠ ケースC: 相場停滞 → 何もしない")
+        print(f"    trend_strength={ts_latest:+.3f} < -0.02 かつ rsr_dispersion={rsr_disp_avg:.1f} < 5")
+        print("    【推奨】観察継続。戦略パラメータ変更は禁止。")
+        return
+
+    if regime == "bear" and ts_latest < 0:
+        print("  ⚠ bear相場中 → 新規改善の導入は見送り")
+        print("    【推奨】既存ポジションの管理のみ。MTF等の導入は次の bull/neutral まで延期。")
+        return
+
+    # ケースA: 理想状態
+    case_a = (
+        rsr_pass_avg >= 4
+        and (bo_rate_avg is not None and bo_rate_avg >= 0.35)
+        and (rsr_disp_avg is not None and rsr_disp_avg >= 8)
+    )
+    # ケースB: 供給不足
+    case_b = rsr_pass_avg >= 6 and (last10.get("candidate_count", pd.Series([0])).mean() < 1 if "candidate_count" in last10 else True)
+
+    if case_a:
+        print("  ✅ ケースA: 理想状態 → MTF導入を検討")
+        print(f"    rsr_pass={rsr_pass_avg:.1f}≥4 / bo_rate={bo_rate_avg:.2f}≥0.35 / disp={rsr_disp_avg:.1f}≥8")
+        print("    【推奨】`python -m backtest.mtf_comparison` を実行してMTF導入効果を確認。")
+    elif case_b:
+        print("  △ ケースB: 供給不足 → breakout条件の調整を検討")
+        print(f"    rsr_pass={rsr_pass_avg:.1f}≥6 だが候補ゼロが続いている")
+        print("    【候補】Donchian hybrid（turtle_entry=15 → mtf_comparison で検証後）")
+    else:
+        n_ok = sum([
+            rsr_pass_avg >= 4,
+            bo_rate_avg is not None and bo_rate_avg >= 0.35,
+            rsr_disp_avg is not None and rsr_disp_avg >= 8,
+        ])
+        print(f"  △ 条件未満（{n_ok}/3 満たす）→ 観察継続")
+        if rsr_pass_avg < 4:
+            print(f"    rsr_pass_count={rsr_pass_avg:.1f} < 4 → supply回復待ち")
+        if bo_rate_avg is not None and bo_rate_avg < 0.35:
+            print(f"    breakout_opportunity_rate={bo_rate_avg:.2f} < 0.35 → ブレイクアウト機会不足")
+        if rsr_disp_avg is not None and rsr_disp_avg < 8:
+            print(f"    rsr_dispersion={rsr_disp_avg:.1f} < 8 → トレンドの分散不足")
+        print("    【推奨】4/8以降も同条件で継続観察（min_rsr=75変更は未検討）")
+
 
 def main() -> int:
     p = argparse.ArgumentParser(description="週次・月次レビューレポート")
@@ -273,6 +377,10 @@ def main() -> int:
     # 3. 供給診断
     print("\n━━ 供給診断（直近20日）━━")
     _supply_trend(metrics, since)
+
+    # 4/8 判断ロジック
+    print("\n━━ 4/8 判断ロジック（自動） ━━")
+    _judgment_auto(metrics)
 
     print("\n" + "=" * 68)
     return 0

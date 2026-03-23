@@ -555,7 +555,9 @@ class SignalBridge:
         # Step 4: ブレイクアウト直前銘柄（20日高値の2%以内）
         diag_near_breakout   = 0
         # False Breakout診断（entry後5日以内 かつ -2ATR到達）
-        diag_failed_breakout = 0
+        diag_failed_breakout  = 0
+        # MTFフィルター診断: RSR通過したが週足MA20で落ちる銘柄数（診断のみ・実際はフィルターしない）
+        diag_mtf_filtered     = 0
 
         # ── シグナル生成ループ ───────────────────────────────────────
         signals: list[StockSignal] = []
@@ -672,6 +674,16 @@ class SignalBridge:
 
                 if rsr_now >= min_rsr_threshold:
                     diag_rsr_pass += 1
+
+                    # Step 2: MTFフィルター診断（週足MA20 < close なら週足弱い）
+                    try:
+                        _wc = df["Close"].resample("W-FRI").last().dropna()
+                        _wm20 = _wc.rolling(20).mean().dropna()
+                        if len(_wm20) > 0 and float(_wc.iloc[-1]) <= float(_wm20.iloc[-1]):
+                            diag_mtf_filtered += 1
+                    except Exception:
+                        pass
+
                     if signal_int == 0:
                         diag_blocked_bo += 1   # RSR通過済みなのにBUYにならない = Breakout/SEPA/Mom
 
@@ -755,6 +767,8 @@ class SignalBridge:
             "near_breakout":      diag_near_breakout,
             # False Breakout: 保有中 かつ entry後5日以内 かつ -2ATR到達した銘柄数
             "failed_breakout":    diag_failed_breakout,
+            # MTFフィルター: RSR通過したが週足MA20弱で落ちる銘柄数（診断のみ）
+            "mtf_filtered":       diag_mtf_filtered,
         }
         logger.info(
             "DIAG universe=%d rsr_pass=%d blocked_rsr=%d blocked_breakout=%d candidates=%d topk=%d",
@@ -1169,9 +1183,10 @@ class SignalBridge:
         _diag_dir.mkdir(parents=True, exist_ok=True)
         _diag_path = _diag_dir / "metrics.jsonl"
         # 市場レジーム（TOPIX ETF 1306.T の 200日MA / 50日MA比較）
-        _above_ma200  = None
-        _bench_vs_ma  = None
-        _trend_market = None
+        _above_ma200    = None
+        _bench_vs_ma    = None
+        _trend_market   = None
+        _trend_strength = None
         try:
             _bench_close = bench_prices.dropna()
             _ma200       = float(_bench_close.rolling(200).mean().iloc[-1])
@@ -1186,6 +1201,9 @@ class SignalBridge:
                 _trend_market = "bear"
             else:
                 _trend_market = "neutral"
+            # トレンド強度: (MA50 - MA200) / MA200
+            # > +0.05 強トレンド / +0.02〜0.05 通常 / ±0.02 横ばい / < -0.02 下落
+            _trend_strength = round((_ma50 - _ma200) / _ma200, 4)
         except Exception:
             pass
 
@@ -1206,19 +1224,39 @@ class SignalBridge:
         except Exception:
             pass
 
-        # Step 3: RSR Top10 ランキング安定性（昨日との重複率）
-        _top10_overlap = None
+        # Step 3: RSR Top10 ランキング安定性（昨日との重複率）+ Top10滞在半減期
+        _top10_overlap      = None
+        _rsr_leader_half_life = None
         _top10_today = [e["symbol"] for e in _diag.get("rsr_distribution", [])[:10]]
         try:
             _rsr_dist_path_tmp = _diag_dir / "rsr_distribution.jsonl"
             if _rsr_dist_path_tmp.exists():
                 _dist_lines = _rsr_dist_path_tmp.read_text(encoding="utf-8").splitlines()
-                # 同日の記録は除いて直近1件を取得
+                # 同日の記録は除いて直近1件を取得（overlap計算）
                 _prev_entries = [l for l in _dist_lines if l.strip() and f'"date": "{today_str}"' not in l]
                 if _prev_entries:
                     _prev = _json.loads(_prev_entries[-1])
                     _top10_yesterday = [e["symbol"] for e in _prev.get("top20", [])[:10]]
                     _top10_overlap = len(set(_top10_today) & set(_top10_yesterday))
+
+                # Top10滞在半減期: 連続日のretention率から log半減期を計算
+                # >20日=強トレンド / 10〜20=通常 / <8=回転相場
+                _all_dist = [_json.loads(l) for l in _dist_lines if l.strip()]
+                _all_dist.sort(key=lambda x: x.get("date", ""))
+                if len(_all_dist) >= 5:
+                    import math as _math
+                    _retentions = []
+                    for _di in range(1, len(_all_dist)):
+                        _s_prev = {e["symbol"] for e in _all_dist[_di-1].get("top20", [])[:10]}
+                        _s_curr = {e["symbol"] for e in _all_dist[_di  ].get("top20", [])[:10]}
+                        if _s_prev:
+                            _retentions.append(len(_s_prev & _s_curr) / len(_s_prev))
+                    if _retentions:
+                        _avg_ret = float(np.mean(_retentions))
+                        if 0 < _avg_ret < 1.0:
+                            _rsr_leader_half_life = round(-_math.log(2) / _math.log(_avg_ret), 1)
+                        elif _avg_ret >= 1.0:
+                            _rsr_leader_half_life = 99.0
         except Exception:
             pass
 
@@ -1241,14 +1279,17 @@ class SignalBridge:
             "signals_per_week":        _signals_per_week,
             # Step 3: RSR Top10 ランキング安定性（理想 overlap 4〜7）
             "top10_overlap":           _top10_overlap,
+            # Top10滞在半減期（>20日=強トレンド / <8日=回転相場）
+            "rsr_leader_half_life":    _rsr_leader_half_life,
             "topk_count":              _diag["topk_count"],
             "positions":               len(current_positions),
             "exposure":                round(_exposure, 4),
             "cash_ratio":              round(available_cash / max(1.0, current_equity), 4),
             "market_above_ma200":      _above_ma200,
             "topix_vs_ma200_pct":      _bench_vs_ma,
-            # Step 1: 市場トレンドレジーム（bull/neutral/bear）
+            # Step 1: 市場トレンドレジーム（bull/neutral/bear）+ トレンド強度
             "trend_market":            _trend_market,
+            "trend_strength":          _trend_strength,   # (MA50-MA200)/MA200: >0.05=強 / <-0.02=下落
             # Step 2: ブレイクアウト直前銘柄数（20日高値の2%以内）
             "near_breakout_count":     _diag.get("near_breakout", 0),
             # Step 3: RSR分散（Top20のRSRのstd — 高いほどトップ層が際立つ）
@@ -1258,6 +1299,9 @@ class SignalBridge:
             "failed_breakout_rate":    round(_diag.get("failed_breakout", 0) / max(1, len(current_positions)), 3) if current_positions else 0.0,
             # 供給上限診断: RSR通過銘柄のうちブレイク直前の割合（>0.4=供給十分 / <0.2=停滞）
             "breakout_opportunity_rate": round(_diag.get("near_breakout", 0) / max(1, _diag.get("rsr_pass", 1)), 3) if _diag.get("rsr_pass", 0) > 0 else None,
+            # MTFフィルター診断: RSR通過のうち週足弱い割合（0.2〜0.4が理想 / 0.05以下ならMTF意味なし）
+            "mtf_filtered_candidates": _diag.get("mtf_filtered", 0),
+            "mtf_filter_rate":         round(_diag.get("mtf_filtered", 0) / max(1, _diag.get("rsr_pass", 1)), 3) if _diag.get("rsr_pass", 0) > 0 else None,
         }
         with _diag_path.open("a", encoding="utf-8") as _f:
             _f.write(_json.dumps(_metrics, ensure_ascii=False) + "\n")
