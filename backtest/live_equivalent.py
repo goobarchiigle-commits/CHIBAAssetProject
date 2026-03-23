@@ -95,6 +95,7 @@ class Position:
     qty:         int
     entry_price: float
     entry_idx:   int
+    entry_atr:   float = 0.0   # ATR20 at entry（False Breakout計測用）
 
 
 def _load_temporal24() -> dict[str, str]:
@@ -133,6 +134,7 @@ def run_backtest(
     use_broad_rsr:            bool  = False,   # True: RSR context = TOPIX100全件(~76), False: 年別選定銘柄
     trade_universe:           dict[str, str] | None = None,  # 取引対象ユニバースを外部から指定
     turtle_entry:             int   = 20,      # Turtle エントリー期間（デフォルト=確定値）
+    weekly_trend_filter:      str | None = None,  # MTFフィルター: "ma20" | "cross" | None
     verbose:                  bool  = True,
 ) -> dict:
     """
@@ -232,6 +234,32 @@ def run_backtest(
         if verbose:
             print(f"  RSR context: {rsr_df.shape[1]}銘柄 × {rsr_df.shape[0]}日")
 
+    # ---- 3b. 週足トレンド事前計算（MTFフィルター） ----
+    weekly_trend_map: dict[str, pd.Series] = {}
+    if weekly_trend_filter:
+        trade_syms_for_mtf = list(all_rolling_syms.keys())
+        if verbose:
+            print(f"[MTF] 週足トレンド計算中（filter={weekly_trend_filter}, {len(trade_syms_for_mtf)}銘柄）...")
+        for sym in trade_syms_for_mtf:
+            if sym not in universe_raw:
+                continue
+            daily_close  = universe_raw[sym]["df"]["Close"]
+            weekly_close = daily_close.resample("W-FRI").last().dropna()
+            try:
+                if weekly_trend_filter == "ma20":
+                    wma20 = weekly_close.rolling(20).mean()
+                    signal = (weekly_close > wma20)
+                elif weekly_trend_filter == "cross":
+                    wma10 = weekly_close.rolling(10).mean()
+                    wma30 = weekly_close.rolling(30).mean()
+                    signal = (wma10 > wma30)
+                else:
+                    continue
+                # 週足シグナルを日足インデックスに前向き補完
+                weekly_trend_map[sym] = signal.reindex(daily_close.index, method="ffill").fillna(False)
+            except Exception:
+                pass
+
     # ---- 4. 戦略初期化（固定モードのみ事前生成） ----
     def _make_strats(syms: dict[str, str], rsr_source: pd.DataFrame) -> dict:
         strats = {}
@@ -288,6 +316,7 @@ def run_backtest(
     cb_active      = False
     peak_equity    = float(capital)
     reentry_ban:   dict[str, int]      = {}
+    false_breakout_count = 0   # MTF効果測定用
 
     current_year   = -1
     active_syms:    dict[str, str]    = {}
@@ -359,6 +388,15 @@ def run_backtest(
             hold_idx   = (i - positions[sym].entry_idx) if is_holding else 0
             rsr_val    = float(rsr_row.get(sym, 0.0)) if sym in rsr_row.index else 0.0
 
+            # False Breakout診断（entry後5日以内 かつ -2ATR到達）
+            if is_holding and hold_idx <= 5 and positions[sym].entry_atr > 0:
+                try:
+                    _c = float(df_sym.loc[date, "Close"])
+                    if _c < positions[sym].entry_price - 2.0 * positions[sym].entry_atr:
+                        false_breakout_count += 1
+                except Exception:
+                    pass
+
             # 時間ストップ
             if is_holding and hold_idx > max_hold_days:
                 sell_signals.append((sym, "TIME_STOP"))
@@ -380,6 +418,11 @@ def run_backtest(
             elif sig == 1 and not is_holding:
                 ban_until = reentry_ban.get(sym, -1)
                 if i >= ban_until:
+                    # MTFフィルター: weekly trend が上向きのときのみ BUY
+                    if weekly_trend_filter and sym in weekly_trend_map:
+                        wt = weekly_trend_map[sym]
+                        if date in wt.index and not bool(wt.loc[date]):
+                            continue   # weekly trend ≠ up → BUY スキップ
                     buy_candidates.append((rsr_val, sym))
 
         cand_list.append(len(buy_candidates))
@@ -434,10 +477,27 @@ def run_backtest(
                 qty = int(alloc / buy_px / LOT) * LOT
                 if qty <= 0:
                     continue
+
+                # ATR20 at entry（True Range平均）
+                _atr20_bt = 0.0
+                try:
+                    _df_b = df_sym.loc[:date]
+                    _tr = pd.concat([
+                        _df_b["High"] - _df_b["Low"],
+                        (_df_b["High"] - _df_b["Close"].shift()).abs(),
+                        (_df_b["Low"]  - _df_b["Close"].shift()).abs(),
+                    ], axis=1).max(axis=1)
+                    _v = float(_tr.rolling(20).mean().iloc[-1])
+                    if not np.isnan(_v):
+                        _atr20_bt = _v
+                except Exception:
+                    pass
+
                 cash -= qty * buy_px * (1 + COST_ONE_WAY)
                 positions[sym] = Position(
                     symbol=sym, sector=active_syms.get(sym, "不明"),
                     qty=qty, entry_price=buy_px, entry_idx=i + 1,
+                    entry_atr=_atr20_bt,
                 )
                 trades.append({"symbol": sym, "side": "BUY",
                                "entry": buy_px, "exit": None,
@@ -470,21 +530,23 @@ def run_backtest(
 
     sells      = [t for t in trades if t["side"] == "SELL" and t["pnl"] is not None]
     win_rate   = sum(1 for t in sells if t["pnl"] > 0) / max(1, len(sells))
+    false_bo_rate = false_breakout_count / max(1, len(sells))
 
     return {
-        "cagr":          cagr,
-        "sharpe":        sharpe,
-        "max_dd":        max_dd,
-        "calmar":        calmar,
-        "avg_exposure":  avg_exposure,
-        "avg_positions": avg_positions,
-        "avg_candidates": avg_candidates,
-        "zero_exp_rate": zero_exp_rate,
-        "trade_count":   len(sells),
-        "win_rate":      win_rate,
-        "avg_hhi":       avg_hhi,
-        "max_hhi":       max_hhi,
-        "equity_curve":  eq,
+        "cagr":                cagr,
+        "sharpe":              sharpe,
+        "max_dd":              max_dd,
+        "calmar":              calmar,
+        "avg_exposure":        avg_exposure,
+        "avg_positions":       avg_positions,
+        "avg_candidates":      avg_candidates,
+        "zero_exp_rate":       zero_exp_rate,
+        "trade_count":         len(sells),
+        "win_rate":            win_rate,
+        "avg_hhi":             avg_hhi,
+        "max_hhi":             max_hhi,
+        "false_breakout_rate": false_bo_rate,
+        "equity_curve":        eq,
     }
 
 

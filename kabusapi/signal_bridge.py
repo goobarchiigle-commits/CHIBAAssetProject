@@ -159,6 +159,7 @@ class OrderInstruction:
     estimated_price:  float
     estimated_amount: float
     reason:           str
+    atr20:            float = 0.0  # BUY時ATR20（False Breakout診断用）
 
 
 @dataclass
@@ -261,6 +262,7 @@ class SignalBridge:
             "recovery_threshold":    None,
             "position_entry_dates":  {},
             "position_entry_prices": {},   # BUY時の参考単価（PnL計算用）
+            "position_entry_atrs":   {},   # BUY時ATR20（False Breakout診断用）
             "reentry_blocked":       {},
             "last_updated":          None,
         }
@@ -533,7 +535,9 @@ class SignalBridge:
             logger.info("再エントリー禁止銘柄: %s", active_blocked)
 
         # ── 保有エントリー日マップ ───────────────────────────────────
-        pos_entry_dates: dict[str, str] = portfolio_state.get("position_entry_dates", {})
+        pos_entry_dates:  dict[str, str]   = portfolio_state.get("position_entry_dates",  {})
+        pos_entry_prices: dict[str, float] = portfolio_state.get("position_entry_prices", {})
+        pos_entry_atrs:   dict[str, float] = portfolio_state.get("position_entry_atrs",   {})
 
         # ── 診断カウンター ────────────────────────────────────────
         diag_total        = 0   # 非保有・非ブロック銘柄数（BUY候補の母数）
@@ -549,7 +553,9 @@ class SignalBridge:
         diag_bo15_pass = 0   # RSR通過 かつ 15日ブレイクなら通過したはずの数
         diag_bo10_pass = 0   # RSR通過 かつ 10日ブレイクなら通過したはずの数
         # Step 4: ブレイクアウト直前銘柄（20日高値の2%以内）
-        diag_near_breakout = 0
+        diag_near_breakout   = 0
+        # False Breakout診断（entry後5日以内 かつ -2ATR到達）
+        diag_failed_breakout = 0
 
         # ── シグナル生成ループ ───────────────────────────────────────
         signals: list[StockSignal] = []
@@ -692,6 +698,18 @@ class SignalBridge:
                 else:
                     diag_blocked_rsr += 1
 
+            # ── False Breakout診断（保有中 かつ entry後5営業日以内 かつ -2ATR到達）─
+            if currently_holding and not is_time_exit and not is_rank_exit:
+                _ep  = pos_entry_prices.get(sym, 0.0)
+                _ea  = pos_entry_atrs.get(sym, 0.0)
+                if _ep > 0 and _ea > 0 and hold_td <= 5:
+                    try:
+                        _price_now = float(df["Close"].iloc[-1])
+                        if _price_now < _ep - 2.0 * _ea:
+                            diag_failed_breakout += 1
+                    except Exception:
+                        pass
+
             signals.append(StockSignal(
                 symbol            = sym,
                 sector            = sector,
@@ -735,6 +753,8 @@ class SignalBridge:
             "bo10_extra":         diag_bo10_pass,   # 10日なら追加通過する銘柄数
             # Step 4: ブレイクアウト直前（20日高値の2%以内）
             "near_breakout":      diag_near_breakout,
+            # False Breakout: 保有中 かつ entry後5日以内 かつ -2ATR到達した銘柄数
+            "failed_breakout":    diag_failed_breakout,
         }
         logger.info(
             "DIAG universe=%d rsr_pass=%d blocked_rsr=%d blocked_breakout=%d candidates=%d topk=%d",
@@ -855,7 +875,8 @@ class SignalBridge:
             alloc           = total_cash / max(1, effective_slots)
             alloc           = min(alloc, max_alloc_cap)
 
-            ref_price = float(universe_raw[sig.symbol]["df"]["Close"].iloc[-1])
+            _df_buy   = universe_raw[sig.symbol]["df"]
+            ref_price = float(_df_buy["Close"].iloc[-1])
             lot_cost  = ref_price * 100
             qty       = int(alloc // lot_cost) * 100
             if qty <= 0:
@@ -864,6 +885,20 @@ class SignalBridge:
                     f" → BUY スキップ"
                 )
                 continue
+
+            # ATR20 計算（True Range平均）
+            _atr20 = 0.0
+            try:
+                _tr = pd.concat([
+                    _df_buy["High"] - _df_buy["Low"],
+                    (_df_buy["High"] - _df_buy["Close"].shift()).abs(),
+                    (_df_buy["Low"]  - _df_buy["Close"].shift()).abs(),
+                ], axis=1).max(axis=1)
+                _atr_val = float(_tr.rolling(20).mean().iloc[-1])
+                if not np.isnan(_atr_val):
+                    _atr20 = _atr_val
+            except Exception:
+                pass
 
             orders.append(OrderInstruction(
                 symbol           = sig.symbol,
@@ -875,6 +910,7 @@ class SignalBridge:
                 estimated_price  = ref_price,
                 estimated_amount = qty * ref_price,
                 reason           = sig.reason,
+                atr20            = _atr20,
             ))
 
             sector_count[sig.sector] = sector_count.get(sig.sector, 0) + 1
@@ -923,6 +959,7 @@ class SignalBridge:
                     "side":            o.side,
                     "qty":             o.qty,
                     "estimated_price": o.estimated_price,
+                    "atr20":           o.atr20,
                     "sector":          o.sector,
                     "reason":          o.reason,
                     "order_id":        result.order_id,
@@ -941,6 +978,7 @@ class SignalBridge:
                     "side":            o.side,
                     "qty":             o.qty,
                     "estimated_price": o.estimated_price,
+                    "atr20":           o.atr20,
                     "sector":          o.sector,
                     "reason":          o.reason,
                     "success":         False,
@@ -970,6 +1008,7 @@ class SignalBridge:
         state             = self._load_portfolio_state()
         pos_entry_dates   = state.setdefault("position_entry_dates",  {})
         pos_entry_prices  = state.setdefault("position_entry_prices", {})
+        pos_entry_atrs    = state.setdefault("position_entry_atrs",   {})
         reentry_blocked   = state.setdefault("reentry_blocked",       {})
 
         # 最新の市場レジームをメトリクスから取得（regime別成績集計用）
@@ -998,10 +1037,13 @@ class SignalBridge:
             amount = qty * price
 
             if side == "BUY":
+                atr20 = float(r.get("atr20", 0.0))
                 pos_entry_dates[sym]  = today_str
                 pos_entry_prices[sym] = price
+                if atr20 > 0:
+                    pos_entry_atrs[sym] = atr20
                 reentry_blocked.pop(sym, None)
-                logger.info("entry_date 記録: %s → %s @ ¥%.0f", sym, today_str, price)
+                logger.info("entry_date 記録: %s → %s @ ¥%.0f ATR20=%.0f", sym, today_str, price, atr20)
                 _trade = {
                     "date":         today_str,
                     "symbol":       sym,
@@ -1010,6 +1052,7 @@ class SignalBridge:
                     "qty":          qty,
                     "price":        price,
                     "amount":       amount,
+                    "atr20":        atr20,
                     "entry_regime": _latest_regime,
                     "reason":       reason,
                 }
@@ -1018,6 +1061,7 @@ class SignalBridge:
 
             elif side == "SELL":
                 entry_price = pos_entry_prices.pop(sym, None)
+                entry_atr   = pos_entry_atrs.pop(sym, None)
                 entry_date  = pos_entry_dates.pop(sym, None)
 
                 pnl     = round((price - entry_price) * qty, 0) if entry_price else None
@@ -1209,6 +1253,11 @@ class SignalBridge:
             "near_breakout_count":     _diag.get("near_breakout", 0),
             # Step 3: RSR分散（Top20のRSRのstd — 高いほどトップ層が際立つ）
             "rsr_dispersion":          round(float(np.std([e["rsr"] for e in _diag.get("rsr_distribution", [])[:20]])), 2) if _diag.get("rsr_distribution") else None,
+            # False Breakout診断（entry後5日以内 かつ -2ATR到達）
+            "failed_breakout_count":   _diag.get("failed_breakout", 0),
+            "failed_breakout_rate":    round(_diag.get("failed_breakout", 0) / max(1, len(current_positions)), 3) if current_positions else 0.0,
+            # 供給上限診断: RSR通過銘柄のうちブレイク直前の割合（>0.4=供給十分 / <0.2=停滞）
+            "breakout_opportunity_rate": round(_diag.get("near_breakout", 0) / max(1, _diag.get("rsr_pass", 1)), 3) if _diag.get("rsr_pass", 0) > 0 else None,
         }
         with _diag_path.open("a", encoding="utf-8") as _f:
             _f.write(_json.dumps(_metrics, ensure_ascii=False) + "\n")
