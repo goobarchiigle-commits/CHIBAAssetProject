@@ -132,6 +132,7 @@ def run_backtest(
     use_rolling:              bool  = False,   # True: ローリング選定ユニバースを使用
     use_broad_rsr:            bool  = False,   # True: RSR context = TOPIX100全件(~76), False: 年別選定銘柄
     trade_universe:           dict[str, str] | None = None,  # 取引対象ユニバースを外部から指定
+    turtle_entry:             int   = 20,      # Turtle エントリー期間（デフォルト=確定値）
     verbose:                  bool  = True,
 ) -> dict:
     """
@@ -247,7 +248,7 @@ def run_backtest(
                     min_sepa         = MIN_SEPA,
                     min_rsr          = min_rsr,
                     mom_period       = 21,
-                    turtle_entry     = 20,
+                    turtle_entry     = turtle_entry,
                     turtle_exit      = 20,
                     use_turtle_entry = True,
                 )

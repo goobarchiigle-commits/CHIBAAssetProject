@@ -540,6 +540,13 @@ class SignalBridge:
         diag_blocked_rsr  = 0   # RSRで弾かれた数
         diag_blocked_bo   = 0   # RSR通過後にBreakout/SEPA/momentumで弾かれた数
         diag_rsr_dist: list[dict] = []   # RSR分布（全非保有銘柄）
+        # Step 2: supply ceiling（RSR>70/60/50 の分布）
+        diag_rsr_gt70 = 0
+        diag_rsr_gt60 = 0
+        diag_rsr_gt50 = 0
+        # Step 3: Turtle breakout期間比較（戦略変更なし・ログのみ）
+        diag_bo15_pass = 0   # RSR通過 かつ 15日ブレイクなら通過したはずの数
+        diag_bo10_pass = 0   # RSR通過 かつ 10日ブレイクなら通過したはずの数
 
         # ── シグナル生成ループ ───────────────────────────────────────
         signals: list[StockSignal] = []
@@ -648,10 +655,32 @@ class SignalBridge:
             if not currently_holding and not is_time_exit and not is_rank_exit and sym not in active_blocked:
                 diag_total += 1
                 diag_rsr_dist.append({"symbol": sym, "rsr": round(rsr_now, 1)})
+
+                # Step 2: supply ceiling カウント（RSR分布）
+                if rsr_now > 70: diag_rsr_gt70 += 1
+                if rsr_now > 60: diag_rsr_gt60 += 1
+                if rsr_now > 50: diag_rsr_gt50 += 1
+
                 if rsr_now >= min_rsr_threshold:
                     diag_rsr_pass += 1
                     if signal_int == 0:
                         diag_blocked_bo += 1   # RSR通過済みなのにBUYにならない = Breakout/SEPA/Mom
+
+                        # Step 3: Turtle期間比較（現行20日 vs 15日 vs 10日）
+                        # 戦略には影響しない診断ログのみ
+                        try:
+                            close_s   = df["Close"]
+                            price_now = float(close_s.iloc[-1])
+                            if len(close_s) >= 16:
+                                high_15 = float(close_s.iloc[-16:-1].max())
+                                if price_now > high_15:
+                                    diag_bo15_pass += 1   # 15日なら通過したはず
+                            if len(close_s) >= 11:
+                                high_10 = float(close_s.iloc[-11:-1].max())
+                                if price_now > high_10:
+                                    diag_bo10_pass += 1   # 10日なら通過したはず
+                        except Exception:
+                            pass
                 else:
                     diag_blocked_rsr += 1
 
@@ -689,6 +718,13 @@ class SignalBridge:
             "buy_candidates":     len(buy_eligible),
             "topk_count":         len(top_k_syms),
             "rsr_distribution":   rsr_dist_sorted[:20],
+            # Step 2: supply ceiling
+            "rsr_gt70":           diag_rsr_gt70,
+            "rsr_gt60":           diag_rsr_gt60,
+            "rsr_gt50":           diag_rsr_gt50,
+            # Step 3: Turtle期間比較（何銘柄が15日/10日で追加通過するか）
+            "bo15_extra":         diag_bo15_pass,   # 15日なら追加通過する銘柄数
+            "bo10_extra":         diag_bo10_pass,   # 10日なら追加通過する銘柄数
         }
         logger.info(
             "DIAG universe=%d rsr_pass=%d blocked_rsr=%d blocked_breakout=%d candidates=%d topk=%d",
@@ -1025,6 +1061,13 @@ class SignalBridge:
             "candidate_count":         _diag["buy_candidates"], # 最終BUY候補数（全フィルター通過後）
             "blocked_by_rsr":          _diag["blocked_rsr"],    # RSR未達でブロック
             "blocked_by_breakout":     _diag["blocked_breakout"],  # Turtleブレイクアウト未達でブロック
+            # Step 2: supply ceiling（RSRは足りているか？）
+            "rsr_gt70_count":          _diag["rsr_gt70"],   # RSR>70 銘柄数
+            "rsr_gt60_count":          _diag["rsr_gt60"],   # RSR>60 銘柄数（閾値引き下げ参考）
+            "rsr_gt50_count":          _diag["rsr_gt50"],   # RSR>50 銘柄数
+            # Step 3: Turtle期間比較（追加通過候補数）
+            "bo15_extra":              _diag["bo15_extra"],  # 15日なら追加でBUY候補になる数
+            "bo10_extra":              _diag["bo10_extra"],  # 10日なら追加でBUY候補になる数
             "topk_count":              _diag["topk_count"],
             "positions":               len(current_positions),
             "exposure":                round(_exposure, 4),
