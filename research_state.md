@@ -1,5 +1,5 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-03-22（ローリング選定ユニバース構築 + ライブ等価バックテスト OOS検証完了）
+# Single Source of Truth / 最終更新: 2026-03-23（運用評価フェーズ移行 / 週次レポート完成）
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
 
 ---
@@ -582,6 +582,48 @@ RSR上位候補:    7013.T(92.9) / 8058.T(90.5) / 8015.T(85.7) / 7011.T(76.2)
 - `rsr_pass_count` の 10日平均 ≥ 3.0 → 正常化確認
 - `candidate_count` の 10日平均 ≥ 0.3 → Turtle供給の確認
 - 上記未達の場合: min_rsr=75→70 への引き下げを検討（Step 3: RSRスロープ改善と同時）
+
+---
+
+## フェーズ移行: 研究フェーズ → 運用評価フェーズ（2026-03-23）
+
+### 現在地
+- RSR設計: IBD加重12ヶ月（直近3ヶ月×40% + 各3ヶ月×20%）→ 問題なし
+- 診断ログ: 供給・安定性・RSR分散・市場レジーム・近接銘柄まで整備完了
+- OOS検証: rolling fold-level実施済み（turtle_entry=20確定）
+- **次のボトルネック: 意思決定速度（ログはあるが判断レポートがなかった）**
+
+### 完了: 意思決定基盤の構築（Step 1）
+
+#### `research/weekly_report.py`（新規作成）
+```
+python research/weekly_report.py
+python research/weekly_report.py --weeks 4
+python research/weekly_report.py --since 2026-04-01
+```
+出力内容:
+- 週次: 取引数 / 勝率 / 期待値 / PnL / signals_per_week密度
+- 月次: 月別PnL / MaxDD / **regime別成績**（bull/neutral/bear）← 重要
+- 供給診断: rsr_pass / near_breakout / rsr_dispersion の20日推移
+
+#### `signal_bridge.py` 追加ログ（2026-03-23）
+| フィールド | 説明 |
+|---|---|
+| `trend_market` | bull/neutral/bear（TOPIX MA50 vs MA200） |
+| `near_breakout_count` | 20日高値の2%以内の銘柄数（供給予測） |
+| `rsr_dispersion` | Top20 RSRのstd（>10=強い相場、<5=横ばい） |
+| `estimated_price` in send_results | BUY/SELL実行時の参考価格（PnL計算基礎） |
+
+#### `logs/trades.jsonl`（自動生成）
+- 実発注成功後に `update_state_after_execution()` が書き込む
+- BUY: date/symbol/sector/qty/price/entry_regime
+- SELL: 上記 + pnl/pnl_pct/hold_days/entry_price/entry_date
+
+### ロードマップ（今後の優先順位）
+1. **RSR42観察期間中（〜2026-04-08）**: weekly_report で供給診断と市場レジームを監視
+2. **Step 2: MTF実戦検証**: weekly_close > weekly_ma20 でフォールスブレイクアウト削減
+3. **Step 3: RSR改良**: RSR×RSRスロープの複合スコア（ピーク銘柄除外）
+4. **全市場ユニバース研究** → 空売り
 
 ---
 

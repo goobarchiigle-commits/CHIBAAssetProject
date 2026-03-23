@@ -255,13 +255,14 @@ class SignalBridge:
     def _load_portfolio_state(self) -> dict:
         """ポートフォリオ状態ファイルを読み込む（存在しなければデフォルト値）"""
         default = {
-            "cb_state":             "NORMAL",
-            "equity_peak":          self.capital,
-            "cb_cooldown_end_date": None,
-            "recovery_threshold":   None,
-            "position_entry_dates": {},
-            "reentry_blocked":      {},
-            "last_updated":         None,
+            "cb_state":              "NORMAL",
+            "equity_peak":           self.capital,
+            "cb_cooldown_end_date":  None,
+            "recovery_threshold":    None,
+            "position_entry_dates":  {},
+            "position_entry_prices": {},   # BUY時の参考単価（PnL計算用）
+            "reentry_blocked":       {},
+            "last_updated":          None,
         }
         if not self._state_file.exists():
             return default
@@ -547,6 +548,8 @@ class SignalBridge:
         # Step 3: Turtle breakout期間比較（戦略変更なし・ログのみ）
         diag_bo15_pass = 0   # RSR通過 かつ 15日ブレイクなら通過したはずの数
         diag_bo10_pass = 0   # RSR通過 かつ 10日ブレイクなら通過したはずの数
+        # Step 4: ブレイクアウト直前銘柄（20日高値の2%以内）
+        diag_near_breakout = 0
 
         # ── シグナル生成ループ ───────────────────────────────────────
         signals: list[StockSignal] = []
@@ -679,6 +682,11 @@ class SignalBridge:
                                 high_10 = float(close_s.iloc[-11:-1].max())
                                 if price_now > high_10:
                                     diag_bo10_pass += 1   # 10日なら通過したはず
+                            # Step 4: 20日高値の2%以内（ブレイクアウト直前）
+                            if len(close_s) >= 21:
+                                high_20 = float(close_s.iloc[-21:-1].max())
+                                if high_20 > 0 and (high_20 - price_now) / high_20 < 0.02:
+                                    diag_near_breakout += 1
                         except Exception:
                             pass
                 else:
@@ -725,6 +733,8 @@ class SignalBridge:
             # Step 3: Turtle期間比較（何銘柄が15日/10日で追加通過するか）
             "bo15_extra":         diag_bo15_pass,   # 15日なら追加通過する銘柄数
             "bo10_extra":         diag_bo10_pass,   # 10日なら追加通過する銘柄数
+            # Step 4: ブレイクアウト直前（20日高値の2%以内）
+            "near_breakout":      diag_near_breakout,
         }
         logger.info(
             "DIAG universe=%d rsr_pass=%d blocked_rsr=%d blocked_breakout=%d candidates=%d topk=%d",
@@ -909,13 +919,15 @@ class SignalBridge:
                     order_type = order_type,
                 )
                 results.append({
-                    "symbol":      o.symbol,
-                    "side":        o.side,
-                    "qty":         o.qty,
-                    "reason":      o.reason,
-                    "order_id":    result.order_id,
-                    "success":     result.success,
-                    "result_code": result.result_code,
+                    "symbol":          o.symbol,
+                    "side":            o.side,
+                    "qty":             o.qty,
+                    "estimated_price": o.estimated_price,
+                    "sector":          o.sector,
+                    "reason":          o.reason,
+                    "order_id":        result.order_id,
+                    "success":         result.success,
+                    "result_code":     result.result_code,
                 })
                 status = "✅ 成功" if result.success else "❌ 失敗"
                 logger.info(
@@ -925,12 +937,14 @@ class SignalBridge:
             except Exception as e:
                 logger.error("%s %s 注文送信エラー: %s", o.side, o.symbol, e)
                 results.append({
-                    "symbol":  o.symbol,
-                    "side":    o.side,
-                    "qty":     o.qty,
-                    "reason":  o.reason,
-                    "success": False,
-                    "error":   str(e),
+                    "symbol":          o.symbol,
+                    "side":            o.side,
+                    "qty":             o.qty,
+                    "estimated_price": o.estimated_price,
+                    "sector":          o.sector,
+                    "reason":          o.reason,
+                    "success":         False,
+                    "error":           str(e),
                 })
 
         return results
@@ -944,14 +958,33 @@ class SignalBridge:
         today_str:    str,
     ) -> None:
         """
-        実際の約定確認後に portfolio_state を更新する。
-        BUY 成功 → entry_date 記録
-        SELL 成功 + 時間ストップ → reentry_blocked に追加（5 営業日）
-        SELL 成功 → entry_date 削除
+        実際の約定確認後に portfolio_state を更新し、トレードログを書く。
+        BUY 成功 → entry_date / entry_price 記録 + logs/trades.jsonl に open エントリー
+        SELL 成功 → entry_date / entry_price 削除 + PnL 計算して closed エントリー書き込み
+        SELL + 時間ストップ → reentry_blocked に追加（5 営業日）
         """
-        state           = self._load_portfolio_state()
-        pos_entry_dates = state.setdefault("position_entry_dates", {})
-        reentry_blocked = state.setdefault("reentry_blocked", {})
+        import json as _json
+        from pathlib import Path as _Path
+        from datetime import date as _date
+
+        state             = self._load_portfolio_state()
+        pos_entry_dates   = state.setdefault("position_entry_dates",  {})
+        pos_entry_prices  = state.setdefault("position_entry_prices", {})
+        reentry_blocked   = state.setdefault("reentry_blocked",       {})
+
+        # 最新の市場レジームをメトリクスから取得（regime別成績集計用）
+        _latest_regime = None
+        _metrics_path  = _Path("logs/diagnostics/metrics.jsonl")
+        if _metrics_path.exists():
+            try:
+                _lines = [l for l in _metrics_path.read_text(encoding="utf-8").splitlines() if l.strip()]
+                if _lines:
+                    _latest_regime = _json.loads(_lines[-1]).get("trend_market")
+            except Exception:
+                pass
+
+        _trades_path = _Path("logs/trades.jsonl")
+        _trades_path.parent.mkdir(parents=True, exist_ok=True)
 
         for r in send_results:
             if not r.get("success"):
@@ -959,14 +992,44 @@ class SignalBridge:
             sym    = r["symbol"]
             side   = r["side"]
             reason = r.get("reason", "")
+            qty    = r.get("qty", 0)
+            price  = float(r.get("estimated_price", 0.0))
+            sector = r.get("sector", "不明")
+            amount = qty * price
 
             if side == "BUY":
-                pos_entry_dates[sym] = today_str
+                pos_entry_dates[sym]  = today_str
+                pos_entry_prices[sym] = price
                 reentry_blocked.pop(sym, None)
-                logger.info("entry_date 記録: %s → %s", sym, today_str)
+                logger.info("entry_date 記録: %s → %s @ ¥%.0f", sym, today_str, price)
+                _trade = {
+                    "date":         today_str,
+                    "symbol":       sym,
+                    "sector":       sector,
+                    "side":         "BUY",
+                    "qty":          qty,
+                    "price":        price,
+                    "amount":       amount,
+                    "entry_regime": _latest_regime,
+                    "reason":       reason,
+                }
+                with _trades_path.open("a", encoding="utf-8") as _f:
+                    _f.write(_json.dumps(_trade, ensure_ascii=False) + "\n")
 
             elif side == "SELL":
-                pos_entry_dates.pop(sym, None)
+                entry_price = pos_entry_prices.pop(sym, None)
+                entry_date  = pos_entry_dates.pop(sym, None)
+
+                pnl     = round((price - entry_price) * qty, 0) if entry_price else None
+                pnl_pct = round((price / entry_price) - 1, 4)   if entry_price else None
+
+                hold_days = None
+                if entry_date:
+                    try:
+                        hold_days = (_date.fromisoformat(today_str) - _date.fromisoformat(entry_date)).days
+                    except Exception:
+                        pass
+
                 if "時間ストップ" in reason:
                     today_ts      = pd.Timestamp(today_str)
                     block_end     = _add_trading_days(today_ts, REENTRY_COOLDOWN_TRADING_DAYS)
@@ -976,6 +1039,25 @@ class SignalBridge:
                         "再エントリー禁止: %s 〜 %s（時間ストップ後%d営業日）",
                         sym, block_end_str, REENTRY_COOLDOWN_TRADING_DAYS,
                     )
+
+                _trade = {
+                    "date":        today_str,
+                    "symbol":      sym,
+                    "sector":      sector,
+                    "side":        "SELL",
+                    "qty":         qty,
+                    "price":       price,
+                    "amount":      amount,
+                    "pnl":         pnl,
+                    "pnl_pct":     pnl_pct,
+                    "hold_days":   hold_days,
+                    "entry_price": entry_price,
+                    "entry_date":  entry_date,
+                    "entry_regime": _latest_regime,
+                    "reason":      reason,
+                }
+                with _trades_path.open("a", encoding="utf-8") as _f:
+                    _f.write(_json.dumps(_trade, ensure_ascii=False) + "\n")
 
         self._save_portfolio_state(state)
 
@@ -1042,16 +1124,26 @@ class SignalBridge:
         _diag_dir  = _Path("logs/diagnostics")
         _diag_dir.mkdir(parents=True, exist_ok=True)
         _diag_path = _diag_dir / "metrics.jsonl"
-        # 市場レジーム（TOPIX ETF 1306.T の 200日MA比較）
+        # 市場レジーム（TOPIX ETF 1306.T の 200日MA / 50日MA比較）
+        _above_ma200  = None
+        _bench_vs_ma  = None
+        _trend_market = None
         try:
             _bench_close = bench_prices.dropna()
             _ma200       = float(_bench_close.rolling(200).mean().iloc[-1])
+            _ma50        = float(_bench_close.rolling(50).mean().iloc[-1])
             _bench_last  = float(_bench_close.iloc[-1])
             _above_ma200 = bool(_bench_last > _ma200)
             _bench_vs_ma = round((_bench_last / _ma200 - 1) * 100, 2)  # %
+            # トレンドレジーム分類: bull=MA50>MA200, bear=MA50<MA200（デスクロス）
+            if _ma50 > _ma200 * 1.005:
+                _trend_market = "bull"
+            elif _ma50 < _ma200 * 0.995:
+                _trend_market = "bear"
+            else:
+                _trend_market = "neutral"
         except Exception:
-            _above_ma200 = None
-            _bench_vs_ma = None
+            pass
 
         # Step 2: 週次シグナル密度（直近5営業日の日別 candidate_count 合計）
         # 1日に複数回実行しても日ごとに1回分のみカウント（当日の最新値を使用）
@@ -1111,6 +1203,12 @@ class SignalBridge:
             "cash_ratio":              round(available_cash / max(1.0, current_equity), 4),
             "market_above_ma200":      _above_ma200,
             "topix_vs_ma200_pct":      _bench_vs_ma,
+            # Step 1: 市場トレンドレジーム（bull/neutral/bear）
+            "trend_market":            _trend_market,
+            # Step 2: ブレイクアウト直前銘柄数（20日高値の2%以内）
+            "near_breakout_count":     _diag.get("near_breakout", 0),
+            # Step 3: RSR分散（Top20のRSRのstd — 高いほどトップ層が際立つ）
+            "rsr_dispersion":          round(float(np.std([e["rsr"] for e in _diag.get("rsr_distribution", [])[:20]])), 2) if _diag.get("rsr_distribution") else None,
         }
         with _diag_path.open("a", encoding="utf-8") as _f:
             _f.write(_json.dumps(_metrics, ensure_ascii=False) + "\n")
