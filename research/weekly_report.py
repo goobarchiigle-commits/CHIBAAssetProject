@@ -273,6 +273,29 @@ def _supply_trend(metrics: pd.DataFrame, since: pd.Timestamp | None) -> None:
             mtf_label = "MTF有効" if 0.2 <= mtf_v <= 0.4 else ("MTF過剰フィルター" if mtf_v > 0.4 else "MTF意味なし（週足整合）")
             print(f"  MTFフィルター率: {mtf_v:.2f}  → {mtf_label}  (目安: 0.2〜0.4=理想 / <0.05=意味なし)")
 
+    # ── 構造的ボトルネック（リーダー集中相場・売買不可理由）──
+    print()
+    if "blocked_leaders_count" in df.columns:
+        bl_v   = float(df["blocked_leaders_count"].dropna().iloc[-1]) if not df["blocked_leaders_count"].dropna().empty else 0
+        blw_v  = float(df["blocked_leaders_weight"].dropna().iloc[-1]) if "blocked_leaders_weight" in df.columns and not df["blocked_leaders_weight"].dropna().empty else 0.0
+        bl_label = "⚠ 期待値低下リスク" if blw_v > 0.2 else ("注意" if blw_v > 0.1 else "正常")
+        print(f"  RSR Top10 売買不可: {int(bl_v)}銘柄  重み={blw_v:.1%}  → {bl_label}  (目安: >20%で期待値低下)")
+    if "rsr_top10_tradeable_ratio" in df.columns:
+        tr10_s = df["rsr_top10_tradeable_ratio"].dropna()
+        if not tr10_s.empty:
+            tr10_v = float(tr10_s.iloc[-1])
+            tr10_label = "リーダー集中相場（高価格株主導）" if tr10_v < 0.5 else ("やや集中" if tr10_v < 0.7 else "正常")
+            print(f"  RSR Top10 売買可能割合: {tr10_v:.0%}  → {tr10_label}  (目安: ≥50%)")
+    if "blocked_by_price" in df.columns:
+        bp_s = df["blocked_by_price"].dropna()
+        bl_s = df["blocked_by_liquidity"].dropna() if "blocked_by_liquidity" in df.columns else pd.Series(dtype=float)
+        br_s = df["blocked_by_risk"].dropna() if "blocked_by_risk" in df.columns else pd.Series(dtype=float)
+        bp_v  = int(bp_s.iloc[-1])  if not bp_s.empty  else 0
+        bl_v2 = int(bl_s.iloc[-1])  if not bl_s.empty  else 0
+        br_v  = int(br_s.iloc[-1])  if not br_s.empty  else 0
+        note  = "→ ポジションサイズ設計を見直す" if bp_v > 0 else ""
+        print(f"  ブロック理由: 価格={bp_v}銘柄  流動性={bl_v2}銘柄  リスク管理={br_v}銘柄  {note}")
+
 
 # ── メイン ────────────────────────────────────────────────────────────
 

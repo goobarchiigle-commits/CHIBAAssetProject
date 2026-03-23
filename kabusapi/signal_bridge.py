@@ -786,10 +786,59 @@ class SignalBridge:
             # MTFフィルター: RSR通過したが週足MA20弱で落ちる銘柄数（診断のみ）
             "mtf_filtered":       diag_mtf_filtered,
         }
+
+        # ── 構造的ボトルネック診断（シグナルループ後に一括計算） ──────
+        # Step 1: RSR Top10 のうち売買不可銘柄数・重み
+        #   blocked_leaders_weight > 0.2（20%超）→ ブレイクアウト期待値崩れの可能性
+        # Step 2: 売買不可の理由を price / liquidity / risk に分離
+        #   実務で最多は blocked_by_price → 戦略変更ではなくポジションサイズ設計の問題
+        # Step 3: RSR Top10 のうち売買可能割合（rsr_top10_tradeable_ratio）
+        #   < 0.5 → リーダー集中相場（高価格銘柄主導）
+        _blocked_leaders_count    = 0
+        _blocked_leaders_weight   = 0.0
+        _rsr_top10_tradeable_cnt  = 0
+        _blocked_by_price         = 0
+        _blocked_by_liquidity     = 0
+        _blocked_by_risk          = 0
+        try:
+            _rsr_top10 = rsr_latest.nlargest(10)
+            _rsr_top10_total_score = float(_rsr_top10.sum()) or 1.0
+            for _lsym, _lrsr in _rsr_top10.items():
+                if _lsym in self.universe_tickers:
+                    _rsr_top10_tradeable_cnt += 1
+                else:
+                    _blocked_leaders_count += 1
+                    _blocked_leaders_weight += float(_lrsr)
+            _blocked_leaders_weight = round(_blocked_leaders_weight / _rsr_top10_total_score, 3)
+
+            # blocked_by_{reason}: RSR >= 閾値 の全銘柄を対象に理由を分類
+            for _bsym in rsr_latest[rsr_latest >= _min_rsr_for_ctx].index:
+                if _bsym in active_blocked:
+                    _blocked_by_risk += 1
+                elif _bsym not in self.universe_tickers:
+                    # trade_universe に存在しない = 価格フィルターで除外
+                    _blocked_by_price += 1
+                elif liquidity.get(_bsym, 0) < MIN_DAILY_VALUE_YEN:
+                    # trade_universe に存在するが流動性不足
+                    _blocked_by_liquidity += 1
+        except Exception as _e:
+            logger.debug("blocked_leaders 計算エラー: %s", _e)
+
+        diagnostics["blocked_leaders_count"]   = _blocked_leaders_count
+        diagnostics["blocked_leaders_weight"]  = _blocked_leaders_weight
+        diagnostics["rsr_top10_tradeable_cnt"] = _rsr_top10_tradeable_cnt
+        diagnostics["blocked_by_price"]        = _blocked_by_price
+        diagnostics["blocked_by_liquidity"]    = _blocked_by_liquidity
+        diagnostics["blocked_by_risk"]         = _blocked_by_risk
+
         logger.info(
-            "DIAG universe=%d rsr_pass=%d blocked_rsr=%d blocked_breakout=%d candidates=%d topk=%d",
+            "DIAG universe=%d rsr_pass=%d blocked_rsr=%d blocked_breakout=%d candidates=%d topk=%d"
+            " | leaders: blocked=%d weight=%.1f%% top10_tradeable=%d"
+            " | price=%d liq=%d risk=%d",
             diag_total, diag_rsr_pass, diag_blocked_rsr, diag_blocked_bo,
             len(buy_eligible), len(top_k_syms),
+            _blocked_leaders_count, _blocked_leaders_weight * 100, _rsr_top10_tradeable_cnt,
+            _blocked_by_price, _blocked_by_liquidity, _blocked_by_risk,
         )
 
         return signals, top_k_syms, diagnostics
@@ -1342,6 +1391,16 @@ class SignalBridge:
             # False Breakout診断（entry後5日以内 かつ -2ATR到達）
             "failed_breakout_count":   _diag.get("failed_breakout", 0),
             "failed_breakout_rate":    round(_diag.get("failed_breakout", 0) / max(1, len(current_positions)), 3) if current_positions else 0.0,
+            # 構造的ボトルネック診断（Step 1〜3）
+            # RSR Top10 売買ブロック（>20% → ブレイクアウト期待値低下リスク）
+            "blocked_leaders_count":   _diag.get("blocked_leaders_count", 0),
+            "blocked_leaders_weight":  _diag.get("blocked_leaders_weight", 0.0),
+            # RSR Top10 のうち売買可能割合（<0.5 → リーダー集中相場）
+            "rsr_top10_tradeable_ratio": round(_diag.get("rsr_top10_tradeable_cnt", 0) / 10, 2),
+            # 売買不可の理由別カウント（blocked_by_price が最多 → ポジションサイズ設計の問題）
+            "blocked_by_price":        _diag.get("blocked_by_price", 0),
+            "blocked_by_liquidity":    _diag.get("blocked_by_liquidity", 0),
+            "blocked_by_risk":         _diag.get("blocked_by_risk", 0),
             # Step 1 (観測バイアス): bo_pressure_raw = near_breakout_count の絶対値
             # bo_rate は RSR供給増加で希薄化するが、raw は市場圧力を直接反映する先行指標
             "bo_pressure_raw":           _diag.get("near_breakout", 0),
