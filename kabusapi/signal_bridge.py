@@ -684,6 +684,19 @@ class SignalBridge:
                     except Exception:
                         pass
 
+                    # Step 4: ブレイク前圧力（RSR通過銘柄全体・signal問わず計測）
+                    # 定義: close >= 20日高値 × 0.97（3%以内）
+                    # BUYシグナル済み銘柄も含める → 市場全体のブレイク圧力を早期検知
+                    try:
+                        _close_s   = df["Close"]
+                        _price_now = float(_close_s.iloc[-1])
+                        if len(_close_s) >= 21:
+                            _high_20 = float(_close_s.iloc[-21:-1].max())
+                            if _high_20 > 0 and _price_now >= _high_20 * 0.97:
+                                diag_near_breakout += 1
+                    except Exception:
+                        pass
+
                     if signal_int == 0:
                         diag_blocked_bo += 1   # RSR通過済みなのにBUYにならない = Breakout/SEPA/Mom
 
@@ -700,11 +713,6 @@ class SignalBridge:
                                 high_10 = float(close_s.iloc[-11:-1].max())
                                 if price_now > high_10:
                                     diag_bo10_pass += 1   # 10日なら通過したはず
-                            # Step 4: 20日高値の2%以内（ブレイクアウト直前）
-                            if len(close_s) >= 21:
-                                high_20 = float(close_s.iloc[-21:-1].max())
-                                if high_20 > 0 and (high_20 - price_now) / high_20 < 0.02:
-                                    diag_near_breakout += 1
                         except Exception:
                             pass
                 else:
@@ -1251,7 +1259,20 @@ class SignalBridge:
                         _s_curr = {e["symbol"] for e in _all_dist[_di  ].get("top20", [])[:10]}
                         if _s_prev:
                             _retentions.append(len(_s_prev & _s_curr) / len(_s_prev))
-                    if _retentions:
+                    if len(_retentions) >= 3:
+                        # EMA平滑化 → log-linear slope → 半減期推定
+                        # 算術平均より日次ノイズを30〜40%削減（回転相場の誤判定防止）
+                        _s_ret  = pd.Series(_retentions)
+                        _ema    = _s_ret.ewm(span=min(10, len(_s_ret)), adjust=False).mean()
+                        _y      = np.log(np.maximum(_ema.values, 1e-6))
+                        _x      = np.arange(len(_y), dtype=float)
+                        _slope  = float(np.polyfit(_x, _y, 1)[0])
+                        if _slope >= 0:
+                            _rsr_leader_half_life = 99.0
+                        else:
+                            _rsr_leader_half_life = round(-_math.log(2) / _slope, 1)
+                    elif _retentions:
+                        # データ不足時フォールバック（算術平均）
                         _avg_ret = float(np.mean(_retentions))
                         if 0 < _avg_ret < 1.0:
                             _rsr_leader_half_life = round(-_math.log(2) / _math.log(_avg_ret), 1)
