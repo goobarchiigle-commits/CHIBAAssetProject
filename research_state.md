@@ -506,9 +506,11 @@ max_single_weight: 0.15   ← 今回の変更点
 | ~~1~~（完了） | ~~paper trade 2週間: broad RSR + filter-first + w=0.15~~ | 2026-03-23 診断ログ追加で代替 |
 | ~~2~~（完了） | ~~`run_live_signal.py` / `signal_bridge.py` に確定設計を反映~~ | 2026-03-23: MAX_POS=3, TOP_K=3, max_single_weight=0.15 適用済み |
 | ~~3~~（完了） | ~~価格フィルター上限引き上げ~~ | 2026-03-23: ¥500,000 → ¥600,000（8002.T 評価可能に） |
-| **1** | **10営業日 paper trade 観察**: `logs/diagnostics/metrics.jsonl` で avg_candidates / exposure を集計 | 2026-03-23〜。RSR閾値調整の判断材料 |
-| **2** | RSR閾値テスト: min_rsr=75→70 への変更検討 | 10日分ログで avg_blocked_rsr > 10/day が続いた場合 |
-| **3** | ranking universe 拡張テスト（TOPIX500プロキシ） | RSR閾値調整後も exposure < 20% が続く場合 |
+| ~~1~~（完了） | ~~10営業日 paper trade 観察~~（前倒し実施） | 2026-03-23: 診断結果からcandidate=0を確認→即日対応 |
+| ~~2~~（完了） | ~~ranking universe 拡張テスト（RSR42への拡張）~~ | 2026-03-23: 並列テストでcands/日0.18→0.69（3.7倍）確認 |
+| **1** | **10営業日 paper trade 観察（RSR42版）**: `rsr_pass_count` / `candidate_count` を集計 | 2026-03-23〜。基準: rsr_pass_count≥3/日が安定したら正常化と判断 |
+| **2** | RSRスロープ改善テスト（Step 3） | `rsr_pass_count≥3` 安定後に実施。RSR単純パーセンタイル → トレンド品質で補強 |
+| **3** | 複合ランキング（Composite Alpha）テスト（Step 4） | RSRスロープ結果を踏まえて実施 |
 | 保留 | R²×スロープランキング（Clenow方式）への置き換え | 現在は単純 RSR。品質モメンタムで選別精度向上の可能性 |
 
 ### 2026-03-23 診断結果（3本並行テスト）
@@ -524,6 +526,62 @@ max_single_weight: 0.15   ← 今回の変更点
 **市場レジーム**: TOPIX +11.89% vs 200MA → 強気相場確認（弱気ではない）
 **RSR期間感度**: IBD式が最良（42日/ブレンドは悪化）
 **ユニバースバイアス**: 軽微（300銘柄に拡張でも+1銘柄のみ）
+
+---
+
+## Experiment: Universe Expansion to RSR42（2026-03-23）
+
+### 背景（供給危機の発見）
+診断ログ（metrics.jsonl）で `candidate_count=0`、`signals_blocked_rsr=15` を確認。
+TEMPORAL24（化学・医薬品・レジャー中心）は RSR42コンテキスト（電機精密・海運・機械中心）で
+常に下位ランクになる構造的ミスマッチが根本原因。
+
+### 実験設計
+| | Universe A（旧） | Universe B（新） |
+|---|---|---|
+| 取引ユニバース | TEMPORAL24（24銘柄） | RSR42（42銘柄） |
+| RSRコンテキスト | RSR42 | RSR42（同一） |
+| max_single_weight | 0.15 | 0.15 |
+
+### バックテスト結果（2018-2024、IS）
+| 指標 | Universe A | Universe B |
+|---|---|---|
+| CAGR | +3.82% | +11.05% |
+| Sharpe | 0.697 | **1.258** |
+| MaxDD | -7.09% | **-12.42%** |
+| avg_exposure | 13.2% | 21.9% |
+| avg_cands/日 | 0.183 | **0.686** |
+| 取引数（7年） | 199 | 247 |
+
+### ライブドライラン結果（2026-03-23）
+```
+universe_size:       32（価格フィルター後）
+rsr_pass_count:       5（旧設定では 0）← 供給回復
+candidate_count:      0（Turtle 20日高値ブレイクアウト待ち）
+blocked_by_breakout:  4（RSR通過だがエントリー条件未達 ← 正常動作）
+SELL シグナル:   5401.T（RSR=11.9）/ 5411.T（RSR=14.3）← 旧ポジション整理
+RSR上位候補:    7013.T(92.9) / 8058.T(90.5) / 8015.T(85.7) / 7011.T(76.2)
+```
+
+### 判定
+- **RSR供給回復**: 0→5（戦略が「正常化している」サイン）
+- **Breakout待ちフェーズ**: 機械・商社 銘柄が20日高値を更新すれば即座にBUY候補
+- **MaxDD -12.42%**: Phase 1基準（<20%）・CB限界（-15%）ともにクリア
+
+### 変更ファイル
+| ファイル | 変更内容 |
+|---|---|
+| `configs/universe/2026Q1_rsr42_universe.json` | 新規作成（42銘柄定義） |
+| `.env` | `LIVE_UNIVERSE_FILE` → rsr42_universe に変更 |
+| `backtest/universe_parallel_test.py` | 新規作成（A/B並列比較スクリプト） |
+| `backtest/live_equivalent.py` | `trade_universe` パラメータ追加 |
+| `kabusapi/signal_bridge.py` | metrics に `rsr_pass_count` / `blocked_by_rsr` / `blocked_by_breakout` 追加 |
+
+### 次の評価ウィンドウ
+**10営業日後（〜2026-04-08頃）**:
+- `rsr_pass_count` の 10日平均 ≥ 3.0 → 正常化確認
+- `candidate_count` の 10日平均 ≥ 0.3 → Turtle供給の確認
+- 上記未達の場合: min_rsr=75→70 への引き下げを検討（Step 3: RSRスロープ改善と同時）
 
 ---
 

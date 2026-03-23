@@ -1020,15 +1020,15 @@ class SignalBridge:
         _metrics   = {
             "date":                    today_str,
             "run_at":                  now.strftime("%Y-%m-%dT%H:%M:%S%z"),
-            "candidate_count":         _diag["rsr_pass"],
+            "universe_size":           _diag["universe_size"],
+            "rsr_pass_count":          _diag["rsr_pass"],       # RSRフィルター通過数（supply診断用）
+            "candidate_count":         _diag["buy_candidates"], # 最終BUY候補数（全フィルター通過後）
+            "blocked_by_rsr":          _diag["blocked_rsr"],    # RSR未達でブロック
+            "blocked_by_breakout":     _diag["blocked_breakout"],  # Turtleブレイクアウト未達でブロック
             "topk_count":              _diag["topk_count"],
             "positions":               len(current_positions),
             "exposure":                round(_exposure, 4),
             "cash_ratio":              round(available_cash / max(1.0, current_equity), 4),
-            "signals_blocked_rsr":     _diag["blocked_rsr"],
-            "signals_blocked_breakout": _diag["blocked_breakout"],
-            "universe_size":           _diag["universe_size"],
-            "buy_candidates":          _diag["buy_candidates"],
             "market_above_ma200":      _above_ma200,
             "topix_vs_ma200_pct":      _bench_vs_ma,
         }

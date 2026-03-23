@@ -131,6 +131,7 @@ def run_backtest(
     max_new_positions_per_day: int  = MAX_NEW_PER_DAY,
     use_rolling:              bool  = False,   # True: ローリング選定ユニバースを使用
     use_broad_rsr:            bool  = False,   # True: RSR context = TOPIX100全件(~76), False: 年別選定銘柄
+    trade_universe:           dict[str, str] | None = None,  # 取引対象ユニバースを外部から指定
     verbose:                  bool  = True,
 ) -> dict:
     """
@@ -163,12 +164,15 @@ def run_backtest(
             for yr, d in rolling_univs.items():
                 print(f"  {yr}: {len(d)}銘柄")
     else:
-        temporal24 = _load_temporal24()
+        if trade_universe is not None:
+            temporal24 = trade_universe
+        else:
+            temporal24 = _load_temporal24()
         trade_syms_fixed = list(temporal24.keys())
         all_rolling_syms = temporal24
         rolling_univs    = None
         if verbose:
-            print(f"[1/4] TEMPORAL24: {len(trade_syms_fixed)}銘柄")
+            print(f"[1/4] 取引ユニバース: {len(trade_syms_fixed)}銘柄")
 
     rsr_univ_42 = _load_rsr_universe_42()
 
