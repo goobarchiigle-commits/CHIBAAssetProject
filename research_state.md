@@ -1,5 +1,5 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-03-23（統計取得フェーズ完成 / 全ログ・判断基盤確立）
+# Single Source of Truth / 最終更新: 2026-03-24（MTF実装完了 / 診断ログ拡充 / キャッシュアーキテクチャ確立）
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
 
 ---
@@ -674,6 +674,101 @@ Baseline vs MTF-A(weekly_ma20) vs MTF-B(weekly_cross) を自動比較。
 2. RSR×RSRスロープ複合スコア（ピーク銘柄除外）
 3. 全市場ユニバース研究
 4. 空売り
+
+---
+
+---
+
+## 完了した実装（2026-03-24）
+
+### ✅ 診断ログ拡充 5本（2026-03-24 前半）
+
+#### `signal_bridge.py` 追加フィールド
+| フィールド | 定義 | 目安 |
+|---|---|---|
+| `mid_pressure_weight` | close≥high20×0.90の銘柄のRSRスコア重み（正規化） | ≥0.20で相場エネルギー蓄積 |
+| `near_breakout_count` | close≥high20×0.95の銘柄数（5%以内） | ≥3でブレイク直前 |
+| `near_breakout_weight` | 同上のRSRスコア重み | ≥0.25で相場動く |
+| `breakout_cluster_today` | 同日BUYシグナル数 | ≥3でクラスター検知 |
+| `breakout_cluster_fired` | クラスター発動フラグ | True→effective_max_pos=5 |
+| `missed_breakout_count` | BUYシグナルのうち発注しなかった数 | 取りこぼし監視 |
+
+#### ブレイクアウトクラスター拡張
+- `breakout_cluster_today >= 3` → `effective_max_pos = 5`（3→5に拡張）
+- `_build_orders()` に `effective_max_pos` パラメータ追加
+
+#### リーダースロット
+- RSR≥85 かつ rsr_rank==1 の最上位銘柄 → 配分上限を20%→35%に拡張（¥700k）
+- `_leader_slot_used` で1スロットのみ発動、ログに LEADER SLOT を記録
+
+### ✅ MTFフィルター実装（2026-03-24 後半）
+
+#### 設計
+- **日次RSR≥75 AND 週足RSR≥75 AND 週足close>週足MA20** の3条件
+- SELL信号には影響しない（BUY抑制のみ）
+- 母集団: 日次・週足とも**同一42銘柄**（因子の意味を壊さない）
+- 週足composite return: 13/26/39/52週シフト × 0.4/0.2/0.2/0.2（日次と同一ウェイト）
+
+#### キャッシュアーキテクチャ（朝1回計算・日中はファイル参照）
+```
+cache/mtf_state_YYYYMMDD.json
+  {
+    "date": "2026-03-24",
+    "rsr_weekly":   {sym: float},   # 週足RSRスコア
+    "weekly_ma_ok": {sym: bool},    # 週足close > 週足MA20
+  }
+```
+- 当日キャッシュ存在 → `from_cache=True`（再計算ゼロ）
+- 週足データは金曜引けで確定 → 日中再計算の意味なし
+- `_build_mtf_cache_for_day()` メソッド追加
+
+#### MTF pass率ログ
+| フィールド | 説明 |
+|---|---|
+| `mtf_candidates` | RSR日次≥75のBUY候補数（母数） |
+| `mtf_wrsr_pass` | 週足RSR≥75 通過数 |
+| `mtf_wma_pass` | 週足MA20 通過数 |
+| `mtf_full_pass` | 3条件すべて通過数 |
+| `mtf_pass_rate` | full_pass / candidates（≥0.3でトレンド相場入り） |
+
+#### 2026-03-24 現在のログ値
+```
+rsr_pass_count:       4（42銘柄中・RSR≥75）
+near_breakout_count:  0
+near_breakout_weight: 0.0
+mid_pressure_count:   1
+mid_pressure_weight:  0.098
+mtf_candidates:       0（BUYシグナル未発生）
+breakout_cluster:     False
+```
+→ **相場エネルギー蓄積中。戦略は正常に「待機」している状態**
+
+#### 今日の週足キャッシュ内容
+- 週足RSR≥75: 5銘柄（8058.T=95.2 / 6920.T=90.5 / 8002.T=80.9 / 7011.T=78.6 / 8035.T=76.2）
+- weekly_ma_ok=True: 21/42銘柄（相場半数はトレンドあり）
+
+### 判断基準（MTF発動条件）
+```
+mid_pressure_weight >= 0.20  → MTFが効き始めるフェーズ
+near_breakout_weight >= 0.25 → 1〜2週間以内に動く可能性
+breakout_cluster_today >= 3  → effective_max_pos=5 に自動拡張
+```
+
+### コミット履歴（2026-03-24）
+```
+e2c6619 feat: add mid_pressure_weight
+faae3fe feat: breakout cluster expansion / near_breakout_weight / leader slot
+b87396c feat: MTF filter (weekly RSR >= 70 + weekly MA20) [初版]
+9a0f8fe fix: MTF 3点修正（キャッシュ化/exception=HOLD/閾値75）
+b90af59 refactor: MTF cache-once-per-day architecture
+```
+
+### 更新されたファイル
+| ファイル | 変更内容 |
+|---|---|
+| `kabusapi/signal_bridge.py` | MTF実装・診断ログ拡充・キャッシュアーキテクチャ |
+| `research/weekly_report.py` | MTF pass率・blocked_leaders・4/8判定条件更新 |
+| `cache/mtf_state_YYYYMMDD.json` | 日次MTFキャッシュ（新規） |
 
 ---
 
