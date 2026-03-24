@@ -388,8 +388,74 @@ class SignalBridge:
     # ------------------------------------------------------------------ #
     # データ取得
     # ------------------------------------------------------------------ #
+    # OHLCVキャッシュ管理
+    # ------------------------------------------------------------------ #
+    def _save_to_cache(self, ticker: str, df: pd.DataFrame) -> None:
+        """取得成功データをparquetキャッシュに保存する"""
+        try:
+            OHLCV_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+            df.to_parquet(OHLCV_CACHE_DIR / f"{ticker}.parquet")
+        except Exception as e:
+            logger.warning("%s キャッシュ保存失敗: %s", ticker, e)
+
+    def _load_from_cache(self, ticker: str, start_date: str) -> pd.DataFrame:
+        """
+        parquetキャッシュを読み込む。
+        OHLCV_CACHE_MAX_AGE_DAYS 以内のキャッシュのみ有効とする。
+        """
+        cache_path = OHLCV_CACHE_DIR / f"{ticker}.parquet"
+        if not cache_path.exists():
+            return pd.DataFrame()
+        try:
+            df = pd.read_parquet(cache_path)
+            if df.empty:
+                return pd.DataFrame()
+            age_days = (datetime.now(JST).date() - df.index.max().date()).days
+            if age_days > OHLCV_CACHE_MAX_AGE_DAYS:
+                logger.warning("%s キャッシュ期限切れ（%d日前）", ticker, age_days)
+                return pd.DataFrame()
+            df = df[df.index >= pd.Timestamp(start_date)]
+            logger.info("%s キャッシュから読み込み（最終: %s, %d日前）",
+                        ticker, df.index.max().date(), age_days)
+            return df
+        except Exception as e:
+            logger.warning("%s キャッシュ読み込み失敗: %s", ticker, e)
+            return pd.DataFrame()
+
+    def _retry_single_fetch(
+        self, ticker: str, start_date: str, end_date: str
+    ) -> pd.DataFrame:
+        """
+        バッチ取得失敗時の個別再フェッチ。
+        sleep jitter でレートリミット回避。
+        """
+        import random, time
+        time.sleep(random.uniform(0.3, 1.2))
+        try:
+            df = yf.download(ticker, start=start_date, end=end_date, progress=False)
+            if isinstance(df.columns, pd.MultiIndex):
+                df = df.droplevel(1, axis=1)
+            df.dropna(subset=["Close"], inplace=True)
+            return df
+        except Exception as e:
+            logger.warning("%s 個別フェッチ失敗: %s", ticker, e)
+            return pd.DataFrame()
+
+    # ------------------------------------------------------------------ #
     def _download_data(self, lookback_days: int = 600) -> tuple[dict, pd.Series]:
-        """ユニバース全銘柄とベンチマークの株価を取得する"""
+        """
+        ユニバース全銘柄とベンチマークの株価を取得する。
+
+        取得優先順位:
+          1. バッチ一括ダウンロード（yfinance）
+          2. 個別リトライ（sleep jitter付き）
+          3. ローカルparquetキャッシュ（フォールバック）
+
+        RSR欠損耐性:
+          - Close系列の欠損を ffill(limit=3) で補完
+          - 3日超の欠損銘柄は RSR計算から除外
+          - メトリクス: rsr_missing_count / rsr_filled_count / rsr_excluded_count
+        """
         import warnings
         warnings.filterwarnings("ignore")
 
@@ -402,6 +468,8 @@ class SignalBridge:
             | set(self.universe_tickers.keys())
             | set(self.shadow_universe_tickers.keys())
         ) + [self.benchmark_ticker]
+
+        # ── Step1: バッチ一括ダウンロード ─────────────────────────────────
         raw = yf.download(
             all_tickers,
             start=start_date,
@@ -410,30 +478,121 @@ class SignalBridge:
             group_by="ticker",
         )
 
-        all_universe = {**self.rsr_universe_tickers, **self.universe_tickers, **self.shadow_universe_tickers}
-        universe_raw = {}
+        # ── Step2: 銘柄ごとにDFを切り出す → 失敗分は個別リトライ + キャッシュ ──
+        all_universe = {
+            **self.rsr_universe_tickers,
+            **self.universe_tickers,
+            **self.shadow_universe_tickers,
+        }
+        universe_raw:    dict = {}
+        batch_failed:    list[str] = []
+        cache_fallbacks: list[str] = []
+
         for sym, sector in all_universe.items():
+            df = pd.DataFrame()
+            from_batch = False
             try:
                 df = raw[sym].copy()
+                if isinstance(df.columns, pd.MultiIndex):
+                    df = df.droplevel(1, axis=1)
                 df.dropna(subset=["Close"], inplace=True)
-                if df.empty or len(df) < 252:
-                    logger.warning("%s データ不足（%d 日）→ スキップ", sym, len(df))
-                    continue
-                universe_raw[sym] = {"df": df, "sector": sector}
+                if not df.empty and len(df) >= 252:
+                    from_batch = True
+                else:
+                    batch_failed.append(sym)
             except (KeyError, TypeError):
-                logger.warning("%s データ取得失敗 → スキップ", sym)
+                batch_failed.append(sym)
 
+            if from_batch:
+                self._save_to_cache(sym, df)
+                universe_raw[sym] = {"df": df, "sector": sector}
+
+        # ── Step3: バッチ失敗分を個別リトライ → それでも駄目ならキャッシュ ──
+        if batch_failed:
+            logger.warning("バッチ失敗: %d銘柄 → 個別リトライ+キャッシュ試行", len(batch_failed))
+        for sym in batch_failed:
+            sector = all_universe[sym]
+            df = self._retry_single_fetch(sym, start_date, end_date)
+            if not df.empty and len(df) >= 252:
+                self._save_to_cache(sym, df)
+                universe_raw[sym] = {"df": df, "sector": sector}
+            else:
+                df_cached = self._load_from_cache(sym, start_date)
+                if not df_cached.empty and len(df_cached) >= 252:
+                    cache_fallbacks.append(sym)
+                    universe_raw[sym] = {"df": df_cached, "sector": sector}
+                else:
+                    logger.warning("%s フォールバック失敗 → RSR除外", sym)
+
+        if cache_fallbacks:
+            logger.info("キャッシュフォールバック: %s", cache_fallbacks)
+
+        # ── Step4: RSR用Close行列を構築し、欠損を ffill(limit=3) で補完 ──
+        # RSRはユニバース内順位型なので欠損=別銘柄のランクが歪む
+        rsr_syms = [s for s in self.rsr_universe_tickers if s in universe_raw]
+        if rsr_syms:
+            close_matrix = pd.DataFrame(
+                {s: universe_raw[s]["df"]["Close"] for s in rsr_syms}
+            )
+            # 欠損カウント（補完前）
+            missing_before = close_matrix.isna().sum()
+            rsr_missing_count = int((missing_before > 0).sum())
+
+            # ffill(limit=3) 補完
+            close_filled = close_matrix.ffill(limit=3)
+            filled_cells  = (close_matrix.isna() & close_filled.notna())
+            rsr_filled_count = int((filled_cells.any()).sum())
+
+            # 最新日が補完後もNaNの銘柄 → RSR計算から除外
+            latest_na = close_filled.iloc[-1].isna()
+            rsr_excluded_syms = latest_na[latest_na].index.tolist()
+            rsr_excluded_count = len(rsr_excluded_syms)
+
+            # 補完済みCloseをuniverse_rawに反映（RSR計算用銘柄のみ）
+            for sym in rsr_syms:
+                if sym in rsr_excluded_syms:
+                    logger.warning("%s RSR欠損>3日 → RSR計算除外", sym)
+                    # universe_rawからは除かない（SELLシグナル生成には残す）
+                    universe_raw[sym]["rsr_excluded"] = True
+                else:
+                    universe_raw[sym]["df"]["Close"] = close_filled[sym]
+
+            logger.info(
+                "RSR欠損補完: missing=%d filled=%d excluded=%d",
+                rsr_missing_count, rsr_filled_count, rsr_excluded_count,
+            )
+            # diagnostics用に保持
+            self._last_data_health = {
+                "rsr_missing_count":  rsr_missing_count,
+                "rsr_filled_count":   rsr_filled_count,
+                "rsr_excluded_count": rsr_excluded_count,
+                "cache_fallback_syms": cache_fallbacks,
+            }
+        else:
+            self._last_data_health = {
+                "rsr_missing_count": 0, "rsr_filled_count": 0,
+                "rsr_excluded_count": 0, "cache_fallback_syms": [],
+            }
+
+        # ── Step5: ベンチマーク取得 ────────────────────────────────────────
+        df_bench = pd.DataFrame()
         try:
             df_bench = raw[self.benchmark_ticker].copy()
-            df_bench.dropna(subset=["Close"], inplace=True)
-        except (KeyError, TypeError):
-            df_bench = yf.download(
-                self.benchmark_ticker, start=start_date, end=end_date, progress=False
-            )
             if isinstance(df_bench.columns, pd.MultiIndex):
                 df_bench = df_bench.droplevel(1, axis=1)
+            df_bench.dropna(subset=["Close"], inplace=True)
+        except (KeyError, TypeError):
+            pass
+        if df_bench.empty:
+            df_bench = self._retry_single_fetch(
+                self.benchmark_ticker, start_date, end_date
+            )
 
-        logger.info("取得成功: %d / %d 銘柄", len(universe_raw), len(self.universe_tickers))
+        logger.info(
+            "取得完了: %d / %d 銘柄（バッチ失敗=%d キャッシュ使用=%d）",
+            len(universe_raw), len(all_universe) - 1,
+            len(batch_failed), len(cache_fallbacks),
+        )
         return universe_raw, df_bench["Close"]
 
     # ------------------------------------------------------------------ #
@@ -1877,6 +2036,14 @@ class SignalBridge:
             "max_position_yen":    round(self.capital * self.max_single_weight, 0),
             "leader_slot_yen":     round(self.capital * 0.35, 0),
             "risk_per_trade_yen":  round(self.capital * 0.01, 0),
+            # データ健全性メトリクス（OHLCV欠損補完の状態を記録）
+            # rsr_missing_count: 1日以上のCloseが欠損していた銘柄数
+            # rsr_filled_count:  ffill(limit=3)で補完できた銘柄数
+            # rsr_excluded_count: 欠損>3日でRSR計算から除外した銘柄数
+            "rsr_missing_count":   getattr(self, "_last_data_health", {}).get("rsr_missing_count",  0),
+            "rsr_filled_count":    getattr(self, "_last_data_health", {}).get("rsr_filled_count",   0),
+            "rsr_excluded_count":  getattr(self, "_last_data_health", {}).get("rsr_excluded_count", 0),
+            "cache_fallback_count": len(getattr(self, "_last_data_health", {}).get("cache_fallback_syms", [])),
         }
         # Step 2: Shadow昇格トリガー判定
         # rsr_pass >= 8 OR near_breakout >= 3 で警告出力（自動昇格は行わない・要ユーザー確認）
