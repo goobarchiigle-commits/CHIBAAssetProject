@@ -806,6 +806,7 @@ class SignalBridge:
         _high20_distance_median   = None   # median((high20 - close) / high20) RSR通過全銘柄
         _rsr_top10_sector_count   = None   # RSR Top10 に何セクターあるか（相場拡散の先行指標）
         _mid_pressure_count       = 0      # close >= high20 * 0.90（中間圧力銘柄数）
+        _mid_pressure_weight      = 0.0    # mid_pressure銘柄のRSRスコア重み（市場エネルギー）
         try:
             _rsr_top10 = rsr_latest.nlargest(10)
             _rsr_top10_total_score = float(_rsr_top10.sum()) or 1.0
@@ -854,11 +855,15 @@ class SignalBridge:
                             _distances.append(_dist)
                             # mid_pressure: 高値の10%以内（near_breakout=3%より早段階）
                             if _dprice >= _dhigh20 * 0.90:
-                                _mid_pressure_count += 1
+                                _mid_pressure_count  += 1
+                                _mid_pressure_weight += float(rsr_latest.get(_dsym, 0))
                 except Exception:
                     pass
             if _distances:
                 _high20_distance_median = round(float(np.median(_distances)), 4)
+            # mid_pressure_weight を正規化（RSR通過銘柄の総スコアで割る）
+            _rsr_pass_total_score = float(rsr_latest[rsr_latest >= _min_rsr_for_ctx].sum()) or 1.0
+            _mid_pressure_weight  = round(_mid_pressure_weight / _rsr_pass_total_score, 3)
 
             # blocked_by_{reason}: RSR >= 閾値 の全銘柄を対象に理由を分類
             for _bsym in rsr_latest[rsr_latest >= _min_rsr_for_ctx].index:
@@ -883,6 +888,7 @@ class SignalBridge:
         diagnostics["rsr_top10_sector_count"]  = _rsr_top10_sector_count
         diagnostics["high20_distance_median"]  = _high20_distance_median
         diagnostics["mid_pressure_count"]      = _mid_pressure_count
+        diagnostics["mid_pressure_weight"]     = _mid_pressure_weight
 
         logger.info(
             "DIAG universe=%d rsr_pass=%d blocked_rsr=%d blocked_breakout=%d candidates=%d topk=%d"
@@ -1529,6 +1535,8 @@ class SignalBridge:
             "high20_distance_delta_5d":  _high20_distance_delta_5d,
             # Step 3追加: 中間圧力カウント（高値10%以内 / near_breakout=3%より早い先行指標）
             "mid_pressure_count":        _diag.get("mid_pressure_count", 0),
+            # Step 3追加: 中間圧力重み（RSRスコア加重 / countより市場エネルギーを正確に反映）
+            "mid_pressure_weight":       _diag.get("mid_pressure_weight", 0.0),
             # 供給上限診断: RSR通過銘柄のうちブレイク直前の割合（>0.25=十分 / <0.2=停滞）
             "breakout_opportunity_rate": round(_diag.get("near_breakout", 0) / max(1, _diag.get("rsr_pass", 1)), 3) if _diag.get("rsr_pass", 0) > 0 else None,
             # MTFフィルター診断: RSR通過のうち週足弱い割合（0.2〜0.4が理想 / 0.05以下ならMTF意味なし）
