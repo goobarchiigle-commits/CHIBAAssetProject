@@ -800,10 +800,12 @@ class SignalBridge:
         _blocked_by_price         = 0
         _blocked_by_liquidity     = 0
         _blocked_by_risk          = 0
-        # Step 2（価格分布ログ）・Step 3（ブレイク前距離中央値）
+        # Step 2（価格分布ログ）・Step 3（距離ログ）・Step 4〜6（追加監視ログ）
         _rsr_top10_median_price   = None   # RSR Top10 の価格中央値
         _rsr_top10_max_price      = None   # RSR Top10 の最高価格
         _high20_distance_median   = None   # median((high20 - close) / high20) RSR通過全銘柄
+        _rsr_top10_sector_count   = None   # RSR Top10 に何セクターあるか（相場拡散の先行指標）
+        _mid_pressure_count       = 0      # close >= high20 * 0.90（中間圧力銘柄数）
         try:
             _rsr_top10 = rsr_latest.nlargest(10)
             _rsr_top10_total_score = float(_rsr_top10.sum()) or 1.0
@@ -815,21 +817,29 @@ class SignalBridge:
                     _blocked_leaders_weight += float(_lrsr)
             _blocked_leaders_weight = round(_blocked_leaders_weight / _rsr_top10_total_score, 3)
 
-            # Step 2: RSR Top10 の価格分布
-            # rsr_top10_median_price が上昇 → リーダー高価格化（リーダー集中相場の進行）
-            _top10_prices = []
+            # Step 2: RSR Top10 の価格分布・セクター集中度
+            # median_price 上昇 → リーダー高価格化
+            # sector_count 増加 → 相場拡散の先行サイン（ブレイク前によく起きる）
+            _top10_prices   = []
+            _top10_sectors  = set()
             for _lsym in _rsr_top10.index:
                 if _lsym in universe_raw:
                     try:
                         _top10_prices.append(float(universe_raw[_lsym]["df"]["Close"].iloc[-1]))
                     except Exception:
                         pass
+                # セクター情報は rsr_universe_tickers か universe_tickers から取得
+                _sec = self.rsr_universe_tickers.get(_lsym) or self.universe_tickers.get(_lsym)
+                if _sec:
+                    _top10_sectors.add(_sec)
             if _top10_prices:
                 _rsr_top10_median_price = round(float(np.median(_top10_prices)), 0)
                 _rsr_top10_max_price    = round(float(np.max(_top10_prices)), 0)
+            _rsr_top10_sector_count = len(_top10_sectors) if _top10_sectors else None
 
             # Step 3: 20日高値距離の中央値（RSR通過銘柄）
             # 0.06 → 0.03 に縮小するとブレイクアウトクラスター到来のサイン
+            # mid_pressure_count: close >= high20 * 0.90（中間圧力 = near_breakoutより早い先行指標）
             _distances = []
             for _dsym in rsr_latest[rsr_latest >= _min_rsr_for_ctx].index:
                 if _dsym not in universe_raw:
@@ -840,7 +850,11 @@ class SignalBridge:
                         _dhigh20 = float(_dclose.iloc[-21:-1].max())
                         _dprice  = float(_dclose.iloc[-1])
                         if _dhigh20 > 0:
-                            _distances.append((_dhigh20 - _dprice) / _dhigh20)
+                            _dist = (_dhigh20 - _dprice) / _dhigh20
+                            _distances.append(_dist)
+                            # mid_pressure: 高値の10%以内（near_breakout=3%より早段階）
+                            if _dprice >= _dhigh20 * 0.90:
+                                _mid_pressure_count += 1
                 except Exception:
                     pass
             if _distances:
@@ -866,7 +880,9 @@ class SignalBridge:
         diagnostics["rsr_pass_context_total"]  = _rsr_pass_context_total
         diagnostics["rsr_top10_median_price"]  = _rsr_top10_median_price
         diagnostics["rsr_top10_max_price"]     = _rsr_top10_max_price
+        diagnostics["rsr_top10_sector_count"]  = _rsr_top10_sector_count
         diagnostics["high20_distance_median"]  = _high20_distance_median
+        diagnostics["mid_pressure_count"]      = _mid_pressure_count
 
         logger.info(
             "DIAG universe=%d rsr_pass=%d blocked_rsr=%d blocked_breakout=%d candidates=%d topk=%d"
@@ -1353,18 +1369,31 @@ class SignalBridge:
 
         # Step 2: 週次シグナル密度（直近5営業日の日別 candidate_count 合計）
         # 1日に複数回実行しても日ごとに1回分のみカウント（当日の最新値を使用）
-        _signals_per_week = None
+        _signals_per_week         = None
+        _high20_distance_delta_5d = None  # Step 1: distance の5日変化率（-0.04以下でブレイク前兆）
         try:
             if _diag_path.exists():
                 _all_lines = [_json.loads(l) for l in _diag_path.read_text(encoding="utf-8").splitlines() if l.strip()]
                 # 日別に最新エントリーを取得
-                _by_date: dict[str, int] = {}
+                _by_date_cand: dict[str, int]   = {}
+                _by_date_dist: dict[str, float] = {}
                 for _e in _all_lines:
-                    _by_date[_e["date"]] = _e.get("candidate_count", 0)
-                # 今日を含む直近5営業日
-                _today_dt = pd.Timestamp(today_str)
-                _recent_dates = sorted(_by_date.keys())[-5:]
-                _signals_per_week = sum(_by_date[d] for d in _recent_dates)
+                    _by_date_cand[_e["date"]] = _e.get("candidate_count", 0)
+                    if _e.get("high20_distance_median") is not None:
+                        _by_date_dist[_e["date"]] = float(_e["high20_distance_median"])
+                # signals_per_week
+                _recent_dates = sorted(_by_date_cand.keys())[-5:]
+                _signals_per_week = sum(_by_date_cand[d] for d in _recent_dates)
+                # distance delta 5d: 今日の distance - 5営業日前の distance
+                _dist_today = _by_date_dist.get(today_str) or _diag.get("high20_distance_median")
+                _dist_dates_sorted = sorted(_by_date_dist.keys())
+                # 今日を除いた過去5営業日前を探す
+                _past_dates = [d for d in _dist_dates_sorted if d < today_str]
+                if _dist_today is not None and len(_past_dates) >= 1:
+                    # 最大5日前のデータ。5日分なければある分で計算
+                    _ref_date = _past_dates[-min(5, len(_past_dates))]
+                    _dist_ref = _by_date_dist[_ref_date]
+                    _high20_distance_delta_5d = round(float(_dist_today) - _dist_ref, 4)
         except Exception:
             pass
 
@@ -1490,11 +1519,16 @@ class SignalBridge:
             # 0.6以下 → 強い銘柄が価格/流動性フィルターで除外されている（候補ゼロの構造的原因）
             "rsr_pass_context_total":    _diag.get("rsr_pass_context_total", 0),
             "rsr_pass_tradeable_ratio":  round(_diag["rsr_pass"] / max(1, _diag.get("rsr_pass_context_total", 1)), 3) if _diag.get("rsr_pass_context_total", 0) > 0 else None,
-            # Step 2: RSR Top10 価格分布（上昇→リーダー高価格化 / 相場フェーズ検出）
+            # Step 2: RSR Top10 価格分布・セクター集中度
             "rsr_top10_median_price":    _diag.get("rsr_top10_median_price"),
             "rsr_top10_max_price":       _diag.get("rsr_top10_max_price"),
-            # Step 3: 高値距離中央値（0.06→0.03で breakout cluster 到来サイン）
+            "rsr_top10_sector_count":    _diag.get("rsr_top10_sector_count"),  # 相場拡散前に増加
+            # Step 3: 高値距離ログ（距離収縮で breakout cluster 到来）
             "high20_distance_median":    _diag.get("high20_distance_median"),
+            # Step 1: 5日距離変化率（-0.04以下でブレイク前兆 / None=データ蓄積中）
+            "high20_distance_delta_5d":  _high20_distance_delta_5d,
+            # Step 3追加: 中間圧力カウント（高値10%以内 / near_breakout=3%より早い先行指標）
+            "mid_pressure_count":        _diag.get("mid_pressure_count", 0),
             # 供給上限診断: RSR通過銘柄のうちブレイク直前の割合（>0.25=十分 / <0.2=停滞）
             "breakout_opportunity_rate": round(_diag.get("near_breakout", 0) / max(1, _diag.get("rsr_pass", 1)), 3) if _diag.get("rsr_pass", 0) > 0 else None,
             # MTFフィルター診断: RSR通過のうち週足弱い割合（0.2〜0.4が理想 / 0.05以下ならMTF意味なし）
