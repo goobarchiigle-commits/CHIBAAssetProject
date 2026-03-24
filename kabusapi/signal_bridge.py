@@ -463,6 +463,111 @@ class SignalBridge:
         return float(wallet.get("StockAccountWallet", self.capital))
 
     # ------------------------------------------------------------------ #
+    # MTFキャッシュ（朝1回計算 → 日中はファイル参照）
+    # ------------------------------------------------------------------ #
+    def _build_mtf_cache_for_day(
+        self,
+        universe_raw: dict,
+        today_str: str,
+    ) -> dict:
+        """
+        週足RSR + 週足MA20フィルターを計算してキャッシュに保存する。
+        当日キャッシュが存在すれば計算をスキップして読み込む。
+
+        週足データは金曜引けで確定するため日中に変化しない。
+        朝1回だけ計算し、日中の複数回実行はキャッシュを参照するだけにする。
+
+        Returns:
+            {
+              "rsr_weekly":  {sym: float},   # 週足RSRスコア
+              "weekly_ma_ok": {sym: bool},   # weekly_close > weekly_MA20
+              "mtf_ok":      {sym: bool},    # rsr_weekly>=75 AND weekly_ma_ok
+              "from_cache":  bool,
+            }
+        """
+        import json as _j
+        _cache_dir  = Path("cache")
+        _cache_path = _cache_dir / f"mtf_state_{today_str}.json"
+
+        # ── キャッシュ読み込み ──────────────────────────────────────────
+        if _cache_path.exists():
+            try:
+                _cached = _j.loads(_cache_path.read_text(encoding="utf-8"))
+                if _cached.get("date") == today_str:
+                    logger.info("MTFキャッシュ読み込み: %s", _cache_path)
+                    _rw = _cached.get("rsr_weekly",  {})
+                    _mo = _cached.get("weekly_ma_ok", {})
+                    return {
+                        "rsr_weekly":   _rw,
+                        "weekly_ma_ok": _mo,
+                        "mtf_ok":       {s: (_rw.get(s, 0) >= 75.0 and _mo.get(s, False))
+                                         for s in set(_rw) | set(_mo)},
+                        "from_cache":   True,
+                    }
+            except Exception as _e:
+                logger.warning("MTFキャッシュ読み込みエラー → 再計算: %s", _e)
+
+        # ── 週足Close 一括計算 ──────────────────────────────────────────
+        _wc_all: dict[str, pd.Series] = {}
+        for _sym in universe_raw:
+            try:
+                _wc = universe_raw[_sym]["df"]["Close"].resample("W-FRI").last().dropna()
+                _wc_all[_sym] = _wc
+            except Exception:
+                pass
+
+        # ── 週足RSR（42銘柄同一母集団）──────────────────────────────────
+        _rsr_weekly: dict[str, float] = {}
+        try:
+            _rsr_syms = {s: _wc_all[s] for s in self.rsr_universe_tickers if s in _wc_all}
+            if len(_rsr_syms) >= 2:
+                _wc_df  = pd.DataFrame(_rsr_syms)
+                _wr3    = _wc_df / _wc_df.shift(13) - 1
+                _wr6    = _wc_df.shift(13) / _wc_df.shift(26) - 1
+                _wr9    = _wc_df.shift(26) / _wc_df.shift(39) - 1
+                _wr12   = _wc_df.shift(39) / _wc_df.shift(52) - 1
+                _wcomp  = 0.4 * _wr3 + 0.2 * _wr6 + 0.2 * _wr9 + 0.2 * _wr12
+                _wrsr_s = (_wcomp.rank(axis=1, pct=True).iloc[-1] * 100).clip(0, 100)
+                _rsr_weekly = {s: round(float(v), 2) for s, v in _wrsr_s.items() if not np.isnan(v)}
+        except Exception as _e:
+            logger.warning("週足RSR計算エラー: %s", _e)
+
+        # ── 週足MA20フィルター ─────────────────────────────────────────
+        _weekly_ma_ok: dict[str, bool] = {}
+        for _sym, _wc in _wc_all.items():
+            try:
+                _wma20 = _wc.rolling(20).mean().dropna()
+                if len(_wma20) >= 5:
+                    _weekly_ma_ok[_sym] = bool(float(_wc.iloc[-1]) > float(_wma20.iloc[-1]))
+                else:
+                    _weekly_ma_ok[_sym] = False   # データ不足 = 通過させない
+            except Exception:
+                _weekly_ma_ok[_sym] = False       # 計算失敗 = HOLD
+
+        # ── キャッシュ書き込み ──────────────────────────────────────────
+        try:
+            _cache_dir.mkdir(parents=True, exist_ok=True)
+            _cache_path.write_text(
+                _j.dumps({
+                    "date":         today_str,
+                    "rsr_weekly":   _rsr_weekly,
+                    "weekly_ma_ok": _weekly_ma_ok,
+                }, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            logger.info("MTFキャッシュ書き込み: %s", _cache_path)
+        except Exception as _e:
+            logger.warning("MTFキャッシュ書き込みエラー: %s", _e)
+
+        return {
+            "rsr_weekly":   _rsr_weekly,
+            "weekly_ma_ok": _weekly_ma_ok,
+            "mtf_ok":       {s: (_rsr_weekly.get(s, 0) >= 75.0 and _weekly_ma_ok.get(s, False))
+                             for s in set(_rsr_weekly) | set(_weekly_ma_ok)},
+            "from_cache":   False,
+        }
+
+    # ------------------------------------------------------------------ #
     # シグナル生成（Top-k ローテーション + 時間ストップ）
     # ------------------------------------------------------------------ #
     def _generate_all_signals(
@@ -496,44 +601,16 @@ class SignalBridge:
         rsr_universe = calc_universe_rsr(rsr_prices)
         rsr_latest   = rsr_universe.iloc[-1]   # 最新スナップショット
 
-        # ── 週足Close / MA20 事前計算（全銘柄一括・ループ内resampleを廃止） ───────
-        # universe_raw の全銘柄を対象にする（RSR42 + 売買ユニバースを包含）
-        # これ1つを RSR週足計算・MTFフィルター・診断ログで共有する
-        weekly_close_cache: dict[str, pd.Series] = {}
-        weekly_ma20_cache:  dict[str, pd.Series] = {}
-        for _sym in universe_raw:
-            try:
-                _wc = universe_raw[_sym]["df"]["Close"].resample("W-FRI").last().dropna()
-                weekly_close_cache[_sym] = _wc
-                weekly_ma20_cache[_sym]  = _wc.rolling(20).mean()
-            except Exception:
-                pass
-
-        # ── 週足RSR計算（同一42銘柄・上記キャッシュを使用） ───────────
-        # 母集団は日次と完全に同一（因子の意味を壊さない）
-        # 週足 composite return: 週次シフト版（13/26/39/52週 = 3/6/9/12ヶ月）
-        # 日次 calc_composite_return のウェイト 0.4/0.2/0.2/0.2 を維持する
-        try:
-            _wc_dict = {
-                _sym: weekly_close_cache[_sym]
-                for _sym in self.rsr_universe_tickers
-                if _sym in weekly_close_cache
-            }
-            if len(_wc_dict) >= 2:
-                _wc_df    = pd.DataFrame(_wc_dict)
-                _wr3      = _wc_df / _wc_df.shift(13) - 1               # 3ヶ月（13週）
-                _wr6      = _wc_df.shift(13) / _wc_df.shift(26) - 1     # 3〜6ヶ月
-                _wr9      = _wc_df.shift(26) / _wc_df.shift(39) - 1     # 6〜9ヶ月
-                _wr12     = _wc_df.shift(39) / _wc_df.shift(52) - 1     # 9〜12ヶ月
-                _w_comp   = 0.4 * _wr3 + 0.2 * _wr6 + 0.2 * _wr9 + 0.2 * _wr12
-                rsr_weekly_latest: pd.Series = (
-                    _w_comp.rank(axis=1, pct=True).iloc[-1] * 100
-                ).clip(0, 100)
-            else:
-                rsr_weekly_latest = pd.Series(dtype=float)
-        except Exception as _e:
-            logger.warning("週足RSR計算エラー（スキップ）: %s", _e)
-            rsr_weekly_latest = pd.Series(dtype=float)
+        # ── MTFキャッシュ（朝1回計算・日中は再計算しない） ──────────────
+        # 週足データは金曜引けで確定 → 日中に変化しない。
+        # 当日キャッシュがあれば読み込み専用、なければ計算して保存。
+        _mtf_state      = self._build_mtf_cache_for_day(universe_raw, today_str)
+        _rsr_weekly_map = _mtf_state["rsr_weekly"]   # {sym: float}
+        _weekly_ma_ok_map = _mtf_state["weekly_ma_ok"]  # {sym: bool}
+        logger.info(
+            "MTFキャッシュ from_cache=%s / 週足RSR対象=%d銘柄",
+            _mtf_state["from_cache"], len(_rsr_weekly_map),
+        )
 
         # Step 2 (観測バイアス): RSRコンテキスト全体の通過数を記録
         # 売買ユニバースが RSR42 の部分集合のため、強い銘柄が価格フィルターで
@@ -703,19 +780,10 @@ class SignalBridge:
                 # ダマシブレイク -30〜40% 削減効果。SELLには影響しない。
                 if signal_int == 1 and rsr_now >= min_rsr_threshold:
                     diag_mtf_candidates += 1
-                    _rsr_weekly_now = float(rsr_weekly_latest.get(sym, 0.0))
-                    # 事前計算キャッシュを使用（ループ内resample廃止）
-                    # 計算失敗 = HOLD（通過扱いにしない：ノイズ銘柄をブロック）
-                    _weekly_ma_ok = False
-                    try:
-                        _wc_c  = weekly_close_cache.get(sym)
-                        _wm20_c = weekly_ma20_cache.get(sym)
-                        if (_wc_c is not None and _wm20_c is not None
-                                and len(_wm20_c.dropna()) >= 5):
-                            _weekly_ma_ok = float(_wc_c.iloc[-1]) > float(_wm20_c.dropna().iloc[-1])
-                    except Exception:
-                        _weekly_ma_ok = False  # 計算不能 = HOLD（通過させない）
-                    _wrsr_ok = _rsr_weekly_now >= 75.0  # 日次と同じ閾値で整合
+                    # MTFキャッシュを参照（日中再計算なし）
+                    _rsr_weekly_now = float(_rsr_weekly_map.get(sym, 0.0))
+                    _weekly_ma_ok   = bool(_weekly_ma_ok_map.get(sym, False))
+                    _wrsr_ok        = _rsr_weekly_now >= 75.0  # 日次と同じ閾値
                     if _wrsr_ok:
                         diag_mtf_wrsr_pass += 1
                     if _weekly_ma_ok:
@@ -765,17 +833,10 @@ class SignalBridge:
                 if rsr_now >= min_rsr_threshold:
                     diag_rsr_pass += 1
 
-                    # Step 2: MTFフィルター診断（後方互換: 週足MA20 < close なら diag_mtf_filtered++）
-                    # キャッシュ利用（ループ内resample廃止）
-                    try:
-                        _wc_diag   = weekly_close_cache.get(sym)
-                        _wm20_diag = weekly_ma20_cache.get(sym)
-                        if (_wc_diag is not None and _wm20_diag is not None):
-                            _wm20_d = _wm20_diag.dropna()
-                            if len(_wm20_d) > 0 and float(_wc_diag.iloc[-1]) <= float(_wm20_d.iloc[-1]):
-                                diag_mtf_filtered += 1
-                    except Exception:
-                        pass
+                    # Step 2: MTFフィルター診断（後方互換: 週足MA20不通過なら count）
+                    # キャッシュ参照（計算不要）
+                    if not _weekly_ma_ok_map.get(sym, True):
+                        diag_mtf_filtered += 1
 
                     # Step 4: ブレイク前圧力（RSR通過銘柄全体・signal問わず計測）
                     # 定義: close >= 20日高値 × 0.97（3%以内）
