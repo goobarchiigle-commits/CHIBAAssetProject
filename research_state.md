@@ -761,6 +761,9 @@ faae3fe feat: breakout cluster expansion / near_breakout_weight / leader slot
 b87396c feat: MTF filter (weekly RSR >= 70 + weekly MA20) [初版]
 9a0f8fe fix: MTF 3点修正（キャッシュ化/exception=HOLD/閾値75）
 b90af59 refactor: MTF cache-once-per-day architecture
+dd33491 feat: RSR母集団を42→62に拡張
+f7ce02e feat: OHLCVキャッシュ + RSR欠損補完を実装
+b606009 feat: Shadow Phase1 条件付き発注を実装
 ```
 
 ### 更新されたファイル
@@ -769,6 +772,82 @@ b90af59 refactor: MTF cache-once-per-day architecture
 | `kabusapi/signal_bridge.py` | MTF実装・診断ログ拡充・キャッシュアーキテクチャ |
 | `research/weekly_report.py` | MTF pass率・blocked_leaders・4/8判定条件更新 |
 | `cache/mtf_state_YYYYMMDD.json` | 日次MTFキャッシュ（新規） |
+
+---
+
+## 完了した実装（2026-03-24 後半）
+
+### ✅ RSR母集団拡張（42 → 62）採用
+
+**バックテスト**: `backtest/rsr_context_expansion.py`（新規）
+**結果**: `results/rsr_context_expansion_2026-03-24.json`
+
+| 指標 | BASELINE (RSR42) | EXPANDED (RSR62) | 差分 |
+|---|---|---|---|
+| CAGR | +14.45% | +16.27% | +1.82pp |
+| Sharpe | 1.201 | 1.313 | +9.3% |
+| MaxDD | -14.19% | -13.03% | 改善 |
+| Calmar | 1.285 | 1.648 | **+28.3%** |
+| 取引数（7年） | 159 | 150 | -5.7% |
+| RSR Turnover | 0.052 | 0.052 | 変化なし |
+
+**採用判断**: 取引数-5.7%だが **Calmar+28%/Sharpe+9%/MaxDD縮小** のトリプル質的向上。採用。
+RSR Turnoverが完全に安定（0.052 = 0.052）→ランキング安定性も確認。
+
+**live反映**: `run_live_signal.py` に `RSR_UNIVERSE_62 = {**RSR_UNIVERSE, **SHADOW_UNIVERSE}` 追加。
+SignalBridgeに `rsr_universe_tickers=RSR_UNIVERSE_62` で渡す設計。
+
+---
+
+### ✅ OHLCVキャッシュ + RSR欠損補完実装
+
+**変更ファイル**: `kabusapi/signal_bridge.py`
+
+| 機能 | 実装詳細 |
+|---|---|
+| parquetキャッシュ | `cache/ohlcv/{ticker}.parquet`（5日間有効） |
+| 3段階フォールバック | バッチ → 個別リトライ+jitter(0.3-1.2s) → キャッシュ読み込み |
+| RSR欠損補完 | `ffill(limit=3)`（3日超欠損はRSR計算除外） |
+| ヘルス指標 | `rsr_missing_count` / `rsr_filled_count` / `rsr_excluded_count` / `cache_fallback_count` |
+
+**今日のドライラン結果**: 4銘柄(7201.T/8053.T/2914.T/5706.T)がyfinance取得失敗 → ffill補完で吸収。
+キャッシュ書き込みには `pyarrow` 必要 → `pip install pyarrow` 済み。
+
+---
+
+### ✅ Shadow Phase1 条件付き発注実装
+
+**変更ファイル**: `kabusapi/signal_bridge.py`、`run_live_signal.py`
+
+#### 発動条件
+```
+shadow_rsr_pass >= 8（直近20日の RSR62≥70 通過日数）
+AND rsr62 >= 70
+AND rsr62 > live_top10_median
+AND 価格フィルター（1単元 ≤ available_cash × max_single_weight）
+AND CB NORMAL
+```
+
+#### パラメータ
+```
+shadow_slots     = 1（live max3 + shadow 1 = 合計最大4ポジション）
+shadow_rsr_min   = 70.0
+shadow_rsr_pass_min = 8
+order side       = "SHADOW_BUY"（API送信時は Side.BUY として扱う）
+```
+
+#### 今日のドライラン結果
+```
+shadow_rsr_pass: 8（条件充足）
+候補: 8802.T(三菱地所 RSR=78.3) / 2802.T(味の素 RSR=72.1)
+blocked_by_alloc:
+  8802.T: ¥429,800/単元 > 上限¥400,000（cap ¥1,990,392 × 0.20）
+  2802.T: ¥417,600/単元 > 上限¥400,000
+```
+→ 資本¥2.1M（+10万）で 2802.T 解禁、¥2.43M で 8802.T も解禁。
+
+#### 観測メトリクス（追加）
+`shadow_signal_count` / `shadow_entry_count` / `shadow_blocked_by_alloc` / `shadow_rsr_pass_met`
 
 ---
 

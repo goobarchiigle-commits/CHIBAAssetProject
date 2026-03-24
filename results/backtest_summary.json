@@ -9,7 +9,7 @@
     "sharpe": 1.693,
     "max_dd": -0.0612,
     "calmar": 2.656,
-    "n_trades": null,
+    "n_trades": 246,
     "avg_positions": 1.6,
     "cash_ratio": 0.83,
     "phase1_pass": true
