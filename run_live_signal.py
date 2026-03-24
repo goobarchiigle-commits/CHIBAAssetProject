@@ -345,7 +345,7 @@ logger.info(
 
 CAPITAL              = 2_000_000
 MAX_POS              = 3        # top_k と一致させる（確定設計 2026-03-23）
-MAX_SINGLE_WEIGHT    = 0.15     # 1銘柄最大ウェイト（確定設計: 25%→15%でMaxDD改善）
+MAX_SINGLE_WEIGHT    = 0.20     # 1銘柄最大ウェイト（0.15→0.20: 日本株単元制度による機会損失解消）
 MIN_SECTORS          = 1        # セクター制約なし
 MAX_DD_LIMIT         = 0.15
 TOP_K                = 3        # RSR 上位 k 銘柄のみ BUY 対象（確定設計 2026-03-23）

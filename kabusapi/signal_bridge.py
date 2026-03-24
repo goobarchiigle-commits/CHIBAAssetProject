@@ -934,7 +934,7 @@ class SignalBridge:
                     "ENTRY BLOCKED BY CB: 以下 %d 銘柄の BUY をスキップ → %s",
                     len(blocked_buys), blocked_buys,
                 )
-            return orders, warnings  # CB 中は SELL のみ
+            return orders, warnings, 0  # CB 中は SELL のみ
 
         # 売り後の回収資金を加算
         sell_proceeds  = sum(o.estimated_amount for o in orders if o.side == "SELL")
@@ -957,9 +957,10 @@ class SignalBridge:
                 sector = self.universe_tickers.get(sym, "不明")
                 sector_count[sector] = sector_count.get(sector, 0) + 1
 
-        max_per_sector = max(1, self.max_positions // max(1, self.min_sectors))
-        max_alloc_cap  = self.capital * self.max_single_weight
+        max_per_sector    = max(1, self.max_positions // max(1, self.min_sectors))
+        max_alloc_cap     = self.capital * self.max_single_weight
         new_buys_this_run = today_new_buys
+        blocked_by_alloc_cap_count = 0  # 配分上限キャップで qty_cap=0 になった件数
 
         for i, sig in enumerate(buy_candidates):
             open_slots = self.max_positions - n_held_after_sells
@@ -1020,9 +1021,20 @@ class SignalBridge:
                 _fallback_alloc = total_cash / max(1, effective_slots)
                 qty_risk = int(min(_fallback_alloc, max_alloc_cap) // lot_cost) * 100
 
-            # 配分上限キャップ（max_single_weight=15%）
+            # 配分上限キャップ（max_single_weight）
             qty_cap = int(max_alloc_cap // lot_cost) * 100
-            qty     = min(qty_risk, qty_cap)
+
+            if qty_cap == 0:
+                # 1単元コスト > max_alloc_cap → 資本制約による除外（戦略ではなくサイズ設計の問題）
+                blocked_by_alloc_cap_count += 1
+                warnings.append(
+                    f"{sig.symbol}: 配分上限キャップにより除外"
+                    f" (1単元=¥{lot_cost:,.0f} > alloc_cap=¥{max_alloc_cap:,.0f})"
+                    f" → BUY スキップ"
+                )
+                continue
+
+            qty = min(qty_risk, qty_cap)
 
             if qty <= 0:
                 warnings.append(
@@ -1064,7 +1076,7 @@ class SignalBridge:
             new_buys_this_run        += 1
             total_cash               -= qty * ref_price
 
-        return orders, warnings
+        return orders, warnings, blocked_by_alloc_cap_count
 
     # ------------------------------------------------------------------ #
     # 発注実行（live モードのみ）レート制限付き
@@ -1293,7 +1305,7 @@ class SignalBridge:
         )
 
         # 6. 注文生成
-        orders, order_warnings = self._build_orders(
+        orders, order_warnings, _blocked_alloc_cap = self._build_orders(
             signals, universe_raw, current_positions, available_cash,
             cb_active=cb_active,
         )
@@ -1468,6 +1480,9 @@ class SignalBridge:
             "blocked_by_price":        _diag.get("blocked_by_price", 0),
             "blocked_by_liquidity":    _diag.get("blocked_by_liquidity", 0),
             "blocked_by_risk":         _diag.get("blocked_by_risk", 0),
+            # 発注フェーズで 1単元コスト > alloc_cap によりスキップした件数
+            # 資本制約 vs 市場構造の切り分けに使う（戦略の問題ではなくサイズ設計の問題）
+            "blocked_by_alloc_cap":    _blocked_alloc_cap,
             # Step 1 (観測バイアス): bo_pressure_raw = near_breakout_count の絶対値
             # bo_rate は RSR供給増加で希薄化するが、raw は市場圧力を直接反映する先行指標
             "bo_pressure_raw":           _diag.get("near_breakout", 0),
