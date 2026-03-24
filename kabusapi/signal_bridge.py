@@ -807,6 +807,8 @@ class SignalBridge:
         _rsr_top10_sector_count   = None   # RSR Top10 に何セクターあるか（相場拡散の先行指標）
         _mid_pressure_count       = 0      # close >= high20 * 0.90（中間圧力銘柄数）
         _mid_pressure_weight      = 0.0    # mid_pressure銘柄のRSRスコア重み（市場エネルギー）
+        _near_breakout_count      = 0      # close >= high20 * 0.95（ブレイク直前圧力 / bo=0.97より広い）
+        _near_breakout_weight     = 0.0    # near_breakout銘柄のRSRスコア重み（>=0.25で相場動く）
         try:
             _rsr_top10 = rsr_latest.nlargest(10)
             _rsr_top10_total_score = float(_rsr_top10.sum()) or 1.0
@@ -853,7 +855,11 @@ class SignalBridge:
                         if _dhigh20 > 0:
                             _dist = (_dhigh20 - _dprice) / _dhigh20
                             _distances.append(_dist)
-                            # mid_pressure: 高値の10%以内（near_breakout=3%より早段階）
+                            # near_breakout: 高値の5%以内（bo=3%より広い初動検知）
+                            if _dprice >= _dhigh20 * 0.95:
+                                _near_breakout_count  += 1
+                                _near_breakout_weight += float(rsr_latest.get(_dsym, 0))
+                            # mid_pressure: 高値の10%以内（near_breakout=5%より早段階）
                             if _dprice >= _dhigh20 * 0.90:
                                 _mid_pressure_count  += 1
                                 _mid_pressure_weight += float(rsr_latest.get(_dsym, 0))
@@ -861,9 +867,10 @@ class SignalBridge:
                     pass
             if _distances:
                 _high20_distance_median = round(float(np.median(_distances)), 4)
-            # mid_pressure_weight を正規化（RSR通過銘柄の総スコアで割る）
+            # mid_pressure_weight / near_breakout_weight を正規化（RSR通過銘柄の総スコアで割る）
             _rsr_pass_total_score = float(rsr_latest[rsr_latest >= _min_rsr_for_ctx].sum()) or 1.0
-            _mid_pressure_weight  = round(_mid_pressure_weight / _rsr_pass_total_score, 3)
+            _mid_pressure_weight  = round(_mid_pressure_weight  / _rsr_pass_total_score, 3)
+            _near_breakout_weight = round(_near_breakout_weight / _rsr_pass_total_score, 3)
 
             # blocked_by_{reason}: RSR >= 閾値 の全銘柄を対象に理由を分類
             for _bsym in rsr_latest[rsr_latest >= _min_rsr_for_ctx].index:
@@ -889,6 +896,8 @@ class SignalBridge:
         diagnostics["high20_distance_median"]  = _high20_distance_median
         diagnostics["mid_pressure_count"]      = _mid_pressure_count
         diagnostics["mid_pressure_weight"]     = _mid_pressure_weight
+        diagnostics["near_breakout_count"]     = _near_breakout_count
+        diagnostics["near_breakout_weight"]    = _near_breakout_weight
 
         logger.info(
             "DIAG universe=%d rsr_pass=%d blocked_rsr=%d blocked_breakout=%d candidates=%d topk=%d"
@@ -907,12 +916,13 @@ class SignalBridge:
     # ------------------------------------------------------------------ #
     def _build_orders(
         self,
-        signals:           list[StockSignal],
-        universe_raw:      dict,
-        current_positions: dict,
-        available_cash:    float,
-        cb_active:         bool,
-        today_new_buys:    int = 0,
+        signals:              list[StockSignal],
+        universe_raw:         dict,
+        current_positions:    dict,
+        available_cash:       float,
+        cb_active:            bool,
+        today_new_buys:       int = 0,
+        effective_max_pos:    int | None = None,
     ) -> tuple[list[OrderInstruction], list[str]]:
         """
         シグナルリストからポートフォリオルールを適用して注文を生成する。
@@ -979,16 +989,22 @@ class SignalBridge:
                 sector = self.universe_tickers.get(sym, "不明")
                 sector_count[sector] = sector_count.get(sector, 0) + 1
 
-        max_per_sector    = max(1, self.max_positions // max(1, self.min_sectors))
+        _eff_max_pos      = effective_max_pos if effective_max_pos is not None else self.max_positions
+        max_per_sector    = max(1, _eff_max_pos // max(1, self.min_sectors))
         max_alloc_cap     = self.capital * self.max_single_weight
         new_buys_this_run = today_new_buys
         blocked_by_alloc_cap_count = 0  # 配分上限キャップで qty_cap=0 になった件数
+        # リーダースロット設計: RSR >= 85 の最高位銘柄に1スロットだけ大きめ配分を許可
+        # 大型株主導相場（blocked_leaders_weight>40%）でも高RSR銘柄を取りこぼさないため
+        _LEADER_RSR_THRESHOLD = 85.0
+        _LEADER_SLOT_WEIGHT   = 0.35     # 70万円/200万円 — 通常上限0.20の約1.75倍
+        _leader_slot_used     = False
 
         for i, sig in enumerate(buy_candidates):
-            open_slots = self.max_positions - n_held_after_sells
+            open_slots = _eff_max_pos - n_held_after_sells
             if open_slots <= 0:
                 warnings.append(
-                    f"最大ポジション数({self.max_positions})に達したため"
+                    f"最大ポジション数({_eff_max_pos})に達したため"
                     f" {sig.symbol} の BUY をスキップ"
                 )
                 break
@@ -1043,15 +1059,23 @@ class SignalBridge:
                 _fallback_alloc = total_cash / max(1, effective_slots)
                 qty_risk = int(min(_fallback_alloc, max_alloc_cap) // lot_cost) * 100
 
-            # 配分上限キャップ（max_single_weight）
-            qty_cap = int(max_alloc_cap // lot_cost) * 100
+            # 配分上限キャップ（通常: max_single_weight / リーダー: leader_slot_weight）
+            _is_leader = (
+                sig.rsr >= _LEADER_RSR_THRESHOLD
+                and not _leader_slot_used
+                and sig.rsr_rank == 1  # RSR最上位のみ
+            )
+            _effective_alloc_cap = (
+                self.capital * _LEADER_SLOT_WEIGHT if _is_leader else max_alloc_cap
+            )
+            qty_cap = int(_effective_alloc_cap // lot_cost) * 100
 
             if qty_cap == 0:
-                # 1単元コスト > max_alloc_cap → 資本制約による除外（戦略ではなくサイズ設計の問題）
+                # 1単元コスト > alloc_cap → 資本制約による除外（戦略ではなくサイズ設計の問題）
                 blocked_by_alloc_cap_count += 1
                 warnings.append(
                     f"{sig.symbol}: 配分上限キャップにより除外"
-                    f" (1単元=¥{lot_cost:,.0f} > alloc_cap=¥{max_alloc_cap:,.0f})"
+                    f" (1単元=¥{lot_cost:,.0f} > alloc_cap=¥{_effective_alloc_cap:,.0f})"
                     f" → BUY スキップ"
                 )
                 continue
@@ -1097,6 +1121,13 @@ class SignalBridge:
             n_held_after_sells       += 1
             new_buys_this_run        += 1
             total_cash               -= qty * ref_price
+            if _is_leader:
+                _leader_slot_used = True
+                logger.info(
+                    "LEADER SLOT: %s RSR=%.1f alloc=¥%.0f (%.0f%% weight)",
+                    sig.symbol, sig.rsr, qty * ref_price,
+                    (qty * ref_price) / self.capital * 100,
+                )
 
         return orders, warnings, blocked_by_alloc_cap_count
 
@@ -1326,20 +1357,33 @@ class SignalBridge:
             buy_count, sell_count, len(signals) - buy_count - sell_count,
         )
 
+        # 6. ブレイクアウトクラスター検知（同日 BUY シグナル数 ≥ 3 → スロット拡張）
+        _CLUSTER_THRESHOLD  = 3
+        _buy_cands          = [s for s in signals if s.signal == 1 and not s.currently_holding]
+        _buy_cands_count    = len(_buy_cands)
+        _breakout_cluster   = _buy_cands_count >= _CLUSTER_THRESHOLD
+        _effective_max_pos  = 5 if _breakout_cluster else self.max_positions
+        if _breakout_cluster:
+            logger.info(
+                "CLUSTER DETECTED: BUY candidates=%d >= threshold=%d → effective_max_pos=%d",
+                _buy_cands_count, _CLUSTER_THRESHOLD, _effective_max_pos,
+            )
+
         # 6. 注文生成
         orders, order_warnings, _blocked_alloc_cap = self._build_orders(
             signals, universe_raw, current_positions, available_cash,
             cb_active=cb_active,
+            effective_max_pos=_effective_max_pos,
         )
 
         # 6b. LIVE_STATE サマリーログ（戦略停止 / 市場悪化 / フィルター過剰 の切り分け用）
-        _buy_cands = [s for s in signals if s.signal == 1 and not s.currently_holding]
         _entries   = [o for o in orders if o.side == "BUY"]
+        _missed_breakout_count = max(0, _buy_cands_count - len(_entries))
         _exposure  = 1.0 - available_cash / max(1.0, current_equity)
         logger.info(
-            "LIVE_STATE candidates=%d ranked=%d entries=%d positions=%d exposure=%.3f",
-            len(_buy_cands), len(top_k_syms), len(_entries),
-            len(current_positions), _exposure,
+            "LIVE_STATE candidates=%d ranked=%d entries=%d positions=%d exposure=%.3f cluster=%s missed=%d",
+            _buy_cands_count, len(top_k_syms), len(_entries),
+            len(current_positions), _exposure, _breakout_cluster, _missed_breakout_count,
         )
 
         # 6c. 運用診断メトリクス → logs/diagnostics/metrics.jsonl に日次追記
@@ -1533,10 +1577,17 @@ class SignalBridge:
             "high20_distance_median":    _diag.get("high20_distance_median"),
             # Step 1: 5日距離変化率（-0.04以下でブレイク前兆 / None=データ蓄積中）
             "high20_distance_delta_5d":  _high20_distance_delta_5d,
-            # Step 3追加: 中間圧力カウント（高値10%以内 / near_breakout=3%より早い先行指標）
+            # Step 3追加: 中間圧力カウント（高値10%以内 / near_breakout=5%より早い先行指標）
             "mid_pressure_count":        _diag.get("mid_pressure_count", 0),
             # Step 3追加: 中間圧力重み（RSRスコア加重 / countより市場エネルギーを正確に反映）
             "mid_pressure_weight":       _diag.get("mid_pressure_weight", 0.0),
+            # Step 2追加: ブレイク直前圧力 count/weight（高値5%以内 / >=3 or weight>=0.25で相場動く）
+            "near_breakout_count":       _diag.get("near_breakout_count", 0),
+            "near_breakout_weight":      _diag.get("near_breakout_weight", 0.0),
+            # クラスター検知: 同日BUYシグナル数（>=3で effective_max_pos=5 に拡張）
+            "breakout_cluster_today":    _buy_cands_count,
+            "breakout_cluster_fired":    _breakout_cluster,
+            "missed_breakout_count":     _missed_breakout_count,
             # 供給上限診断: RSR通過銘柄のうちブレイク直前の割合（>0.25=十分 / <0.2=停滞）
             "breakout_opportunity_rate": round(_diag.get("near_breakout", 0) / max(1, _diag.get("rsr_pass", 1)), 3) if _diag.get("rsr_pass", 0) > 0 else None,
             # MTFフィルター診断: RSR通過のうち週足弱い割合（0.2〜0.4が理想 / 0.05以下ならMTF意味なし）
