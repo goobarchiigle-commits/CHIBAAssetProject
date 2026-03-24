@@ -42,6 +42,9 @@ JST = timezone(timedelta(hours=9))
 # ポートフォリオ状態・CB 管理定数
 # ------------------------------------------------------------------ #
 PORTFOLIO_STATE_FILE          = Path("runtime/portfolio_state.json")
+OHLCV_CACHE_DIR               = Path("cache/ohlcv")   # OHLCVキャッシュ（ダウンロード失敗時のフォールバック）
+OHLCV_CACHE_MAX_AGE_DAYS      = 5                      # キャッシュ有効期限（営業日換算で約1週間）
+DATA_HEALTH_MIN_RATIO         = 0.90                   # RSR42データ健全性下限（これ未満でシグナル停止）
 CB_DD_TRIGGER                 = 0.15          # DD がここを割ったら CB 発動
 CB_COOLDOWN_TRADING_DAYS      = 30            # CB 後のクールダウン（営業日）
 RECOVERY_THRESHOLD_RATIO      = 0.98          # peak の何割まで回復したら NORMAL
@@ -594,9 +597,10 @@ class SignalBridge:
         today     = pd.Timestamp.now().normalize()
         today_str = today.strftime("%Y-%m-%d")
 
-        # ── RSR 計算（42銘柄統一コンテキスト） ──────────────────────────
-        # research / live / backtest で同一の母集団を使うことで
-        # RSR percentile の意味を統一する（母集団が変わると別指標になる）
+        # ── RSR 計算（62銘柄コンテキスト: 42 live + 20 shadow）────────────
+        # 2026-03-24 バックテスト検証: RSR62 で Calmar +28% / Sharpe +9% 確認済み。
+        # rsr_universe_tickers に shadow を含めることで競争母集団が広がり
+        # 通過銘柄の「本物の相対強度」が上がる（エントリー数微減・質向上）
         rsr_prices = {
             sym: info["df"]["Close"]
             for sym, info in universe_raw.items()

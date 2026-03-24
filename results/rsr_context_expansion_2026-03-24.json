@@ -1,0 +1,32 @@
+{
+  "run_date": "2026-03-24",
+  "eval_period": "2018-01-01 / 2024-12-31",
+  "baseline": {
+    "label": "BASELINE (RSR42)",
+    "cagr_pct": 19.19,
+    "max_dd_pct": -14.94,
+    "calmar": 1.284,
+    "sharpe": 1.201,
+    "n_trades": 159,
+    "n_trades_per_year": 37.2,
+    "avg_exposure": 51.0,
+    "win_rate_pct": 52.2
+  },
+  "expanded": {
+    "label": "EXPANDED (RSR62)",
+    "cagr_pct": 21.48,
+    "max_dd_pct": -13.03,
+    "calmar": 1.648,
+    "sharpe": 1.313,
+    "n_trades": 150,
+    "n_trades_per_year": 35.1,
+    "avg_exposure": 52.2,
+    "win_rate_pct": 52.0
+  },
+  "rsr_turnover": {
+    "baseline_42": 0.0519,
+    "expanded_62": 0.0519,
+    "delta": 0.0
+  },
+  "verdict": "FAIL"
+}

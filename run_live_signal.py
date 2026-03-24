@@ -525,9 +525,10 @@ def main() -> int:
     import warnings
     warnings.filterwarnings("ignore")
 
-    # ---- RSRユニバース（42銘柄統一コンテキスト）を設定 ----
+    # ---- RSRユニバース（62銘柄コンテキスト: 42 live + 20 shadow）を設定 ----
     # research / live / backtest で同一の母集団を使い RSR percentile を統一する。
     # RSR は cross-sectional factor なので母集団が変わると別指標になる。
+    # 2026-03-24 バックテスト検証で RSR62 の Calmar +28% / Sharpe +9% を確認 → 採用。
     # 環境変数 RSR_UNIVERSE_FILE で上書き可能。デフォルトは configs/rsr_universe_42.csv。
     _rsr_universe_file = os.environ.get(
         "RSR_UNIVERSE_FILE",
@@ -580,12 +581,19 @@ def main() -> int:
     except Exception as _se:
         logger.warning("Shadow Universe読み込みスキップ: %s", _se)
 
+    # RSR62コンテキスト = 42 live + shadow（重複なし）
+    RSR_UNIVERSE_62: dict[str, str] = {**RSR_UNIVERSE, **SHADOW_UNIVERSE}
+    logger.info(
+        "RSRコンテキスト: %d銘柄（42 live + %d shadow）/ 売買ユニバース: %d銘柄",
+        len(RSR_UNIVERSE_62), len(SHADOW_UNIVERSE), len(LIVE_UNIVERSE),
+    )
+
     from kabusapi.signal_bridge import SignalBridge
 
     bridge = SignalBridge(
         universe_tickers          = LIVE_UNIVERSE,
-        rsr_universe_tickers      = RSR_UNIVERSE,   # RSR計算は42銘柄固定（研究と一致）
-        shadow_universe_tickers   = SHADOW_UNIVERSE or None,  # 監視専用・発注なし
+        rsr_universe_tickers      = RSR_UNIVERSE_62,  # RSR62コンテキスト（42+shadow20）
+        shadow_universe_tickers   = SHADOW_UNIVERSE or None,  # 監視用（RSR計算兼用）
         fujiko_params             = FUJIKO_PARAMS,
         capital                   = CAPITAL,
         max_positions             = min(MAX_POS, MAX_OPEN_POSITIONS),
