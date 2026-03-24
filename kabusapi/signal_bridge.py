@@ -214,8 +214,10 @@ class SignalBridge:
         max_new_positions_per_day: int   = 2,
         order_rate_limit_per_min:  int   = ORDER_RATE_LIMIT_PER_MIN,
         portfolio_state_file:      Path | None = None,
+        shadow_universe_tickers:   dict[str, str] | None = None,
     ) -> None:
         self.universe_tickers          = universe_tickers
+        self.shadow_universe_tickers   = shadow_universe_tickers or {}
         self.rsr_universe_tickers      = (
             rsr_universe_tickers if rsr_universe_tickers is not None
             else universe_tickers
@@ -393,7 +395,9 @@ class SignalBridge:
         logger.info("データ取得: %s 〜 %s", start_date, end_date)
 
         all_tickers = list(
-            set(self.rsr_universe_tickers.keys()) | set(self.universe_tickers.keys())
+            set(self.rsr_universe_tickers.keys())
+            | set(self.universe_tickers.keys())
+            | set(self.shadow_universe_tickers.keys())
         ) + [self.benchmark_ticker]
         raw = yf.download(
             all_tickers,
@@ -403,7 +407,7 @@ class SignalBridge:
             group_by="ticker",
         )
 
-        all_universe = {**self.rsr_universe_tickers, **self.universe_tickers}
+        all_universe = {**self.rsr_universe_tickers, **self.universe_tickers, **self.shadow_universe_tickers}
         universe_raw = {}
         for sym, sector in all_universe.items():
             try:
@@ -600,6 +604,66 @@ class SignalBridge:
         }
         rsr_universe = calc_universe_rsr(rsr_prices)
         rsr_latest   = rsr_universe.iloc[-1]   # 最新スナップショット
+
+        # ── Shadow Universe RSR（監視専用・RSR42母集団と独立して計算）─────
+        # RSR計算母集団（42銘柄）は絶対に変更しない。
+        # Shadow poolは独自の相対強度順位を持ち、rsr_pass >= 65 の銘柄数を診断ログに記録する。
+        _shadow_rsr_pass  = 0
+        _shadow_near_bo   = 0
+        _shadow_promo_list: list[str] = []
+        if self.shadow_universe_tickers:
+            _shadow_prices = {
+                sym: info["df"]["Close"]
+                for sym, info in universe_raw.items()
+                if sym in self.shadow_universe_tickers
+            }
+            if len(_shadow_prices) >= 5:
+                try:
+                    _shadow_rsr_u      = calc_universe_rsr(_shadow_prices)
+                    _shadow_rsr_latest = _shadow_rsr_u.iloc[-1]
+                    _shadow_rsr_pass   = int((_shadow_rsr_latest >= 65).sum())
+                    for _ssym in _shadow_rsr_latest[_shadow_rsr_latest >= 65].index:
+                        if _ssym not in universe_raw:
+                            continue
+                        try:
+                            _sc = universe_raw[_ssym]["df"]["Close"]
+                            if len(_sc) >= 21:
+                                _sh20 = float(_sc.iloc[-21:-1].max())
+                                _sp   = float(_sc.iloc[-1])
+                                if _sh20 > 0 and _sp >= _sh20 * 0.92:
+                                    _shadow_near_bo += 1
+                        except Exception:
+                            pass
+                    logger.info(
+                        "Shadow Universe: pool=%d rsr_pass(>=65)=%d near_breakout=%d",
+                        len(_shadow_prices), _shadow_rsr_pass, _shadow_near_bo,
+                    )
+                    # 昇格候補: Shadow pool内で RSR>=68 かつ 価格<=¥8,000（1単元≤¥800,000）
+                    # → 実際に昇格させるかはユーザー判断（自動昇格はしない）
+                    _SHADOW_PROMO_RSR   = 68.0
+                    _SHADOW_PROMO_PRICE = 8_000
+                    _shadow_promo_cands: list[str] = []
+                    for _sp_sym in _shadow_rsr_latest[_shadow_rsr_latest >= _SHADOW_PROMO_RSR].index:
+                        if _sp_sym in universe_raw:
+                            try:
+                                _sp_price = float(universe_raw[_sp_sym]["df"]["Close"].iloc[-1])
+                                if _sp_price <= _SHADOW_PROMO_PRICE:
+                                    _sp_rsr = float(_shadow_rsr_latest[_sp_sym])
+                                    _shadow_promo_cands.append((_sp_rsr, _sp_sym, round(_sp_price, 0)))
+                            except Exception:
+                                pass
+                    _shadow_promo_cands.sort(reverse=True)
+                    _shadow_promo_list = [s for _, s, _ in _shadow_promo_cands[:6]]
+                    if _shadow_promo_list:
+                        logger.info(
+                            "Shadow昇格候補(%d銘柄): %s",
+                            len(_shadow_promo_list), _shadow_promo_list,
+                        )
+                except Exception as _se:
+                    logger.debug("Shadow RSR計算エラー: %s", _se)
+                    _shadow_promo_list = []
+        else:
+            _shadow_promo_list = []
 
         # ── MTFキャッシュ（朝1回計算・日中は再計算しない） ──────────────
         # 週足データは金曜引けで確定 → 日中に変化しない。
@@ -904,6 +968,9 @@ class SignalBridge:
             reverse=True,
         )
         top_k_syms = [sym for _, sym in buy_eligible[:self.top_k]]
+        # avg_tradeable_rsr: 全フィルター通過後のBUY候補のRSR平均（0件なら None）
+        _buy_elig_rsrs = [rsr for rsr, _ in buy_eligible]
+        _avg_tradeable_rsr = round(float(np.mean(_buy_elig_rsrs)), 1) if _buy_elig_rsrs else None
         logger.info(
             "BUY 候補（RSR順）: %s → top%d = %s",
             [sym for _, sym in buy_eligible], self.top_k, top_k_syms,
@@ -912,11 +979,13 @@ class SignalBridge:
         rsr_dist_sorted = sorted(diag_rsr_dist, key=lambda x: x["rsr"], reverse=True)
         diagnostics = {
             "universe_size":      diag_total,
+            "rsr42_total":        len(rsr_prices),  # RSR42母集団の実データ取得数（supply_ratio の分母）
             "rsr_pass":           diag_rsr_pass,
             "blocked_rsr":        diag_blocked_rsr,
             "blocked_breakout":   diag_blocked_bo,
             "buy_candidates":     len(buy_eligible),
             "topk_count":         len(top_k_syms),
+            "avg_tradeable_rsr":  _avg_tradeable_rsr,
             "rsr_distribution":   rsr_dist_sorted[:20],
             # Step 2: supply ceiling
             "rsr_gt70":           diag_rsr_gt70,
@@ -927,6 +996,9 @@ class SignalBridge:
             "bo10_extra":         diag_bo10_pass,   # 10日なら追加通過する銘柄数
             # Step 4: ブレイクアウト直前（20日高値の2%以内）
             "near_breakout":      diag_near_breakout,
+            "shadow_rsr_pass":        _shadow_rsr_pass,
+            "shadow_near_bo":         _shadow_near_bo,
+            "shadow_promo_candidates": _shadow_promo_list,
             # False Breakout: 保有中 かつ entry後5日以内 かつ -2ATR到達した銘柄数
             "failed_breakout":    diag_failed_breakout,
             # MTFフィルター（実適用）: 3条件 pass/候補
@@ -950,6 +1022,7 @@ class SignalBridge:
         _blocked_by_price         = 0
         _blocked_by_liquidity     = 0
         _blocked_by_risk          = 0
+        _blocked_price_rsr_scores: list[float] = []  # blocked_rsr_mean 計算用
         # Step 2（価格分布ログ）・Step 3（距離ログ）・Step 4〜6（追加監視ログ）
         _rsr_top10_median_price   = None   # RSR Top10 の価格中央値
         _rsr_top10_max_price      = None   # RSR Top10 の最高価格
@@ -957,7 +1030,7 @@ class SignalBridge:
         _rsr_top10_sector_count   = None   # RSR Top10 に何セクターあるか（相場拡散の先行指標）
         _mid_pressure_count       = 0      # close >= high20 * 0.90（中間圧力銘柄数）
         _mid_pressure_weight      = 0.0    # mid_pressure銘柄のRSRスコア重み（市場エネルギー）
-        _near_breakout_count      = 0      # close >= high20 * 0.95（ブレイク直前圧力 / bo=0.97より広い）
+        _near_breakout_count      = 0      # close >= high20 * 0.92（ブレイク直前圧力 / 8%以内 / bo=0.97より広い）
         _near_breakout_weight     = 0.0    # near_breakout銘柄のRSRスコア重み（>=0.25で相場動く）
         try:
             _rsr_top10 = rsr_latest.nlargest(10)
@@ -1005,8 +1078,8 @@ class SignalBridge:
                         if _dhigh20 > 0:
                             _dist = (_dhigh20 - _dprice) / _dhigh20
                             _distances.append(_dist)
-                            # near_breakout: 高値の5%以内（bo=3%より広い初動検知）
-                            if _dprice >= _dhigh20 * 0.95:
+                            # near_breakout: 高値の8%以内（bo=3%より広い初動検知 / high20_distance=16%の現状に合わせて拡張）
+                            if _dprice >= _dhigh20 * 0.92:
                                 _near_breakout_count  += 1
                                 _near_breakout_weight += float(rsr_latest.get(_dsym, 0))
                             # mid_pressure: 高値の10%以内（near_breakout=5%より早段階）
@@ -1028,11 +1101,14 @@ class SignalBridge:
                     _blocked_by_risk += 1
                 elif _bsym not in self.universe_tickers:
                     _blocked_by_price += 1
+                    _blocked_price_rsr_scores.append(float(rsr_latest[_bsym]))
                 elif liquidity.get(_bsym, 0) < MIN_DAILY_VALUE_YEN:
                     _blocked_by_liquidity += 1
         except Exception as _e:
             logger.debug("blocked_leaders/price_dist/distance 計算エラー: %s", _e)
 
+        _blocked_rsr_mean = round(float(np.mean(_blocked_price_rsr_scores)), 1) if _blocked_price_rsr_scores else None
+        diagnostics["blocked_rsr_mean"]        = _blocked_rsr_mean
         diagnostics["blocked_leaders_count"]   = _blocked_leaders_count
         diagnostics["blocked_leaders_weight"]  = _blocked_leaders_weight
         diagnostics["rsr_top10_tradeable_cnt"] = _rsr_top10_tradeable_cnt
@@ -1144,6 +1220,7 @@ class SignalBridge:
         max_alloc_cap     = self.capital * self.max_single_weight
         new_buys_this_run = today_new_buys
         blocked_by_alloc_cap_count = 0  # 配分上限キャップで qty_cap=0 になった件数
+        lot_rounded_up_count       = 0  # ATR計算 <100株 → 最低1単元フォールバックした件数
         # リーダースロット設計: RSR >= 85 の最高位銘柄に1スロットだけ大きめ配分を許可
         # 大型株主導相場（blocked_leaders_weight>40%）でも高RSR銘柄を取りこぼさないため
         _LEADER_RSR_THRESHOLD = 85.0
@@ -1200,8 +1277,18 @@ class SignalBridge:
                 pass
 
             if _atr_for_size > 0:
-                # ATRベース: 2万円 / ATR20 → 単元に丸める
-                qty_risk = int((_risk_per_trade / _atr_for_size) // 100) * 100
+                # ATRベース: risk / ATR20 → 単元に丸める → 0になった場合は最低1単元フォールバック
+                qty_raw  = int(_risk_per_trade / _atr_for_size)
+                qty_risk = (qty_raw // 100) * 100
+                if qty_risk == 0:
+                    # ATR計算結果 < 100株 → ロット制約 → 最低1単元を試みる
+                    # 後段の qty_cap == 0 チェックが「それでも買えない」を保護する
+                    qty_risk = 100
+                    lot_rounded_up_count += 1
+                    logger.debug(
+                        "%s: ATRベース qty_raw=%d → 100株フォールバック (ATR=%.0f risk=¥%.0f)",
+                        sig.symbol, qty_raw, _atr_for_size, _risk_per_trade,
+                    )
             else:
                 # ATR取得失敗時は配分上限ベースにフォールバック
                 n_remaining     = len(buy_candidates) - i
@@ -1279,7 +1366,7 @@ class SignalBridge:
                     (qty * ref_price) / self.capital * 100,
                 )
 
-        return orders, warnings, blocked_by_alloc_cap_count
+        return orders, warnings, blocked_by_alloc_cap_count, lot_rounded_up_count
 
     # ------------------------------------------------------------------ #
     # 発注実行（live モードのみ）レート制限付き
@@ -1520,7 +1607,7 @@ class SignalBridge:
             )
 
         # 6. 注文生成
-        orders, order_warnings, _blocked_alloc_cap = self._build_orders(
+        orders, order_warnings, _blocked_alloc_cap, _lot_rounded_up = self._build_orders(
             signals, universe_raw, current_positions, available_cash,
             cb_active=cb_active,
             effective_max_pos=_effective_max_pos,
@@ -1711,7 +1798,10 @@ class SignalBridge:
             "blocked_by_risk":         _diag.get("blocked_by_risk", 0),
             # 発注フェーズで 1単元コスト > alloc_cap によりスキップした件数
             # 資本制約 vs 市場構造の切り分けに使う（戦略の問題ではなくサイズ設計の問題）
+            # blocked_by_alloc_cap: 1単元コスト > alloc_cap で発注不能（Step3: blocked_by_lot）
+            # blocked_by_lot:       ATRベース <100株 → フォールバックで100株に丸めた件数
             "blocked_by_alloc_cap":    _blocked_alloc_cap,
+            "blocked_by_lot":          _lot_rounded_up,
             # Step 1 (観測バイアス): bo_pressure_raw = near_breakout_count の絶対値
             # bo_rate は RSR供給増加で希薄化するが、raw は市場圧力を直接反映する先行指標
             "bo_pressure_raw":           _diag.get("near_breakout", 0),
@@ -1753,7 +1843,63 @@ class SignalBridge:
             "mtf_pass_rate":     round(
                 _diag.get("mtf_full_pass", 0) / max(1, _diag.get("mtf_candidates", 1)), 3
             ) if _diag.get("mtf_candidates", 0) > 0 else None,
+            # Shadow Universe診断（RSR42母集団と独立 / 監視専用・発注なし）
+            # shadow_rsr_pass: pool内RSR>=65の銘柄数（>= 3 で中小型株にも動き始めた合図）
+            # shadow_near_bo:  shadow pool内でnear_breakout（8%以内）の銘柄数
+            # shadow_promo:    RSR>=68 かつ ¥8,000以下の昇格候補銘柄（自動昇格はしない・確認用）
+            "shadow_rsr_pass":   _diag.get("shadow_rsr_pass", 0),
+            "shadow_near_bo":    _diag.get("shadow_near_bo", 0),
+            "shadow_promo":      _diag.get("shadow_promo_candidates", []),
+            "shadow_promo_count": len(_diag.get("shadow_promo_candidates", [])),
+            # 追加診断ログ
+            # avg_tradeable_rsr: BUY候補のRSR平均（全フィルター通過後 / Noneなら候補ゼロ）
+            # blocked_rsr_mean:  blocked_by_price銘柄のRSR平均（高いほど"強いが買えない"銘柄が多い）
+            "avg_tradeable_rsr": _diag.get("avg_tradeable_rsr"),
+            "blocked_rsr_mean":  _diag.get("blocked_rsr_mean"),
+            # Step 1: RSR供給量比率（rsr_pass / RSR42母集団数）
+            # 0.10=相場停止 / 0.20=初動 / 0.30=トレンド開始
+            "rsr_supply_ratio":  round(
+                _diag["rsr_pass"] / max(1, _diag.get("rsr42_total", 42)), 3
+            ),
+            # Step 3: 市場リーダーブロック率（RSR Top10のうち買えない銘柄の割合）
+            # 0.3以下=正常 / 0.5超=機会損失 / 0.7=大型株主導でリーダーが全員買えない状態
+            "market_leader_block_rate": round(
+                _diag.get("blocked_leaders_count", 0) / 10.0, 2
+            ),
+            # 資本連動パラメータ（資本変更の効果を追跡する）
+            # capital増加 → max_allocation増加 → blocked_by_price減少 の連動を可視化
+            "capital":             self.capital,
+            "max_allocation":      round(self.capital * 0.30, 0),
+            "max_position_yen":    round(self.capital * self.max_single_weight, 0),
+            "leader_slot_yen":     round(self.capital * 0.35, 0),
+            "risk_per_trade_yen":  round(self.capital * 0.01, 0),
         }
+        # Step 2: Shadow昇格トリガー判定
+        # rsr_pass >= 8 OR near_breakout >= 3 で警告出力（自動昇格は行わない・要ユーザー確認）
+        _promo_trigger = (
+            _diag["rsr_pass"] >= 8
+            or _diag.get("near_breakout_count", 0) >= 3
+        )
+        _metrics["shadow_promo_triggered"] = _promo_trigger
+        if _promo_trigger and _diag.get("shadow_promo_candidates"):
+            _trigger_reason = (
+                f"rsr_pass={_diag['rsr_pass']}(>=8)"
+                if _diag["rsr_pass"] >= 8
+                else f"near_breakout={_diag.get('near_breakout_count',0)}(>=3)"
+            )
+            logger.warning(
+                "⚠ Shadow昇格トリガー発動 [%s]: 候補=%s"
+                " → LIVE_UNIVERSE追加を検討してください（要ユーザー確認）",
+                _trigger_reason, _diag.get("shadow_promo_candidates", []),
+            )
+            print(
+                f"\n{'='*60}"
+                f"\n⚠  Shadow昇格トリガー発動 [{_trigger_reason}]"
+                f"\n   昇格候補: {_diag.get('shadow_promo_candidates', [])}"
+                f"\n   LIVE_UNIVERSE への追加はユーザー確認後に実施してください。"
+                f"\n{'='*60}"
+            )
+
         with _diag_path.open("a", encoding="utf-8") as _f:
             _f.write(_json.dumps(_metrics, ensure_ascii=False) + "\n")
         logger.info("診断メトリクス保存: %s", _diag_path)

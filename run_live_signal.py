@@ -118,10 +118,57 @@ def load_universe() -> tuple[dict[str, str], dict]:
 
 
 # ------------------------------------------------------------------ #
+# 資本連動パラメータ導出（固定値廃止・資本比率化）
+# ------------------------------------------------------------------ #
+def derive_risk_params(capital: int) -> dict:
+    """
+    総資本からポジション制約を比率で導出する。
+    固定値（MAX_ALLOCATION=60万など）を廃止し、資本増加が自動的に
+    ユニバース価格上限・ポジションサイズに反映されるようにする。
+
+    Args:
+        capital: 総資本（円）
+
+    Returns:
+        risk_per_trade  : 1トレード最大リスク（capital × 1%）
+        max_position    : 1銘柄最大配分（capital × 20%）
+        leader_slot     : リーダースロット配分（capital × 35%）
+        max_allocation  : ユニバース価格上限 = 1単元コスト上限（capital × 30%）
+
+    資本別の挙動:
+        200万 → max_allocation ¥600,000  (¥6,000/株まで)
+        350万 → max_allocation ¥1,050,000 (¥10,500/株まで)
+        480万 → max_allocation ¥1,440,000 (¥14,400/株まで ≈ 川崎重工クラス)
+        500万 → max_allocation ¥1,500,000 (¥15,000/株まで)
+        800万 → max_allocation ¥2,400,000 (¥24,000/株まで ≈ アドバンテストクラス)
+    """
+    return {
+        "risk_per_trade":  capital * 0.01,
+        "max_position":    capital * 0.20,
+        "leader_slot":     capital * 0.35,
+        "max_allocation":  capital * 0.30,
+    }
+
+
+def recommended_universe_size(capital: int) -> int:
+    """
+    資本に応じた推奨観測ユニバースサイズ（advisory / 自動変更しない）。
+    実際の変更は configs/universe/*.json の手動更新 + ユーザー確認が必要。
+    """
+    if capital < 3_000_000:
+        return 42
+    elif capital < 5_000_000:
+        return 50
+    elif capital < 8_000_000:
+        return 60
+    else:
+        return 80
+
+
+# ------------------------------------------------------------------ #
 # 株価上限フィルター（シグナル生成前に適用）
 # ------------------------------------------------------------------ #
-MAX_ALLOCATION = int(os.environ.get("MAX_POSITION_YEN", 600_000))
-LOT_SIZE       = 100   # 東証標準単元株数
+LOT_SIZE = 100   # 東証標準単元株数
 
 def filter_universe_by_price(
     tickers:      dict[str, str],
@@ -343,9 +390,10 @@ logger.info(
     FUJIKO_PARAMS["min_sepa"],
 )
 
-CAPITAL              = 2_000_000
+CAPITAL              = int(os.environ.get("CAPITAL", 2_000_000))  # .env の CAPITAL= で上書き可
+_RISK_PARAMS         = derive_risk_params(CAPITAL)               # 資本連動パラメータ（全体で一貫して使用）
+MAX_SINGLE_WEIGHT    = 0.20     # 1銘柄最大ウェイト（capital * 20%）
 MAX_POS              = 3        # top_k と一致させる（確定設計 2026-03-23）
-MAX_SINGLE_WEIGHT    = 0.20     # 1銘柄最大ウェイト（0.15→0.20: 日本株単元制度による機会損失解消）
 MIN_SECTORS          = 1        # セクター制約なし
 MAX_DD_LIMIT         = 0.15
 TOP_K                = 3        # RSR 上位 k 銘柄のみ BUY 対象（確定設計 2026-03-23）
@@ -373,6 +421,11 @@ def print_banner(live: bool, universe: dict[str, str], universe_meta: dict) -> N
     print(f"  ユニバース     : {len(universe)}銘柄 (v={version}, created={created})")
     print(f"  ポートフォリオ : max_pos={MAX_POS} / top_k={TOP_K} / max_hold_days={MAX_HOLD_DAYS}d")
     print(f"  安全設計       : MAX_DAILY={MAX_DAILY_ORDERS} / MAX_PER_SYM={MAX_SYMBOL_ORDERS} / MAX_OPEN={MAX_OPEN_POSITIONS}")
+    _rp = _RISK_PARAMS
+    _rec_uni = recommended_universe_size(CAPITAL)
+    print(f"  資本設定       : ¥{CAPITAL:,}  max_alloc=¥{int(_rp['max_allocation']):,}(×30%)  max_pos=¥{int(_rp['max_position']):,}(×20%)")
+    if _rec_uni > len(universe):
+        print(f"  [推奨] ユニバース拡張: 現在{len(universe)}銘柄 → 推奨{_rec_uni}銘柄（資本¥{CAPITAL:,}に対応）")
     print("=" * 64)
 
 
@@ -493,26 +546,46 @@ def main() -> int:
         len(LIVE_UNIVERSE),
     )
 
-    # ---- 株価上限フィルター（RSR計算の後に適用） ----
+    # ---- 株価上限フィルター（資本連動 = capital × 30%）----
     # 保有中銘柄は API 接続前のため空集合で保守的に処理する。
-    logger.info("株価上限フィルター適用中（上限: ¥%s/単元）...", f"{MAX_ALLOCATION:,}")
+    _max_alloc = int(_RISK_PARAMS["max_allocation"])
+    logger.info(
+        "株価上限フィルター適用中（上限: ¥%s/単元 = capital×30%%）", f"{_max_alloc:,}"
+    )
     LIVE_UNIVERSE, price_skipped = filter_universe_by_price(
-        LIVE_UNIVERSE, MAX_ALLOCATION, held_symbols=set()
+        LIVE_UNIVERSE, _max_alloc, held_symbols=set()
     )
     if price_skipped:
-        print(f"\n[価格フィルター] {len(price_skipped)}銘柄を除外（¥{MAX_ALLOCATION:,}/単元超）:")
+        print(f"\n[価格フィルター] {len(price_skipped)}銘柄を除外（¥{_max_alloc:,}/単元超 = capital×30%）:")
         for sym, price, cost in price_skipped:
-            print(f"  ✗ {sym:<8} ¥{price:>8,.0f}/株  1単元=¥{cost:>9,.0f}  > 上限¥{MAX_ALLOCATION:,}")
+            print(f"  ✗ {sym:<8} ¥{price:>8,.0f}/株  1単元=¥{cost:>9,.0f}  > 上限¥{_max_alloc:,}")
     logger.info(
         "RSRユニバース: %d銘柄（TOPIX100固定） / 売買ユニバース: %d銘柄（価格フィルター後）",
         len(RSR_UNIVERSE), len(LIVE_UNIVERSE),
     )
 
+    # ---- Shadow Universe（監視専用・RSR42母集団は変更しない）----
+    # SHADOW_UNIVERSE_FILE 未設定でも動作する（省略可能）。
+    _shadow_file = os.environ.get(
+        "SHADOW_UNIVERSE_FILE",
+        str(Path(__file__).parent / "configs" / "universe" / "shadow_universe.json"),
+    )
+    SHADOW_UNIVERSE: dict[str, str] = {}
+    try:
+        _shadow_path = Path(_shadow_file)
+        if _shadow_path.exists():
+            _shadow_data = json.loads(_shadow_path.read_text(encoding="utf-8"))
+            SHADOW_UNIVERSE = _shadow_data.get("symbols", {})
+            logger.info("Shadow Universe: %d銘柄（監視専用）", len(SHADOW_UNIVERSE))
+    except Exception as _se:
+        logger.warning("Shadow Universe読み込みスキップ: %s", _se)
+
     from kabusapi.signal_bridge import SignalBridge
 
     bridge = SignalBridge(
         universe_tickers          = LIVE_UNIVERSE,
-        rsr_universe_tickers      = RSR_UNIVERSE,   # RSR計算は24銘柄固定（研究と一致）
+        rsr_universe_tickers      = RSR_UNIVERSE,   # RSR計算は42銘柄固定（研究と一致）
+        shadow_universe_tickers   = SHADOW_UNIVERSE or None,  # 監視専用・発注なし
         fujiko_params             = FUJIKO_PARAMS,
         capital                   = CAPITAL,
         max_positions             = min(MAX_POS, MAX_OPEN_POSITIONS),
