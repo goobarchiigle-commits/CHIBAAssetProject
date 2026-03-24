@@ -1162,6 +1162,13 @@ class SignalBridge:
             "shadow_rsr_pass":        _shadow_rsr_pass,
             "shadow_near_bo":         _shadow_near_bo,
             "shadow_promo_candidates": _shadow_promo_list,
+            # Shadow RSR62スコア（発注条件チェック用 / shadow_rsr > live_top10_median に使用）
+            # RSR62コンテキスト（全62銘柄内での順位）なので live RSR と直接比較可能
+            "shadow_rsr62_scores": {
+                sym: round(float(rsr_latest[sym]), 1)
+                for sym in self.shadow_universe_tickers
+                if sym in rsr_latest.index
+            },
             # False Breakout: 保有中 かつ entry後5日以内 かつ -2ATR到達した銘柄数
             "failed_breakout":    diag_failed_breakout,
             # MTFフィルター（実適用）: 3条件 pass/候補
@@ -1303,6 +1310,136 @@ class SignalBridge:
     # ------------------------------------------------------------------ #
     # 注文生成
     # ------------------------------------------------------------------ #
+    # ------------------------------------------------------------------ #
+    # Shadow Phase1 注文生成
+    # ------------------------------------------------------------------ #
+    def _build_shadow_orders(
+        self,
+        diag:              dict,
+        universe_raw:      dict,
+        current_positions: dict,
+        available_cash:    float,
+        cb_active:         bool,
+        live_orders:       list,          # 既存live注文（重複防止用）
+        shadow_slots:      int   = 1,
+        shadow_rsr_min:    float = 70.0,
+        shadow_rsr_pass_min: int = 8,
+    ) -> tuple[list, dict]:
+        """
+        Shadow Universe から条件付きBUY注文を生成する（Phase1）。
+
+        条件（すべて満たす場合のみ発動）:
+          1. CB NORMAL かつ shadow_rsr_pass >= shadow_rsr_pass_min (=8)
+          2. shadow_rsr62 >= shadow_rsr_min (=70.0)  ← RSR62コンテキストでの絶対基準
+          3. shadow_rsr62 > live_top10_median         ← live銘柄上位10本の中央値超え
+          4. 価格フィルター: price * 100 <= max_alloc_cap
+          5. 未保有 かつ live注文と重複なし
+
+        発注上限: shadow_slots=1（live max3 + shadow 1 = 合計最大4）
+        """
+        shadow_metrics = {
+            "shadow_signal_count":     0,
+            "shadow_entry_count":      0,
+            "shadow_blocked_by_alloc": 0,
+            "shadow_rsr_pass_met":     False,
+        }
+        orders: list[OrderInstruction] = []
+
+        # ── 発動条件チェック ───────────────────────────────────────────────
+        _srsr_pass = diag.get("shadow_rsr_pass", 0)
+        shadow_metrics["shadow_rsr_pass_met"] = _srsr_pass >= shadow_rsr_pass_min
+        if cb_active or _srsr_pass < shadow_rsr_pass_min:
+            return orders, shadow_metrics
+
+        # ── live Top10 RSR 中央値 ──────────────────────────────────────────
+        _top10_rsrs = [e["rsr"] for e in diag.get("rsr_distribution", [])[:10]]
+        if not _top10_rsrs:
+            return orders, shadow_metrics
+        _live_top10_median = float(np.median(_top10_rsrs))
+
+        # ── RSR62スコアで候補を絞る ────────────────────────────────────────
+        _shadow_rsr62 = diag.get("shadow_rsr62_scores", {})
+        _live_order_syms = {o.symbol for o in live_orders}
+        _held_syms       = set(current_positions.keys())
+        _max_alloc_cap   = self.capital * self.max_single_weight
+
+        # 候補: rsr62 >= min かつ live中央値超え かつ 未保有 かつ live注文と重複なし
+        _candidates: list[tuple[float, str]] = []
+        for sym, rsr62 in _shadow_rsr62.items():
+            if rsr62 < shadow_rsr_min:
+                continue
+            if rsr62 <= _live_top10_median:
+                continue
+            if sym in _held_syms or sym in _live_order_syms:
+                continue
+            _candidates.append((rsr62, sym))
+
+        _candidates.sort(reverse=True)
+        shadow_metrics["shadow_signal_count"] = len(_candidates)
+
+        # ── 価格フィルター + 注文生成（最大 shadow_slots 件）─────────────
+        for rsr62, sym in _candidates:
+            if len(orders) >= shadow_slots:
+                break
+            if sym not in universe_raw:
+                continue
+
+            _df    = universe_raw[sym]["df"]
+            _price = float(_df["Close"].iloc[-1])
+            _cost  = _price * 100   # 1単元
+
+            # 価格フィルター
+            if _cost > _max_alloc_cap:
+                shadow_metrics["shadow_blocked_by_alloc"] += 1
+                logger.info(
+                    "SHADOW blocked_by_alloc: %s ¥%.0f/単元 > 上限¥%.0f",
+                    sym, _cost, _max_alloc_cap,
+                )
+                continue
+
+            # 余力チェック
+            if available_cash < _cost:
+                logger.info("SHADOW 余力不足: %s ¥%.0f > 余力¥%.0f", sym, _cost, available_cash)
+                continue
+
+            # ATRベースのロットサイズ（1%リスク）
+            _risk_yen = self.capital * 0.01
+            try:
+                _atr = float(_df["Close"].diff().abs().rolling(20).mean().iloc[-1])
+                _qty_raw = int(_risk_yen / max(_atr, 1.0))
+                _qty     = max(100, (_qty_raw // 100) * 100)
+            except Exception:
+                _qty = 100
+
+            _qty = min(_qty, int(_max_alloc_cap / _price / 100) * 100)
+            _qty = max(100, _qty)
+
+            orders.append(OrderInstruction(
+                symbol           = sym,
+                symbol_4digit    = sym.replace(".T", ""),
+                sector           = self.shadow_universe_tickers.get(sym, "不明"),
+                side             = "SHADOW_BUY",
+                qty              = _qty,
+                order_type       = "MARKET_OPEN",
+                estimated_price  = _price,
+                estimated_amount = _qty * _price,
+                reason           = (
+                    f"SHADOW_BUY: RSR62={rsr62:.1f} "
+                    f"(>{_live_top10_median:.1f}=live_top10_median) "
+                    f"shadow_rsr_pass={_srsr_pass}"
+                ),
+                atr20            = 0.0,
+            ))
+
+        shadow_metrics["shadow_entry_count"] = len(orders)
+        if orders:
+            logger.info(
+                "SHADOW Phase1: %d件 → %s (rsr62条件: >%.1f AND >%.1f)",
+                len(orders), [o.symbol for o in orders],
+                shadow_rsr_min, _live_top10_median,
+            )
+        return orders, shadow_metrics
+
     def _build_orders(
         self,
         signals:              list[StockSignal],
@@ -1551,7 +1688,7 @@ class SignalBridge:
 
         results = []
         for idx, o in enumerate(orders):
-            side_code = Side.BUY if o.side == "BUY" else Side.SELL
+            side_code = Side.BUY if o.side in ("BUY", "SHADOW_BUY") else Side.SELL
 
             # レート制限: 2件目以降にインターバルを挿入
             if idx > 0:
@@ -1776,8 +1913,24 @@ class SignalBridge:
             effective_max_pos=_effective_max_pos,
         )
 
-        # 6b. LIVE_STATE サマリーログ（戦略停止 / 市場悪化 / フィルター過剰 の切り分け用）
-        _entries   = [o for o in orders if o.side == "BUY"]
+        # 6b. Shadow Phase1 注文生成（live orders に追加・既存ロジック不変）
+        # 条件: CB NORMAL AND shadow_rsr_pass>=8 AND rsr62>=70 AND rsr62>live_top10_median
+        _cash_after_live_buys = (
+            available_cash
+            - sum(o.estimated_amount for o in orders if o.side == "BUY")
+        )
+        shadow_orders, _shadow_metrics = self._build_shadow_orders(
+            diag              = _diag,
+            universe_raw      = universe_raw,
+            current_positions = current_positions,
+            available_cash    = _cash_after_live_buys,
+            cb_active         = cb_active,
+            live_orders       = orders,
+        )
+        orders = orders + shadow_orders
+
+        # 6c. LIVE_STATE サマリーログ（戦略停止 / 市場悪化 / フィルター過剰 の切り分け用）
+        _entries   = [o for o in orders if o.side in ("BUY", "SHADOW_BUY")]
         _missed_breakout_count = max(0, _buy_cands_count - len(_entries))
         _exposure  = 1.0 - available_cash / max(1.0, current_equity)
         logger.info(
@@ -2044,6 +2197,15 @@ class SignalBridge:
             "rsr_filled_count":    getattr(self, "_last_data_health", {}).get("rsr_filled_count",   0),
             "rsr_excluded_count":  getattr(self, "_last_data_health", {}).get("rsr_excluded_count", 0),
             "cache_fallback_count": len(getattr(self, "_last_data_health", {}).get("cache_fallback_syms", [])),
+            # Shadow Phase1 観測メトリクス
+            # shadow_signal_count:     RSR/価格条件を満たした候補数（発注前）
+            # shadow_entry_count:      実際に発注した件数（≤ shadow_slots=1）
+            # shadow_blocked_by_alloc: 価格上限でブロックされた件数
+            # shadow_rsr_pass_met:     発動条件（rsr_pass>=8）を満たしているか
+            "shadow_signal_count":     _shadow_metrics.get("shadow_signal_count",     0),
+            "shadow_entry_count":      _shadow_metrics.get("shadow_entry_count",      0),
+            "shadow_blocked_by_alloc": _shadow_metrics.get("shadow_blocked_by_alloc", 0),
+            "shadow_rsr_pass_met":     _shadow_metrics.get("shadow_rsr_pass_met",     False),
         }
         # Step 2: Shadow昇格トリガー判定
         # rsr_pass >= 8 OR near_breakout >= 3 で警告出力（自動昇格は行わない・要ユーザー確認）
