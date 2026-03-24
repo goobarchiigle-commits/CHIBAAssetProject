@@ -1758,6 +1758,7 @@ class SignalBridge:
         pos_entry_prices  = state.setdefault("position_entry_prices", {})
         pos_entry_atrs    = state.setdefault("position_entry_atrs",   {})
         reentry_blocked   = state.setdefault("reentry_blocked",       {})
+        shadow_positions  = state.setdefault("shadow_positions",      {})  # {sym: entry_price} shadow由来
 
         # 最新の市場レジームをメトリクスから取得（regime別成績集計用）
         _latest_regime = None
@@ -1784,19 +1785,24 @@ class SignalBridge:
             sector = r.get("sector", "不明")
             amount = qty * price
 
-            if side == "BUY":
+            if side in ("BUY", "SHADOW_BUY"):
                 atr20 = float(r.get("atr20", 0.0))
                 pos_entry_dates[sym]  = today_str
                 pos_entry_prices[sym] = price
                 if atr20 > 0:
                     pos_entry_atrs[sym] = atr20
                 reentry_blocked.pop(sym, None)
-                logger.info("entry_date 記録: %s → %s @ ¥%.0f ATR20=%.0f", sym, today_str, price, atr20)
+                # shadow由来ポジションを記録（SELL時に shadow_realized_return を計算するため）
+                if side == "SHADOW_BUY":
+                    shadow_positions[sym] = price
+                    logger.info("SHADOW entry_date 記録: %s → %s @ ¥%.0f", sym, today_str, price)
+                else:
+                    logger.info("entry_date 記録: %s → %s @ ¥%.0f ATR20=%.0f", sym, today_str, price, atr20)
                 _trade = {
                     "date":         today_str,
                     "symbol":       sym,
                     "sector":       sector,
-                    "side":         "BUY",
+                    "side":         side,   # "BUY" or "SHADOW_BUY"
                     "qty":          qty,
                     "price":        price,
                     "amount":       amount,
@@ -1811,9 +1817,20 @@ class SignalBridge:
                 entry_price = pos_entry_prices.pop(sym, None)
                 entry_atr   = pos_entry_atrs.pop(sym, None)
                 entry_date  = pos_entry_dates.pop(sym, None)
+                # shadow由来ポジション判定（記録を削除して返り値を取得）
+                _shadow_entry_price = shadow_positions.pop(sym, None)
+                _is_shadow = _shadow_entry_price is not None
 
                 pnl     = round((price - entry_price) * qty, 0) if entry_price else None
                 pnl_pct = round((price / entry_price) - 1, 4)   if entry_price else None
+
+                # shadow_realized_return: shadow由来のSELL時に計算してログ出力
+                if _is_shadow and entry_price:
+                    _shadow_ret = round((price / entry_price) - 1, 4)
+                    logger.info(
+                        "SHADOW realized_return: %s entry=¥%.0f exit=¥%.0f return=%.2f%%",
+                        sym, entry_price, price, _shadow_ret * 100,
+                    )
 
                 hold_days = None
                 if entry_date:
@@ -1833,20 +1850,22 @@ class SignalBridge:
                     )
 
                 _trade = {
-                    "date":        today_str,
-                    "symbol":      sym,
-                    "sector":      sector,
-                    "side":        "SELL",
-                    "qty":         qty,
-                    "price":       price,
-                    "amount":      amount,
-                    "pnl":         pnl,
-                    "pnl_pct":     pnl_pct,
-                    "hold_days":   hold_days,
-                    "entry_price": entry_price,
-                    "entry_date":  entry_date,
-                    "entry_regime": _latest_regime,
-                    "reason":      reason,
+                    "date":                   today_str,
+                    "symbol":                 sym,
+                    "sector":                 sector,
+                    "side":                   "SELL",
+                    "qty":                    qty,
+                    "price":                  price,
+                    "amount":                 amount,
+                    "pnl":                    pnl,
+                    "pnl_pct":                pnl_pct,
+                    "hold_days":              hold_days,
+                    "entry_price":            entry_price,
+                    "entry_date":             entry_date,
+                    "entry_regime":           _latest_regime,
+                    "reason":                 reason,
+                    "is_shadow":              _is_shadow,
+                    "shadow_realized_return": round((price / entry_price) - 1, 4) if (_is_shadow and entry_price) else None,
                 }
                 with _trades_path.open("a", encoding="utf-8") as _f:
                     _f.write(_json.dumps(_trade, ensure_ascii=False) + "\n")
@@ -1895,11 +1914,19 @@ class SignalBridge:
         )
 
         # 6. ブレイクアウトクラスター検知（同日 BUY シグナル数 ≥ 3 → スロット拡張）
+        import math as _math
+        _CAPITAL_PER_SLOT   = 1_200_000   # 資本連動: 120万/スロット（360万→3, 480万→4, 600万→5）
+        _equity_based_max   = max(self.max_positions, _math.floor(current_equity / _CAPITAL_PER_SLOT))
         _CLUSTER_THRESHOLD  = 3
         _buy_cands          = [s for s in signals if s.signal == 1 and not s.currently_holding]
         _buy_cands_count    = len(_buy_cands)
         _breakout_cluster   = _buy_cands_count >= _CLUSTER_THRESHOLD
-        _effective_max_pos  = 5 if _breakout_cluster else self.max_positions
+        _effective_max_pos  = 5 if _breakout_cluster else _equity_based_max
+        if _equity_based_max > self.max_positions:
+            logger.info(
+                "CAPITAL_EXPANSION: equity=¥%.0f → equity_based_max=%d (base=%d)",
+                current_equity, _equity_based_max, self.max_positions,
+            )
         if _breakout_cluster:
             logger.info(
                 "CLUSTER DETECTED: BUY candidates=%d >= threshold=%d → effective_max_pos=%d",
@@ -2269,11 +2296,12 @@ class SignalBridge:
                 "current_drawdown": round(
                     (current_equity - equity_peak) / max(1.0, equity_peak), 4
                 ),
-                "current_positions": len(current_positions),
-                "max_positions":     self.max_positions,
-                "open_slots":        max(0, self.max_positions - len(current_positions)),
-                "cb_state":          portfolio_state["cb_state"],
-                "cb_cooldown_end":   portfolio_state.get("cb_cooldown_end_date"),
+                "current_positions":   len(current_positions),
+                "max_positions":       self.max_positions,
+                "equity_based_max_pos": _equity_based_max,   # 資本連動上限（360万→3, 480万→4, 600万→5）
+                "open_slots":          max(0, _effective_max_pos - len(current_positions)),
+                "cb_state":            portfolio_state["cb_state"],
+                "cb_cooldown_end":     portfolio_state.get("cb_cooldown_end_date"),
             },
             signals = [
                 {

@@ -438,7 +438,12 @@ def print_signals(result) -> None:
         print(f"  {'銘柄':<10} {'売買':<6} {'数量':>6} {'参考価格':>10} {'参考金額':>12}  理由")
         print("  " + "-" * 74)
         for o in orders:
-            side_str = "🟢 BUY " if o["side"] == "BUY" else "🔴 SELL"
+            if o["side"] == "BUY":
+                side_str = "🟢 BUY  "
+            elif o["side"] == "SHADOW_BUY":
+                side_str = "🔵 SHDW "
+            else:
+                side_str = "🔴 SELL "
             print(
                 f"  {o['symbol']:<10} {side_str} {o['qty']:>6}株 "
                 f"¥{o['estimated_price']:>9,.0f} "
@@ -617,9 +622,11 @@ def main() -> int:
         cooldown = ps.get("cb_cooldown_end") or ""
         print(f"  ⚠ CB状態    : {cb_str}（クールダウン終了: {cooldown}）")
     dd_pct = ps.get("current_drawdown", 0.0) * 100
+    _eq_max = ps.get("equity_based_max_pos", ps["max_positions"])
+    _eq_note = f" [資本連動→{_eq_max}]" if _eq_max != ps["max_positions"] else ""
     print(
         f"  ポートフォリオ: 保有 {ps['current_positions']} / "
-        f"最大 {ps['max_positions']} 銘柄  "
+        f"最大 {ps['max_positions']} 銘柄{_eq_note}  "
         f"空きスロット: {ps['open_slots']}  "
         f"余力: ¥{ps['available_cash']:,.0f}  "
         f"DD: {dd_pct:+.1f}%"
