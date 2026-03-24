@@ -496,19 +496,29 @@ class SignalBridge:
         rsr_universe = calc_universe_rsr(rsr_prices)
         rsr_latest   = rsr_universe.iloc[-1]   # 最新スナップショット
 
-        # ── 週足RSR計算（同一42銘柄・日次OHLCVをresample） ──────────────
+        # ── 週足Close / MA20 事前計算（全銘柄一括・ループ内resampleを廃止） ───────
+        # universe_raw の全銘柄を対象にする（RSR42 + 売買ユニバースを包含）
+        # これ1つを RSR週足計算・MTFフィルター・診断ログで共有する
+        weekly_close_cache: dict[str, pd.Series] = {}
+        weekly_ma20_cache:  dict[str, pd.Series] = {}
+        for _sym in universe_raw:
+            try:
+                _wc = universe_raw[_sym]["df"]["Close"].resample("W-FRI").last().dropna()
+                weekly_close_cache[_sym] = _wc
+                weekly_ma20_cache[_sym]  = _wc.rolling(20).mean()
+            except Exception:
+                pass
+
+        # ── 週足RSR計算（同一42銘柄・上記キャッシュを使用） ───────────
         # 母集団は日次と完全に同一（因子の意味を壊さない）
         # 週足 composite return: 週次シフト版（13/26/39/52週 = 3/6/9/12ヶ月）
         # 日次 calc_composite_return のウェイト 0.4/0.2/0.2/0.2 を維持する
         try:
-            _wc_dict: dict = {}
-            for _sym in self.rsr_universe_tickers:
-                if _sym in universe_raw:
-                    _wc_dict[_sym] = (
-                        universe_raw[_sym]["df"]["Close"]
-                        .resample("W-FRI").last()
-                        .dropna()
-                    )
+            _wc_dict = {
+                _sym: weekly_close_cache[_sym]
+                for _sym in self.rsr_universe_tickers
+                if _sym in weekly_close_cache
+            }
             if len(_wc_dict) >= 2:
                 _wc_df    = pd.DataFrame(_wc_dict)
                 _wr3      = _wc_df / _wc_df.shift(13) - 1               # 3ヶ月（13週）
@@ -694,15 +704,18 @@ class SignalBridge:
                 if signal_int == 1 and rsr_now >= min_rsr_threshold:
                     diag_mtf_candidates += 1
                     _rsr_weekly_now = float(rsr_weekly_latest.get(sym, 0.0))
-                    _weekly_ma_ok   = False
+                    # 事前計算キャッシュを使用（ループ内resample廃止）
+                    # 計算失敗 = HOLD（通過扱いにしない：ノイズ銘柄をブロック）
+                    _weekly_ma_ok = False
                     try:
-                        _wc  = df["Close"].resample("W-FRI").last().dropna()
-                        _wm20 = _wc.rolling(20).mean().dropna()
-                        if len(_wm20) >= 5:
-                            _weekly_ma_ok = float(_wc.iloc[-1]) > float(_wm20.iloc[-1])
+                        _wc_c  = weekly_close_cache.get(sym)
+                        _wm20_c = weekly_ma20_cache.get(sym)
+                        if (_wc_c is not None and _wm20_c is not None
+                                and len(_wm20_c.dropna()) >= 5):
+                            _weekly_ma_ok = float(_wc_c.iloc[-1]) > float(_wm20_c.dropna().iloc[-1])
                     except Exception:
-                        _weekly_ma_ok = True  # 計算不能は通過扱い（保守的）
-                    _wrsr_ok = _rsr_weekly_now >= 70.0
+                        _weekly_ma_ok = False  # 計算不能 = HOLD（通過させない）
+                    _wrsr_ok = _rsr_weekly_now >= 75.0  # 日次と同じ閾値で整合
                     if _wrsr_ok:
                         diag_mtf_wrsr_pass += 1
                     if _weekly_ma_ok:
@@ -753,12 +766,14 @@ class SignalBridge:
                     diag_rsr_pass += 1
 
                     # Step 2: MTFフィルター診断（後方互換: 週足MA20 < close なら diag_mtf_filtered++）
-                    # 実際のフィルター処理はシグナルループ内で実施済み
+                    # キャッシュ利用（ループ内resample廃止）
                     try:
-                        _wc_diag = df["Close"].resample("W-FRI").last().dropna()
-                        _wm20_diag = _wc_diag.rolling(20).mean().dropna()
-                        if len(_wm20_diag) > 0 and float(_wc_diag.iloc[-1]) <= float(_wm20_diag.iloc[-1]):
-                            diag_mtf_filtered += 1
+                        _wc_diag   = weekly_close_cache.get(sym)
+                        _wm20_diag = weekly_ma20_cache.get(sym)
+                        if (_wc_diag is not None and _wm20_diag is not None):
+                            _wm20_d = _wm20_diag.dropna()
+                            if len(_wm20_d) > 0 and float(_wc_diag.iloc[-1]) <= float(_wm20_d.iloc[-1]):
+                                diag_mtf_filtered += 1
                     except Exception:
                         pass
 
