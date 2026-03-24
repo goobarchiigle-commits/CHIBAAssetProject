@@ -800,6 +800,10 @@ class SignalBridge:
         _blocked_by_price         = 0
         _blocked_by_liquidity     = 0
         _blocked_by_risk          = 0
+        # Step 2（価格分布ログ）・Step 3（ブレイク前距離中央値）
+        _rsr_top10_median_price   = None   # RSR Top10 の価格中央値
+        _rsr_top10_max_price      = None   # RSR Top10 の最高価格
+        _high20_distance_median   = None   # median((high20 - close) / high20) RSR通過全銘柄
         try:
             _rsr_top10 = rsr_latest.nlargest(10)
             _rsr_top10_total_score = float(_rsr_top10.sum()) or 1.0
@@ -811,18 +815,47 @@ class SignalBridge:
                     _blocked_leaders_weight += float(_lrsr)
             _blocked_leaders_weight = round(_blocked_leaders_weight / _rsr_top10_total_score, 3)
 
+            # Step 2: RSR Top10 の価格分布
+            # rsr_top10_median_price が上昇 → リーダー高価格化（リーダー集中相場の進行）
+            _top10_prices = []
+            for _lsym in _rsr_top10.index:
+                if _lsym in universe_raw:
+                    try:
+                        _top10_prices.append(float(universe_raw[_lsym]["df"]["Close"].iloc[-1]))
+                    except Exception:
+                        pass
+            if _top10_prices:
+                _rsr_top10_median_price = round(float(np.median(_top10_prices)), 0)
+                _rsr_top10_max_price    = round(float(np.max(_top10_prices)), 0)
+
+            # Step 3: 20日高値距離の中央値（RSR通過銘柄）
+            # 0.06 → 0.03 に縮小するとブレイクアウトクラスター到来のサイン
+            _distances = []
+            for _dsym in rsr_latest[rsr_latest >= _min_rsr_for_ctx].index:
+                if _dsym not in universe_raw:
+                    continue
+                try:
+                    _dclose = universe_raw[_dsym]["df"]["Close"]
+                    if len(_dclose) >= 21:
+                        _dhigh20 = float(_dclose.iloc[-21:-1].max())
+                        _dprice  = float(_dclose.iloc[-1])
+                        if _dhigh20 > 0:
+                            _distances.append((_dhigh20 - _dprice) / _dhigh20)
+                except Exception:
+                    pass
+            if _distances:
+                _high20_distance_median = round(float(np.median(_distances)), 4)
+
             # blocked_by_{reason}: RSR >= 閾値 の全銘柄を対象に理由を分類
             for _bsym in rsr_latest[rsr_latest >= _min_rsr_for_ctx].index:
                 if _bsym in active_blocked:
                     _blocked_by_risk += 1
                 elif _bsym not in self.universe_tickers:
-                    # trade_universe に存在しない = 価格フィルターで除外
                     _blocked_by_price += 1
                 elif liquidity.get(_bsym, 0) < MIN_DAILY_VALUE_YEN:
-                    # trade_universe に存在するが流動性不足
                     _blocked_by_liquidity += 1
         except Exception as _e:
-            logger.debug("blocked_leaders 計算エラー: %s", _e)
+            logger.debug("blocked_leaders/price_dist/distance 計算エラー: %s", _e)
 
         diagnostics["blocked_leaders_count"]   = _blocked_leaders_count
         diagnostics["blocked_leaders_weight"]  = _blocked_leaders_weight
@@ -830,6 +863,10 @@ class SignalBridge:
         diagnostics["blocked_by_price"]        = _blocked_by_price
         diagnostics["blocked_by_liquidity"]    = _blocked_by_liquidity
         diagnostics["blocked_by_risk"]         = _blocked_by_risk
+        diagnostics["rsr_pass_context_total"]  = _rsr_pass_context_total
+        diagnostics["rsr_top10_median_price"]  = _rsr_top10_median_price
+        diagnostics["rsr_top10_max_price"]     = _rsr_top10_max_price
+        diagnostics["high20_distance_median"]  = _high20_distance_median
 
         logger.info(
             "DIAG universe=%d rsr_pass=%d blocked_rsr=%d blocked_breakout=%d candidates=%d topk=%d"
@@ -949,18 +986,48 @@ class SignalBridge:
                 )
                 continue
 
-            n_remaining     = len(buy_candidates) - i
-            effective_slots = min(open_slots, n_remaining)
-            alloc           = total_cash / max(1, effective_slots)
-            alloc           = min(alloc, max_alloc_cap)
-
             _df_buy   = universe_raw[sig.symbol]["df"]
             ref_price = float(_df_buy["Close"].iloc[-1])
-            lot_cost  = ref_price * 100
-            qty       = int(alloc // lot_cost) * 100
+            lot_cost  = ref_price * 100  # 1単元（100株）コスト
+
+            # ── リスクベース・ポジションサイジング（ATR制御 + 配分上限の二重制御）
+            # risk_per_trade = capital × 1%（1トレード最大リスク額）
+            # qty_risk  = risk_per_trade / ATR20  （ATRベース株数）
+            # qty_cap   = alloc_cap / price        （配分上限ベース株数）
+            # qty       = min(qty_risk, qty_cap)  → 小さい方を採用
+            _risk_pct      = 0.01                              # 1% リスク
+            _risk_per_trade = self.capital * _risk_pct        # 200万 × 1% = 2万円
+            _atr_for_size  = 0.0
+            try:
+                _tr = pd.concat([
+                    _df_buy["High"] - _df_buy["Low"],
+                    (_df_buy["High"] - _df_buy["Close"].shift()).abs(),
+                    (_df_buy["Low"]  - _df_buy["Close"].shift()).abs(),
+                ], axis=1).max(axis=1)
+                _av = float(_tr.rolling(20).mean().iloc[-1])
+                if not np.isnan(_av) and _av > 0:
+                    _atr_for_size = _av
+            except Exception:
+                pass
+
+            if _atr_for_size > 0:
+                # ATRベース: 2万円 / ATR20 → 単元に丸める
+                qty_risk = int((_risk_per_trade / _atr_for_size) // 100) * 100
+            else:
+                # ATR取得失敗時は配分上限ベースにフォールバック
+                n_remaining     = len(buy_candidates) - i
+                effective_slots = min(open_slots, n_remaining)
+                _fallback_alloc = total_cash / max(1, effective_slots)
+                qty_risk = int(min(_fallback_alloc, max_alloc_cap) // lot_cost) * 100
+
+            # 配分上限キャップ（max_single_weight=15%）
+            qty_cap = int(max_alloc_cap // lot_cost) * 100
+            qty     = min(qty_risk, qty_cap)
+
             if qty <= 0:
                 warnings.append(
-                    f"{sig.symbol}: 1単元100株=¥{lot_cost:,.0f} > 配分上限¥{alloc:,.0f}"
+                    f"{sig.symbol}: リスクベースサイジング結果qty=0"
+                    f" (ATR={_atr_for_size:,.0f} risk=¥{_risk_per_trade:,.0f} price=¥{ref_price:,.0f})"
                     f" → BUY スキップ"
                 )
                 continue
@@ -1406,8 +1473,13 @@ class SignalBridge:
             "bo_pressure_raw":           _diag.get("near_breakout", 0),
             # Step 2 (観測バイアス): RSRコンテキスト全体の通過数と売買可能割合
             # 0.6以下 → 強い銘柄が価格/流動性フィルターで除外されている（候補ゼロの構造的原因）
-            "rsr_pass_context_total":    _rsr_pass_context_total,
-            "rsr_pass_tradeable_ratio":  round(_diag["rsr_pass"] / max(1, _rsr_pass_context_total), 3) if _rsr_pass_context_total > 0 else None,
+            "rsr_pass_context_total":    _diag.get("rsr_pass_context_total", 0),
+            "rsr_pass_tradeable_ratio":  round(_diag["rsr_pass"] / max(1, _diag.get("rsr_pass_context_total", 1)), 3) if _diag.get("rsr_pass_context_total", 0) > 0 else None,
+            # Step 2: RSR Top10 価格分布（上昇→リーダー高価格化 / 相場フェーズ検出）
+            "rsr_top10_median_price":    _diag.get("rsr_top10_median_price"),
+            "rsr_top10_max_price":       _diag.get("rsr_top10_max_price"),
+            # Step 3: 高値距離中央値（0.06→0.03で breakout cluster 到来サイン）
+            "high20_distance_median":    _diag.get("high20_distance_median"),
             # 供給上限診断: RSR通過銘柄のうちブレイク直前の割合（>0.25=十分 / <0.2=停滞）
             "breakout_opportunity_rate": round(_diag.get("near_breakout", 0) / max(1, _diag.get("rsr_pass", 1)), 3) if _diag.get("rsr_pass", 0) > 0 else None,
             # MTFフィルター診断: RSR通過のうち週足弱い割合（0.2〜0.4が理想 / 0.05以下ならMTF意味なし）
