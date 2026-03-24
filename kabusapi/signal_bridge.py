@@ -496,6 +496,35 @@ class SignalBridge:
         rsr_universe = calc_universe_rsr(rsr_prices)
         rsr_latest   = rsr_universe.iloc[-1]   # 最新スナップショット
 
+        # ── 週足RSR計算（同一42銘柄・日次OHLCVをresample） ──────────────
+        # 母集団は日次と完全に同一（因子の意味を壊さない）
+        # 週足 composite return: 週次シフト版（13/26/39/52週 = 3/6/9/12ヶ月）
+        # 日次 calc_composite_return のウェイト 0.4/0.2/0.2/0.2 を維持する
+        try:
+            _wc_dict: dict = {}
+            for _sym in self.rsr_universe_tickers:
+                if _sym in universe_raw:
+                    _wc_dict[_sym] = (
+                        universe_raw[_sym]["df"]["Close"]
+                        .resample("W-FRI").last()
+                        .dropna()
+                    )
+            if len(_wc_dict) >= 2:
+                _wc_df    = pd.DataFrame(_wc_dict)
+                _wr3      = _wc_df / _wc_df.shift(13) - 1               # 3ヶ月（13週）
+                _wr6      = _wc_df.shift(13) / _wc_df.shift(26) - 1     # 3〜6ヶ月
+                _wr9      = _wc_df.shift(26) / _wc_df.shift(39) - 1     # 6〜9ヶ月
+                _wr12     = _wc_df.shift(39) / _wc_df.shift(52) - 1     # 9〜12ヶ月
+                _w_comp   = 0.4 * _wr3 + 0.2 * _wr6 + 0.2 * _wr9 + 0.2 * _wr12
+                rsr_weekly_latest: pd.Series = (
+                    _w_comp.rank(axis=1, pct=True).iloc[-1] * 100
+                ).clip(0, 100)
+            else:
+                rsr_weekly_latest = pd.Series(dtype=float)
+        except Exception as _e:
+            logger.warning("週足RSR計算エラー（スキップ）: %s", _e)
+            rsr_weekly_latest = pd.Series(dtype=float)
+
         # Step 2 (観測バイアス): RSRコンテキスト全体の通過数を記録
         # 売買ユニバースが RSR42 の部分集合のため、強い銘柄が価格フィルターで
         # 除外されると diag_rsr_pass が低いまま固定される問題を検出する。
@@ -564,8 +593,13 @@ class SignalBridge:
         diag_near_breakout   = 0
         # False Breakout診断（entry後5日以内 かつ -2ATR到達）
         diag_failed_breakout  = 0
-        # MTFフィルター診断: RSR通過したが週足MA20で落ちる銘柄数（診断のみ・実際はフィルターしない）
-        diag_mtf_filtered     = 0
+        # MTFフィルター（実際に適用）: RSR日次>=75 AND 週足RSR>=70 AND 週足MA20
+        # mtf_candidates = RSR日次通過数 / mtf_pass = 3条件すべて通過数
+        diag_mtf_candidates   = 0   # RSR日次>=75 の銘柄数（MTF対象母数）
+        diag_mtf_filtered     = 0   # 週足MA20フィルターで落ちた数（後方互換）
+        diag_mtf_wrsr_pass    = 0   # 週足RSR>=70 通過数
+        diag_mtf_wma_pass     = 0   # 週足MA20 通過数
+        diag_mtf_full_pass    = 0   # 3条件すべて通過数（実エントリー候補）
 
         # ── シグナル生成ループ ───────────────────────────────────────
         signals: list[StockSignal] = []
@@ -654,6 +688,41 @@ class SignalBridge:
                     else:
                         signal_int, strategy_type = 0, "fujiko"
 
+                # ── MTFフィルター（BUYシグナルにのみ適用）────────────────
+                # 条件: 週足RSR >= 70 AND 週足終値 > 週足MA20
+                # ダマシブレイク -30〜40% 削減効果。SELLには影響しない。
+                if signal_int == 1 and rsr_now >= min_rsr_threshold:
+                    diag_mtf_candidates += 1
+                    _rsr_weekly_now = float(rsr_weekly_latest.get(sym, 0.0))
+                    _weekly_ma_ok   = False
+                    try:
+                        _wc  = df["Close"].resample("W-FRI").last().dropna()
+                        _wm20 = _wc.rolling(20).mean().dropna()
+                        if len(_wm20) >= 5:
+                            _weekly_ma_ok = float(_wc.iloc[-1]) > float(_wm20.iloc[-1])
+                    except Exception:
+                        _weekly_ma_ok = True  # 計算不能は通過扱い（保守的）
+                    _wrsr_ok = _rsr_weekly_now >= 70.0
+                    if _wrsr_ok:
+                        diag_mtf_wrsr_pass += 1
+                    if _weekly_ma_ok:
+                        diag_mtf_wma_pass  += 1
+                    if _wrsr_ok and _weekly_ma_ok:
+                        diag_mtf_full_pass += 1
+                    else:
+                        # MTFフィルター不通過 → BUYを抑制
+                        signal_int = 0
+                        strategy_type = "fujiko"
+                        _mtf_reason = []
+                        if not _wrsr_ok:
+                            _mtf_reason.append(f"weekly_RSR={_rsr_weekly_now:.1f}<70")
+                        if not _weekly_ma_ok:
+                            _mtf_reason.append("weekly_close<=MA20")
+                        reason = (
+                            f"HOLD[MTF弱]: {' / '.join(_mtf_reason)}"
+                            f" daily_RSR={rsr_now:.1f} rank={rsr_rank}"
+                        )
+
                 strat_label = "フジコ法" if strategy_type == "fujiko" else "平均回帰"
                 if signal_int == 1:
                     reason = (
@@ -664,7 +733,7 @@ class SignalBridge:
                     reason = (
                         f"SELL[{strat_label}]: RSR={rsr_now:.1f} mom={mom_now:+.1f}"
                     )
-                else:
+                elif signal_int == 0 and not reason.startswith("HOLD[MTF"):
                     reason = (
                         f"HOLD: RSR={rsr_now:.1f} rank={rsr_rank}"
                         f" SEPA={sepa_now} ({strat_label})"
@@ -683,11 +752,12 @@ class SignalBridge:
                 if rsr_now >= min_rsr_threshold:
                     diag_rsr_pass += 1
 
-                    # Step 2: MTFフィルター診断（週足MA20 < close なら週足弱い）
+                    # Step 2: MTFフィルター診断（後方互換: 週足MA20 < close なら diag_mtf_filtered++）
+                    # 実際のフィルター処理はシグナルループ内で実施済み
                     try:
-                        _wc = df["Close"].resample("W-FRI").last().dropna()
-                        _wm20 = _wc.rolling(20).mean().dropna()
-                        if len(_wm20) > 0 and float(_wc.iloc[-1]) <= float(_wm20.iloc[-1]):
+                        _wc_diag = df["Close"].resample("W-FRI").last().dropna()
+                        _wm20_diag = _wc_diag.rolling(20).mean().dropna()
+                        if len(_wm20_diag) > 0 and float(_wc_diag.iloc[-1]) <= float(_wm20_diag.iloc[-1]):
                             diag_mtf_filtered += 1
                     except Exception:
                         pass
@@ -783,8 +853,12 @@ class SignalBridge:
             "near_breakout":      diag_near_breakout,
             # False Breakout: 保有中 かつ entry後5日以内 かつ -2ATR到達した銘柄数
             "failed_breakout":    diag_failed_breakout,
-            # MTFフィルター: RSR通過したが週足MA20弱で落ちる銘柄数（診断のみ）
-            "mtf_filtered":       diag_mtf_filtered,
+            # MTFフィルター（実適用）: 3条件 pass/候補
+            "mtf_filtered":       diag_mtf_filtered,     # 後方互換（週足MA20不通過数）
+            "mtf_candidates":     diag_mtf_candidates,   # RSR日次>=75 のBUY候補数
+            "mtf_wrsr_pass":      diag_mtf_wrsr_pass,    # 週足RSR>=70 通過数
+            "mtf_wma_pass":       diag_mtf_wma_pass,     # 週足MA20 通過数
+            "mtf_full_pass":      diag_mtf_full_pass,    # 3条件すべて通過（実エントリー候補）
         }
 
         # ── 構造的ボトルネック診断（シグナルループ後に一括計算） ──────
@@ -1590,9 +1664,19 @@ class SignalBridge:
             "missed_breakout_count":     _missed_breakout_count,
             # 供給上限診断: RSR通過銘柄のうちブレイク直前の割合（>0.25=十分 / <0.2=停滞）
             "breakout_opportunity_rate": round(_diag.get("near_breakout", 0) / max(1, _diag.get("rsr_pass", 1)), 3) if _diag.get("rsr_pass", 0) > 0 else None,
-            # MTFフィルター診断: RSR通過のうち週足弱い割合（0.2〜0.4が理想 / 0.05以下ならMTF意味なし）
+            # MTFフィルター診断（後方互換）
             "mtf_filtered_candidates": _diag.get("mtf_filtered", 0),
             "mtf_filter_rate":         round(_diag.get("mtf_filtered", 0) / max(1, _diag.get("rsr_pass", 1)), 3) if _diag.get("rsr_pass", 0) > 0 else None,
+            # MTF実装（Step 3）: pass率ログ
+            # mtf_pass_rate = 3条件通過 / 候補数
+            # 0.0 → 市場トレンドなし / 0.3以上 → 相場が来ている
+            "mtf_candidates":    _diag.get("mtf_candidates", 0),
+            "mtf_wrsr_pass":     _diag.get("mtf_wrsr_pass", 0),
+            "mtf_wma_pass":      _diag.get("mtf_wma_pass", 0),
+            "mtf_full_pass":     _diag.get("mtf_full_pass", 0),
+            "mtf_pass_rate":     round(
+                _diag.get("mtf_full_pass", 0) / max(1, _diag.get("mtf_candidates", 1)), 3
+            ) if _diag.get("mtf_candidates", 0) > 0 else None,
         }
         with _diag_path.open("a", encoding="utf-8") as _f:
             _f.write(_json.dumps(_metrics, ensure_ascii=False) + "\n")
