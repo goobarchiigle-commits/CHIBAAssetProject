@@ -1315,55 +1315,94 @@ class SignalBridge:
     # ------------------------------------------------------------------ #
     def _build_shadow_orders(
         self,
-        diag:              dict,
-        universe_raw:      dict,
-        current_positions: dict,
-        available_cash:    float,
-        cb_active:         bool,
-        live_orders:       list,          # 既存live注文（重複防止用）
-        shadow_slots:      int   = 1,
-        shadow_rsr_min:    float = 70.0,
-        shadow_rsr_pass_min: int = 8,
-    ) -> tuple[list, dict]:
+        diag:                    dict,
+        universe_raw:            dict,
+        current_positions:       dict,
+        available_cash:          float,
+        cb_active:               bool,
+        live_orders:             list,
+        shadow_virtual_positions: dict,   # {sym: {"entry_price": float, "entry_date": str, "virtual": True}}
+        today_str:               str,
+        shadow_slots:            int   = 1,
+        shadow_rsr_min:          float = 70.0,
+        shadow_rsr_pass_min:     int   = 8,
+    ) -> tuple[list, dict, dict, list]:
         """
         Shadow Universe から条件付きBUY注文を生成する（Phase1）。
 
         条件（すべて満たす場合のみ発動）:
           1. CB NORMAL かつ shadow_rsr_pass >= shadow_rsr_pass_min (=8)
-          2. shadow_rsr62 >= shadow_rsr_min (=70.0)  ← RSR62コンテキストでの絶対基準
-          3. shadow_rsr62 > live_top10_median         ← live銘柄上位10本の中央値超え
+          2. shadow_rsr62 >= shadow_rsr_min (=70.0)
+          3. shadow_rsr62 > live_top10_median
           4. 価格フィルター: price * 100 <= max_alloc_cap
           5. 未保有 かつ live注文と重複なし
 
-        発注上限: shadow_slots=1（live max3 + shadow 1 = 合計最大4）
+        blocked_by_alloc でも仮想エントリーを記録し、研究データを生成する。
+        仮想エントリーの決済: RSR < shadow_rsr_min に低下した時点で自動計算。
+
+        Returns: (orders, shadow_metrics, new_virtual_positions, closed_virtual_syms)
         """
         shadow_metrics = {
-            "shadow_signal_count":     0,
-            "shadow_entry_count":      0,
-            "shadow_blocked_by_alloc": 0,
-            "shadow_rsr_pass_met":     False,
+            "shadow_signal_count":       0,
+            "shadow_entry_count":        0,
+            "shadow_blocked_by_alloc":   0,
+            "shadow_rsr_pass_met":       False,
+            "shadow_virtual_entries":    [],   # 今回新規記録した仮想エントリー
+            "shadow_virtual_closed":     [],   # 今回決済した仮想エントリー
+            "shadow_virtual_open_count": 0,    # 現在オープン中の仮想エントリー数
         }
         orders: list[OrderInstruction] = []
+        new_virtual: dict  = {}   # portfolio_state に追加するもの
+        closed_syms: list  = []   # portfolio_state から削除するもの
+
+        _shadow_rsr62 = diag.get("shadow_rsr62_scores", {})
+
+        # ── 仮想エントリーの決済チェック（RSR < shadow_rsr_min で自動決済）───
+        for sym, vpos in shadow_virtual_positions.items():
+            rsr62 = _shadow_rsr62.get(sym, 0.0)
+            if rsr62 < shadow_rsr_min:   # RSR低下 → 仮想決済
+                entry_price = vpos.get("entry_price", 0.0)
+                if entry_price > 0 and sym in universe_raw:
+                    try:
+                        exit_price = float(universe_raw[sym]["df"]["Close"].iloc[-1])
+                        ret        = round((exit_price / entry_price) - 1, 4)
+                        logger.info(
+                            "SHADOW_VIRTUAL_CLOSE: %s entry=¥%.0f exit=¥%.0f return=%.2f%%",
+                            sym, entry_price, exit_price, ret * 100,
+                        )
+                        shadow_metrics["shadow_virtual_closed"].append({
+                            "symbol":      sym,
+                            "entry_price": entry_price,
+                            "exit_price":  round(exit_price, 0),
+                            "return":      ret,
+                            "entry_date":  vpos.get("entry_date"),
+                            "exit_date":   today_str,
+                        })
+                    except Exception:
+                        pass
+                closed_syms.append(sym)
+
+        shadow_metrics["shadow_virtual_open_count"] = (
+            len(shadow_virtual_positions) - len(closed_syms)
+        )
 
         # ── 発動条件チェック ───────────────────────────────────────────────
         _srsr_pass = diag.get("shadow_rsr_pass", 0)
         shadow_metrics["shadow_rsr_pass_met"] = _srsr_pass >= shadow_rsr_pass_min
         if cb_active or _srsr_pass < shadow_rsr_pass_min:
-            return orders, shadow_metrics
+            return orders, shadow_metrics, new_virtual, closed_syms
 
         # ── live Top10 RSR 中央値 ──────────────────────────────────────────
         _top10_rsrs = [e["rsr"] for e in diag.get("rsr_distribution", [])[:10]]
         if not _top10_rsrs:
-            return orders, shadow_metrics
+            return orders, shadow_metrics, new_virtual, closed_syms
         _live_top10_median = float(np.median(_top10_rsrs))
 
         # ── RSR62スコアで候補を絞る ────────────────────────────────────────
-        _shadow_rsr62 = diag.get("shadow_rsr62_scores", {})
         _live_order_syms = {o.symbol for o in live_orders}
         _held_syms       = set(current_positions.keys())
         _max_alloc_cap   = self.capital * self.max_single_weight
 
-        # 候補: rsr62 >= min かつ live中央値超え かつ 未保有 かつ live注文と重複なし
         _candidates: list[tuple[float, str]] = []
         for sym, rsr62 in _shadow_rsr62.items():
             if rsr62 < shadow_rsr_min:
@@ -1395,6 +1434,21 @@ class SignalBridge:
                     "SHADOW blocked_by_alloc: %s ¥%.0f/単元 > 上限¥%.0f",
                     sym, _cost, _max_alloc_cap,
                 )
+                # 仮想エントリー記録（blockedでも研究データとして記録）
+                if sym not in shadow_virtual_positions and sym not in _held_syms:
+                    new_virtual[sym] = {
+                        "entry_price": round(_price, 0),
+                        "entry_date":  today_str,
+                        "virtual":     True,
+                        "rsr62":       round(rsr62, 1),
+                    }
+                    logger.info(
+                        "SHADOW_VIRTUAL_ENTRY: %s @ ¥%.0f RSR62=%.1f (blocked_by_alloc)",
+                        sym, _price, rsr62,
+                    )
+                    shadow_metrics["shadow_virtual_entries"].append({
+                        "symbol": sym, "entry_price": round(_price, 0), "rsr62": round(rsr62, 1),
+                    })
                 continue
 
             # 余力チェック
@@ -1438,7 +1492,7 @@ class SignalBridge:
                 len(orders), [o.symbol for o in orders],
                 shadow_rsr_min, _live_top10_median,
             )
-        return orders, shadow_metrics
+        return orders, shadow_metrics, new_virtual, closed_syms
 
     def _build_orders(
         self,
@@ -1942,18 +1996,27 @@ class SignalBridge:
 
         # 6b. Shadow Phase1 注文生成（live orders に追加・既存ロジック不変）
         # 条件: CB NORMAL AND shadow_rsr_pass>=8 AND rsr62>=70 AND rsr62>live_top10_median
+        # blocked_by_alloc でも仮想エントリーを記録して研究データを生成する
         _cash_after_live_buys = (
             available_cash
             - sum(o.estimated_amount for o in orders if o.side == "BUY")
         )
-        shadow_orders, _shadow_metrics = self._build_shadow_orders(
-            diag              = _diag,
-            universe_raw      = universe_raw,
-            current_positions = current_positions,
-            available_cash    = _cash_after_live_buys,
-            cb_active         = cb_active,
-            live_orders       = orders,
+        _shadow_virtual_positions = portfolio_state.get("shadow_virtual_positions", {})
+        shadow_orders, _shadow_metrics, _new_virtual, _closed_virtual = self._build_shadow_orders(
+            diag                     = _diag,
+            universe_raw             = universe_raw,
+            current_positions        = current_positions,
+            available_cash           = _cash_after_live_buys,
+            cb_active                = cb_active,
+            live_orders              = orders,
+            shadow_virtual_positions = _shadow_virtual_positions,
+            today_str                = today_str,
         )
+        # 仮想ポジション状態を portfolio_state に反映（決済→削除、新規→追加）
+        for sym in _closed_virtual:
+            _shadow_virtual_positions.pop(sym, None)
+        _shadow_virtual_positions.update(_new_virtual)
+        portfolio_state["shadow_virtual_positions"] = _shadow_virtual_positions
         orders = orders + shadow_orders
 
         # 6c. LIVE_STATE サマリーログ（戦略停止 / 市場悪化 / フィルター過剰 の切り分け用）
@@ -2229,10 +2292,13 @@ class SignalBridge:
             # shadow_entry_count:      実際に発注した件数（≤ shadow_slots=1）
             # shadow_blocked_by_alloc: 価格上限でブロックされた件数
             # shadow_rsr_pass_met:     発動条件（rsr_pass>=8）を満たしているか
-            "shadow_signal_count":     _shadow_metrics.get("shadow_signal_count",     0),
-            "shadow_entry_count":      _shadow_metrics.get("shadow_entry_count",      0),
-            "shadow_blocked_by_alloc": _shadow_metrics.get("shadow_blocked_by_alloc", 0),
-            "shadow_rsr_pass_met":     _shadow_metrics.get("shadow_rsr_pass_met",     False),
+            "shadow_signal_count":         _shadow_metrics.get("shadow_signal_count",         0),
+            "shadow_entry_count":          _shadow_metrics.get("shadow_entry_count",          0),
+            "shadow_blocked_by_alloc":     _shadow_metrics.get("shadow_blocked_by_alloc",     0),
+            "shadow_rsr_pass_met":         _shadow_metrics.get("shadow_rsr_pass_met",         False),
+            "shadow_virtual_open_count":   _shadow_metrics.get("shadow_virtual_open_count",   0),
+            "shadow_virtual_entries":      _shadow_metrics.get("shadow_virtual_entries",       []),
+            "shadow_virtual_closed":       _shadow_metrics.get("shadow_virtual_closed",        []),
         }
         # Step 2: Shadow昇格トリガー判定
         # rsr_pass >= 8 OR near_breakout >= 3 で警告出力（自動昇格は行わない・要ユーザー確認）

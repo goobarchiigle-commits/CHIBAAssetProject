@@ -392,13 +392,16 @@ logger.info(
 
 CAPITAL              = int(os.environ.get("CAPITAL", 2_000_000))  # .env の CAPITAL= で上書き可
 _RISK_PARAMS         = derive_risk_params(CAPITAL)               # 資本連動パラメータ（全体で一貫して使用）
-MAX_SINGLE_WEIGHT    = 0.20     # 1銘柄最大ウェイト（capital * 20%）
+MAX_SINGLE_WEIGHT    = 0.30     # 1銘柄最大ウェイト（capital * 30% = ¥600,000/200万）
+# 変更履歴: 0.20 → 0.30 (2026-03-25)
+# 理由: RSR上位銘柄（高時価総額）が単元価格¥400,000超で構造的排除されていた。
+#       日本株RSR戦略では equity×30%（単元許可型）が最も安定。
 MAX_POS              = 3        # top_k と一致させる（確定設計 2026-03-23）
 MIN_SECTORS          = 1        # セクター制約なし
 MAX_DD_LIMIT         = 0.15
 TOP_K                = 3        # RSR 上位 k 銘柄のみ BUY 対象（確定設計 2026-03-23）
 MAX_HOLD_DAYS        = 60       # 最大保有営業日数（OOS MaxDD -13.98% 確認済み）
-MAX_NEW_POS_PER_DAY  = 2        # 1回の実行で生成する新規 BUY 上限
+MAX_NEW_POS_PER_DAY  = 1        # 1回の実行で生成する新規 BUY 上限（過剰発注防止・初期運用安定化）
 
 
 def parse_args() -> argparse.Namespace:
