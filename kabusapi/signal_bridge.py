@@ -768,6 +768,13 @@ class SignalBridge:
         rsr_universe = calc_universe_rsr(rsr_prices)
         rsr_latest   = rsr_universe.iloc[-1]   # 最新スナップショット
 
+        # ── クラスタ相場検出（早期計算 — シグナルループ・Shadow昇格より前に必要）────
+        # Step1/2/3 で参照するため rsr_latest 取得直後に計算する
+        _pre_ctx_size      = max(1, len(rsr_latest))
+        _pre_rsr_gt80      = int((rsr_latest >= 80).sum())
+        _pre_cluster_mode  = (_pre_rsr_gt80 / _pre_ctx_size) >= 0.15  # 15%以上でcluster
+        # ↑ 後段の _trend_cluster_mode と同値。ログは後段でまとめて出力する。
+
         # ── Shadow Universe RSR（監視専用・RSR42母集団と独立して計算）─────
         # RSR計算母集団（42銘柄）は絶対に変更しない。
         # Shadow poolは独自の相対強度順位を持ち、rsr_pass >= 65 の銘柄数を診断ログに記録する。
@@ -801,9 +808,11 @@ class SignalBridge:
                         "Shadow Universe: pool=%d rsr_pass(>=65)=%d near_breakout=%d",
                         len(_shadow_prices), _shadow_rsr_pass, _shadow_near_bo,
                     )
-                    # 昇格候補: Shadow pool内で RSR>=68 かつ 価格<=¥8,000（1単元≤¥800,000）
-                    # → 実際に昇格させるかはユーザー判断（自動昇格はしない）
-                    _SHADOW_PROMO_RSR   = 68.0
+                    # 昇格候補: Shadow pool内で RSR閾値超え かつ 価格<=¥8,000（1単元≤¥800,000）
+                    # cluster_mode中はRSR>=90・top2に絞る（クラスタ相場では真の強者のみ昇格）
+                    # 通常時: RSR>=68・top6
+                    _SHADOW_PROMO_RSR   = 90.0 if _pre_cluster_mode else 68.0
+                    _SHADOW_PROMO_LIMIT = 2    if _pre_cluster_mode else 6
                     _SHADOW_PROMO_PRICE = 8_000
                     _shadow_promo_cands: list[str] = []
                     for _sp_sym in _shadow_rsr_latest[_shadow_rsr_latest >= _SHADOW_PROMO_RSR].index:
@@ -816,7 +825,7 @@ class SignalBridge:
                             except Exception:
                                 pass
                     _shadow_promo_cands.sort(reverse=True)
-                    _shadow_promo_list = [s for _, s, _ in _shadow_promo_cands[:6]]
+                    _shadow_promo_list = [s for _, s, _ in _shadow_promo_cands[:_SHADOW_PROMO_LIMIT]]
                     if _shadow_promo_list:
                         logger.info(
                             "Shadow昇格候補(%d銘柄): %s",
@@ -1007,6 +1016,16 @@ class SignalBridge:
                     signal_int, strategy_type = f_signal, "fujiko"
                 elif rule == "mean_rev":
                     signal_int, strategy_type = m_signal, "mean_rev"
+                    # TREND_CLUSTER_MODE中はmean_rev BUYをブロック
+                    # 理由: クラスタ相場 = 資金が特定セクターに集中 = 逆張りは構造的弱化に逆らう
+                    # 2026-03-16の5411.T(鉄鋼)エントリーがこのパターンで損失
+                    if signal_int == 1 and _pre_cluster_mode:
+                        signal_int    = 0
+                        strategy_type = "mean_rev"
+                        reason = (
+                            f"HOLD[cluster_block]: {sector}(mean_rev) BUYブロック"
+                            f" cluster_mode=True rsr80_share={_pre_rsr_gt80}/{_pre_ctx_size}"
+                        )
                 else:  # dynamic
                     if f_signal == 1:
                         signal_int, strategy_type = 1, "fujiko"
