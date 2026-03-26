@@ -52,6 +52,18 @@ REENTRY_COOLDOWN_TRADING_DAYS = 5             # 時間ストップ後の再エ�
 MIN_DAILY_VALUE_YEN           = 5_000_000_000 # 流動性フィルター（5B 円/日）
 ORDER_RATE_LIMIT_PER_MIN      = 3             # kabu API 発注レート（件/分）
 
+# ── mean_rev 反発未発生検出 ──────────────────────────────────────
+# エントリー後 MEANREV_FAIL_DAYS 営業日以内に High が
+# entry_price × (1 + MEANREV_MIN_BOUNCE) に到達しなかった場合は早期撤退
+MEANREV_FAIL_DAYS    = int(os.environ.get("MEANREV_FAIL_DAYS",    "4"))
+MEANREV_MIN_BOUNCE   = float(os.environ.get("MEANREV_MIN_BOUNCE", "0.01"))
+
+# ── クラスタ相場 2段階制御 ─────────────────────────────────────
+# level1 (density >= 15%): mean_rev 新規 BUY 停止
+# level2 (density >= 25%): momentum 偏重（MOM_WEIGHT_ADJ を更に引き上げ）
+CLUSTER_LEVEL1_THRESH = float(os.environ.get("CLUSTER_LEVEL1_THRESH", "0.15"))
+CLUSTER_LEVEL2_THRESH = float(os.environ.get("CLUSTER_LEVEL2_THRESH", "0.25"))
+
 
 # ------------------------------------------------------------------ #
 # モジュールレベル ユーティリティ
@@ -162,7 +174,8 @@ class OrderInstruction:
     estimated_price:  float
     estimated_amount: float
     reason:           str
-    atr20:            float = 0.0  # BUY時ATR20（False Breakout診断用）
+    atr20:            float = 0.0   # BUY時ATR20（False Breakout診断用）
+    strategy_type:    str   = ""    # "fujiko" / "mean_rev"（mean_rev反発検出で参照）
 
 
 @dataclass
@@ -772,7 +785,18 @@ class SignalBridge:
         # Step1/2/3 で参照するため rsr_latest 取得直後に計算する
         _pre_ctx_size      = max(1, len(rsr_latest))
         _pre_rsr_gt80      = int((rsr_latest >= 80).sum())
-        _pre_cluster_mode  = (_pre_rsr_gt80 / _pre_ctx_size) >= 0.15  # 15%以上でcluster
+        _pre_density       = _pre_rsr_gt80 / _pre_ctx_size
+        # 2段階クラスタレベル
+        #   level 0: 通常相場
+        #   level 1 (density >= CLUSTER_LEVEL1_THRESH): mean_rev 新規 BUY 停止
+        #   level 2 (density >= CLUSTER_LEVEL2_THRESH): momentum 偏重 + Shadow昇格厳格化
+        if _pre_density >= CLUSTER_LEVEL2_THRESH:
+            _pre_cluster_level = 2
+        elif _pre_density >= CLUSTER_LEVEL1_THRESH:
+            _pre_cluster_level = 1
+        else:
+            _pre_cluster_level = 0
+        _pre_cluster_mode  = _pre_cluster_level >= 1  # 後方互換（level1以上 = cluster_mode）
         # ↑ 後段の _trend_cluster_mode と同値。ログは後段でまとめて出力する。
 
         # ── Shadow Universe RSR（監視専用・RSR42母集団と独立して計算）─────
@@ -809,19 +833,40 @@ class SignalBridge:
                         len(_shadow_prices), _shadow_rsr_pass, _shadow_near_bo,
                     )
                     # 昇格候補: Shadow pool内で RSR閾値超え かつ 価格<=¥8,000（1単元≤¥800,000）
-                    # cluster_mode中はRSR>=90・top2に絞る（クラスタ相場では真の強者のみ昇格）
-                    # 通常時: RSR>=68・top6
-                    _SHADOW_PROMO_RSR   = 90.0 if _pre_cluster_mode else 68.0
-                    _SHADOW_PROMO_LIMIT = 2    if _pre_cluster_mode else 6
+                    # cluster level2: RSR>=90・top2（真の強者のみ昇格）
+                    # cluster level1: RSR>=80・top4
+                    # 通常時:         RSR>=68・top6
+                    # スコア = RSR + 0.5 × RSRモメンタム（コツコツ上昇を優遇）
+                    if _pre_cluster_level >= 2:
+                        _SHADOW_PROMO_RSR   = 90.0
+                        _SHADOW_PROMO_LIMIT = 2
+                    elif _pre_cluster_level == 1:
+                        _SHADOW_PROMO_RSR   = 80.0
+                        _SHADOW_PROMO_LIMIT = 4
+                    else:
+                        _SHADOW_PROMO_RSR   = 68.0
+                        _SHADOW_PROMO_LIMIT = 6
                     _SHADOW_PROMO_PRICE = 8_000
-                    _shadow_promo_cands: list[str] = []
+                    _shadow_promo_cands: list[tuple[float, str, float]] = []
                     for _sp_sym in _shadow_rsr_latest[_shadow_rsr_latest >= _SHADOW_PROMO_RSR].index:
                         if _sp_sym in universe_raw:
                             try:
                                 _sp_price = float(universe_raw[_sp_sym]["df"]["Close"].iloc[-1])
                                 if _sp_price <= _SHADOW_PROMO_PRICE:
-                                    _sp_rsr = float(_shadow_rsr_latest[_sp_sym])
-                                    _shadow_promo_cands.append((_sp_rsr, _sp_sym, round(_sp_price, 0)))
+                                    _sp_rsr   = float(_shadow_rsr_latest[_sp_sym])
+                                    # RSRモメンタム（21日+5日加重）を composite score に加算
+                                    # mom = 0.7×mom21 + 0.3×mom5 で急騰ピーク銘柄を抑制し
+                                    # 「上昇中の初動銘柄」を優遇する
+                                    try:
+                                        _sp_rsr_series = _shadow_rsr_u[_sp_sym].dropna()
+                                        _n = len(_sp_rsr_series)
+                                        _mom21 = float(_sp_rsr_series.iloc[-1] - _sp_rsr_series.iloc[-22]) if _n >= 22 else 0.0
+                                        _mom5  = float(_sp_rsr_series.iloc[-1] - _sp_rsr_series.iloc[-6])  if _n >= 6  else 0.0
+                                        _sp_mom = 0.7 * _mom21 + 0.3 * _mom5
+                                    except Exception:
+                                        _sp_mom = 0.0
+                                    _sp_score = _sp_rsr + 0.5 * _sp_mom
+                                    _shadow_promo_cands.append((_sp_score, _sp_sym, round(_sp_price, 0)))
                             except Exception:
                                 pass
                     _shadow_promo_cands.sort(reverse=True)
@@ -861,20 +906,30 @@ class SignalBridge:
         _rsr_gt80_context  = int((rsr_latest >= 80).sum())
         _rsr_gt70_context  = int((rsr_latest >= 70).sum())
         _rsr_top_share     = round(_rsr_gt80_context / _ctx_size, 3)
-        _trend_cluster_mode = _rsr_top_share > 0.10   # RSR80以上が10%超 = 集中相場
-        if _trend_cluster_mode:
+        # 2段階クラスタレベル（_pre_cluster_level と同値。ここでは後段ログ用に再参照）
+        _trend_cluster_mode  = _pre_cluster_level >= 1   # 後方互換
+        _trend_cluster_level = _pre_cluster_level        # 2段階制御に使用
+        if _trend_cluster_level == 2:
             logger.warning(
-                "TREND_CLUSTER_MODE: RSR80以上=%d/%d (%.1f%%) > 10%% "
-                "→ エントリー銘柄集中リスク。モメンタム相場に注意",
+                "TREND_CLUSTER_MODE level2: RSR80以上=%d/%d (%.1f%%) >= %.0f%% "
+                "→ momentum偏重 + mean_rev全停止 + Shadow昇格RSR≥90",
                 _rsr_gt80_context, _ctx_size, _rsr_top_share * 100,
+                CLUSTER_LEVEL2_THRESH * 100,
+            )
+        elif _trend_cluster_level == 1:
+            logger.warning(
+                "TREND_CLUSTER_MODE level1: RSR80以上=%d/%d (%.1f%%) >= %.0f%% "
+                "→ mean_rev BUY停止 + Shadow昇格RSR≥80",
+                _rsr_gt80_context, _ctx_size, _rsr_top_share * 100,
+                CLUSTER_LEVEL1_THRESH * 100,
             )
 
         logger.info(
             "RSR コンテキスト: %d 銘柄（統一42銘柄）context_pass=%d "
-            "RSR80以上=%d(%.1f%%) RSR70以上=%d cluster=%s",
+            "RSR80以上=%d(%.1f%%) RSR70以上=%d cluster_level=%d",
             len(rsr_prices), _rsr_pass_context_total,
             _rsr_gt80_context, _rsr_top_share * 100,
-            _rsr_gt70_context, _trend_cluster_mode,
+            _rsr_gt70_context, _trend_cluster_level,
         )
 
         # ── 流動性スコア（Volume × Close の 20 日平均） ───────────────
@@ -982,8 +1037,38 @@ class SignalBridge:
             m_signal = mr_strat.generate_signal(df)
 
             # ── filter-first アーキテクチャ（research と同じ） ───────────
-            # 優先順位: 時間ストップ > RSR低下エグジット > 再エントリー禁止 > 戦略シグナル
+            # 優先順位: 時間ストップ > RSR低下エグジット > mean_rev反発失敗 > 再エントリー禁止 > 戦略シグナル
             is_rank_exit = currently_holding and rsr_now < min_rsr_threshold
+
+            # ── mean_rev 反発未発生検出（早期撤退）────────────────────────
+            # エントリー後 MEANREV_FAIL_DAYS 営業日で High が +MEANREV_MIN_BOUNCE 未到達 → SELL
+            # 平均回帰戦略のエントリー後に反発が発生しない場合、構造的下落の可能性が高い
+            is_meanrev_fail  = False
+            _meanrev_bounce  = 0.0
+            _meanrev_strategy_type: str | None = None
+            if (currently_holding
+                    and sym in pos_entry_prices
+                    and sym in pos_entry_dates):
+                # このシンボルの保有戦略タイプを portfolio_state から取得
+                _pos_strategy = portfolio_state.get("position_strategy_types", {}).get(sym, "")
+                if _pos_strategy == "mean_rev":
+                    _mr_entry_price = float(pos_entry_prices[sym])
+                    _mr_entry_date  = pos_entry_dates[sym]
+                    try:
+                        _entry_ts    = pd.Timestamp(_mr_entry_date)
+                        _high_since  = float(df.loc[df.index >= _entry_ts, "High"].max()) if _mr_entry_price > 0 else 0.0
+                        _close_now   = float(df["Close"].iloc[-1])
+                        _meanrev_bounce = (_high_since - _mr_entry_price) / max(1.0, _mr_entry_price)
+                        # 2条件AND: 反発未到達 かつ 現在値がエントリー比-0.5%以下
+                        # 後者はギャップダウン後の弱トレンド継続を捕捉する
+                        _below_entry = _close_now < _mr_entry_price * 0.995
+                        if (hold_td >= MEANREV_FAIL_DAYS
+                                and _meanrev_bounce < MEANREV_MIN_BOUNCE
+                                and _below_entry):
+                            is_meanrev_fail = True
+                            _meanrev_strategy_type = "mean_rev"
+                    except Exception:
+                        pass
 
             if is_time_exit:
                 signal_int    = -1
@@ -999,6 +1084,15 @@ class SignalBridge:
                 reason = (
                     f"SELL[RSR低下]: RSR={rsr_now:.1f} < 閾値{min_rsr_threshold:.0f}"
                     f" rank={rsr_rank}"
+                )
+
+            elif is_meanrev_fail:
+                signal_int    = -1
+                strategy_type = "mean_rev"
+                reason = (
+                    f"SELL[meanrev_fail]: {hold_td}日保有"
+                    f" bounce={_meanrev_bounce:+.2%}<{MEANREV_MIN_BOUNCE:.1%}"
+                    f" close<entry×0.995 → 反発未発生・構造的下落と判断"
                 )
 
             elif sym in active_blocked:
@@ -1164,9 +1258,14 @@ class SignalBridge:
         # composite = RSR + RSR_momentum × MOM_WEIGHT_ADJ
         # 効果: 上昇加速中の銘柄が同RSRの停滞銘柄より優先される（モメンタム相場で有効）
         # MOM_WEIGHT_ADJ=0.3 → "RSRモメンタム1.0→1.3倍"相当
-        _MOM_WEIGHT_ADJ = 0.3   # trend_cluster_mode 時は 0.4 に引き上げ
-        if _trend_cluster_mode:
-            _MOM_WEIGHT_ADJ = 0.4
+        # level0=0.3（通常）/ level1=0.5（mean_rev停止相場）/ level2=0.7（完全トレンド支配）
+        # level2(density>=25%)は市場がトレンド一辺倒になっているため
+        # モメンタム加速中の上位1〜3銘柄への集中度を最大化する
+        _MOM_WEIGHT_ADJ = 0.3
+        if _trend_cluster_level == 1:
+            _MOM_WEIGHT_ADJ = 0.5
+        elif _trend_cluster_level >= 2:
+            _MOM_WEIGHT_ADJ = 0.7
         buy_eligible = sorted(
             [(s.rsr + s.rsr_mom * _MOM_WEIGHT_ADJ, s.symbol)
              for s in signals if s.signal == 1 and not s.currently_holding],
@@ -1193,10 +1292,11 @@ class SignalBridge:
             "avg_tradeable_rsr":  _avg_tradeable_rsr,
             "rsr_distribution":   rsr_dist_sorted[:20],
             # Step 2: supply ceiling（live 28銘柄内）
-            "rsr_gt80_context":   _rsr_gt80_context,   # 62銘柄中RSR80以上
-            "rsr_gt70_context":   _rsr_gt70_context,   # 62銘柄中RSR70以上
-            "rsr_top_share":      _rsr_top_share,       # RSR80以上の比率（>0.10でcluster）
-            "trend_cluster_mode": _trend_cluster_mode,  # True = モメンタム集中相場
+            "rsr_gt80_context":    _rsr_gt80_context,    # 62銘柄中RSR80以上
+            "rsr_gt70_context":    _rsr_gt70_context,    # 62銘柄中RSR70以上
+            "rsr_top_share":       _rsr_top_share,        # RSR80以上の比率
+            "trend_cluster_mode":  _trend_cluster_mode,   # True = クラスタ相場（level>=1）
+            "trend_cluster_level": _trend_cluster_level,  # 0=通常 / 1=mean_rev停止 / 2=momentum偏重
             "rsr_gt70":           diag_rsr_gt70,
             "rsr_gt60":           diag_rsr_gt60,
             "rsr_gt50":           diag_rsr_gt50,
@@ -1752,6 +1852,7 @@ class SignalBridge:
                 estimated_amount = qty * ref_price,
                 reason           = sig.reason,
                 atr20            = _atr20,
+                strategy_type    = sig.strategy_type,
             ))
 
             sector_count[sig.sector] = sector_count.get(sig.sector, 0) + 1
@@ -1810,6 +1911,7 @@ class SignalBridge:
                     "atr20":           o.atr20,
                     "sector":          o.sector,
                     "reason":          o.reason,
+                    "strategy_type":   o.strategy_type,
                     "order_id":        result.order_id,
                     "success":         result.success,
                     "result_code":     result.result_code,
@@ -1829,6 +1931,7 @@ class SignalBridge:
                     "atr20":           o.atr20,
                     "sector":          o.sector,
                     "reason":          o.reason,
+                    "strategy_type":   o.strategy_type,
                     "success":         False,
                     "error":           str(e),
                 })
@@ -1854,11 +1957,12 @@ class SignalBridge:
         from datetime import date as _date
 
         state             = self._load_portfolio_state()
-        pos_entry_dates   = state.setdefault("position_entry_dates",  {})
-        pos_entry_prices  = state.setdefault("position_entry_prices", {})
-        pos_entry_atrs    = state.setdefault("position_entry_atrs",   {})
-        reentry_blocked   = state.setdefault("reentry_blocked",       {})
-        shadow_positions  = state.setdefault("shadow_positions",      {})  # {sym: entry_price} shadow由来
+        pos_entry_dates   = state.setdefault("position_entry_dates",    {})
+        pos_entry_prices  = state.setdefault("position_entry_prices",   {})
+        pos_entry_atrs    = state.setdefault("position_entry_atrs",     {})
+        reentry_blocked   = state.setdefault("reentry_blocked",         {})
+        shadow_positions  = state.setdefault("shadow_positions",        {})  # {sym: entry_price} shadow由来
+        pos_strategy_types = state.setdefault("position_strategy_types", {})  # {sym: "fujiko"/"mean_rev"}
 
         # 最新の市場レジームをメトリクスから取得（regime別成績集計用）
         _latest_regime = None
@@ -1892,6 +1996,10 @@ class SignalBridge:
                 if atr20 > 0:
                     pos_entry_atrs[sym] = atr20
                 reentry_blocked.pop(sym, None)
+                # 戦略タイプを記録（mean_rev反発未発生検出で参照）
+                _order_strategy = r.get("strategy_type", "")
+                if _order_strategy:
+                    pos_strategy_types[sym] = _order_strategy
                 # shadow由来ポジションを記録（SELL時に shadow_realized_return を計算するため）
                 if side == "SHADOW_BUY":
                     shadow_positions[sym] = price
@@ -1917,6 +2025,7 @@ class SignalBridge:
                 entry_price = pos_entry_prices.pop(sym, None)
                 entry_atr   = pos_entry_atrs.pop(sym, None)
                 entry_date  = pos_entry_dates.pop(sym, None)
+                pos_strategy_types.pop(sym, None)
                 # shadow由来ポジション判定（記録を削除して返り値を取得）
                 _shadow_entry_price = shadow_positions.pop(sym, None)
                 _is_shadow = _shadow_entry_price is not None
@@ -2212,6 +2321,7 @@ class SignalBridge:
             "rsr_gt70_context":        _diag["rsr_gt70_context"],
             "rsr_top_share":           _diag["rsr_top_share"],
             "trend_cluster_mode":      _diag["trend_cluster_mode"],
+            "trend_cluster_level":     _diag.get("trend_cluster_level", 0),
             # supply ceiling（live 28銘柄内）
             "rsr_gt70_count":          _diag["rsr_gt70"],
             "rsr_gt60_count":          _diag["rsr_gt60"],
