@@ -847,9 +847,25 @@ class SignalBridge:
         _min_rsr_for_ctx = self._fujiko_params_live.get("min_rsr", 75.0)
         _rsr_pass_context_total = int((rsr_latest >= _min_rsr_for_ctx).sum())
 
+        # ── RSR集中度（62銘柄コンテキスト全体での分布）─────────────────
+        _ctx_size          = max(1, len(rsr_latest))
+        _rsr_gt80_context  = int((rsr_latest >= 80).sum())
+        _rsr_gt70_context  = int((rsr_latest >= 70).sum())
+        _rsr_top_share     = round(_rsr_gt80_context / _ctx_size, 3)
+        _trend_cluster_mode = _rsr_top_share > 0.10   # RSR80以上が10%超 = 集中相場
+        if _trend_cluster_mode:
+            logger.warning(
+                "TREND_CLUSTER_MODE: RSR80以上=%d/%d (%.1f%%) > 10%% "
+                "→ エントリー銘柄集中リスク。モメンタム相場に注意",
+                _rsr_gt80_context, _ctx_size, _rsr_top_share * 100,
+            )
+
         logger.info(
-            "RSR コンテキスト: %d 銘柄（統一42銘柄）context_pass=%d",
+            "RSR コンテキスト: %d 銘柄（統一42銘柄）context_pass=%d "
+            "RSR80以上=%d(%.1f%%) RSR70以上=%d cluster=%s",
             len(rsr_prices), _rsr_pass_context_total,
+            _rsr_gt80_context, _rsr_top_share * 100,
+            _rsr_gt70_context, _trend_cluster_mode,
         )
 
         # ── 流動性スコア（Volume × Close の 20 日平均） ───────────────
@@ -1125,9 +1141,16 @@ class SignalBridge:
                 strategy_type     = strategy_type,
             ))
 
-        # BUY 候補を RSR 降順でソートして top_k 個に絞る（eligible.sort → eligible[:top_k]）
+        # BUY 候補を RSR+モメンタム複合スコアでソートして top_k 個に絞る
+        # composite = RSR + RSR_momentum × MOM_WEIGHT_ADJ
+        # 効果: 上昇加速中の銘柄が同RSRの停滞銘柄より優先される（モメンタム相場で有効）
+        # MOM_WEIGHT_ADJ=0.3 → "RSRモメンタム1.0→1.3倍"相当
+        _MOM_WEIGHT_ADJ = 0.3   # trend_cluster_mode 時は 0.4 に引き上げ
+        if _trend_cluster_mode:
+            _MOM_WEIGHT_ADJ = 0.4
         buy_eligible = sorted(
-            [(s.rsr, s.symbol) for s in signals if s.signal == 1 and not s.currently_holding],
+            [(s.rsr + s.rsr_mom * _MOM_WEIGHT_ADJ, s.symbol)
+             for s in signals if s.signal == 1 and not s.currently_holding],
             reverse=True,
         )
         top_k_syms = [sym for _, sym in buy_eligible[:self.top_k]]
@@ -1150,7 +1173,11 @@ class SignalBridge:
             "topk_count":         len(top_k_syms),
             "avg_tradeable_rsr":  _avg_tradeable_rsr,
             "rsr_distribution":   rsr_dist_sorted[:20],
-            # Step 2: supply ceiling
+            # Step 2: supply ceiling（live 28銘柄内）
+            "rsr_gt80_context":   _rsr_gt80_context,   # 62銘柄中RSR80以上
+            "rsr_gt70_context":   _rsr_gt70_context,   # 62銘柄中RSR70以上
+            "rsr_top_share":      _rsr_top_share,       # RSR80以上の比率（>0.10でcluster）
+            "trend_cluster_mode": _trend_cluster_mode,  # True = モメンタム集中相場
             "rsr_gt70":           diag_rsr_gt70,
             "rsr_gt60":           diag_rsr_gt60,
             "rsr_gt50":           diag_rsr_gt50,
@@ -2161,7 +2188,12 @@ class SignalBridge:
             "candidate_count":         _diag["buy_candidates"], # 最終BUY候補数（全フィルター通過後）
             "blocked_by_rsr":          _diag["blocked_rsr"],    # RSR未達でブロック
             "blocked_by_breakout":     _diag["blocked_breakout"],  # Turtleブレイクアウト未達でブロック
-            # supply ceiling（RSRは足りているか？）
+            # RSR集中度（62銘柄コンテキスト全体）
+            "rsr_gt80_context":        _diag["rsr_gt80_context"],
+            "rsr_gt70_context":        _diag["rsr_gt70_context"],
+            "rsr_top_share":           _diag["rsr_top_share"],
+            "trend_cluster_mode":      _diag["trend_cluster_mode"],
+            # supply ceiling（live 28銘柄内）
             "rsr_gt70_count":          _diag["rsr_gt70"],
             "rsr_gt60_count":          _diag["rsr_gt60"],
             "rsr_gt50_count":          _diag["rsr_gt50"],
