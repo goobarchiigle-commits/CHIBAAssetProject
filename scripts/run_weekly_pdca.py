@@ -46,45 +46,75 @@ logger = logging.getLogger("weekly_pdca")
 # AIレビュープロンプト
 # ------------------------------------------------------------------ #
 AI_REVIEW_PROMPT = """\
-あなたは定量トレーディング戦略の分析者です。
-以下は今週のフジコ法（モメンタム戦略）の運用レポートです。PDCAサイクルで分析してください。
+You are a quantitative trading system analyst reviewing a Japanese momentum strategy (Fujiko method).
+The system is in Phase 1-2 boundary: signal verification phase, not yet full trade execution.
+Focus on SIGNAL HEALTH, not PnL. Trades may be zero — that is expected at this stage.
 
-## 分析の焦点
-1. **レジーム変化**: trend_market / trend_strength の変化。bull→neutral 転換の兆候があるか
-2. **モメンタム減衰**: RSRリーダー半減期が短くなっていないか（<8日 → 回転相場で戦略効果低下）
-3. **リスク集中**: 同一セクターへの集中度。blocked_leaders_count が高い場合の対策
-4. **発注リスク監査**: 過剰発注頻度・流動性インパクト・シグナルクラスタリングの異常値
-5. **供給構造**: rsr_pass / near_breakout の推移からブレイクアウト機会の枯渇・増加を判定
+## Analysis Focus (in priority order)
 
-## 出力形式（必ずこのMarkdown構造で出力すること）
+1. **Signal Starvation**: Is candidate_count near zero? Why?
+   - Check: rsr_pass_count vs candidate_count vs executed_signals
+   - Execution rate = candidate_count / max(rsr_pass_count, 1)
+   - Danger zone: execution_rate < 0.2 for 5+ consecutive days
+
+2. **Universe Bias**: Are high-RSR stocks being systematically blocked?
+   - Check: blocked_leaders_count, market_leader_block_rate, blocked_by_price
+   - If market_leader_block_rate > 0.5: expensive stocks dominate RSR but can't be bought
+   - Fix options: capital expansion, universe revision, RSR threshold adjustment
+
+3. **Ranking Stability**: Is RSR ranking stable or rotating rapidly?
+   - Check: top10_overlap, rsr_leader_half_life
+   - half_life < 8 days = rotation market (momentum strategy loses edge)
+   - half_life > 20 days = strong trend (ideal for this strategy)
+
+4. **Regime Mismatch**: Is the market regime compatible with the strategy?
+   - Check: trend_market, trend_strength, market_above_ma200
+   - bull + trend_strength > 0.05 = ideal
+   - bear = reduce exposure, don't change parameters
+
+5. **Filter Efficiency**: Which filter is causing the most signal loss?
+   - RSR filter: blocked_by_rsr / universe_size
+   - Breakout filter: blocked_by_breakout / rsr_pass_count
+   - Price filter: blocked_by_price, rsr_pass_tradeable_ratio
+   - Identify the single biggest bottleneck
+
+## Output Format (output in Japanese, use this exact Markdown structure)
 
 ---
 
-## AI レビュー（PDCA） {DATE}
+## AI レビュー（研究PDCA） {DATE}
+
+### シグナル健全性サマリー
+- 実行率（candidate / RSR通過）:
+- 主なボトルネック（1つに絞る）:
+- 緊急度:（高/中/低）
+
+### 問題の根本原因
+（データに基づいて具体的に）
 
 ### P（今週の評価）
-- 戦略パフォーマンス:
+- シグナル生成:
 - 市場環境:
-- 主なリスク:
+- ユニバース状態:
 
-### D（今週実施したこと）
-- 取引サマリー:
+### D（今週変更したこと）
 - パラメータ変更:
+- ユニバース変更:
 
-### C（結果の検証）
-- 期待通りだった点:
-- 期待外れだった点:
-- 4/8 判断ロジックの結果:
+### C（検証結果）
+- 改善した点:
+- 悪化した点:
+- 仮説と結果の差:
 
 ### A（来週のアクション）
-1. （最優先・具体的コマンドまたはパラメータ名を示す）
+1. （最優先・検証コマンドまたは変更パラメータを必ず明記）
 2.
 3.
 
 ### 発注リスク監査
-- 過剰発注:
-- 流動性インパクト:
-- シグナルクラスタリング:
+- シグナルクラスタリング（cluster_days_5d）:
+- 流動性インパクト（rsr_pass_tradeable_ratio）:
+- 機会損失（missed_breakout_avg）:
 
 ---
 """

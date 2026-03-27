@@ -391,6 +391,114 @@ def _judgment_auto(metrics: pd.DataFrame) -> None:
         print("    【推奨】4/8以降も同条件で継続観察")
 
 
+# ── シグナルメトリクス集計（研究PDCA用） ────────────────────────────
+
+def summarize_signal_metrics(metrics: pd.DataFrame, since: pd.Timestamp | None) -> dict:
+    """
+    シグナル生成の健全性を集計する（取引ゼロでも機能する研究PDCA用）。
+
+    Returns dict with:
+        avg_universe, avg_rsr_pass, avg_candidates,
+        execution_rate, filter_efficiency,
+        avg_blocked_by_rsr, avg_blocked_by_breakout, avg_blocked_by_price,
+        avg_market_leader_block_rate, dominant_bottleneck
+    """
+    if metrics.empty:
+        return {}
+
+    df = metrics.copy()
+    if since is not None:
+        df = df[df["date"] >= since]
+    df = df.sort_values("date")
+    if df.empty:
+        return {}
+
+    rsr_pass_col = "rsr_pass_count" if "rsr_pass_count" in df.columns else (
+                   "candidate_count" if "candidate_count" in df.columns else None)
+
+    avg_universe   = float(df.get("universe_size",        pd.Series([0])).mean())
+    avg_rsr_pass   = float(df[rsr_pass_col].mean())                 if rsr_pass_col else 0.0
+    avg_candidates = float(df.get("candidate_count",      pd.Series([0])).mean())
+    avg_blocked_rsr  = float(df.get("blocked_by_rsr",     pd.Series([0])).mean())
+    avg_blocked_bo   = float(df.get("blocked_by_breakout",pd.Series([0])).mean())
+    avg_blocked_px   = float(df.get("blocked_by_price",   pd.Series([0])).mean())
+    avg_bl_rate      = float(df.get("market_leader_block_rate", pd.Series([0])).dropna().mean())
+    avg_tradeable    = float(df.get("rsr_pass_tradeable_ratio", pd.Series([1])).dropna().mean())
+
+    # 実行率 = 最終BUY候補 / RSR通過数
+    execution_rate = avg_candidates / max(avg_rsr_pass, 0.01)
+
+    # ボトルネック特定（どのフィルターが最も多く候補を削っているか）
+    bottlenecks = {
+        "RSRフィルター": avg_blocked_rsr,
+        "Breakoutフィルター": avg_blocked_bo,
+        "価格フィルター": avg_blocked_px,
+    }
+    dominant_bottleneck = max(bottlenecks, key=bottlenecks.get)
+
+    return {
+        "avg_universe":             round(avg_universe, 1),
+        "avg_rsr_pass":             round(avg_rsr_pass, 1),
+        "avg_candidates":           round(avg_candidates, 2),
+        "execution_rate":           round(execution_rate, 3),
+        "avg_blocked_by_rsr":       round(avg_blocked_rsr, 1),
+        "avg_blocked_by_breakout":  round(avg_blocked_bo, 1),
+        "avg_blocked_by_price":     round(avg_blocked_px, 1),
+        "avg_market_leader_block":  round(avg_bl_rate, 2),
+        "avg_tradeable_ratio":      round(avg_tradeable, 2),
+        "dominant_bottleneck":      dominant_bottleneck,
+    }
+
+
+def _signal_health_report(metrics: pd.DataFrame, since: pd.Timestamp | None) -> None:
+    """シグナル生成健全性レポート（研究PDCA用・取引ゼロでも有効）"""
+    summary = summarize_signal_metrics(metrics, since)
+    if not summary:
+        print("  シグナルメトリクスデータなし")
+        return
+
+    exec_rate = summary["execution_rate"]
+    exec_label = (
+        "正常" if exec_rate >= 0.3 else
+        ("低下" if exec_rate >= 0.1 else
+         "枯渇（signal starvation）")
+    )
+    bl_rate = summary["avg_market_leader_block"]
+    bl_label = (
+        "正常" if bl_rate < 0.3 else
+        ("注意" if bl_rate < 0.5 else
+         "リーダー集中相場（高RSR銘柄が価格で買えない）")
+    )
+    tr_ratio = summary["avg_tradeable_ratio"]
+
+    print(f"\n  {'指標':<35} {'値':>8}  {'判定'}")
+    print("  " + "-" * 65)
+    print(f"  {'ユニバース平均銘柄数':<35} {summary['avg_universe']:>8.1f}")
+    print(f"  {'RSR通過平均（/日）':<35} {summary['avg_rsr_pass']:>8.1f}  目安: >=4/日")
+    print(f"  {'最終BUY候補平均（/日）':<35} {summary['avg_candidates']:>8.2f}  目安: >=1/日")
+    print(f"  {'実行率（候補/RSR通過）':<35} {exec_rate:>8.1%}  {exec_label}")
+    print(f"  {'RSRブロック平均':<35} {summary['avg_blocked_by_rsr']:>8.1f}")
+    print(f"  {'Breakoutブロック平均':<35} {summary['avg_blocked_by_breakout']:>8.1f}")
+    print(f"  {'価格ブロック平均':<35} {summary['avg_blocked_by_price']:>8.1f}")
+    print(f"  {'RSRリーダーブロック率':<35} {bl_rate:>8.1%}  {bl_label}")
+    print(f"  {'RSR通過→売買可能率':<35} {tr_ratio:>8.1%}  目安: >=60%")
+    print(f"\n  主なボトルネック: {summary['dominant_bottleneck']}")
+
+    # 改善示唆
+    print()
+    if exec_rate < 0.1:
+        print("  [要対応] 実行率 < 10% — signal starvation 状態")
+        if summary["avg_blocked_by_rsr"] > summary["avg_rsr_pass"] * 3:
+            print("    -> RSRフィルター(min_rsr)の緩和を検討（現状: バックテスト確認要）")
+        if bl_rate > 0.5:
+            print("    -> 価格上限に引っかかる高RSR銘柄が多い。capital拡大 or ユニバース見直し")
+    elif exec_rate < 0.3:
+        print("  [注意] 実行率 30%未満 — Breakoutフィルターの調整を検討")
+        print("       `python -m backtest.turtle_entry_rolling_oos` で turtle_entry=15 vs 20 を比較")
+
+
+# ── メイン ────────────────────────────────────────────────────────────
+
 def main() -> int:
     p = argparse.ArgumentParser(description="週次・月次レビューレポート")
     p.add_argument("--weeks", type=int, default=8, help="直近何週分表示するか（default 8）")
@@ -413,6 +521,10 @@ def main() -> int:
     closed = trades[trades["side"] == "SELL"] if (not trades.empty and "side" in trades.columns) else pd.DataFrame()
     print(f"  クローズ済み取引: {len(closed)} 件 / データソース: {TRADES_PATH}")
     print("=" * 68)
+
+    # 0. シグナル健全性（研究PDCA用・最優先）
+    print("\n━━ シグナル生成健全性 ━━")
+    _signal_health_report(metrics, since)
 
     # 1. 週次トレード統計
     print("\n━━ 週次トレード統計 ━━")
