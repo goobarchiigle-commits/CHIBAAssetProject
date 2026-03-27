@@ -278,10 +278,11 @@ class SignalBridge:
             "equity_peak":           self.capital,
             "cb_cooldown_end_date":  None,
             "recovery_threshold":    None,
-            "position_entry_dates":  {},
-            "position_entry_prices": {},   # BUY時の参考単価（PnL計算用）
-            "position_entry_atrs":   {},   # BUY時ATR20（False Breakout診断用）
-            "reentry_blocked":       {},
+            "position_entry_dates":    {},
+            "position_entry_prices":   {},   # BUY時の参考単価（PnL計算用）
+            "position_entry_atrs":     {},   # BUY時ATR20（False Breakout診断用）
+            "position_highest_closes": {},   # トレーリングストップ用: 保有中の最高終値
+            "reentry_blocked":         {},
             "last_updated":          None,
         }
         if not self._state_file.exists():
@@ -966,9 +967,10 @@ class SignalBridge:
             logger.info("再エントリー禁止銘柄: %s", active_blocked)
 
         # ── 保有エントリー日マップ ───────────────────────────────────
-        pos_entry_dates:  dict[str, str]   = portfolio_state.get("position_entry_dates",  {})
-        pos_entry_prices: dict[str, float] = portfolio_state.get("position_entry_prices", {})
-        pos_entry_atrs:   dict[str, float] = portfolio_state.get("position_entry_atrs",   {})
+        pos_entry_dates:    dict[str, str]   = portfolio_state.get("position_entry_dates",    {})
+        pos_entry_prices:   dict[str, float] = portfolio_state.get("position_entry_prices",   {})
+        pos_entry_atrs:     dict[str, float] = portfolio_state.get("position_entry_atrs",     {})
+        pos_highest_closes: dict[str, float] = portfolio_state.get("position_highest_closes", {})
 
         # ── 診断カウンター ────────────────────────────────────────
         diag_total        = 0   # 非保有・非ブロック銘柄数（BUY候補の母数）
@@ -1024,6 +1026,26 @@ class SignalBridge:
                 hold_td      = _trading_days_held(pos_entry_dates[sym], today)
                 is_time_exit = hold_td >= self.max_hold_days
 
+            # ── トレーリングストップ（3×ATR20） ────────────────────────────
+            # 優先度: 最高（時間ストップより先に判定）
+            # 更新タイミング: 毎朝データ取得後に highest_close を更新してから判定
+            #   → 当日 open で寄成 SELL を生成する
+            is_trailing_stop = False
+            _ts_close        = 0.0
+            _ts_atr20        = 0.0
+            _ts_highest      = 0.0
+            _ts_stop_price   = 0.0
+            if currently_holding:
+                from portfolio.volatility_allocator import calc_atr as _calc_atr
+                _ts_close  = float(df["Close"].iloc[-1])
+                _ts_atr20  = _calc_atr(df, period=20)
+                _prev_high = pos_highest_closes.get(sym, _ts_close)
+                _ts_highest = max(_prev_high, _ts_close)
+                pos_highest_closes[sym] = _ts_highest   # 毎朝 highest_close を更新（先に更新→後で判定）
+                if not np.isnan(_ts_atr20) and _ts_atr20 > 0:
+                    _ts_stop_price   = _ts_highest - 3.0 * _ts_atr20
+                    is_trailing_stop = _ts_close < _ts_stop_price
+
             # ── FujikoStrategy（min_rsr=75 で研究と同じ閾値フィルター） ────
             fujiko_strat = FujikoStrategy(
                 rsr_series       = rsr,
@@ -1037,7 +1059,7 @@ class SignalBridge:
             m_signal = mr_strat.generate_signal(df)
 
             # ── filter-first アーキテクチャ（research と同じ） ───────────
-            # 優先順位: 時間ストップ > RSR低下エグジット > mean_rev反発失敗 > 再エントリー禁止 > 戦略シグナル
+            # 優先順位: トレーリングストップ > 時間ストップ > RSR低下エグジット > mean_rev反発失敗 > 再エントリー禁止 > 戦略シグナル
             is_rank_exit = currently_holding and rsr_now < min_rsr_threshold
 
             # ── mean_rev 反発未発生検出（早期撤退）────────────────────────
@@ -1070,7 +1092,16 @@ class SignalBridge:
                     except Exception:
                         pass
 
-            if is_time_exit:
+            if is_trailing_stop:
+                signal_int    = -1
+                strategy_type = "fujiko"
+                reason = (
+                    f"SELL[トレーリングストップ]: close={_ts_close:.0f}"
+                    f" < peak={_ts_highest:.0f} - 3×ATR({_ts_atr20:.0f})"
+                    f" → stop={_ts_stop_price:.0f}"
+                )
+
+            elif is_time_exit:
                 signal_int    = -1
                 strategy_type = "fujiko"
                 reason = (
@@ -1253,6 +1284,9 @@ class SignalBridge:
                 reason            = reason,
                 strategy_type     = strategy_type,
             ))
+
+        # highest_close の更新内容を portfolio_state に書き戻す（_save_portfolio_state で永続化）
+        portfolio_state["position_highest_closes"] = pos_highest_closes
 
         # BUY 候補を RSR+モメンタム複合スコアでソートして top_k 個に絞る
         # composite = RSR + RSR_momentum × MOM_WEIGHT_ADJ
@@ -1956,11 +1990,12 @@ class SignalBridge:
         from pathlib import Path as _Path
         from datetime import date as _date
 
-        state             = self._load_portfolio_state()
-        pos_entry_dates   = state.setdefault("position_entry_dates",    {})
-        pos_entry_prices  = state.setdefault("position_entry_prices",   {})
-        pos_entry_atrs    = state.setdefault("position_entry_atrs",     {})
-        reentry_blocked   = state.setdefault("reentry_blocked",         {})
+        state               = self._load_portfolio_state()
+        pos_entry_dates     = state.setdefault("position_entry_dates",    {})
+        pos_entry_prices    = state.setdefault("position_entry_prices",   {})
+        pos_entry_atrs      = state.setdefault("position_entry_atrs",     {})
+        pos_highest_closes  = state.setdefault("position_highest_closes", {})
+        reentry_blocked     = state.setdefault("reentry_blocked",         {})
         shadow_positions  = state.setdefault("shadow_positions",        {})  # {sym: entry_price} shadow由来
         pos_strategy_types = state.setdefault("position_strategy_types", {})  # {sym: "fujiko"/"mean_rev"}
 
@@ -1991,8 +2026,9 @@ class SignalBridge:
 
             if side in ("BUY", "SHADOW_BUY"):
                 atr20 = float(r.get("atr20", 0.0))
-                pos_entry_dates[sym]  = today_str
-                pos_entry_prices[sym] = price
+                pos_entry_dates[sym]      = today_str
+                pos_entry_prices[sym]     = price
+                pos_highest_closes[sym]   = price   # トレーリングストップ: 初期 highest_close = エントリー価格
                 if atr20 > 0:
                     pos_entry_atrs[sym] = atr20
                 reentry_blocked.pop(sym, None)
@@ -2025,6 +2061,7 @@ class SignalBridge:
                 entry_price = pos_entry_prices.pop(sym, None)
                 entry_atr   = pos_entry_atrs.pop(sym, None)
                 entry_date  = pos_entry_dates.pop(sym, None)
+                pos_highest_closes.pop(sym, None)   # トレーリングストップ用 highest_close をクリア
                 pos_strategy_types.pop(sym, None)
                 # shadow由来ポジション判定（記録を削除して返り値を取得）
                 _shadow_entry_price = shadow_positions.pop(sym, None)

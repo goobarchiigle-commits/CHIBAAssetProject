@@ -331,6 +331,46 @@ def _send_orders_with_retry(bridge, orders: list) -> list[dict]:
 # ------------------------------------------------------------------ #
 LIVE_LOG_DIR = Path("logs/live")
 
+PHASE2_METRICS_FILE = Path("logs/phase2_live_metrics.jsonl")
+
+def log_phase2_metrics(result) -> None:
+    """
+    Phase2 日次運用メトリクスを logs/phase2_live_metrics.jsonl に追記する。
+
+    フィールド:
+        date         : 実行日（JST）
+        equity       : 現在の推定資産総額（円）
+        drawdown     : 現在のドローダウン（0.0〜-1.0）
+        positions    : 保有銘柄リスト
+        breadth      : RSR>=50 比率（ユニバース内）
+        signal_count : BUY シグナル数（当日）
+    """
+    today_str = datetime.now(JST).strftime("%Y-%m-%d")
+    pf = result.portfolio_summary
+
+    holding = [s["symbol"] for s in result.signals if s.get("currently_holding")]
+    rsr_vals = [s["rsr"] for s in result.signals]
+    breadth  = (
+        sum(1 for r in rsr_vals if r >= 50) / len(rsr_vals)
+        if rsr_vals else 0.0
+    )
+    signal_count = sum(1 for s in result.signals if s.get("signal") == 1)
+
+    entry = {
+        "date":         today_str,
+        "equity":       round(pf.get("current_equity", 0), 0),
+        "drawdown":     round(pf.get("current_drawdown", 0.0), 4),
+        "positions":    holding,
+        "breadth":      round(breadth, 3),
+        "signal_count": signal_count,
+    }
+
+    PHASE2_METRICS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with PHASE2_METRICS_FILE.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+    logger.info("Phase2メトリクス保存: %s", PHASE2_METRICS_FILE)
+
+
 def save_live_logs(run_id: str, result, send_results: list) -> None:
     """
     logs/live/YYYYMMDD_signals.json  — 全銘柄シグナル
@@ -656,6 +696,12 @@ def main() -> int:
     if not args.no_save:
         saved_path = save_signal_json(result, args.output_dir)
         print(f"\n💾 シグナル保存: {saved_path}")
+
+    # Phase2 日次メトリクス記録（DRY_RUN / LIVE 共通）
+    try:
+        log_phase2_metrics(result)
+    except Exception as _e:
+        logger.warning("Phase2メトリクス記録失敗（無視）: %s", _e)
 
     if not args.live:
         print("\n" + "=" * 64)
