@@ -112,17 +112,18 @@ def _add_trading_days(start: pd.Timestamp, n: int) -> pd.Timestamp:
 @dataclass
 class StockSignal:
     """1銘柄分のシグナル情報"""
-    symbol:            str
-    sector:            str
-    signal:            int     # +1=買い / -1=売り / 0=ホールド
-    rsr:               float   # RSR 値（0〜100）
-    rsr_rank:          int     # top_k ユニバース内の RSR 順位（1=最高）
-    sepa_score:        int     # SEPA 条件数（0〜8）
-    rsr_mom:           float   # RSR モメンタム
-    hold_days:         int     # 現在の保有営業日数（未保有は 0）
-    currently_holding: bool    # 現在保有中か
-    reason:            str     # シグナル理由（ログ用）
-    strategy_type:     str = "fujiko"  # "fujiko" / "mean_rev"
+    symbol:               str
+    sector:               str
+    signal:               int     # +1=買い / -1=売り / 0=ホールド
+    rsr:                  float   # RSR 値（0〜100）
+    rsr_rank:             int     # top_k ユニバース内の RSR 順位（1=最高）
+    sepa_score:           int     # SEPA 条件数（0〜8）
+    rsr_mom:              float   # RSR モメンタム
+    hold_days:            int     # 現在の保有営業日数（未保有は 0）
+    currently_holding:    bool    # 現在保有中か
+    reason:               str     # シグナル理由（ログ用）
+    strategy_type:        str   = "fujiko"   # "fujiko" / "mean_rev"
+    trailing_stop_price:  float = 0.0        # ギャップダウン検出用（0 = 未保有 or 未計算）
 
 
 # セクター別採用戦略（dynamic_selection.py の結果に基づく）
@@ -255,6 +256,9 @@ class SignalBridge:
         # min_rsr はパラメータをそのまま使う（research と同じ閾値フィルター）
         self._fujiko_params_live = {**fujiko_params}
 
+        # gap_stop 用: run() 後に保有ポジションのストップ情報をキャッシュ
+        self._last_held_stop_info: dict[str, dict] = {}
+
         self._client = None
         try:
             from kabusapi.client import KabuClient
@@ -294,13 +298,33 @@ class SignalBridge:
             return default
 
     def _save_portfolio_state(self, state: dict) -> None:
-        """ポートフォリオ状態をファイルに保存する"""
+        """ポートフォリオ状態をアトミック書き込みで保存する。
+        書き込み途中の異常終了でファイルが破損しないよう tempfile + shutil.move を使用する。
+        """
+        import shutil
+        import tempfile
+
         self._state_file.parent.mkdir(parents=True, exist_ok=True)
         state["last_updated"] = datetime.now(JST).strftime("%Y-%m-%d")
-        self._state_file.write_text(
-            json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8"
+        payload = json.dumps(state, ensure_ascii=False, indent=2)
+
+        # 同じディレクトリに一時ファイルを作成し、書き込み完了後にアトミックに移動する
+        fd, tmp_path = tempfile.mkstemp(
+            dir=self._state_file.parent, suffix=".tmp"
         )
-        logger.info("ポートフォリオ状態保存: %s", self._state_file)
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as f:
+                f.write(payload)
+            shutil.move(tmp_path, self._state_file)
+        except Exception:
+            # 失敗時は一時ファイルを削除してから再 raise
+            try:
+                os.unlink(tmp_path)
+            except OSError:
+                pass
+            raise
+
+        logger.info("ポートフォリオ状態保存（atomic）: %s", self._state_file)
 
     def _compute_current_equity(
         self,
@@ -1272,17 +1296,18 @@ class SignalBridge:
                         pass
 
             signals.append(StockSignal(
-                symbol            = sym,
-                sector            = sector,
-                signal            = signal_int,
-                rsr               = rsr_now,
-                rsr_rank          = rsr_rank,
-                sepa_score        = sepa_now,
-                rsr_mom           = mom_now,
-                hold_days         = hold_td,
-                currently_holding = currently_holding,
-                reason            = reason,
-                strategy_type     = strategy_type,
+                symbol               = sym,
+                sector               = sector,
+                signal               = signal_int,
+                rsr                  = rsr_now,
+                rsr_rank             = rsr_rank,
+                sepa_score           = sepa_now,
+                rsr_mom              = mom_now,
+                hold_days            = hold_td,
+                currently_holding    = currently_holding,
+                reason               = reason,
+                strategy_type        = strategy_type,
+                trailing_stop_price  = _ts_stop_price,
             ))
 
         # highest_close の更新内容を portfolio_state に書き戻す（_save_portfolio_state で永続化）
@@ -1973,6 +1998,171 @@ class SignalBridge:
         return results
 
     # ------------------------------------------------------------------ #
+    # ------------------------------------------------------------------ #
+    # ギャップダウンストップ（9:00 AM 直前に board 価格で再評価）
+    # ------------------------------------------------------------------ #
+
+    # board 取得間隔（寄り付き直後の API 負荷を抑制）
+    _BOARD_FETCH_INTERVAL = 0.15   # 秒
+
+    # ギャップイベントログ（後日の損失分布分析用）
+    _GAP_EVENT_LOG = Path("logs/gap_events.jsonl")
+
+    @staticmethod
+    def _resolve_board_price(board) -> Optional[float]:
+        """
+        board オブジェクトから有効な価格を解決する。
+
+        優先順: current_price → bid_price → None
+        日本株では寄り付き未成立時に両方が 0 になるケースがあるため None を返す。
+        None の場合は呼び出し元でスキップする（保守的設計: 強制 SELL しない）。
+        """
+        cp = board.current_price
+        bp = board.bid_price
+        if cp is not None and cp > 0:
+            return float(cp)
+        if bp is not None and bp > 0:
+            return float(bp)
+        return None   # 寄り付き未成立・板なし → 判定スキップ
+
+    def _log_gap_event(self, event: dict) -> None:
+        """ギャップイベントを logs/gap_events.jsonl に追記する（研究用）。"""
+        try:
+            self._GAP_EVENT_LOG.parent.mkdir(parents=True, exist_ok=True)
+            with self._GAP_EVENT_LOG.open("a", encoding="utf-8") as f:
+                f.write(json.dumps(event, ensure_ascii=False) + "\n")
+        except Exception as e:
+            logger.warning("gap_event ログ書き込み失敗（無視）: %s", e)
+
+    def check_gap_stops(
+        self,
+        order_objects: list[OrderInstruction],
+    ) -> list[OrderInstruction]:
+        """
+        9:00 AM 直後に board 価格を取得し、ギャップダウン SELL を追加する。
+
+        背景:
+            trailing stop は前日終値で判定するため、当日の寄り付きギャップを検出できない。
+            例: 前日終値=110 > stop=105 (HOLD) → 当日 board=90 → このメソッドで SELL 追加
+
+        安全設計:
+            - API 未接続 (dry-run) は無条件スキップ
+            - board 取得失敗銘柄は保守的にスキップ（強制 SELL しない）
+            - 既に SELL 注文がある銘柄はスキップ（二重 SELL 防止）
+            - current_price=0 かつ bid_price=0（寄り付き未成立）→ スキップ
+            - board 取得間隔 0.15秒（寄り付き直後の API 負荷制御）
+
+        副作用:
+            - ギャップイベント（トリガー有無を問わず）を logs/gap_events.jsonl に記録
+
+        Returns:
+            order_objects にギャップダウン SELL を追加したリスト（追加なければそのまま返す）
+        """
+        if self._client is None:
+            logger.info("gap_stop: API未接続 → ギャップダウンチェックをスキップ")
+            return order_objects
+
+        held_stop_info = self._last_held_stop_info
+        if not held_stop_info:
+            logger.info("gap_stop: 保有ポジションなし → スキップ")
+            return order_objects
+
+        # 既に SELL 注文がある銘柄はスキップ（二重 SELL 防止）
+        already_selling: set[str] = {o.symbol for o in order_objects if o.side == "SELL"}
+
+        today_str  = datetime.now(JST).strftime("%Y-%m-%d")
+        gap_orders: list[OrderInstruction] = []
+
+        for sym, info in held_stop_info.items():
+            if sym in already_selling:
+                logger.info("gap_stop: %s は既に SELL 注文済み → スキップ", sym)
+                continue
+
+            stop_price = info["stop_price"]
+            if stop_price <= 0:
+                continue
+
+            # board 取得（3回リトライ・0.5秒間隔）
+            board = None
+            sym_4digit = sym.replace(".T", "")
+            for attempt in range(3):
+                try:
+                    board = self._client.get_board(sym_4digit, exchange=1)  # 1=TSE
+                    break
+                except Exception as e:
+                    if attempt < 2:
+                        time.sleep(0.5)
+                    else:
+                        logger.warning("gap_stop: %s board取得失敗（3回） → スキップ: %s", sym, e)
+
+            # board 取得間隔（寄り付き直後の API 負荷制御）
+            time.sleep(self._BOARD_FETCH_INTERVAL)
+
+            if board is None:
+                continue
+
+            # 有効価格を解決（寄り付き未成立で両方 0 なら None → スキップ）
+            board_price = self._resolve_board_price(board)
+            if board_price is None:
+                logger.info("gap_stop: %s 価格取得不可（寄り付き未成立？）→ スキップ", sym)
+                self._log_gap_event({
+                    "date":           today_str,
+                    "symbol":         sym,
+                    "board_price":    None,
+                    "stop_price":     stop_price,
+                    "last_close":     info["last_close"],
+                    "gap_triggered":  False,
+                    "skip_reason":    "price_unavailable",
+                })
+                continue
+
+            triggered = board_price < stop_price
+
+            # ギャップイベントを記録（トリガー有無を問わず）
+            self._log_gap_event({
+                "date":          today_str,
+                "symbol":        sym,
+                "board_price":   round(board_price, 0),
+                "stop_price":    round(stop_price, 0),
+                "last_close":    round(info["last_close"], 0),
+                "gap_triggered": triggered,
+                "skip_reason":   None,
+            })
+
+            if triggered:
+                logger.warning(
+                    "gap_stop TRIGGERED: %s board=%.0f < stop=%.0f (last_close=%.0f) → SELL追加",
+                    sym, board_price, stop_price, info["last_close"],
+                )
+                gap_orders.append(OrderInstruction(
+                    symbol           = sym,
+                    symbol_4digit    = sym_4digit,
+                    sector           = info["sector"],
+                    side             = "SELL",
+                    qty              = info["qty"],
+                    order_type       = "MARKET_OPEN",
+                    estimated_price  = board_price,
+                    estimated_amount = info["qty"] * board_price,
+                    reason           = (
+                        f"SELL[ギャップダウン]: board={board_price:.0f}"
+                        f" < stop={stop_price:.0f}"
+                        f" (last_close={info['last_close']:.0f})"
+                    ),
+                ))
+            else:
+                logger.info(
+                    "gap_stop OK: %s board=%.0f >= stop=%.0f",
+                    sym, board_price, stop_price,
+                )
+
+        if gap_orders:
+            logger.warning(
+                "gap_stop: %d銘柄のギャップダウン SELL を追加 → %s",
+                len(gap_orders), [o.symbol for o in gap_orders],
+            )
+
+        return order_objects + gap_orders
+
     # 約定後の状態更新（run_live_signal.py から呼ぶ）
     # ------------------------------------------------------------------ #
     def update_state_after_execution(
@@ -2158,6 +2348,28 @@ class SignalBridge:
             "シグナル: BUY=%d / SELL=%d / HOLD=%d",
             buy_count, sell_count, len(signals) - buy_count - sell_count,
         )
+
+        # gap_stop 用キャッシュ: 保有中ポジションのストップ価格を記録
+        # check_gap_stops() が 9:00 AM 直後に board を取得して参照する
+        self._last_held_stop_info = {
+            s.symbol: {
+                "qty":        current_positions[s.symbol]["qty"],
+                "stop_price": s.trailing_stop_price,
+                "last_close": float(universe_raw[s.symbol]["df"]["Close"].iloc[-1]),
+                "sector":     s.sector,
+            }
+            for s in signals
+            if (s.currently_holding
+                and s.trailing_stop_price > 0
+                and s.symbol in current_positions
+                and s.symbol in universe_raw)
+        }
+        if self._last_held_stop_info:
+            logger.info(
+                "gap_stop cache: %d 銘柄 %s",
+                len(self._last_held_stop_info),
+                {sym: f"stop={info['stop_price']:.0f}" for sym, info in self._last_held_stop_info.items()},
+            )
 
         # 6. ブレイクアウトクラスター検知（同日 BUY シグナル数 ≥ 3 → スロット拡張）
         import math as _math

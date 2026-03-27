@@ -342,18 +342,21 @@ def log_phase2_metrics(result) -> None:
         equity       : 現在の推定資産総額（円）
         drawdown     : 現在のドローダウン（0.0〜-1.0）
         positions    : 保有銘柄リスト
-        breadth      : RSR>=50 比率（ユニバース内）
+        breadth_50   : RSR>=50 比率（市場参加の広がり）
+        breadth_75   : RSR>=75 比率（エントリー閾値以上の銘柄割合）
         signal_count : BUY シグナル数（当日）
+
+    breadth_50 - breadth_75 はトレンド成熟度の代理変数として使用できる。
+    差が小さい（全体が高RSR）= 成熟相場。差が大きい = 局所的な強さ。
     """
     today_str = datetime.now(JST).strftime("%Y-%m-%d")
     pf = result.portfolio_summary
 
     holding = [s["symbol"] for s in result.signals if s.get("currently_holding")]
     rsr_vals = [s["rsr"] for s in result.signals]
-    breadth  = (
-        sum(1 for r in rsr_vals if r >= 50) / len(rsr_vals)
-        if rsr_vals else 0.0
-    )
+    n = len(rsr_vals)
+    breadth_50 = sum(1 for r in rsr_vals if r >= 50) / n if n else 0.0
+    breadth_75 = sum(1 for r in rsr_vals if r >= 75) / n if n else 0.0
     signal_count = sum(1 for s in result.signals if s.get("signal") == 1)
 
     entry = {
@@ -361,7 +364,8 @@ def log_phase2_metrics(result) -> None:
         "equity":       round(pf.get("current_equity", 0), 0),
         "drawdown":     round(pf.get("current_drawdown", 0.0), 4),
         "positions":    holding,
-        "breadth":      round(breadth, 3),
+        "breadth_50":   round(breadth_50, 3),
+        "breadth_75":   round(breadth_75, 3),
         "signal_count": signal_count,
     }
 
@@ -773,6 +777,16 @@ def main() -> int:
         print(f"\n⏰ 取引開始まで {wait_sec:.0f}秒待機中... (09:00:05 発注予定)")
         time.sleep(wait_sec)
         print("  → 待機完了。発注を開始します。")
+    # ──────────────────────────────────────────────────────────────────
+
+    # ── ギャップダウン追加チェック（9:00 直後・board 価格で再評価）────
+    # 前日終値では検出できなかったギャップダウンを寄り付き直前の板で検出し、
+    # 必要なら SELL 注文を追加する。API 未接続は自動スキップ。
+    logger.info("ギャップダウンチェック中（board 取得）...")
+    try:
+        order_objects = bridge.check_gap_stops(order_objects)
+    except Exception as _gap_e:
+        logger.warning("ギャップダウンチェック失敗（スキップ）: %s", _gap_e)
     # ──────────────────────────────────────────────────────────────────
 
     # ----------------------------------------------------------------
