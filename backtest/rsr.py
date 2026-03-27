@@ -15,6 +15,13 @@ RSR（Relative Strength Rating）計算モジュール
 先読みリーク防止（CLAUDE.md ルール1）:
   shift(1) を使って前日終値ベースでリターンを計算する。
   当日の終値は確定後のみ使用。
+
+Composite Alpha（Step 1 改善）:
+  alpha_score = slope_90d * r2_90d
+    slope_90d: 標準化x軸の対数価格への OLS スロープ
+    r2_90d:    決定係数（0〜1）= トレンドのスムーズさ
+  最終ランクスコア = rsr_percentile * composite_alpha（正値のみ）
+  → ランキング用（フィルタではない）
 """
 
 from __future__ import annotations
@@ -127,6 +134,60 @@ def calc_clenow_score(price: pd.Series, window: int = 90) -> float:
         return 0.0
 
     return float(annualized_slope * r_sq)
+
+
+# ------------------------------------------------------------------ #
+# Composite Alpha — Step 1 改善（RSR × トレンド品質スコア）
+# ------------------------------------------------------------------ #
+def calc_composite_alpha_matrix(
+    universe_prices: dict[str, pd.Series],
+    window: int = 90,
+) -> pd.DataFrame:
+    """
+    ユニバース全銘柄の「トレンド品質スコア」をローリング計算する。
+
+    スコア = slope_90d × r2_90d
+      slope_90d : 標準化x軸の対数価格OLSスロープ（正=上昇、負=下降）
+      r2_90d    : 決定係数（0〜1、高いほど直線的なトレンド）
+
+    最終ランキング用途:
+      final_rank_score = rsr_percentile × max(0, composite_alpha)
+      → RSR高くてもジグザグなら下位に落ちる
+      → RSR高くてスムーズな上昇なら最上位
+
+    先読みリーク防止:
+      i日目のスコアはi日目までのデータ（過去window日）のみ使用。
+      翌営業日のシグナル判定に使用すること。
+
+    計算量: O(n_days × n_symbols)（各日の窓内はベクトル演算）
+    """
+    x_raw = np.arange(window, dtype=float)
+    x_std = (x_raw - x_raw.mean()) / (x_raw.std() + 1e-8)
+    # sum(x_std) = 0, sum(x_std^2) = window（unit variance）
+    # OLS slope = dot(x_std, y) / sum(x_std^2) = dot(x_std, y) / window
+
+    result: dict[str, pd.Series] = {}
+
+    for sym, prices in universe_prices.items():
+        log_p = np.log(np.maximum(prices.values.astype(float), 1e-8))
+        n     = len(log_p)
+        arr   = np.full(n, np.nan)
+
+        for i in range(window - 1, n):
+            y = log_p[i - window + 1: i + 1]
+            if np.any(np.isnan(y)):
+                continue
+            slope  = float(np.dot(x_std, y)) / window
+            y_mean = float(y.mean())
+            y_pred = slope * x_std + y_mean
+            ss_res = float(np.sum((y - y_pred) ** 2))
+            ss_tot = float(np.sum((y - y_mean) ** 2))
+            r2     = max(0.0, 1.0 - ss_res / ss_tot) if ss_tot > 1e-8 else 0.0
+            arr[i] = slope * r2   # 負なら下降トレンド
+
+        result[sym] = pd.Series(arr, index=prices.index)
+
+    return pd.DataFrame(result)
 
 
 def calc_universe_clenow(

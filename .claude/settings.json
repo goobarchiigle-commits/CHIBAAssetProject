@@ -1,0 +1,50 @@
+{
+  "permissions": {
+    "defaultMode": "default",
+    "allow": [
+      "Edit(backtest/**)",
+      "Write(backtest/**)",
+      "Read(backtest/**)",
+      "Edit(strategy/**)",
+      "Write(strategy/**)",
+      "Read(strategy/**)",
+      "Edit(analytics/**)",
+      "Write(analytics/**)",
+      "Read(analytics/**)",
+      "Edit(logs/**)",
+      "Write(logs/**)",
+      "Read(logs/**)",
+      "Edit(tests/**)",
+      "Write(tests/**)",
+      "Read(tests/**)",
+      "Edit(results/**)",
+      "Write(results/**)",
+      "Read(results/**)",
+      "Edit(research_log/**)",
+      "Write(research_log/**)",
+      "Read(research_log/**)",
+      "Edit(research_state.md)",
+      "Write(research_state.md)"
+    ],
+    "deny": [
+      "Edit(.env)",
+      "Write(.env)"
+    ],
+    "ask": [
+      "Edit(execution/**)",
+      "Write(execution/**)",
+      "Edit(broker_api/**)",
+      "Write(broker_api/**)",
+      "Edit(risk/**)",
+      "Write(risk/**)",
+      "Edit(configs/**)",
+      "Write(configs/**)",
+      "Edit(kabusapi/**)",
+      "Write(kabusapi/**)",
+      "Edit(run_live_signal.py)",
+      "Write(run_live_signal.py)",
+      "Edit(run_morning_signal.py)",
+      "Write(run_morning_signal.py)"
+    ]
+  }
+}

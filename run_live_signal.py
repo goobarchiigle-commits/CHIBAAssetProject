@@ -521,6 +521,21 @@ def save_signal_json(result, output_dir: str) -> Path:
 def main() -> int:
     args = parse_args()
 
+    # ---- LIVE_TRADING 環境変数 二重ガード ----
+    # --live フラグ AND .env の LIVE_TRADING=true の両方が必要。
+    # どちらか片方だけでは実発注しない。
+    if args.live:
+        live_trading_env = os.environ.get("LIVE_TRADING", "false").lower()
+        if live_trading_env != "true":
+            print(
+                "[FATAL] --live フラグが指定されましたが、"
+                "環境変数 LIVE_TRADING=true が設定されていません。\n"
+                "  .env に LIVE_TRADING=true を追加してから再実行してください。\n"
+                "  （ドライランは LIVE_TRADING 不要です）",
+                file=sys.stderr,
+            )
+            return 1
+
     # ---- ユニバースロード（起動時チェック） ----
     try:
         LIVE_UNIVERSE, universe_meta = load_universe()

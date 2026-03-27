@@ -1,8 +1,34 @@
 {
-  "last_updated": "2026-03-15",
+  "last_updated": "2026-03-27",
   "period": "2018-2024",
-  "initial_capital": 2000000,
+  "initial_capital": 3000000,
   "best_result": {
+    "name": "STEP5: RSR42/trailing50d-3ATR/CB-fix/alpha2xRSR",
+    "script": "backtest/composite_alpha_bt.py --rsr42-trade",
+    "version": "phase2_stable",
+    "universe": "RSR42 (42銘柄)",
+    "exit_logic": "trailing_50d_3ATR + RSR_exit + time_stop(60d)",
+    "cb_fix": "30日タイムアウト + CB時35%スケール",
+    "alpha_formula": "alpha² × RSR",
+    "cagr": 0.166,
+    "sharpe": 1.267,
+    "max_dd": -0.161,
+    "calmar": 1.032,
+    "n_trades_yr": 80,
+    "win_rate": 0.485,
+    "r_multiple": 2.16,
+    "avg_exposure": 0.358,
+    "annual_returns": {
+      "2020": 0.145,
+      "2021": 0.233,
+      "2022": 0.026,
+      "2023": 0.172,
+      "2024": 0.138
+    },
+    "phase1_pass": true,
+    "note": "旧V2(Sharpe=1.693)より取引数増・MaxDD悪化だが2022年プラス転換が大きな改善"
+  },
+  "previous_best": {
     "name": "V2: 29銘柄/max3/均等/RSR70",
     "script": "backtest/portfolio_v2.py",
     "cagr": 0.1626,
@@ -12,7 +38,8 @@
     "n_trades": 246,
     "avg_positions": 1.6,
     "cash_ratio": 0.83,
-    "phase1_pass": true
+    "phase1_pass": true,
+    "note": "旧ベースライン。RSR29銘柄・均等ウェイト。STEP5と比べるとMaxDD優秀だが2022年-0.4%"
   },
   "triple_validation": {
     "date": "2026-03-14",
@@ -180,6 +207,24 @@
       "max_dd": -0.0612,
       "calmar": 2.656,
       "phase1": true
+    },
+    {
+      "name": "STEP5: RSR42/trailing50d-3ATR/CBfix/alpha²×RSR",
+      "cagr": 0.166,
+      "sharpe": 1.267,
+      "max_dd": -0.161,
+      "calmar": 1.032,
+      "n_trades_yr": 80,
+      "r_multiple": 2.16,
+      "capital": 3000000,
+      "date": "2026-03-27",
+      "phase1": true,
+      "key_improvements": [
+        "CB デッドロック修正（30日タイムアウト）",
+        "CB 完全停止 → 35%スケールダウンに変更",
+        "トレーリングストップ（50日高値 - 3×ATR20）",
+        "2022年: -0.4% → +2.6%（下落相場生存力向上）"
+      ]
     }
   ],
   "rolling_oos_live_equivalent": {
