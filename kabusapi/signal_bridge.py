@@ -228,6 +228,8 @@ class SignalBridge:
         rsr_universe_tickers:      dict[str, str] | None = None,
         top_k:                     int   = 4,
         max_hold_days:             int | None = 60,
+        min_hold_days:             int   = 0,   # 最低保有営業日数（RSR exitを抑制）
+        emergency_exit_pct:        float = -0.08,  # 緊急 exit 閾値（含み損 -8%でmin_hold無視）
         max_new_positions_per_day: int   = 2,
         order_rate_limit_per_min:  int   = ORDER_RATE_LIMIT_PER_MIN,
         portfolio_state_file:      Path | None = None,
@@ -249,6 +251,8 @@ class SignalBridge:
         self.benchmark_ticker          = benchmark_ticker
         self.top_k                     = top_k
         self.max_hold_days             = max_hold_days
+        self.min_hold_days             = min_hold_days
+        self.emergency_exit_pct        = emergency_exit_pct
         self.max_new_positions_per_day = max_new_positions_per_day
         self.order_rate_interval_sec   = 60.0 / max(1, order_rate_limit_per_min)
         self._state_file               = portfolio_state_file or PORTFOLIO_STATE_FILE
@@ -1084,7 +1088,27 @@ class SignalBridge:
 
             # ── filter-first アーキテクチャ（research と同じ） ───────────
             # 優先順位: トレーリングストップ > 時間ストップ > RSR低下エグジット > mean_rev反発失敗 > 再エントリー禁止 > 戦略シグナル
-            is_rank_exit = currently_holding and rsr_now < min_rsr_threshold
+
+            # 緊急 exit 判定（含み損 emergency_exit_pct 以下でmin_holdを無視）
+            # 対象: 決算ギャップダウン / 市場急落 など
+            is_emergency_exit = False
+            if (currently_holding
+                    and sym in pos_entry_prices
+                    and pos_entry_prices[sym] > 0
+                    and _ts_close > 0):
+                _pnl_pct = (_ts_close - pos_entry_prices[sym]) / pos_entry_prices[sym]
+                if _pnl_pct <= self.emergency_exit_pct:
+                    is_emergency_exit = True
+                    logger.warning(
+                        "EMERGENCY_EXIT %s pnl=%.1f%% (threshold=%.1f%%) hold=%d",
+                        sym, _pnl_pct * 100, self.emergency_exit_pct * 100, hold_td,
+                    )
+
+            # min_hold_days: 最低保有日数を満たした場合のみ RSR exit を許可
+            # 例外: 緊急 exit（含み損 -8% 以下）は min_hold を無視して即退出
+            is_rank_exit = (currently_holding
+                            and rsr_now < min_rsr_threshold
+                            and (hold_td >= self.min_hold_days or is_emergency_exit))
 
             # ── mean_rev 反発未発生検出（早期撤退）────────────────────────
             # エントリー後 MEANREV_FAIL_DAYS 営業日で High が +MEANREV_MIN_BOUNCE 未到達 → SELL
@@ -1124,6 +1148,7 @@ class SignalBridge:
                     f" < peak={_ts_highest:.0f} - 3×ATR({_ts_atr20:.0f})"
                     f" → stop={_ts_stop_price:.0f}"
                 )
+                logger.info("EXIT %s reason=TRAIL_EXIT hold=%d rsr=%.1f", sym, hold_td, rsr_now)
 
             elif is_time_exit:
                 signal_int    = -1
@@ -1132,14 +1157,17 @@ class SignalBridge:
                     f"SELL[時間ストップ]: {hold_td}営業日保有"
                     f"（上限{self.max_hold_days}日） RSR={rsr_now:.1f} rank={rsr_rank}"
                 )
+                logger.info("EXIT %s reason=TIME_STOP hold=%d rsr=%.1f", sym, hold_td, rsr_now)
 
             elif is_rank_exit:
                 signal_int    = -1
                 strategy_type = "fujiko"
                 reason = (
                     f"SELL[RSR低下]: RSR={rsr_now:.1f} < 閾値{min_rsr_threshold:.0f}"
-                    f" rank={rsr_rank}"
+                    f" rank={rsr_rank} hold={hold_td}d"
                 )
+                _exit_reason_tag = "EMERGENCY_EXIT" if is_emergency_exit else "RSR_EXIT"
+                logger.info("EXIT %s reason=%s hold=%d rsr=%.1f", sym, _exit_reason_tag, hold_td, rsr_now)
 
             elif is_meanrev_fail:
                 signal_int    = -1
@@ -1225,6 +1253,8 @@ class SignalBridge:
                     reason = (
                         f"SELL[{strat_label}]: RSR={rsr_now:.1f} mom={mom_now:+.1f}"
                     )
+                    if currently_holding:
+                        logger.info("EXIT %s reason=STRATEGY_EXIT hold=%d rsr=%.1f", sym, hold_td, rsr_now)
                 elif signal_int == 0 and not reason.startswith("HOLD[MTF"):
                     reason = (
                         f"HOLD: RSR={rsr_now:.1f} rank={rsr_rank}"

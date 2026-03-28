@@ -445,6 +445,8 @@ MIN_SECTORS          = 1        # セクター制約なし
 MAX_DD_LIMIT         = 0.15
 TOP_K                = 3        # RSR 上位 k 銘柄のみ BUY 対象（確定設計 2026-03-23）
 MAX_HOLD_DAYS        = 60       # 最大保有営業日数（OOS MaxDD -13.98% 確認済み）
+MIN_HOLD_DAYS        = int(os.environ.get("MIN_HOLD_DAYS", 5))          # 最低保有日数（RSR exit抑制 / .envで上書き可）
+EMERGENCY_EXIT_PCT   = float(os.environ.get("EMERGENCY_EXIT_PCT", -0.08)) # 緊急 exit 閾値（-8%でmin_hold無視）
 MAX_NEW_POS_PER_DAY  = 1        # 1回の実行で生成する新規 BUY 上限（過剰発注防止・初期運用安定化）
 
 
@@ -466,7 +468,8 @@ def print_banner(live: bool, universe: dict[str, str], universe_meta: dict) -> N
     print(f"  実行日時       : {datetime.now(JST).strftime('%Y-%m-%d %H:%M:%S JST')}")
     print(f"  モード         : {mode}")
     print(f"  ユニバース     : {len(universe)}銘柄 (v={version}, created={created})")
-    print(f"  ポートフォリオ : max_pos={MAX_POS} / top_k={TOP_K} / max_hold_days={MAX_HOLD_DAYS}d")
+    print(f"  ポートフォリオ : max_pos={MAX_POS} / top_k={TOP_K} / max_hold={MAX_HOLD_DAYS}d"
+          f" / min_hold={MIN_HOLD_DAYS}d / emg_exit={EMERGENCY_EXIT_PCT:.0%}")
     print(f"  安全設計       : MAX_DAILY={MAX_DAILY_ORDERS} / MAX_PER_SYM={MAX_SYMBOL_ORDERS} / MAX_OPEN={MAX_OPEN_POSITIONS}")
     _rp = _RISK_PARAMS
     _rec_uni = recommended_universe_size(CAPITAL)
@@ -670,6 +673,8 @@ def main() -> int:
         live                      = args.live,
         top_k                     = TOP_K,
         max_hold_days             = MAX_HOLD_DAYS,
+        min_hold_days             = MIN_HOLD_DAYS,
+        emergency_exit_pct        = EMERGENCY_EXIT_PCT,
         max_new_positions_per_day = MAX_NEW_POS_PER_DAY,
     )
 

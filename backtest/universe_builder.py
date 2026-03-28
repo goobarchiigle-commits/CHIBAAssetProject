@@ -17,11 +17,23 @@ TOPIX100相当ユニバース定義 + データ取得
 
 from __future__ import annotations
 
+import json
+import logging
+import os
 import sys
 import warnings
+from pathlib import Path
 
 import pandas as pd
 import yfinance as yf
+
+logger = logging.getLogger(__name__)
+
+# ------------------------------------------------------------------ #
+# スナップショット設定
+# ------------------------------------------------------------------ #
+DATA_VERSION: str  = os.environ.get("DATA_VERSION", "")  # 空文字=スナップショット不使用
+SNAPSHOT_BASE: Path = Path("data/backtest_dataset")
 
 
 # ------------------------------------------------------------------ #
@@ -128,6 +140,28 @@ TOPIX100_TICKERS: dict[str, str] = {
 # ------------------------------------------------------------------ #
 # データ取得関数
 # ------------------------------------------------------------------ #
+def _load_from_snapshot(sym: str, start: str, end: str) -> pd.DataFrame | None:
+    """
+    スナップショットから銘柄データを読み込む。
+    DATA_VERSION 未設定またはファイル不存在なら None を返す。
+    """
+    if not DATA_VERSION:
+        return None
+    path = SNAPSHOT_BASE / DATA_VERSION / f"{sym}.parquet"
+    if not path.exists():
+        return None
+    df = pd.read_parquet(path)
+    # 期間フィルタ（スナップショットは広い期間で保存されているため）
+    ts_start = pd.Timestamp(start)
+    ts_end   = pd.Timestamp(end)
+    df = df.loc[(df.index >= ts_start) & (df.index <= ts_end)]
+    # auto_adjust=False のスナップショットは "Adj Close" を Close として使う
+    if "Adj Close" in df.columns and "Close" in df.columns:
+        df = df.copy()
+        df["Close"] = df["Adj Close"]   # RSR・シグナルは調整済み終値を使用
+    return df
+
+
 def download_universe(
     tickers: dict[str, str],
     start:   str,
@@ -137,6 +171,9 @@ def download_universe(
 ) -> dict[str, dict]:
     """
     指定ユニバースの株価データを一括取得する。
+
+    DATA_VERSION 環境変数が設定されていれば data/backtest_dataset/{DATA_VERSION}/
+    のスナップショットを使用する（再現性保証）。未設定なら yfinance から取得。
 
     Args:
         tickers:  {symbol: sector} の辞書
@@ -149,21 +186,35 @@ def download_universe(
         {symbol: {"df": OHLCV DataFrame, "sector": str}} の辞書
         取得失敗・データ不足の銘柄は除外される
     """
+    if DATA_VERSION and verbose:
+        snap_dir = SNAPSHOT_BASE / DATA_VERSION
+        meta_path = snap_dir / "_meta.json"
+        snap_hash = "unknown"
+        if meta_path.exists():
+            with open(meta_path, encoding="utf-8") as f:
+                snap_hash = json.load(f).get("snapshot_hash", "unknown")
+        print(f"  [SNAPSHOT] version={DATA_VERSION}  hash={snap_hash}")
+
     warnings.filterwarnings("ignore")
     result     = {}
     failed     = []
     too_short  = []
+    snap_hits  = 0
 
     for sym, sector in tickers.items():
         try:
-            df = yf.download(sym, start=start, end=end, progress=False)
-            if df.empty:
-                failed.append(sym)
-                continue
-
-            # yfinance v0.2以降はMultiIndex → 1階層に落とす
-            if isinstance(df.columns, pd.MultiIndex):
-                df = df.droplevel(1, axis=1)
+            # ① スナップショット優先
+            df = _load_from_snapshot(sym, start, end)
+            if df is not None:
+                snap_hits += 1
+            else:
+                # ② フォールバック: yfinance
+                df = yf.download(sym, start=start, end=end, progress=False)
+                if df.empty:
+                    failed.append(sym)
+                    continue
+                if isinstance(df.columns, pd.MultiIndex):
+                    df = df.droplevel(1, axis=1)
 
             if len(df) < min_days:
                 too_short.append((sym, len(df)))
@@ -171,7 +222,8 @@ def download_universe(
 
             result[sym] = {"df": df, "sector": sector}
             if verbose:
-                print(f"  ✓ {sym:<8} ({sector:<8}) : {len(df):,} 日")
+                src = "SNAP" if snap_hits > len(result) - 1 else "yf  "
+                print(f"  ✓ {sym:<8} ({sector:<8}) : {len(df):,} 日  [{src}]")
 
         except Exception as e:
             failed.append(sym)
@@ -179,7 +231,8 @@ def download_universe(
                 print(f"  ✗ {sym:<8} 取得失敗: {e}")
 
     if verbose:
-        print(f"\n取得成功: {len(result)} / {len(tickers)} 銘柄", flush=True)
+        print(f"\n取得成功: {len(result)} / {len(tickers)} 銘柄"
+              f"  (snapshot={snap_hits} / yfinance={len(result)-snap_hits})", flush=True)
         if too_short:
             print(f"データ不足で除外: {[s for s, _ in too_short]}")
         if failed:

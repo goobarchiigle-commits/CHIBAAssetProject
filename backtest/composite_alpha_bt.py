@@ -265,8 +265,10 @@ def run_scenario(
     verbose:        bool = True,
     tech_matrices:  dict | None = None,   # STEP4+: 事前計算テクニカル指標
     breadth_series: pd.Series | None = None,  # STEP6+: Market Breadth
-    breadth_stop:   float = BREADTH_STOP,    # STEP6+: BUY停止閾値（調整可能）
-    breadth_reduce: float = BREADTH_REDUCE,  # STEP6+: 縮小閾値（調整可能）
+    breadth_stop:        float = BREADTH_STOP,    # STEP6+: BUY停止閾値（調整可能）
+    breadth_reduce:      float = BREADTH_REDUCE,  # STEP6+: 縮小閾値（調整可能）
+    min_hold:            int   = 0,               # 最低保有日数（0=無効）
+    rsr_exit_threshold:  float = MIN_RSR,         # RSR exitの閾値（デフォルト=MIN_RSR=75）
 ) -> dict:
     """
     汎用バックテストループ。
@@ -326,6 +328,7 @@ def run_scenario(
     pos_list     = []
     cand_list    = []
     trades:      list[dict] = []
+    exit_reason_counts: dict[str, int] = {}   # exit reason 集計
     peak_equity  = float(capital)
     cb_active    = False
     cb_days      = 0     # CB発動からの経過営業日（30日で強制解除）
@@ -409,8 +412,8 @@ def run_scenario(
                 sell_signals.append((sym, "TIME_STOP"))
                 continue
 
-            # RSR低下エグジット
-            if is_holding and rsr_val < MIN_RSR:
+            # RSR低下エグジット（min_hold: 最低保有日数を満たした場合のみ）
+            if is_holding and rsr_val < rsr_exit_threshold and hold_idx >= min_hold:
                 sell_signals.append((sym, "RSR_EXIT"))
                 continue
 
@@ -482,7 +485,9 @@ def run_scenario(
             cash    += proceeds
             trades.append({"symbol": sym, "side": "SELL",
                            "entry": pos.entry_price, "exit": sell_px,
-                           "qty": pos.qty, "pnl": pnl, "reason": reason})
+                           "qty": pos.qty, "pnl": pnl, "reason": reason,
+                           "entry_idx": pos.entry_idx, "exit_idx": i})
+            exit_reason_counts[reason] = exit_reason_counts.get(reason, 0) + 1
             del positions[sym]
             if reason == "TIME_STOP":
                 reentry_ban[sym] = i + 1 + REENTRY_COOL
@@ -584,25 +589,33 @@ def run_scenario(
         y_ret = float(grp.iloc[-1] / grp.iloc[0] - 1)
         annual[str(yr)] = round(y_ret * 100, 2)
 
+    # データセットバージョン（再現性チェック用）
+    import os as _os
+    _dataset_version = _os.environ.get("DATA_VERSION", "live_yfinance")
+
     return {
         "scenario":       scenario,
+        "dataset_version": _dataset_version,   # ← 再現性チェック用
         "cagr":           round(cagr * 100, 2),
         "sharpe":         round(sharpe, 3),
         "max_dd":         round(max_dd * 100, 2),
         "calmar":         round(calmar, 3),
         "n_trades":       len(sells),
         "n_trades_yr":    round(len(sells) / max(years, 0.01), 1),
-        "avg_hold_days":  round(float(np.mean([i - t.get("entry_idx", i)
-                                               for t in trades if t["side"] == "SELL"]))
+        "avg_hold_days":  round(float(np.mean([t["exit_idx"] - t["entry_idx"]
+                                               for t in trades if t["side"] == "SELL"
+                                               and "exit_idx" in t and "entry_idx" in t]))
                                 if sells else 0, 1),
         "win_rate":       round(win_rate * 100, 1),
         "avg_win_pct":    round(avg_win_pct, 2),
         "avg_lose_pct":   round(avg_lose_pct, 2),
         "r_multiple":     round(r_multiple, 2),
         "avg_exposure":   round(float(np.mean(exposure_list)) * 100, 1),
-        "avg_candidates": round(float(np.mean(cand_list)), 2),
-        "annual_returns": annual,
-        "equity_curve":   eq,
+        "avg_candidates":     round(float(np.mean(cand_list)), 2),
+        "annual_returns":     annual,
+        "equity_curve":       eq,
+        "exit_reason_counts": exit_reason_counts,
+        "_trades":            [t for t in trades if t["side"] == "SELL"],
     }
 
 
