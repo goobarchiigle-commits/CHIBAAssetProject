@@ -611,7 +611,8 @@ def run_scenario(
         "avg_lose_pct":   round(avg_lose_pct, 2),
         "r_multiple":     round(r_multiple, 2),
         "avg_exposure":   round(float(np.mean(exposure_list)) * 100, 1),
-        "avg_candidates":     round(float(np.mean(cand_list)), 2),
+        "avg_candidates":              round(float(np.mean(cand_list)), 2),
+        "avg_simultaneous_holdings":  round(float(np.mean(pos_list)), 2),
         "annual_returns":     annual,
         "equity_curve":       eq,
         "exit_reason_counts": exit_reason_counts,
@@ -645,6 +646,21 @@ def main() -> int:
     else:
         trade_syms = _load_trading_universe()
         print(f"\n[1/6] ユニバース: RSR={len(rsr_syms)}銘柄, 取引={len(trade_syms)}銘柄（TEMPORAL24）")
+
+    # ---- 再現性ログ（Step1 基準確認用） ----
+    import os as _os
+    _dataset_version = _os.environ.get("DATA_VERSION", "live_yfinance")
+    _dataset_hash    = "unknown"
+    _meta_path       = Path("data/backtest_dataset") / _dataset_version / "_meta.json"
+    if _meta_path.exists():
+        import json as _json
+        with open(_meta_path, encoding="utf-8") as _f:
+            _dataset_hash = _json.load(_f).get("snapshot_hash", "unknown")
+    print(f"\nDATASET_VERSION  {_dataset_version}")
+    print(f"DATASET_HASH     {_dataset_hash}")
+    print(f"CAPITAL          {CAPITAL:,}")
+    print(f"UNIVERSE         {len(trade_syms)}")
+    print()
 
     # ---- 2. 価格データ取得 ----
     all_syms = {**rsr_syms, **trade_syms}   # RSR42 trade時は重複するが問題なし
@@ -750,6 +766,7 @@ def main() -> int:
         ("R倍率",      "r_multiple",    "{:.2f}"),
         ("avgExp (%)", "avg_exposure",  "{:.1f}"),
         ("取引数/年",  "n_trades_yr",   "{:.0f}"),
+        ("avgHoldings", "avg_simultaneous_holdings", "{:.2f}"),
     ]
     for label, key, fmt in metrics:
         row = f"  {label:<20}"

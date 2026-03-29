@@ -1,5 +1,5 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-03-27（STEP5確定 / 資本300万円 / CBデッドロック修正完了）
+# Single Source of Truth / 最終更新: 2026-03-29（RSRボトルネック分析 / breadthバグ確定 / CAPITAL不一致確認）
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
 
 ---
@@ -18,6 +18,26 @@
 | Phase 2 | 月1〜5万円 × 3ヶ月連続 | 🔄 実運用テスト中 |
 | Phase 3 | 月20万円 × 6ヶ月、DD<15% | ⬜ 未着手 |
 | Phase 4 | 月30万円超 × 12ヶ月 | ⬜ 未着手 |
+
+---
+
+## 現在の課題（2026-03-29 更新）
+
+### ⚠ 構造的ボトルネック: avgHoldings < 3
+
+**結論**: 現在の戦略は `RSR42 × 252日RSR × min_rsr=75` の組み合わせにより
+avgHoldings が常に 2 台に落ちる構造になっている。
+
+**確認済みの原因**:
+1. `min_rsr=75.0` フィルターが強すぎる → 42銘柄中でRSR≥75を常時満たす銘柄が2〜3しかない
+2. breadth（STEP6）は **dead code** → RSRパーセンタイルベースのため常に0.26固定
+3. RSRコンテキスト拡大（42→76→91）ではavgHoldings改善せず（全て危険域）
+
+**次の優先タスク（未完了）**:
+- [ ] min_rsr 感度テスト（75→65→60→55）でavgHoldings改善点を特定
+- [ ] breadth修正: price>MA200 + TOPIX150MA の2条件フィルター（entry suppression のみ）
+- [ ] 2022 DD真因分解（Step3）: exit_reason / gap_loss / market_beta の内訳
+- [ ] CAPITAL整合性修正: strategy.yaml / run_live_signal.py を 3,000,000 に統一
 
 ---
 
@@ -92,6 +112,82 @@ zero_exp≈19% = 下降相場での意図的待機（Feature）
 - パラメータ感度: 滑らかな感度曲線（過学習なし）
 - 銘柄サブセット20試行: Phase1達成率100%
 - 詳細: `results/backtest_summary.json` → `robustness_analysis`
+
+---
+
+## 完了した研究（2026-03-29）
+
+### ✅ データ凍結後 基準バックテスト取得（Step1）
+**スクリプト**: `backtest/composite_alpha_bt.py --rsr42-trade`
+**データ**: `DATA_VERSION=2026-03-28 / HASH=492c888409041827`
+**結果**: `results/composite_alpha_bt_rsr42_2026-03-29.json`
+
+| シナリオ | CAGR | Sharpe | MaxDD | Calmar | avgHoldings |
+|---|---|---|---|---|---|
+| BASELINE | +15.2% | 0.648 | -18.9% | 0.806 | **2.41** |
+| STEP1 | +14.4% | 0.614 | -18.3% | 0.788 | 2.36 |
+| STEP2 | +11.7% | 0.539 | -18.1% | 0.646 | 2.19 |
+| STEP3 | +12.3% | 0.566 | -18.1% | 0.682 | 2.15 |
+| STEP5 | +14.1% | 0.604 | -18.3% | 0.769 | 2.35 |
+| STEP6/6A/6B | 全STEP5と同値 | ← **breadthバグ確定** |
+
+**breadth確定バグ**: STEP5=STEP6=STEP6A=STEP6B（完全一致）
+- Breadth中央値 = 0.26（定数）
+- 原因: RSRがパーセンタイルランクのため、RSR≥75の割合は定義上≈25%で固定
+- `_calc_breadth()` は dead code
+
+**ログ出力追加済み**（再現性確認用）:
+```
+print("DATASET_VERSION", dataset_version)
+print("DATASET_HASH",    dataset_hash)
+print("CAPITAL",         config.capital)
+print("UNIVERSE",        len(universe))
+```
+また `avg_simultaneous_holdings` を全シナリオに追加。
+
+---
+
+### ✅ CAPITAL整合性検証（Step2）
+
+| Layer | 場所 | 値 | 状態 |
+|---|---|---|---|
+| configs | `configs/strategy.yaml` `portfolio.capital` | **2,000,000** | ❌ 旧設定 |
+| engine (BT) | `composite_alpha_bt.py` `CAPITAL` 定数 | **3,000,000** | ✅ 実口座と一致 |
+| engine (live) | `run_live_signal.py` `CAPITAL` default | **2,000,000** | ❌ env未設定時旧値 |
+| engine (v2) | `portfolio_v2.py` `CAPITAL` | **2,000,000** | ❌ 旧設定 |
+| sizing cap | `alloc = min(alloc, capital * 0.25)` | 初期資本固定 | ⚠ equity連動でない |
+
+**DD分析は正しい**（`(cur_equity - peak_equity) / peak_equity`）。ただし position cap が初期資本固定なのでポートフォリオ成長時に保守的になる。
+
+**未修正**（次セッションで対応）:
+- `configs/strategy.yaml`: `capital: 2_000_000` → `3_000_000`
+- `run_live_signal.py`: default `2_000_000` → `3_000_000`
+
+---
+
+### ✅ RSRユニバース拡張テスト（Step3 第1部）
+**スクリプト**: `backtest/rsr_universe_sweep.py`（新規）
+**結果**: `results/rsr_universe_sweep_2026-03-29.json`
+
+設計: トレードユニバース=RSR42固定、RSRコンテキストのみ拡大
+
+| シナリオ | RSRコンテキスト | avgHoldings | 取引数/年 | top5固着HHI | Sharpe |
+|---|---|---|---|---|---|
+| RSR_CTX42 | 42銘柄 | **2.13 ⚠** | 40 | 0.0578 | **0.618** |
+| RSR_CTX76 | 76銘柄 | **1.82 ⚠** | 39 | 0.0616 | 0.430 |
+| RSR_CTX91 | 91銘柄 | **2.33 ⚠** | 44 | 0.0578 | 0.484 |
+
+**仮説「RSRコンテキスト拡大 → avgHoldings改善」は棄却**:
+- 全サイズで avgHoldings < 3（危険域）
+- ランクターンオーバー = 0.07（全サイズ固着）
+- RSR42が最高性能（Sharpe 0.618）
+
+**真因確定**: `min_rsr=75.0` フィルターが強すぎる。コンテキストを広げると同じ銘柄のRSRが下がるため、RSR76/91はむしろ悪化。
+
+**RSR遅延（Step2）速報**:
+- avg_lag_days = 5.8日（理想-5〜+5のギリギリ外）
+- lag>20日の割合: 5.1%（許容範囲）
+- RSR遅延は軽微 → 遅延はボトルネックではない
 
 ---
 
