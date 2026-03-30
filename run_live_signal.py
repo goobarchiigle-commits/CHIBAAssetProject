@@ -39,8 +39,24 @@ import json
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
-sys.path.insert(0, os.path.dirname(__file__))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.stdout.reconfigure(encoding="utf-8")
+
+# .env 読み込み + パス定数 + ライブ安全設定（paths.py が一括管理）
+from paths import (
+    SIGNALS_DIR, ORDER_LOCK_FILE, LIVE_LOG_DIR,
+    PHASE2_METRICS_FILE, RSR_UNIVERSE_FILE,
+    LIVE_UNIVERSE_FILE, SHADOW_UNIVERSE_FILE,
+    LIVE_MODE, MAX_ORDERS_PER_DAY, KABUS_PORT,
+    assert_live_ready, assert_execution_context,
+    assert_kabus_connection, verify_dataset_integrity,
+    acquire_runtime_lock, release_runtime_lock,
+    enforce_order_rate_limit, record_order_sent,
+)
+
+# ── 実行コンテキスト検証（最優先: モジュール読み込み直後）──────────────────
+# research / backtest スクリプトが LIVE_MODE=true のまま呼ばれた場合にブロック
+assert_execution_context()
 
 JST = timezone(timedelta(hours=9))
 
@@ -52,27 +68,10 @@ logging.basicConfig(
 logger = logging.getLogger("live_signal")
 
 # ------------------------------------------------------------------ #
-# .env 読み込み（python-dotenv があれば使用、なければ手動パース）
-# ------------------------------------------------------------------ #
-def _load_dotenv() -> None:
-    try:
-        from dotenv import load_dotenv
-        load_dotenv()
-    except ImportError:
-        env_path = Path(__file__).parent / ".env"
-        if env_path.exists():
-            for line in env_path.read_text(encoding="utf-8").splitlines():
-                line = line.strip()
-                if line and not line.startswith("#") and "=" in line:
-                    k, _, v = line.partition("=")
-                    os.environ.setdefault(k.strip(), v.strip())
-
-_load_dotenv()
-
-# ------------------------------------------------------------------ #
 # 安全設計定数（取引所の過剰発注監視対策）
+# MAX_DAILY_ORDERS は paths.py の MAX_ORDERS_PER_DAY（.env で制御）
 # ------------------------------------------------------------------ #
-MAX_DAILY_ORDERS   = 20   # 1日の発注上限（BUY + SELL 合計）
+MAX_DAILY_ORDERS   = MAX_ORDERS_PER_DAY  # .env の MAX_ORDERS_PER_DAY= で変更可（デフォルト20）
 MAX_SYMBOL_ORDERS  = 2    # 1銘柄あたりの1日の発注上限
 MAX_OPEN_POSITIONS = 10   # ポートフォリオ最大保有銘柄数（ハードキャップ）
 MIN_UNIVERSE_SIZE  = 10   # ユニバース最小銘柄数（これを下回ったら起動しない）
@@ -90,18 +89,11 @@ def load_universe() -> tuple[dict[str, str], dict]:
     Raises:
         RuntimeError: 環境変数未設定・ファイル不存在・銘柄数不足
     """
-    universe_file = os.environ.get("LIVE_UNIVERSE_FILE")
-    if not universe_file:
-        raise RuntimeError(
-            "LIVE_UNIVERSE_FILE が設定されていません。\n"
-            ".env に LIVE_UNIVERSE_FILE=configs/universe/2026Q1_temporal24.json を追加してください。"
-        )
-
-    file_path = Path(universe_file)
+    file_path = LIVE_UNIVERSE_FILE
     if not file_path.exists():
         raise RuntimeError(
             f"ユニバースファイルが見つかりません: {file_path}\n"
-            "パスを確認してください。"
+            "LIVE_UNIVERSE_FILE 環境変数または configs/universe/ を確認してください。"
         )
 
     data = json.loads(file_path.read_text(encoding="utf-8"))
@@ -229,9 +221,8 @@ def filter_universe_by_price(
 
 
 # ------------------------------------------------------------------ #
-# 1. 二重発注防止 — オーダーロックファイル
+# 1. 二重発注防止 — オーダーロックファイル（paths.py からインポート済み）
 # ------------------------------------------------------------------ #
-ORDER_LOCK_FILE = Path("runtime/order_lock.json")
 
 def _load_order_lock() -> dict:
     if not ORDER_LOCK_FILE.exists():
@@ -327,11 +318,8 @@ def _send_orders_with_retry(bridge, orders: list) -> list[dict]:
 
 
 # ------------------------------------------------------------------ #
-# 3. ライブ運用監視ログ
+# 3. ライブ運用監視ログ（LIVE_LOG_DIR / PHASE2_METRICS_FILE は paths.py からインポート済み）
 # ------------------------------------------------------------------ #
-LIVE_LOG_DIR = Path("logs/live")
-
-PHASE2_METRICS_FILE = Path("logs/phase2_live_metrics.jsonl")
 
 def log_phase2_metrics(result) -> None:
     """
@@ -424,7 +412,7 @@ FUJIKO_PARAMS = dict(
     min_rsr          = 75.0,   # research 確定値（filter-first アーキテクチャ）
     mom_period       = 21,
     turtle_entry     = 20,
-    turtle_exit      = 20,
+    turtle_exit      = 55,   # 2026-03-31: exit感度テストで20→55に変更
     use_turtle_entry = True,
 )
 logger.info(
@@ -455,7 +443,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--live",   action="store_true", help="kabuステーション API に実際に発注する")
     p.add_argument("--yes","-y", action="store_true", help="発注確認プロンプトをスキップ")
     p.add_argument("--no-save", action="store_true", help="JSON シグナルファイルを保存しない")
-    p.add_argument("--output-dir", default="data/signals", help="シグナルJSONの保存先")
+    p.add_argument("--output-dir", default=str(SIGNALS_DIR), help="シグナルJSONの保存先")
     return p.parse_args()
 
 
@@ -568,22 +556,32 @@ def save_signal_json(result, output_dir: str) -> Path:
 def main() -> int:
     args = parse_args()
 
-    # ---- LIVE_TRADING 環境変数 二重ガード ----
-    # --live フラグ AND .env の LIVE_TRADING=true の両方が必要。
-    # どちらか片方だけでは実発注しない。
+    # ── Step2: 二重起動防止（最初に取得・atexit で自動解放）──────────────────
     if args.live:
-        live_trading_env = os.environ.get("LIVE_TRADING", "false").lower()
-        if live_trading_env != "true":
-            print(
-                "[FATAL] --live フラグが指定されましたが、"
-                "環境変数 LIVE_TRADING=true が設定されていません。\n"
-                "  .env に LIVE_TRADING=true を追加してから再実行してください。\n"
-                "  （ドライランは LIVE_TRADING 不要です）",
-                file=sys.stderr,
-            )
+        try:
+            acquire_runtime_lock()
+        except RuntimeError as _le:
+            print(f"[FATAL] {_le}", file=sys.stderr)
             return 1
 
-    # ---- ユニバースロード（起動時チェック） ----
+    # ── LIVE_MODE 二重ガード（paths.py 経由）────────────────────────────────
+    # --live フラグ AND .env の LIVE_MODE=true の両方が必要。
+    if args.live:
+        try:
+            assert_live_ready()          # LIVE_MODE / ファイル存在 / 上限値を一括チェック
+            assert_kabus_connection()    # kabuStation API 疎通確認（未起動ならここで止まる）
+        except RuntimeError as _e:
+            release_runtime_lock()
+            print(f"[FATAL] {_e}", file=sys.stderr)
+            return 1
+
+    # ── データ整合性チェック ──────────────────────────────────────────────────
+    try:
+        verify_dataset_integrity(os.environ.get("DATA_VERSION", ""))
+    except RuntimeError as _de:
+        logger.warning("データ整合性チェック警告（ライブは継続）: %s", _de)
+
+    # ── ユニバースロード（起動時チェック）────────────────────────────────────
     try:
         LIVE_UNIVERSE, universe_meta = load_universe()
     except RuntimeError as e:
@@ -592,6 +590,20 @@ def main() -> int:
 
     print_banner(args.live, LIVE_UNIVERSE, universe_meta)
 
+    # ── Step3: 本番モード明示ログ ──────────────────────────────────────────
+    if args.live:
+        logger.warning(
+            "★ LIVE TRADING ENABLED"
+            " | max_orders=%d/day | cooldown=%ss | kabu_port=%s"
+            " | universe=%d銘柄 | universe_ver=%s | dataset=%s",
+            MAX_ORDERS_PER_DAY,
+            os.environ.get("ORDER_COOLDOWN_SECONDS", "5"),
+            KABUS_PORT,
+            len(LIVE_UNIVERSE),
+            universe_meta.get("version", "unknown"),
+            os.environ.get("DATA_VERSION", "live_yfinance"),
+        )
+
     import warnings
     warnings.filterwarnings("ignore")
 
@@ -599,13 +611,9 @@ def main() -> int:
     # research / live / backtest で同一の母集団を使い RSR percentile を統一する。
     # RSR は cross-sectional factor なので母集団が変わると別指標になる。
     # 2026-03-24 バックテスト検証で RSR62 の Calmar +28% / Sharpe +9% を確認 → 採用。
-    # 環境変数 RSR_UNIVERSE_FILE で上書き可能。デフォルトは configs/rsr_universe_42.csv。
-    _rsr_universe_file = os.environ.get(
-        "RSR_UNIVERSE_FILE",
-        str(Path(__file__).parent / "configs" / "rsr_universe_42.csv"),
-    )
+    # RSR_UNIVERSE_FILE は paths.py / 環境変数で管理（絶対パス保証済み）
     import pandas as _pd_rsr
-    _rsr_df = _pd_rsr.read_csv(_rsr_universe_file)
+    _rsr_df = _pd_rsr.read_csv(RSR_UNIVERSE_FILE)
     RSR_UNIVERSE: dict[str, str] = {
         row["symbol"]: row.get("sector", "不明")
         for _, row in _rsr_df.iterrows()
@@ -637,13 +645,10 @@ def main() -> int:
 
     # ---- Shadow Universe（監視専用・RSR42母集団は変更しない）----
     # SHADOW_UNIVERSE_FILE 未設定でも動作する（省略可能）。
-    _shadow_file = os.environ.get(
-        "SHADOW_UNIVERSE_FILE",
-        str(Path(__file__).parent / "configs" / "universe" / "shadow_universe.json"),
-    )
+    # SHADOW_UNIVERSE_FILE は paths.py / 環境変数で管理（絶対パス保証済み）
     SHADOW_UNIVERSE: dict[str, str] = {}
     try:
-        _shadow_path = Path(_shadow_file)
+        _shadow_path = SHADOW_UNIVERSE_FILE
         if _shadow_path.exists():
             _shadow_data = json.loads(_shadow_path.read_text(encoding="utf-8"))
             SHADOW_UNIVERSE = _shadow_data.get("symbols", {})
@@ -799,7 +804,9 @@ def main() -> int:
     # ----------------------------------------------------------------
     print(f"\n発注中（最大{MAX_RETRY}回リトライ）...")
     try:
+        enforce_order_rate_limit()          # レートリミット確認（kabu API BAN防止）
         send_results = _send_orders_with_retry(bridge, order_objects)
+        record_order_sent()                 # タイムスタンプ記録
     except RuntimeError as e:
         logger.error("発注中断: %s", e)
         print(f"\n[FATAL] 発注失敗: {e}")

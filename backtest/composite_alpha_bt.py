@@ -65,7 +65,7 @@ COST_ONE_WAY   = SLIPPAGE + COMMISSION
 MIN_SEPA       = 6
 MOM_PERIOD     = 21
 TURTLE_ENTRY   = 20
-TURTLE_EXIT    = 20
+TURTLE_EXIT    = 55   # 2026-03-31: exit感度テストで20→55に変更（IS Sharpe +12.6%）
 
 COMP_ALPHA_WINDOW = 90   # Composite Alpha 計算ウィンドウ
 
@@ -439,7 +439,7 @@ def run_scenario(
                 continue
             sig = strats[sym].generate_signal(past)
 
-            if sig == -1 and is_holding:
+            if sig == -1 and is_holding and hold_idx >= min_hold:
                 sell_signals.append((sym, "STRATEGY_EXIT"))
             elif sig == 1 and not is_holding:
                 ban_until = reentry_ban.get(sym, -1)
@@ -730,6 +730,7 @@ def main() -> int:
             breadth_series = breadth_series,
             breadth_stop   = b_stop,
             breadth_reduce = b_reduce,
+            min_hold       = 3,   # 2026-03-31: min_hold感度テストで採用
         )
         results[scenario] = res
 

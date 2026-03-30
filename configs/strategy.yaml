@@ -7,8 +7,9 @@ fujiko:
   min_rsr: 70.0         # RSR最低閾値（感度分析で70がベスト）
   mom_period: 21        # RSRモメンタム計算期間（感度分析で21がベスト）
   turtle_entry: 20      # タートル・エントリー（20日高値ブレイク）
-  turtle_exit: 20       # タートル・エグジット（20日安値割れ）← 3way検証で10→20に変更 2026-03-20
+  turtle_exit: 55       # タートル・エグジット（55日安値割れ）← exit感度テストで20→55に変更 2026-03-31（IS Sharpe +12.6%）
   use_turtle_entry: true
+  min_hold: 3             # 最低保有日数（RSRモメンタムエグジット抑制）← 2026-03-31 min_hold感度テストで採用
 
 mean_reversion:
   rsi_period: 5
