@@ -29,8 +29,10 @@ from datetime import date as date_type
 from pathlib import Path
 
 warnings.filterwarnings("ignore")
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.stdout.reconfigure(encoding="utf-8")
+
+from paths import CONFIGS_DIR, UNIVERSE_DIR, RESULTS_DIR, BACKTEST_DATASET_DIR
 
 import numpy as np
 import pandas as pd
@@ -45,8 +47,8 @@ from backtest.universe_builder        import download_universe
 # ------------------------------------------------------------------ #
 # 定数（live_equivalent.py 確定値と揃える）
 # ------------------------------------------------------------------ #
-RSR_UNIVERSE_CSV  = Path("configs/rsr_universe_42.csv")
-TRADING_UNIVERSE_JSON = Path("configs/universe/2026Q1_temporal24.json")
+RSR_UNIVERSE_CSV      = CONFIGS_DIR / "rsr_universe_42.csv"
+TRADING_UNIVERSE_JSON = UNIVERSE_DIR / "2026Q1_temporal24.json"
 
 START          = "2018-01-01"
 END            = "2024-12-31"
@@ -98,7 +100,7 @@ MR_PARAMS = dict(
     ma_long=200, stop_loss_pct=0.07, max_hold_days=10, knife_threshold=0.15,
 )
 
-OUTPUT_DIR = Path("results")
+OUTPUT_DIR = RESULTS_DIR
 TOPIX_SYMBOL = "1306.T"   # NEXT FUNDS TOPIX ETF（TOPIXプロキシ）
 
 
@@ -627,8 +629,6 @@ def main() -> int:
     p = argparse.ArgumentParser()
     p.add_argument("--start",       default=START)
     p.add_argument("--end",         default=END)
-    p.add_argument("--rsr42-trade", action="store_true",
-                   help="取引ユニバースをRSR42に変更（TEMPORAL24のRSR=0問題を修正）")
     args = p.parse_args()
 
     print("=" * 70)
@@ -637,21 +637,16 @@ def main() -> int:
     print("=" * 70)
 
     # ---- 1. ユニバース読み込み ----
-    rsr_syms = _load_rsr_universe()
-    if args.rsr42_trade:
-        # Bug修正: TEMPORAL24銘柄がRSR42に含まれずrsr_val=0になる問題を回避
-        # RSR42を取引ユニバースとして使用 → rsr_val が正常値になる
-        trade_syms = rsr_syms
-        print(f"\n[1/6] ユニバース: RSR42を取引ユニバースとして使用（{len(trade_syms)}銘柄）")
-    else:
-        trade_syms = _load_trading_universe()
-        print(f"\n[1/6] ユニバース: RSR={len(rsr_syms)}銘柄, 取引={len(trade_syms)}銘柄（TEMPORAL24）")
+    # 2026-03-30: RSR42に統一（TEMPORAL24廃止）
+    rsr_syms   = _load_rsr_universe()
+    trade_syms = rsr_syms   # RSR42を取引・RSR両方のユニバースとして使用
+    print(f"\n[1/6] ユニバース: RSR42統一（取引・RSR共通 {len(trade_syms)}銘柄）")
 
     # ---- 再現性ログ（Step1 基準確認用） ----
     import os as _os
     _dataset_version = _os.environ.get("DATA_VERSION", "live_yfinance")
     _dataset_hash    = "unknown"
-    _meta_path       = Path("data/backtest_dataset") / _dataset_version / "_meta.json"
+    _meta_path       = BACKTEST_DATASET_DIR / _dataset_version / "_meta.json"
     if _meta_path.exists():
         import json as _json
         with open(_meta_path, encoding="utf-8") as _f:

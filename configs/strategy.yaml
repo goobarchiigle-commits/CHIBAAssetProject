@@ -1,6 +1,6 @@
 # strategy.yaml — 戦略パラメータ設定（Single Source of Truth）
-# 最終更新: 2026-03-15
-# ベースライン: V2設定 (Calmar=2.656)
+# 最終更新: 2026-03-30
+# ベースライン: RSR42統一（TEMPORAL24廃止 / capital=3,000,000に修正）
 
 fujiko:
   min_sepa: 6           # SEPA条件の最低達成数（8条件中）
@@ -24,7 +24,7 @@ sector_strategy:
   平均回帰: [ガス, 鉄鋼, 銀行, 保険, 輸送機器, 化学, 陸運, 石油]
 
 portfolio:
-  capital: 2_000_000          # 初期資本（円）
+  capital: 3_000_000          # 初期資本（円）← 2026-03-30 実口座300万円と統一
   max_positions: 3            # 最大同時保有銘柄数 ← 拡張検証中
   min_sectors: 1              # 最低セクター数（制約なし）
   max_single_weight: 0.25     # 1銘柄最大ウェイト（25%）
