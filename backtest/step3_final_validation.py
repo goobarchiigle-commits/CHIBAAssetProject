@@ -44,7 +44,7 @@ MAX_POS     = 3
 CAPITAL     = 2_000_000
 FULL_START  = "2016-01-01"   # WF IS期間の先頭余白を含む
 FULL_END    = "2024-12-31"
-OUTPUT      = "C:/Users/owner/.claude/レポート"
+OUTPUT      = "C:/ai-trading/reports"
 os.makedirs(OUTPUT, exist_ok=True)
 
 SECTOR_STRATEGY: dict[str, str] = {

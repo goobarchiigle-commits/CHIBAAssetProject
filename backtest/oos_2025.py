@@ -46,7 +46,7 @@ IS_END     = "2024-12-31"
 OOS_START  = "2025-01-01"
 OOS_END    = "2025-12-31"
 CAPITAL    = 2_000_000
-OUTPUT     = "C:/Users/owner/.claude/レポート"
+OUTPUT     = "C:/ai-trading/reports"
 os.makedirs(OUTPUT, exist_ok=True)
 
 # セクター→戦略マッピング（portfolio_temporal_separation.py と同一）

@@ -40,7 +40,7 @@ from backtest.mean_reversion_strategy import MeanReversionStrategy
 from backtest.portfolio_engine        import PortfolioEngine
 from backtest.engine                  import BacktestEngine, TradeCost
 
-OUTPUT = "C:/Users/owner/.claude/レポート"
+OUTPUT = "C:/ai-trading/reports"
 os.makedirs(OUTPUT, exist_ok=True)
 
 # ------------------------------------------------------------------ #

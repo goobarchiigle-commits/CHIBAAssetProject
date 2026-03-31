@@ -21,7 +21,7 @@ from backtest.engine                  import TradeCost
 START   = "2018-01-01"
 END     = "2024-12-31"
 CAPITAL = 2_000_000
-OUT_DIR = "C:/Users/owner/.claude/レポート"
+OUT_DIR = "C:/ai-trading/reports"
 
 SECTOR_STRATEGY = {
     "海運":"fujiko","機械":"fujiko","電機精密":"fujiko","商社":"fujiko",
