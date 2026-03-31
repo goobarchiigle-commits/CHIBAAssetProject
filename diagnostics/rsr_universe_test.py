@@ -20,9 +20,11 @@ import warnings
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.stdout.reconfigure(encoding="utf-8")
-sys.path.insert(0, str(Path(__file__).parent.parent))
 warnings.filterwarnings("ignore")
+
+from paths import UNIVERSE_DIR, LOGS_DIR
 
 import pandas as pd
 import numpy as np
@@ -215,7 +217,7 @@ def print_summary(results: dict) -> None:
 # ------------------------------------------------------------------ #
 def main():
     # 取引ユニバースを temporal24.json から読み込む
-    universe_file = Path("configs/universe/2026Q1_temporal24.json")
+    universe_file = UNIVERSE_DIR / "2026Q1_temporal24.json"
     data = json.loads(universe_file.read_text(encoding="utf-8"))
     trade_symbols = list(data["symbols"].keys())
     print(f"取引ユニバース: {len(trade_symbols)}銘柄")
@@ -224,7 +226,7 @@ def main():
     print_summary(results)
 
     # ログ保存
-    log_dir = Path("logs/diagnostics")
+    log_dir = LOGS_DIR / "diagnostics"
     log_dir.mkdir(parents=True, exist_ok=True)
 
     out = {

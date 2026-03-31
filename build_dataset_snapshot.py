@@ -41,7 +41,10 @@ from pathlib import Path
 import pandas as pd
 import yfinance as yf
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.stdout.reconfigure(encoding="utf-8")
+
+from paths import BACKTEST_DATASET_DIR, RSR_UNIVERSE_FILE  # .env 読み込み込み
 
 # ------------------------------------------------------------------ #
 # 設定
@@ -50,7 +53,7 @@ DATA_VERSION: str = os.environ.get("DATA_VERSION", "2026-03-28")
 START:        str = "2010-01-01"   # 252日RSR計算には252日の先行データが必要
 END:          str = "2026-04-01"   # 今日以降は取得されない
 
-SNAPSHOT_DIR: Path = Path("data/backtest_dataset") / DATA_VERSION
+SNAPSHOT_DIR: Path = BACKTEST_DATASET_DIR / DATA_VERSION
 TOPIX_SYMBOL: str  = "^TOPIX"     # TOPIX指数
 
 # ------------------------------------------------------------------ #
@@ -61,7 +64,7 @@ def _collect_all_symbols() -> dict[str, str]:
     all_syms: dict[str, str] = {}
 
     # ① RSR42ユニバース（メインバックテスト）
-    rsr_csv = Path("configs/rsr_universe_42.csv")
+    rsr_csv = RSR_UNIVERSE_FILE
     if rsr_csv.exists():
         df = pd.read_csv(rsr_csv)
         for _, row in df.iterrows():

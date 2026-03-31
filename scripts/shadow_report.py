@@ -15,9 +15,12 @@ import json
 import statistics
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.stdout.reconfigure(encoding="utf-8")
 
-TRADES_PATH    = Path("logs/trades.jsonl")
+from paths import LOGS_DIR
+
+TRADES_PATH    = LOGS_DIR / "trades.jsonl"
 EARLY_SAMPLE   = 6      # 早期評価サンプル数
 FULL_SAMPLE    = 15     # 本評価サンプル数
 EARLY_EXPECT   = 0.012  # 早期評価: expectancy > +1.2%

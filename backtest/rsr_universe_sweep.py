@@ -30,8 +30,10 @@ from dataclasses import dataclass
 from pathlib import Path
 
 warnings.filterwarnings("ignore")
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.stdout.reconfigure(encoding="utf-8")
+
+from paths import BACKTEST_DATASET_DIR
 
 import numpy as np
 import pandas as pd
@@ -75,7 +77,7 @@ MR_PARAMS = dict(
     ma_long=200, stop_loss_pct=0.07, max_hold_days=10, knife_threshold=0.15,
 )
 
-SNAPSHOT_BASE = Path("data/backtest_dataset")
+SNAPSHOT_BASE = BACKTEST_DATASET_DIR
 DATA_VERSION  = os.environ.get("DATA_VERSION", "")
 
 

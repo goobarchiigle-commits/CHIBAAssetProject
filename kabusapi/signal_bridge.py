@@ -38,11 +38,14 @@ logger = logging.getLogger(__name__)
 
 JST = timezone(timedelta(hours=9))
 
+# paths.py をインポート（呼び出し元がすでに sys.path にプロジェクトルートを追加済み）
+from paths import RUNTIME_DIR, CACHE_DIR, LOGS_DIR
+
 # ------------------------------------------------------------------ #
 # ポートフォリオ状態・CB 管理定数
 # ------------------------------------------------------------------ #
-PORTFOLIO_STATE_FILE          = Path("runtime/portfolio_state.json")
-OHLCV_CACHE_DIR               = Path("cache/ohlcv")   # OHLCVキャッシュ（ダウンロード失敗時のフォールバック）
+PORTFOLIO_STATE_FILE          = RUNTIME_DIR / "portfolio_state.json"
+OHLCV_CACHE_DIR               = CACHE_DIR   / "ohlcv"              # OHLCVキャッシュ（ダウンロード失敗時のフォールバック）
 OHLCV_CACHE_MAX_AGE_DAYS      = 5                      # キャッシュ有効期限（営業日換算で約1週間）
 DATA_HEALTH_MIN_RATIO         = 0.90                   # RSR42データ健全性下限（これ未満でシグナル停止）
 CB_DD_TRIGGER                 = 0.15          # DD がここを割ったら CB 発動
@@ -415,7 +418,7 @@ class SignalBridge:
         self, transition: str, drawdown: float, equity: float, date: str
     ) -> None:
         """CB イベントを logs/cb_events/ に JSONL 形式で追記する"""
-        cb_log_dir = Path("logs/cb_events")
+        cb_log_dir = LOGS_DIR / "cb_events"
         cb_log_dir.mkdir(parents=True, exist_ok=True)
         event = {
             "date":       date,
@@ -2036,7 +2039,7 @@ class SignalBridge:
     _BOARD_FETCH_INTERVAL = 0.15   # 秒
 
     # ギャップイベントログ（後日の損失分布分析用）
-    _GAP_EVENT_LOG = Path("logs/gap_events.jsonl")
+    _GAP_EVENT_LOG = LOGS_DIR / "gap_events.jsonl"
 
     @staticmethod
     def _resolve_board_price(board) -> Optional[float]:
@@ -2221,7 +2224,7 @@ class SignalBridge:
 
         # 最新の市場レジームをメトリクスから取得（regime別成績集計用）
         _latest_regime = None
-        _metrics_path  = _Path("logs/diagnostics/metrics.jsonl")
+        _metrics_path  = LOGS_DIR / "diagnostics" / "metrics.jsonl"
         if _metrics_path.exists():
             try:
                 _lines = [l for l in _metrics_path.read_text(encoding="utf-8").splitlines() if l.strip()]
@@ -2230,7 +2233,7 @@ class SignalBridge:
             except Exception:
                 pass
 
-        _trades_path = _Path("logs/trades.jsonl")
+        _trades_path = LOGS_DIR / "trades.jsonl"
         _trades_path.parent.mkdir(parents=True, exist_ok=True)
 
         for r in send_results:
@@ -2466,7 +2469,7 @@ class SignalBridge:
         # 6c. 運用診断メトリクス → logs/diagnostics/metrics.jsonl に日次追記
         import json as _json
         from pathlib import Path as _Path
-        _diag_dir  = _Path("logs/diagnostics")
+        _diag_dir  = LOGS_DIR / "diagnostics"
         _diag_dir.mkdir(parents=True, exist_ok=True)
         _diag_path = _diag_dir / "metrics.jsonl"
         # 市場レジーム（TOPIX ETF 1306.T の 200日MA / 50日MA比較）

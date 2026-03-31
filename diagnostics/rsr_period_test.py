@@ -17,9 +17,11 @@ import warnings
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.stdout.reconfigure(encoding="utf-8")
-sys.path.insert(0, str(Path(__file__).parent.parent))
 warnings.filterwarnings("ignore")
+
+from paths import CONFIGS_DIR, UNIVERSE_DIR, LOGS_DIR
 
 import pandas as pd
 import numpy as np
@@ -80,10 +82,10 @@ def calc_rsr_blended(prices_dict: dict[str, pd.Series]) -> pd.DataFrame:
 # ------------------------------------------------------------------ #
 def main():
     # RSRコンテキスト（現行42銘柄）でデータ取得
-    cfg_path = Path("configs/rsr_universe_42.csv")
+    cfg_path = CONFIGS_DIR / "rsr_universe_42.csv"
     rsr_syms = list(pd.read_csv(cfg_path)["symbol"])
 
-    uni_path = Path("configs/universe/2026Q1_temporal24.json")
+    uni_path = UNIVERSE_DIR / "2026Q1_temporal24.json"
     trade_syms = list(json.loads(uni_path.read_text(encoding="utf-8"))["symbols"].keys())
 
     print(f"RSRコンテキスト: {len(rsr_syms)}銘柄  取引ユニバース: {len(trade_syms)}銘柄")
@@ -186,7 +188,7 @@ def main():
     print("=" * 70)
 
     # ログ保存
-    log_dir = Path("logs/diagnostics")
+    log_dir = LOGS_DIR / "diagnostics"
     log_dir.mkdir(parents=True, exist_ok=True)
     out = {"date": TODAY, "variants": results}
     out_path = log_dir / f"rsr_period_test_{TODAY}.json"

@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 # スナップショット設定
 # ------------------------------------------------------------------ #
 DATA_VERSION: str  = os.environ.get("DATA_VERSION", "")  # 空文字=スナップショット不使用
-SNAPSHOT_BASE: Path = Path("data/backtest_dataset")
+from paths import BACKTEST_DATASET_DIR as SNAPSHOT_BASE   # 絶対パス保証
 
 
 # ------------------------------------------------------------------ #

@@ -30,27 +30,16 @@ from collections import defaultdict, deque
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.stdout.reconfigure(encoding="utf-8")
 
-try:
-    from dotenv import load_dotenv
-    load_dotenv()
-except ImportError:
-    env_path = Path(__file__).parent.parent / ".env"
-    if env_path.exists():
-        for line in env_path.read_text(encoding="utf-8").splitlines():
-            line = line.strip()
-            if line and not line.startswith("#") and "=" in line:
-                k, _, v = line.partition("=")
-                os.environ.setdefault(k.strip(), v.strip())
+from paths import LIVE_LOG_DIR  # .env 読み込みも paths.py が担う
 
 import pandas as pd
 
 JST          = timezone(timedelta(hours=9))
 COMMISSION   = 0.00055   # auカブコム 現物手数料率（片道）
 LOT_SIZE     = 100
-LIVE_LOG_DIR = Path("logs/live")
 FILLS_DIR    = LIVE_LOG_DIR / "fills"
 
 # Phase 2 判定基準

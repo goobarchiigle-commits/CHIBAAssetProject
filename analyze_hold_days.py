@@ -2,8 +2,9 @@
 最大利益トレードの保有日数分析（STEP5 / rsr42-trade モード）
 """
 import sys, numpy as np
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.stdout.reconfigure(encoding='utf-8')
-sys.path.insert(0, '.')
 
 from backtest.composite_alpha_bt import (
     _load_rsr_universe, _download_topix, _calc_regime,

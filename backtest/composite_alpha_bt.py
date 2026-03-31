@@ -282,6 +282,11 @@ def run_scenario(
     breadth_reduce:      float = BREADTH_REDUCE,  # STEP6+: 縮小閾値（調整可能）
     min_hold:            int   = 0,               # 最低保有日数（0=無効）
     rsr_exit_threshold:  float = MIN_RSR,         # RSR exitの閾値（デフォルト=MIN_RSR=75）
+    # STEP7: フェーズ別エグジット（建値ストップ + ATRトレイリング）
+    use_phase_exit:      bool  = False,           # フェーズ別エグジット有効化
+    phase_breakeven_pct: float = 0.05,            # 建値ストップ発動利益（+5%）
+    phase_trail_start:   float = 0.10,            # ATRトレイル開始利益（+10%）
+    phase_trail_mult:    float = 2.0,             # ATRトレイル倍率（高値 - N×ATR）
 ) -> dict:
     """
     汎用バックテストループ。
@@ -429,6 +434,31 @@ def run_scenario(
             if is_holding and rsr_val < rsr_exit_threshold and hold_idx >= min_hold:
                 sell_signals.append((sym, "RSR_EXIT"))
                 continue
+
+            # フェーズ別エグジット（STEP7）
+            # Phase 2: 建値ストップ / Phase 3: ATRトレイリング
+            if use_phase_exit and is_holding and hold_idx >= min_hold and tech_matrices is not None:
+                close_today = float(df_sym.loc[date, "Close"])
+                entry_px    = positions[sym].entry_price
+                profit      = (close_today - entry_px) / entry_px if entry_px > 0 else 0.0
+
+                # Phase 2: 利益が phase_breakeven_pct 以上に達したら建値ストップ
+                if profit >= phase_breakeven_pct and close_today <= entry_px:
+                    sell_signals.append((sym, "BREAKEVEN_STOP"))
+                    continue
+
+                # Phase 3: 利益が phase_trail_start 以上になったら高値-N×ATR でトレイル
+                if profit >= phase_trail_start:
+                    tm = tech_matrices
+                    if date in tm["atr20"].index and sym in tm["atr20"].columns:
+                        atr_val = float(tm["atr20"].loc[date, sym])
+                        if not (np.isnan(atr_val) or atr_val <= 0):
+                            entry_date = common_dates[positions[sym].entry_idx] if positions[sym].entry_idx < len(common_dates) else common_dates[0]
+                            high_since = float(df_sym.loc[entry_date:date, "High"].max())
+                            trail_px   = high_since - phase_trail_mult * atr_val
+                            if close_today < trail_px:
+                                sell_signals.append((sym, "ATR_TRAIL"))
+                                continue
 
             # トレーリングストップ（STEP5+）
             if use_trail_exit and is_holding and tech_matrices is not None:

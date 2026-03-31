@@ -36,8 +36,10 @@ import warnings
 from pathlib import Path
 
 warnings.filterwarnings("ignore")
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.stdout.reconfigure(encoding="utf-8")
+
+from paths import CONFIGS_DIR
 
 import numpy as np
 import pandas as pd
@@ -51,7 +53,7 @@ from backtest.engine            import BacktestEngine, TradeCost
 # ------------------------------------------------------------------ #
 # 定数
 # ------------------------------------------------------------------ #
-OUTPUT_JSON = Path("configs/rolling_universe.json")
+OUTPUT_JSON = CONFIGS_DIR / "rolling_universe.json"
 
 FOLDS = [
     {"train_start": "2015-01-01", "train_end": "2017-12-31", "test_year": 2018},

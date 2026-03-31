@@ -38,8 +38,10 @@ import json
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
-sys.path.insert(0, os.path.dirname(__file__))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.stdout.reconfigure(encoding="utf-8")
+
+from paths import SIGNALS_DIR  # .env の読み込みも paths.py が担う
 
 JST = timezone(timedelta(hours=9))
 
@@ -70,8 +72,8 @@ def parse_args() -> argparse.Namespace:
     )
     p.add_argument(
         "--output-dir",
-        default="data/signals",
-        help="シグナル JSON の保存先ディレクトリ（デフォルト: data/signals）",
+        default=str(SIGNALS_DIR),
+        help="シグナル JSON の保存先ディレクトリ",
     )
     return p.parse_args()
 

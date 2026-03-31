@@ -16,10 +16,13 @@ from pathlib import Path
 
 import pandas as pd
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.stdout.reconfigure(encoding="utf-8")
 
+from paths import BACKTEST_DATASET_DIR  # .env 読み込み込み
+
 DATA_VERSION: str  = os.environ.get("DATA_VERSION", "2026-03-28")
-SNAPSHOT_DIR: Path = Path("data/backtest_dataset") / DATA_VERSION
+SNAPSHOT_DIR: Path = BACKTEST_DATASET_DIR / DATA_VERSION
 
 MIN_ROWS      = 2000      # 最低行数（2018-01以降のデータで約1500日以上）
 MAX_NAN_RATIO = 0.005     # Close列のNaN許容率（0.5%以下）

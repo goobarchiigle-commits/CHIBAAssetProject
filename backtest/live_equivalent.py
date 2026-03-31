@@ -36,8 +36,10 @@ from dataclasses import dataclass
 from pathlib import Path
 
 warnings.filterwarnings("ignore")
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.stdout.reconfigure(encoding="utf-8")
+
+from paths import CONFIGS_DIR, UNIVERSE_DIR
 
 import numpy as np
 import pandas as pd
@@ -50,9 +52,9 @@ from backtest.universe_builder        import download_universe
 # ------------------------------------------------------------------ #
 # 定数（research 確定値）
 # ------------------------------------------------------------------ #
-UNIVERSE_JSON     = Path("configs/universe/2026Q1_temporal24.json")
-RSR_UNIVERSE_CSV  = Path("configs/rsr_universe_42.csv")
-ROLLING_JSON      = Path("configs/rolling_universe.json")
+UNIVERSE_JSON     = UNIVERSE_DIR / "2026Q1_temporal24.json"
+RSR_UNIVERSE_CSV  = CONFIGS_DIR / "rsr_universe_42.csv"
+ROLLING_JSON      = CONFIGS_DIR / "rolling_universe.json"
 START             = "2018-01-01"
 END               = "2024-12-31"
 CAPITAL           = 2_000_000

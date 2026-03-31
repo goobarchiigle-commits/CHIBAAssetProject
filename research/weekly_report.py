@@ -26,8 +26,10 @@ import sys
 import warnings
 
 warnings.filterwarnings("ignore")
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.stdout.reconfigure(encoding="utf-8")
+
+from paths import LOGS_DIR
 
 import json
 from pathlib import Path
@@ -38,8 +40,8 @@ import pandas as pd
 
 
 JST            = timezone(timedelta(hours=9))
-TRADES_PATH    = Path("logs/trades.jsonl")
-METRICS_PATH   = Path("logs/diagnostics/metrics.jsonl")
+TRADES_PATH    = LOGS_DIR / "trades.jsonl"
+METRICS_PATH   = LOGS_DIR / "diagnostics" / "metrics.jsonl"
 
 
 # ── データロード ──────────────────────────────────────────────────────

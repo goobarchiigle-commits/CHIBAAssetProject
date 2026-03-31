@@ -27,11 +27,13 @@ import os
 import json
 from pathlib import Path
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.stdout.reconfigure(encoding="utf-8")
 
+from paths import SIGNALS_DIR
+
 CAPITAL       = 2_000_000
-SIGNAL_DIR    = Path("data/signals")
+SIGNAL_DIR    = SIGNALS_DIR
 
 
 def load_runs() -> list[dict]:
