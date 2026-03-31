@@ -38,10 +38,12 @@ import json
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+_here = Path(__file__).resolve().parent
+sys.path.insert(0, str(_here))           # C:/ai-trading/src/ → backtest.xxx imports
+sys.path.insert(0, str(_here.parent))    # C:/ai-trading/     → src.xxx imports
 sys.stdout.reconfigure(encoding="utf-8")
 
-from paths import SIGNALS_DIR  # .env の読み込みも paths.py が担う
+from src.paths import SIGNALS_DIR  # .env の読み込みも paths.py が担う
 
 JST = timezone(timedelta(hours=9))
 

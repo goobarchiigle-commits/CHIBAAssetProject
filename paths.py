@@ -15,12 +15,14 @@ paths.py — プロジェクトパス・ライブ安全設定 一元管理
     MAX_ORDERS_PER_DAY   1日の最大発注件数（デフォルト: 20）
 
 使い方:
-    from paths import PROJECT_ROOT, BASE_DIR, RESULTS_DIR, SIGNALS_DIR
-    from paths import LIVE_MODE, assert_live_ready
+    from src.paths import PROJECT_ROOT, BASE_DIR, RESULTS_DIR, SIGNALS_DIR
+    from src.paths import LIVE_MODE, assert_live_ready
 """
 from __future__ import annotations
 
+import json
 import os
+import time
 from pathlib import Path
 
 
@@ -56,6 +58,11 @@ except ImportError:
 # ────────────────────────────────────────────────────────────────────────────
 BASE_DIR: Path = Path(os.environ.get("AI_TRADING_HOME", str(PROJECT_ROOT)))
 
+
+# kabuステーション API 接続設定
+KABUS_HOST: str = os.environ.get("KABUS_HOST", "localhost")
+KABUS_PORT: int = int(os.environ.get("KABUS_PORT", "18080"))
+KABUS_PASSWORD: str = os.environ.get("KABUS_PASSWORD", "")
 
 # ────────────────────────────────────────────────────────────────────────────
 # 外部データディレクトリ（BASE_DIR 配下 = C:/ai-trading 配下）
@@ -115,6 +122,17 @@ PHASE2_METRICS_FILE: Path = LOGS_DIR    / "phase2_live_metrics.jsonl"
 LIVE_MODE: bool = os.environ.get("LIVE_MODE", "false").lower() == "true"
 MAX_ORDERS_PER_DAY: int = int(os.environ.get("MAX_ORDERS_PER_DAY", "20"))
 MAX_SINGLE_POSITION_YEN: int = int(os.environ.get("MAX_SINGLE_POSITION_YEN", "600000"))
+ORDER_RATE_LIMIT_SEC: float = float(os.environ.get("ORDER_RATE_LIMIT_SEC", "5"))
+
+# ────────────────────────────────────────────────────────────────────────────
+# kabuステーション API 接続設定
+# ────────────────────────────────────────────────────────────────────────────
+KABUS_HOST:     str = os.environ.get("KABUS_HOST", "localhost")
+KABUS_PORT:     int = int(os.environ.get("KABUS_PORT", "18080"))
+KABUS_PASSWORD: str = os.environ.get("KABU_API_PASSWORD", "")
+
+# 発注タイムスタンプ記録ファイル（レートリミット用）
+_LAST_ORDER_FILE: Path = RUNTIME_DIR / "_last_order_ts.json"
 
 
 def assert_live_ready() -> None:
@@ -180,6 +198,94 @@ def assert_execution_context() -> None:
 # ────────────────────────────────────────────────────────────────────────────
 # データ整合性チェック
 # ────────────────────────────────────────────────────────────────────────────
+def assert_kabus_connection() -> None:
+    """
+    kabuステーション API 接続設定の最低限チェック。
+    接続前に必ず呼ぶ。
+    """
+    errors: list[str] = []
+
+    if not KABUS_HOST:
+        errors.append("KABUS_HOST が未設定です")
+
+    if not isinstance(KABUS_PORT, int) or KABUS_PORT <= 0:
+        errors.append(f"KABUS_PORT={KABUS_PORT} が不正です")
+
+    if not KABUS_PASSWORD:
+        errors.append(
+            "KABU_API_PASSWORD が未設定です。\n"
+            "  .env に KABU_API_PASSWORD=<パスワード> を設定してください。"
+        )
+
+    if errors:
+        raise RuntimeError(
+            "kabuステーション接続設定エラー:\n" +
+            "\n".join(f"  [{i+1}] {e}" for i, e in enumerate(errors))
+        )
+
+
+def acquire_runtime_lock() -> None:
+    """
+    二重起動防止ロックを取得する。
+    プロセス終了時に自動解放（atexit 登録）。
+    """
+    import atexit
+    if ORDER_LOCK_FILE.exists():
+        try:
+            data = json.loads(ORDER_LOCK_FILE.read_text(encoding="utf-8"))
+            pid = data.get("pid", "?")
+        except Exception:
+            pid = "?"
+        raise RuntimeError(
+            f"別のインスタンスが実行中です (PID={pid})。\n"
+            f"  {ORDER_LOCK_FILE} を確認してください。\n"
+            "  正常終了していれば手動で削除してください。"
+        )
+    ORDER_LOCK_FILE.parent.mkdir(parents=True, exist_ok=True)
+    ORDER_LOCK_FILE.write_text(
+        json.dumps({"pid": os.getpid(), "started": time.time()}),
+        encoding="utf-8",
+    )
+    atexit.register(release_runtime_lock)
+
+
+def release_runtime_lock() -> None:
+    """ロックファイルを削除してロックを解放する。"""
+    try:
+        ORDER_LOCK_FILE.unlink(missing_ok=True)
+    except Exception:
+        pass
+
+
+def enforce_order_rate_limit() -> None:
+    """
+    直前の発注から ORDER_RATE_LIMIT_SEC 秒未満の場合は RuntimeError を送出する。
+    kabuステーション API の過剰発注 BAN 防止。
+    """
+    if not _LAST_ORDER_FILE.exists():
+        return
+    try:
+        data = json.loads(_LAST_ORDER_FILE.read_text(encoding="utf-8"))
+        elapsed = time.time() - data.get("ts", 0.0)
+        if elapsed < ORDER_RATE_LIMIT_SEC:
+            wait = ORDER_RATE_LIMIT_SEC - elapsed
+            raise RuntimeError(
+                f"レートリミット: あと {wait:.1f}秒 待機が必要です "
+                f"（ORDER_RATE_LIMIT_SEC={ORDER_RATE_LIMIT_SEC}秒）。"
+            )
+    except (json.JSONDecodeError, KeyError):
+        pass
+
+
+def record_order_sent() -> None:
+    """発注タイムスタンプを記録する（enforce_order_rate_limit 用）。"""
+    _LAST_ORDER_FILE.parent.mkdir(parents=True, exist_ok=True)
+    _LAST_ORDER_FILE.write_text(
+        json.dumps({"ts": time.time()}),
+        encoding="utf-8",
+    )
+
+
 def verify_dataset_integrity(data_version: str = "") -> None:
     """
     バックテスト用データセットの存在を確認する。

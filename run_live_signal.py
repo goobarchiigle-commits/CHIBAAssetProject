@@ -39,11 +39,13 @@ import json
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+_here = Path(__file__).resolve().parent
+sys.path.insert(0, str(_here))           # C:/ai-trading/src/ → backtest.xxx imports
+sys.path.insert(0, str(_here.parent))    # C:/ai-trading/     → src.xxx imports
 sys.stdout.reconfigure(encoding="utf-8")
 
 # .env 読み込み + パス定数 + ライブ安全設定（paths.py が一括管理）
-from paths import (
+from src.paths import (
     SIGNALS_DIR, ORDER_LOCK_FILE, LIVE_LOG_DIR,
     PHASE2_METRICS_FILE, RSR_UNIVERSE_FILE,
     LIVE_UNIVERSE_FILE, SHADOW_UNIVERSE_FILE,
