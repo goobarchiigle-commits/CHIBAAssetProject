@@ -211,14 +211,25 @@ def _precompute_tech_matrices(universe_raw: dict, symbols: list) -> dict:
     }
 
 
-def _calc_breadth(rsr_df: pd.DataFrame, threshold: float = 75.0) -> pd.Series:
+def _calc_breadth(universe_raw: dict, ma_period: int = 200) -> pd.Series:
     """
-    RSR≥threshold の割合を毎日計算（Market Breadth インジケータ）。
-    shift(1) で先読み防止済み。
+    Market Breadth = ユニバース内で price > MA{ma_period} の銘柄比率（日次）。
+
+    2026-03-31: RSRパーセンタイル方式（常に0.262固定の dead code）を廃止。
+    price > MA200 方式に変更。shift(1) で先読み防止済み。
     """
-    strong = (rsr_df >= threshold).sum(axis=1)
-    total  = rsr_df.shape[1]
-    return (strong / max(1, total)).shift(1).fillna(0.0)
+    above_ma = {}
+    for sym, info in universe_raw.items():
+        close = info["df"]["Close"]
+        ma    = close.rolling(ma_period, min_periods=ma_period // 2).mean()
+        above_ma[sym] = (close > ma).astype(float)
+
+    if not above_ma:
+        return pd.Series(dtype=float)
+
+    df    = pd.DataFrame(above_ma)
+    ratio = df.mean(axis=1)          # 各日の「上回り銘柄比率」
+    return ratio.shift(1).fillna(0.0)
 
 
 def _alpha_weights(candidates: list[tuple], max_weight: float = MAX_POS_WEIGHT) -> dict[str, float]:
@@ -699,7 +710,7 @@ def main() -> int:
     # ---- 5. STEP4/5/6用テクニカル指標を事前計算 ----
     print("[5/6] テクニカル指標事前計算中（STEP4/5/6用）...")
     tech_matrices = _precompute_tech_matrices(universe_raw, list(trade_syms.keys()))
-    breadth_series = _calc_breadth(rsr_df)
+    breadth_series = _calc_breadth(universe_raw)   # 2026-03-31: price>MA200方式に修正
     print(f"  ATR20: {tech_matrices['atr20'].shape[1]}銘柄  "
           f"High200: {tech_matrices['high200'].shape[1]}銘柄  "
           f"Breadth中央値: {breadth_series.median():.2f}")
