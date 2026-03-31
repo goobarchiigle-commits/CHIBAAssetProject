@@ -561,7 +561,11 @@ def run_scenario(
 
     # ---- 指標計算 ----
     n_days = len(equity_curve)
+    if n_days == 0:
+        return {}
     eq     = pd.Series(equity_curve, index=common_dates[:n_days])
+    if eq.empty:
+        return {}
     years  = n_days / 252
     cagr   = (eq.iloc[-1] / capital) ** (1 / max(years, 0.01)) - 1
 
