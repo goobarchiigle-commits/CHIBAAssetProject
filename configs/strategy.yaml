@@ -1,15 +1,15 @@
 # strategy.yaml — 戦略パラメータ設定（Single Source of Truth）
-# 最終更新: 2026-03-30
+# 最終更新: 2026-04-05
 # ベースライン: RSR42統一（TEMPORAL24廃止 / capital=3,000,000に修正）
+# 2026-04-05: 動的ユニバース採用（dyn_rsr42_bear_rs0: WF5/5, Seg3=+0.258, 2025=0.805 PASS）
 
 fujiko:
   min_sepa: 6           # SEPA条件の最低達成数（8条件中）
-  min_rsr: 70.0         # RSR最低閾値（感度分析で70がベスト）
+  min_rsr: 75.0         # RSR最低閾値（確定運用値）
   mom_period: 21        # RSRモメンタム計算期間（感度分析で21がベスト）
   turtle_entry: 20      # タートル・エントリー（20日高値ブレイク）
   turtle_exit: 55       # タートル・エグジット（55日安値割れ）← exit感度テストで20→55に変更 2026-03-31（IS Sharpe +12.6%）
   use_turtle_entry: true
-  min_hold: 3             # 最低保有日数（RSRモメンタムエグジット抑制）← 2026-03-31 min_hold感度テストで採用
 
 mean_reversion:
   rsi_period: 5
@@ -19,10 +19,17 @@ mean_reversion:
   stop_loss_pct: 0.07   # 7%ストップロス
   max_hold_days: 10     # 最大保有日数
 
+# risk 制御
+risk:
+  min_hold_days: 3
+  max_hold_days: 60
+  emergency_exit_pct: -0.08
+  rebalance_interval: 1
+
 # セクター別戦略割り当て
-sector_strategy:
-  フジコ法: [海運, 機械, 電機精密, 商社, 電機, 食品, 情報通信, 小売, 医薬品, 不動産]
-  平均回帰: [ガス, 鉄鋼, 銀行, 保険, 輸送機器, 化学, 陸運, 石油]
+# sector_strategy:
+#   フジコ法: [海運, 機械, 電機精密, 商社, 電機, 食品, 情報通信, 小売, 医薬品, 不動産]
+#   平均回帰: [ガス, 鉄鋼, 銀行, 保険, 輸送機器, 化学, 陸運, 石油]
 
 portfolio:
   capital: 3_000_000          # 初期資本（円）← 2026-03-30 実口座300万円と統一
@@ -38,17 +45,45 @@ costs:
   commission_rate: 0.00055    # 手数料 0.055%（auカブコム ワンクリック株）
   min_commission: 99          # 最低手数料 99円
 
+# リスク制御フラグ（feature flag で切替可能）
+# 変更時は必ず WF再検証 → CLAUDE.md ルールに従い確認を取ること
+risk_controls:
+  shock_exit_mode: composite  # full_exit | partial_50 | composite（2026-04-05 WF検証済み採用）
+  regime_sizing: none         # none | regime_2 | regime_4（regime_2はWF失敗→研究ブランチに移行）
+  bear_scale: 0.25            # TOPIX MA200下のポジションサイズ係数（regime_sizing 有効時のみ使用）
+
+# 動的ユニバース設定（2026-04-05 採用: dyn_rsr42_bear_rs0）
+# WF 5/5, Seg3_2022=+0.258, 2025 OOS=0.805 → PASS
+# スクリプト: backtest/wf_dyn_rsr42.py / backtest/wf_dynamic_universe.py
+dynamic_universe:
+  enabled: true
+  pool: rsr42                  # rsr42 のみ（TOPIX100拡張は alpha_df 非対応のため不採用）
+  bull_active_n: 30            # Bull 時の選択銘柄数上限（RSR42 42銘柄中）
+  bear_active_n: 20            # Bear 時の選択銘柄数上限（rs>0フィルター後）
+  bull_weights:                # Bull スコアリング重み
+    mom_63: 0.40
+    rsr: 0.35
+    log_vol: 0.25
+  bear_weights:                # Bear スコアリング重み（rs>0 フィルター必須）
+    rs_topix: 0.50
+    rsr: 0.30
+    log_vol: 0.20
+  bear_rs_filter: true         # Bear 時 rs_topix > 0 のみ対象
+  regime_ma_period: 200        # レジーム判定: TOPIX MA期間
+  sustained_bear_days: 40      # 直近60日のうち40日以上MA200下 → 持続型Bear
+  sustained_bear_lookback: 60  # 持続型Bear判定のルックバック日数
+
 # entry_stop 改修版パラメータ（portfolio_entry_stop_v2.py 用）
 # 注: V2設定（27銘柄 2018-2024）ではMaxDD=-5.67% のため -10%閾値は発動しない
 #     実運用で -10% DDに達した際に以下の制御が働く
-entry_stop:
-  entry_stop_dd: 0.10          # -10%でentry_stop発動（新規エントリー禁止）
-  additional_dd_limit: 0.05    # entry_stop中さらに-5%DDで部分クローズ起動
-  partial_close_ratio: 0.30    # 部分クローズ比率（各ポジションの30%を決済）
-  entry_stop_release_ratio: 0.70  # DD が entry_stop_dd × 0.7 まで回復で dd_recovered=True
-  entry_stop_max_days: 20      # 最大在停日数（AND条件の日数側）
-  trend_ma_short: 10           # トレンド判定: equity 短期MA
-  trend_ma_long: 30            # トレンド判定: equity 長期MA
-  cooldown_days: 3             # 解除後N日間は再発動しない
-  just_released_days: 5        # 解除後N日間はポジションサイズを縮小
-  just_released_scale: 0.50    # 縮小比率（50%）
+# entry_stop:
+#   entry_stop_dd: 0.10          # -10%でentry_stop発動（新規エントリー禁止）
+#   additional_dd_limit: 0.05    # entry_stop中さらに-5%DDで部分クローズ起動
+#   partial_close_ratio: 0.30    # 部分クローズ比率（各ポジションの30%を決済）
+#   entry_stop_release_ratio: 0.70  # DD が entry_stop_dd × 0.7 まで回復で dd_recovered=True
+#   entry_stop_max_days: 20      # 最大在停日数（AND条件の日数側）
+#   trend_ma_short: 10           # トレンド判定: equity 短期MA
+#   trend_ma_long: 30            # トレンド判定: equity 長期MA
+#   cooldown_days: 3             # 解除後N日間は再発動しない
+#   just_released_days: 5        # 解除後N日間はポジションサイズを縮小
+#   just_released_scale: 0.50    # 縮小比率（50%）
