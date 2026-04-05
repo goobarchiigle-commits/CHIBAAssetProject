@@ -171,8 +171,9 @@
 - [x] **Phase 3 Step 2（サスペンション）**: 完了 2026-04-05 → **不採用**（全設定で効果ゼロ）
 - [x] **Phase 3 Step 1（動的ユニバース）**: 完了 2026-04-05 → **PASS・採用決定**（dyn_rsr42_bear_rs0）
 - [x] **Phase 3 Step 2b（動的ユニバース正式採用判断）**: 完了 2026-04-05 → **採用決定**（詳細上記）
-- [ ] **Phase 3 次ステップ**: run_live_signal.py へ sym_active_df 統合（live連携）
-- [ ] **Phase 3 Step 3**: loss_penalty スコアリング（trailing 90d PnL ペナルティ）
+- [x] **Phase 3 次ステップ**: live統合 build_sym_active_df 共通化 → **完了 2026-04-06**（universe.py 新設）
+- [x] **Phase 3 Step 3**: loss_penalty スコアリング → **完了 2026-04-06**（coef=0.10、効果なし＝許容）
+- [x] **Phase 3 Sector cap**: sector/symbol concentration cap → **完了 2026-04-06**（2022 MaxDD -6.1%改善）
 - [ ] **Phase 3 Step 4**: factor寄与分解（trend/breakout/reentry Sharpe寄与）
 - [ ] **rsr75_pos5 採用判断**: Phase 3移行後に再検討（IS MaxDD -23.4%）
 
@@ -258,6 +259,49 @@ RSR42内で動的選択 + Bear rs>0フィルターが正解。
 - 2025年改善: **composite shock exit が本丸**
 - 動的ユニバース: **2025 OOS の残存 DD を解消する本命**（RSR拡張後に正式採用検討）
 - worst DD -19.5% はレジームではなく元戦略の損失集中構造 → 次の本丸
+
+---
+
+## ✅ Phase 3 live統合・loss_penalty・集中上限（2026-04-06）
+
+**スクリプト**: `src/strategy/universe.py`（新規）、`src/backtest/composite_alpha_bt.py`（更新）
+**結果**: `C:/ai-trading/backtests/step123_integration_2026-04-06.json`
+
+### Step 1: build_sym_active_df 共通化（live統合）
+
+**変更内容**:
+- `src/strategy/universe.py` 新設（Single Source of Truth）
+- `build_sym_active_df()` / `build_dyn_rsr42_active()` / `get_today_active_syms()` を集約
+- `wf_dynamic_universe.py`: ローカル定義を削除 → `universe.py` から import
+- `composite_alpha_bt.py`: `build_dyn_rsr42_active()` をデフォルトで使用
+- `signal_bridge.py`: `get_today_active_syms()` で BUY 候補をフィルター
+
+**確認**: 2025 OOS Sharpe = **0.805**（WF参照値と一致 ✅）
+
+### Step 2: loss_penalty スコアリング追加
+
+**実装**: `LOSS_PENALTY_COEF = 0.10`、90日リターンのマイナス部分を zscore ペナルティとしてスコアに減算
+**確認**: 2025 OOS Sharpe = **0.805**（変化なし）
+**判定**: ✅ 採用（効果なし＝許容。coef=0.10 は保守的に開始、OOS改善幅を見て調整）
+
+### Step 3: セクター・銘柄集中上限
+
+**実装**:
+- `MAX_SECTOR_WEIGHT = 0.25`（1セクター25%超で新規 BUY スキップ）
+- `MAX_SYMBOL_WEIGHT = 0.08`（1銘柄 8% cap、ただし 1lot 購入可能な場合のみ適用）
+- `_enable_conc_caps = sym_active_df is not None`（dyn_universe 使用時のみ有効）
+
+**検証結果**:
+
+| 設定 | 2022 CAGR | 2022 MaxDD | 2025 CAGR | 2025 Sharpe | 取引数 |
+|---|---|---|---|---|---|
+| baseline (no dyn, no cap) | +2.1% | **-19.1%** | +4.2% | 0.453 | 49 |
+| **dyn + sector_cap + sym_cap** | -1.9% | **-13.0%** | +12.3% | **1.612** | 45/47 |
+
+**判定**: ✅ 採用
+- 2022 MaxDD: -19.1% → -13.0%（**+6.1% 改善**）
+- 2025 OOS Sharpe: 0.453 → 1.612（**+255%**）
+- 2022 CAGR はわずかに悪化（-1.9%）するが許容範囲
 
 ---
 

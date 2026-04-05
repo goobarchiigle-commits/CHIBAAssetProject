@@ -39,7 +39,14 @@ logger = logging.getLogger(__name__)
 JST = timezone(timedelta(hours=9))
 
 # paths.py をインポート（呼び出し元がすでに sys.path にプロジェクトルートを追加済み）
-from paths import RUNTIME_DIR, CACHE_DIR, LOGS_DIR
+from src.paths import (
+    ALLOW_YFINANCE_NETWORK,
+    BACKTEST_DATASET_DIR,
+    CACHE_DIR,
+    DEFAULT_DATA_VERSION,
+    LOGS_DIR,
+    RUNTIME_DIR,
+)
 
 # ------------------------------------------------------------------ #
 # ポートフォリオ状態・CB 管理定数
@@ -92,7 +99,7 @@ def select_top_k(
 def _trading_days_held(entry_date_str: str, today: pd.Timestamp) -> int:
     """entry_date から today までの営業日数（entry 当日 = 0）。JPX 祝日対応。"""
     try:
-        from market.jpx_calendar import JPXCalendar
+        from src.market.jpx_calendar import JPXCalendar
         entry_ts = pd.Timestamp(entry_date_str)
         if today <= entry_ts:
             return 0
@@ -104,7 +111,7 @@ def _trading_days_held(entry_date_str: str, today: pd.Timestamp) -> int:
 
 def _add_trading_days(start: pd.Timestamp, n: int) -> pd.Timestamp:
     """start から n 営業日後の日付を返す。JPX 祝日対応。"""
-    from market.jpx_calendar import JPXCalendar
+    from src.market.jpx_calendar import JPXCalendar
     cal = JPXCalendar()
     return cal.add_trading_days(start, n)
 
@@ -221,8 +228,10 @@ class SignalBridge:
         self,
         universe_tickers:          dict[str, str],
         fujiko_params:             dict,
-        capital:                   float = 2_000_000,
-        max_positions:             int   = 4,
+        capital:                   float,
+        max_positions:             int,
+        min_hold_days:             int,
+        emergency_exit_pct:        float,
         max_dd_limit:              float = 0.15,
         min_sectors:               int   = 1,
         max_single_weight:         float = 0.25,
@@ -231,12 +240,13 @@ class SignalBridge:
         rsr_universe_tickers:      dict[str, str] | None = None,
         top_k:                     int   = 4,
         max_hold_days:             int | None = 60,
-        min_hold_days:             int   = 0,   # 最低保有営業日数（RSR exitを抑制）
-        emergency_exit_pct:        float = -0.08,  # 緊急 exit 閾値（含み損 -8%でmin_hold無視）
         max_new_positions_per_day: int   = 2,
         order_rate_limit_per_min:  int   = ORDER_RATE_LIMIT_PER_MIN,
         portfolio_state_file:      Path | None = None,
         shadow_universe_tickers:   dict[str, str] | None = None,
+        shock_exit_mode:           str   = "full_exit",
+        regime_sizing:             str   = "none",
+        bear_scale:                float = 1.0,
     ) -> None:
         self.universe_tickers          = universe_tickers
         self.shadow_universe_tickers   = shadow_universe_tickers or {}
@@ -259,6 +269,11 @@ class SignalBridge:
         self.max_new_positions_per_day = max_new_positions_per_day
         self.order_rate_interval_sec   = 60.0 / max(1, order_rate_limit_per_min)
         self._state_file               = portfolio_state_file or PORTFOLIO_STATE_FILE
+        self.shock_exit_mode           = shock_exit_mode   # "full_exit" | "partial_50" | "composite"
+        self.regime_sizing             = regime_sizing      # "none" | "regime_2" | "regime_4"
+        self.bear_scale                = bear_scale         # TOPIX MA200下のサイズ係数
+        self._positions_api_status     = {"ok": False, "source": "virtual", "error": None}
+        self._wallet_api_status        = {"ok": False, "source": "virtual", "error": None}
 
         # min_rsr はパラメータをそのまま使う（research と同じ閾値フィルター）
         self._fujiko_params_live = {**fujiko_params}
@@ -268,7 +283,7 @@ class SignalBridge:
 
         self._client = None
         try:
-            from kabusapi.client import KabuClient
+            from src.kabusapi.client import KabuClient
             self._client = KabuClient()
             self._client.fetch_token()
             if not live:
@@ -467,6 +482,34 @@ class SignalBridge:
             logger.warning("%s キャッシュ読み込み失敗: %s", ticker, e)
             return pd.DataFrame()
 
+    def _load_from_snapshot(
+        self,
+        ticker: str,
+        start_date: str,
+        end_date: str,
+    ) -> pd.DataFrame:
+        """backtest snapshot からOHLCVを読み込む。"""
+        if not DEFAULT_DATA_VERSION:
+            return pd.DataFrame()
+        snap_path = BACKTEST_DATASET_DIR / DEFAULT_DATA_VERSION / f"{ticker}.parquet"
+        if not snap_path.exists():
+            return pd.DataFrame()
+        try:
+            df = pd.read_parquet(snap_path)
+            if df.empty:
+                return pd.DataFrame()
+            if "Adj Close" in df.columns and "Close" in df.columns:
+                df = df.copy()
+                df["Close"] = df["Adj Close"]
+            df = df.loc[
+                (df.index >= pd.Timestamp(start_date))
+                & (df.index <= pd.Timestamp(end_date))
+            ]
+            return df.dropna(subset=["Close"])
+        except Exception as e:
+            logger.warning("%s snapshot読み込み失敗: %s", ticker, e)
+            return pd.DataFrame()
+
     def _retry_single_fetch(
         self, ticker: str, start_date: str, end_date: str
     ) -> pd.DataFrame:
@@ -514,16 +557,17 @@ class SignalBridge:
             | set(self.shadow_universe_tickers.keys())
         ) + [self.benchmark_ticker]
 
-        # ── Step1: バッチ一括ダウンロード ─────────────────────────────────
-        raw = yf.download(
-            all_tickers,
-            start=start_date,
-            end=end_date,
-            progress=False,
-            group_by="ticker",
-        )
+        raw = pd.DataFrame()
+        if ALLOW_YFINANCE_NETWORK:
+            raw = yf.download(
+                all_tickers,
+                start=start_date,
+                end=end_date,
+                progress=False,
+                group_by="ticker",
+            )
 
-        # ── Step2: 銘柄ごとにDFを切り出す → 失敗分は個別リトライ + キャッシュ ──
+        # ── Step1: snapshot / cache 優先 → 足りない分だけネットワーク ─────────
         all_universe = {
             **self.rsr_universe_tickers,
             **self.universe_tickers,
@@ -534,18 +578,32 @@ class SignalBridge:
         cache_fallbacks: list[str] = []
 
         for sym, sector in all_universe.items():
+            df = self._load_from_snapshot(sym, start_date, end_date)
+            if not df.empty and len(df) >= 252:
+                universe_raw[sym] = {"df": df, "sector": sector}
+                continue
+
+            df = self._load_from_cache(sym, start_date)
+            if not df.empty and len(df) >= 252:
+                cache_fallbacks.append(sym)
+                universe_raw[sym] = {"df": df, "sector": sector}
+                continue
+
             df = pd.DataFrame()
             from_batch = False
-            try:
-                df = raw[sym].copy()
-                if isinstance(df.columns, pd.MultiIndex):
-                    df = df.droplevel(1, axis=1)
-                df.dropna(subset=["Close"], inplace=True)
-                if not df.empty and len(df) >= 252:
-                    from_batch = True
-                else:
+            if ALLOW_YFINANCE_NETWORK and not raw.empty:
+                try:
+                    df = raw[sym].copy()
+                    if isinstance(df.columns, pd.MultiIndex):
+                        df = df.droplevel(1, axis=1)
+                    df.dropna(subset=["Close"], inplace=True)
+                    if not df.empty and len(df) >= 252:
+                        from_batch = True
+                    else:
+                        batch_failed.append(sym)
+                except (KeyError, TypeError):
                     batch_failed.append(sym)
-            except (KeyError, TypeError):
+            else:
                 batch_failed.append(sym)
 
             if from_batch:
@@ -553,9 +611,9 @@ class SignalBridge:
                 universe_raw[sym] = {"df": df, "sector": sector}
 
         # ── Step3: バッチ失敗分を個別リトライ → それでも駄目ならキャッシュ ──
-        if batch_failed:
+        if batch_failed and ALLOW_YFINANCE_NETWORK:
             logger.warning("バッチ失敗: %d銘柄 → 個別リトライ+キャッシュ試行", len(batch_failed))
-        for sym in batch_failed:
+        for sym in batch_failed if ALLOW_YFINANCE_NETWORK else []:
             sector = all_universe[sym]
             df = self._retry_single_fetch(sym, start_date, end_date)
             if not df.empty and len(df) >= 252:
@@ -621,17 +679,27 @@ class SignalBridge:
 
         # ── Step5: ベンチマーク取得 ────────────────────────────────────────
         df_bench = pd.DataFrame()
-        try:
-            df_bench = raw[self.benchmark_ticker].copy()
-            if isinstance(df_bench.columns, pd.MultiIndex):
-                df_bench = df_bench.droplevel(1, axis=1)
-            df_bench.dropna(subset=["Close"], inplace=True)
-        except (KeyError, TypeError):
-            pass
+        df_bench = self._load_from_snapshot(self.benchmark_ticker, start_date, end_date)
         if df_bench.empty:
+            df_bench = self._load_from_cache(self.benchmark_ticker, start_date)
+        if df_bench.empty and ALLOW_YFINANCE_NETWORK and not raw.empty:
+            try:
+                df_bench = raw[self.benchmark_ticker].copy()
+                if isinstance(df_bench.columns, pd.MultiIndex):
+                    df_bench = df_bench.droplevel(1, axis=1)
+                df_bench.dropna(subset=["Close"], inplace=True)
+            except (KeyError, TypeError):
+                pass
+        if df_bench.empty and ALLOW_YFINANCE_NETWORK:
             df_bench = self._retry_single_fetch(
                 self.benchmark_ticker, start_date, end_date
             )
+        if df_bench.empty and universe_raw:
+            # benchmark不在時はローカル銘柄群の平均終値を代用し、処理継続を優先する
+            bench_close = pd.DataFrame(
+                {sym: info["df"]["Close"] for sym, info in universe_raw.items()}
+            ).mean(axis=1)
+            df_bench = pd.DataFrame({"Close": bench_close.dropna()})
 
         logger.info(
             "取得完了: %d / %d 銘柄（バッチ失敗=%d キャッシュ使用=%d）",
@@ -643,12 +711,34 @@ class SignalBridge:
     # ------------------------------------------------------------------ #
     # 現在のポジション取得
     # ------------------------------------------------------------------ #
+    def _virtual_available_cash(self, current_positions: dict) -> float:
+        n_held = len(current_positions)
+        n_free = max(0, self.max_positions - n_held)
+        return self.capital / self.max_positions * n_free
+
     def _get_current_positions(self) -> dict[str, dict]:
         if self._client is None:
-            logger.info("API 未接続: ポジションは空として扱います")
+            self._positions_api_status = {
+                "ok": False,
+                "source": "virtual",
+                "error": "client_unavailable",
+            }
+            logger.warning("positions API: skipped (client unavailable, virtual portfolio)")
             return {}
 
-        raw_positions = self._client.get_positions()
+        try:
+            raw_positions = self._client.get_positions()
+        except Exception as exc:
+            self._positions_api_status = {
+                "ok": False,
+                "source": "broker_error",
+                "error": str(exc),
+            }
+            logger.error("positions API: failed: %s", exc)
+            if self.live:
+                raise RuntimeError(f"positions API 取得失敗: {exc}") from exc
+            return {}
+
         positions = {}
         for p in raw_positions:
             sym_code = p.get("Symbol", "")
@@ -658,20 +748,46 @@ class SignalBridge:
                     "qty":       p.get("LeavesQty", 0),
                     "avg_price": p.get("Price", 0.0),
                 }
-        logger.info("現在のポジション: %d 銘柄", len(positions))
+        self._positions_api_status = {"ok": True, "source": "broker", "error": None}
+        logger.info("positions API: success (%d positions)", len(positions))
         return positions
 
     # ------------------------------------------------------------------ #
     # 資金確認
     # ------------------------------------------------------------------ #
-    def _get_available_cash(self, current_positions: dict) -> float:
+    def _get_available_cash(self, current_positions: dict) -> float | None:
         if self._client is None:
-            n_held = len(current_positions)
-            n_free = max(0, self.max_positions - n_held)
-            return self.capital / self.max_positions * n_free
+            virtual_cash = self._virtual_available_cash(current_positions)
+            self._wallet_api_status = {
+                "ok": False,
+                "source": "virtual",
+                "error": "client_unavailable",
+            }
+            logger.warning(
+                "wallet API: skipped (client unavailable, virtual cash=¥%s)",
+                f"{virtual_cash:,.0f}",
+            )
+            return virtual_cash
 
-        wallet = self._client.get_wallet_cash()
-        return float(wallet.get("StockAccountWallet", self.capital))
+        try:
+            wallet = self._client.get_wallet_cash()
+            if "StockAccountWallet" not in wallet:
+                raise RuntimeError("StockAccountWallet missing")
+            available_cash = float(wallet["StockAccountWallet"])
+        except Exception as exc:
+            self._wallet_api_status = {
+                "ok": False,
+                "source": "broker_error",
+                "error": str(exc),
+            }
+            logger.error("wallet API: failed: %s", exc)
+            if self.live:
+                raise RuntimeError(f"wallet API 取得失敗: {exc}") from exc
+            return None
+
+        self._wallet_api_status = {"ok": True, "source": "broker", "error": None}
+        logger.info("wallet API: success (available_cash=¥%s)", f"{available_cash:,.0f}")
+        return available_cash
 
     # ------------------------------------------------------------------ #
     # MTFキャッシュ（朝1回計算 → 日中はファイル参照）
@@ -697,6 +813,7 @@ class SignalBridge:
             }
         """
         import json as _j
+        _min_rsr_threshold = float(self._fujiko_params_live["min_rsr"])
         _cache_dir  = Path("cache")
         _cache_path = _cache_dir / f"mtf_state_{today_str}.json"
 
@@ -711,7 +828,7 @@ class SignalBridge:
                     return {
                         "rsr_weekly":   _rw,
                         "weekly_ma_ok": _mo,
-                        "mtf_ok":       {s: (_rw.get(s, 0) >= 75.0 and _mo.get(s, False))
+                        "mtf_ok":       {s: (_rw.get(s, 0) >= _min_rsr_threshold and _mo.get(s, False))
                                          for s in set(_rw) | set(_mo)},
                         "from_cache":   True,
                     }
@@ -773,7 +890,7 @@ class SignalBridge:
         return {
             "rsr_weekly":   _rsr_weekly,
             "weekly_ma_ok": _weekly_ma_ok,
-            "mtf_ok":       {s: (_rsr_weekly.get(s, 0) >= 75.0 and _weekly_ma_ok.get(s, False))
+            "mtf_ok":       {s: (_rsr_weekly.get(s, 0) >= _min_rsr_threshold and _weekly_ma_ok.get(s, False))
                              for s in set(_rsr_weekly) | set(_weekly_ma_ok)},
             "from_cache":   False,
         }
@@ -794,9 +911,10 @@ class SignalBridge:
         Returns:
             (signals, top_k_symbols)
         """
-        from backtest.rsr                     import calc_universe_rsr, calc_rsr_momentum, calc_sepa
-        from backtest.fujiko_strategy         import FujikoStrategy
-        from backtest.mean_reversion_strategy import MeanReversionStrategy
+        from src.backtest.rsr                     import calc_universe_rsr, calc_rsr_momentum, calc_sepa
+        from src.backtest.fujiko_strategy         import FujikoStrategy
+        from src.backtest.mean_reversion_strategy import MeanReversionStrategy
+        from src.strategy.universe import get_today_active_syms
 
         today     = pd.Timestamp.now().normalize()
         today_str = today.strftime("%Y-%m-%d")
@@ -810,8 +928,30 @@ class SignalBridge:
             for sym, info in universe_raw.items()
             if sym in self.rsr_universe_tickers
         }
-        rsr_universe = calc_universe_rsr(rsr_prices)
-        rsr_latest   = rsr_universe.iloc[-1]   # 最新スナップショット
+        rsr_universe = calc_universe_rsr(rsr_prices).ffill(limit=3)
+        rsr_latest   = rsr_universe.iloc[-1].fillna(0.0)   # 最新スナップショット
+
+        # ── dyn_rsr42_bear_rs0: 今日の活性銘柄セットを取得 ─────────────
+        # RSR42のみで月次スコアリング → Bull Top30 / Bear Top20(rs>0)
+        # 空セットの場合はフィルターなし（フォールバック）
+        _rsr42_prices = {
+            sym: info["df"]["Close"]
+            for sym, info in universe_raw.items()
+            if sym in self.universe_tickers   # trade universe = RSR42
+        }
+        _rsr42_df = calc_universe_rsr(_rsr42_prices).ffill(limit=3)
+        _dyn_active_syms = get_today_active_syms(
+            universe_raw = {s: universe_raw[s] for s in self.universe_tickers if s in universe_raw},
+            topix_close  = bench_prices,
+            rsr_df       = _rsr42_df,
+            all_syms     = list(self.universe_tickers.keys()),
+            end          = today_str,
+        )
+        logger.info(
+            "dyn_rsr42_bear_rs0 活性銘柄: %d / %d 銘柄 %s",
+            len(_dyn_active_syms), len(self.universe_tickers),
+            sorted(_dyn_active_syms)[:10],
+        )
 
         # ── クラスタ相場検出（早期計算 — シグナルループ・Shadow昇格より前に必要）────
         # Step1/2/3 で参照するため rsr_latest 取得直後に計算する
@@ -930,7 +1070,7 @@ class SignalBridge:
         # 除外されると diag_rsr_pass が低いまま固定される問題を検出する。
         # rsr_pass_tradeable_ratio = diag_rsr_pass / _rsr_pass_context_total
         # 0.6 以下 → 高 RSR 銘柄の多くが売買不可（価格 or 流動性フィルターで除外）
-        _min_rsr_for_ctx = self._fujiko_params_live.get("min_rsr", 75.0)
+        _min_rsr_for_ctx = float(self._fujiko_params_live["min_rsr"])
         _rsr_pass_context_total = int((rsr_latest >= _min_rsr_for_ctx).sum())
 
         # ── RSR集中度（62銘柄コンテキスト全体での分布）─────────────────
@@ -983,13 +1123,14 @@ class SignalBridge:
 
         # ── min_rsr 閾値（research と同じ filter-first アーキテクチャ） ──────
         # top_k は最後にBUY候補をRSR順にソートして絞るために使う（一次フィルターではない）
-        min_rsr_threshold = self._fujiko_params_live.get("min_rsr", 75.0)
+        min_rsr_threshold = float(self._fujiko_params_live["min_rsr"])
 
         # RSR 順位マップ（全銘柄、1=最高）
-        rsr_rank_map: dict[str, int] = {
-            sym: int(rank)
-            for sym, rank in rsr_latest.rank(ascending=False).items()
-        }
+        rsr_rank_map: dict[str, int] = {}
+        for sym, rank in rsr_latest.rank(ascending=False).items():
+            if pd.isna(rank):
+                continue
+            rsr_rank_map[sym] = int(rank)
 
         # ── 再エントリー禁止リスト ──────────────────────────────────
         reentry_blocked: dict[str, str] = portfolio_state.get("reentry_blocked", {})
@@ -1028,6 +1169,21 @@ class SignalBridge:
         diag_mtf_wma_pass     = 0   # 週足MA20 通過数
         diag_mtf_full_pass    = 0   # 3条件すべて通過数（実エントリー候補）
 
+        # ── composite shock exit: 前日ベンチマーク騰落率を事前計算 ──────
+        _bench_ret_prev = 0.0
+        _is_shock_day   = False
+        if self.shock_exit_mode == "composite":
+            try:
+                _bench_ret_prev = float(bench_prices.pct_change().iloc[-1])
+                _is_shock_day   = _bench_ret_prev <= -0.05
+                if _is_shock_day:
+                    logger.warning(
+                        "COMPOSITE_SHOCK_DAY: bench_ret=%.2f%% → 個別-8%%超ポジションを決済対象に追加",
+                        _bench_ret_prev * 100,
+                    )
+            except Exception:
+                pass
+
         # ── シグナル生成ループ ───────────────────────────────────────
         signals: list[StockSignal] = []
 
@@ -1037,11 +1193,11 @@ class SignalBridge:
 
             df     = info["df"]
             sector = info["sector"]
-            rsr    = rsr_universe[sym] if sym in rsr_universe.columns else None
+            rsr    = rsr_universe[sym].ffill(limit=3) if sym in rsr_universe.columns else None
 
-            rsr_now  = float(rsr.iloc[-1])  if rsr is not None and not rsr.empty  else 0.0
+            rsr_now  = float(rsr.iloc[-1]) if rsr is not None and not rsr.empty and pd.notna(rsr.iloc[-1]) else 0.0
             mom      = calc_rsr_momentum(rsr, self.fujiko_params.get("mom_period", 21)) if rsr is not None else None
-            mom_now  = float(mom.iloc[-1])  if mom is not None and not mom.empty  else 0.0
+            mom_now  = float(mom.iloc[-1]) if mom is not None and not mom.empty and pd.notna(mom.iloc[-1]) else 0.0
             sepa_df  = calc_sepa(df, rsr if rsr is not None else pd.Series(50.0, index=df.index))
             sepa_now = int(sepa_df["sepa_score"].iloc[-1])
             rsr_rank = rsr_rank_map.get(sym, 99)
@@ -1067,7 +1223,7 @@ class SignalBridge:
             _ts_highest      = 0.0
             _ts_stop_price   = 0.0
             if currently_holding:
-                from portfolio.volatility_allocator import calc_atr as _calc_atr
+                from src.portfolio.volatility_allocator import calc_atr as _calc_atr
                 _ts_close  = float(df["Close"].iloc[-1])
                 _ts_atr20  = _calc_atr(df, period=20)
                 _prev_high = pos_highest_closes.get(sym, _ts_close)
@@ -1143,7 +1299,31 @@ class SignalBridge:
                     except Exception:
                         pass
 
-            if is_trailing_stop:
+            # ── composite shock exit（最高優先度）────────────────────────────
+            is_shock_exit = False
+            if currently_holding and _is_shock_day:
+                try:
+                    _sym_ret_prev = float(
+                        universe_raw[sym]["df"]["Close"].pct_change().iloc[-1]
+                    )
+                    if _sym_ret_prev <= -0.08:
+                        is_shock_exit = True
+                        logger.warning(
+                            "COMPOSITE_SHOCK_EXIT %s sym_ret=%.2f%% (bench=%.2f%%)",
+                            sym, _sym_ret_prev * 100, _bench_ret_prev * 100,
+                        )
+                except Exception:
+                    pass
+
+            if is_shock_exit:
+                signal_int    = -1
+                strategy_type = "fujiko"
+                reason = (
+                    f"SELL[composite_shock]: bench={_bench_ret_prev:.2%}"
+                    f" sym={_sym_ret_prev:.2%} ≤ -8%"
+                )
+
+            elif is_trailing_stop:
                 signal_int    = -1
                 strategy_type = "fujiko"
                 reason = (
@@ -1191,6 +1371,7 @@ class SignalBridge:
 
             else:
                 # 全銘柄で戦略を実行（FujikoStrategy が RSR≥min_rsr, SEPA, breakout を内部フィルター）
+                reason = ""   # 未初期化参照防止（line 1375 の reason.startswith ガード）
                 rule = SECTOR_STRATEGY.get(sector, "dynamic")
                 if rule == "fujiko":
                     signal_int, strategy_type = f_signal, "fujiko"
@@ -1225,7 +1406,7 @@ class SignalBridge:
                     # MTFキャッシュを参照（日中再計算なし）
                     _rsr_weekly_now = float(_rsr_weekly_map.get(sym, 0.0))
                     _weekly_ma_ok   = bool(_weekly_ma_ok_map.get(sym, False))
-                    _wrsr_ok        = _rsr_weekly_now >= 75.0  # 日次と同じ閾値
+                    _wrsr_ok        = _rsr_weekly_now >= min_rsr_threshold
                     if _wrsr_ok:
                         diag_mtf_wrsr_pass += 1
                     if _weekly_ma_ok:
@@ -1238,7 +1419,9 @@ class SignalBridge:
                         strategy_type = "fujiko"
                         _mtf_reason = []
                         if not _wrsr_ok:
-                            _mtf_reason.append(f"weekly_RSR={_rsr_weekly_now:.1f}<70")
+                            _mtf_reason.append(
+                                f"weekly_RSR={_rsr_weekly_now:.1f}<{min_rsr_threshold:.1f}"
+                            )
                         if not _weekly_ma_ok:
                             _mtf_reason.append("weekly_close<=MA20")
                         reason = (
@@ -1358,11 +1541,29 @@ class SignalBridge:
             _MOM_WEIGHT_ADJ = 0.5
         elif _trend_cluster_level >= 2:
             _MOM_WEIGHT_ADJ = 0.7
-        buy_eligible = sorted(
+        _buy_eligible_all = sorted(
             [(s.rsr + s.rsr_mom * _MOM_WEIGHT_ADJ, s.symbol)
              for s in signals if s.signal == 1 and not s.currently_holding],
             reverse=True,
         )
+        # dyn_rsr42_bear_rs0 フィルター: 活性銘柄のみ BUY 対象
+        # 空セットはフォールバック（フィルターなし: 活性銘柄計算失敗時の安全策）
+        if _dyn_active_syms:
+            buy_eligible = [
+                (sc, sym) for sc, sym in _buy_eligible_all if sym in _dyn_active_syms
+            ]
+            _dyn_filtered = len(_buy_eligible_all) - len(buy_eligible)
+            if _dyn_filtered:
+                logger.info(
+                    "dyn フィルター: %d → %d 件（%d 件除外）",
+                    len(_buy_eligible_all), len(buy_eligible), _dyn_filtered,
+                )
+            if not buy_eligible:
+                # 全候補が除外された場合（発生頻度は極めて低い）→ フォールバック
+                logger.warning("dyn フィルター後 BUY 候補ゼロ → フォールバック（全候補使用）")
+                buy_eligible = _buy_eligible_all
+        else:
+            buy_eligible = _buy_eligible_all
         top_k_syms = [sym for _, sym in buy_eligible[:self.top_k]]
         # avg_tradeable_rsr: 全フィルター通過後のBUY候補のRSR平均（0件なら None）
         _buy_elig_rsrs = [rsr for rsr, _ in buy_eligible]
@@ -1741,6 +1942,7 @@ class SignalBridge:
         cb_active:            bool,
         today_new_buys:       int = 0,
         effective_max_pos:    int | None = None,
+        above_ma200:          bool | None = None,
     ) -> tuple[list[OrderInstruction], list[str]]:
         """
         シグナルリストからポートフォリオルールを適用して注文を生成する。
@@ -1810,6 +2012,15 @@ class SignalBridge:
         _eff_max_pos      = effective_max_pos if effective_max_pos is not None else self.max_positions
         max_per_sector    = max(1, _eff_max_pos // max(1, self.min_sectors))
         max_alloc_cap     = self.capital * self.max_single_weight
+        # regime_sizing: TOPIX MA200下なら bear_scale を適用してポジションサイズを縮小
+        _regime_scale = 1.0
+        if self.regime_sizing != "none" and above_ma200 is False:
+            _regime_scale = self.bear_scale
+            logger.info(
+                "REGIME_SCALE: %s(bear) → size_scale=%.2f (MA200下落相場)",
+                self.regime_sizing, _regime_scale,
+            )
+        max_alloc_cap = max_alloc_cap * _regime_scale
         new_buys_this_run = today_new_buys
         blocked_by_alloc_cap_count = 0  # 配分上限キャップで qty_cap=0 になった件数
         lot_rounded_up_count       = 0  # ATR計算 <100株 → 最低1単元フォールバックした件数
@@ -1969,7 +2180,7 @@ class SignalBridge:
         kabuステーション API に注文を送信する。
         レート制限: ORDER_RATE_LIMIT_PER_MIN 件/分（デフォルト 3件/分 = 20秒/件）
         """
-        from kabusapi.client import Side, OrderType, Exchange
+        from src.kabusapi.client import Side, OrderType, Exchange
 
         now         = datetime.now(JST)
         market_hour = now.hour * 60 + now.minute
@@ -2361,10 +2572,11 @@ class SignalBridge:
         # 3. ポジション・余力取得
         current_positions = self._get_current_positions()
         available_cash    = self._get_available_cash(current_positions)
+        calc_available_cash = available_cash if available_cash is not None else 0.0
 
         # 4. 現在 equity → CB 状態更新
         current_equity  = self._compute_current_equity(
-            current_positions, universe_raw, available_cash
+            current_positions, universe_raw, calc_available_cash
         )
         portfolio_state = self._update_cb_state(portfolio_state, current_equity, today_str)
         cb_active       = portfolio_state["cb_state"] != "NORMAL"
@@ -2424,18 +2636,27 @@ class SignalBridge:
                 _buy_cands_count, _CLUSTER_THRESHOLD, _effective_max_pos,
             )
 
-        # 6. 注文生成
+        # 6. 注文生成（regime_sizing 用に TOPIX MA200 状態を事前計算）
+        _above_ma200_live: bool | None = None
+        if self.regime_sizing != "none":
+            try:
+                _bc = bench_prices.dropna()
+                _above_ma200_live = bool(float(_bc.iloc[-1]) >= float(_bc.rolling(200, min_periods=1).mean().iloc[-1]))
+            except Exception:
+                pass
+
         orders, order_warnings, _blocked_alloc_cap, _lot_rounded_up = self._build_orders(
-            signals, universe_raw, current_positions, available_cash,
+            signals, universe_raw, current_positions, calc_available_cash,
             cb_active=cb_active,
             effective_max_pos=_effective_max_pos,
+            above_ma200=_above_ma200_live,
         )
 
         # 6b. Shadow Phase1 注文生成（live orders に追加・既存ロジック不変）
         # 条件: CB NORMAL AND shadow_rsr_pass>=8 AND rsr62>=70 AND rsr62>live_top10_median
         # blocked_by_alloc でも仮想エントリーを記録して研究データを生成する
         _cash_after_live_buys = (
-            available_cash
+            calc_available_cash
             - sum(o.estimated_amount for o in orders if o.side == "BUY")
         )
         _shadow_virtual_positions = portfolio_state.get("shadow_virtual_positions", {})
@@ -2459,7 +2680,7 @@ class SignalBridge:
         # 6c. LIVE_STATE サマリーログ（戦略停止 / 市場悪化 / フィルター過剰 の切り分け用）
         _entries   = [o for o in orders if o.side in ("BUY", "SHADOW_BUY")]
         _missed_breakout_count = max(0, _buy_cands_count - len(_entries))
-        _exposure  = 1.0 - available_cash / max(1.0, current_equity)
+        _exposure  = 1.0 - calc_available_cash / max(1.0, current_equity)
         logger.info(
             "LIVE_STATE candidates=%d ranked=%d entries=%d positions=%d exposure=%.3f cluster=%s missed=%d",
             _buy_cands_count, len(top_k_syms), len(_entries),
@@ -2778,11 +2999,11 @@ class SignalBridge:
         _rsr_dist_entry = {
             "date":            today_str,
             "run_at":          now.strftime("%Y-%m-%dT%H:%M:%S%z"),
-            "min_rsr_threshold": self._fujiko_params_live.get("min_rsr", 75.0),
+            "min_rsr_threshold": float(self._fujiko_params_live["min_rsr"]),
             "top20":           _diag.get("rsr_distribution", []),
             "threshold_zone":  [  # 閾値±5のゾーンにいる銘柄（最適点特定用）
                 e for e in _diag.get("rsr_distribution", [])
-                if abs(e["rsr"] - self._fujiko_params_live.get("min_rsr", 75.0)) <= 10
+                if abs(e["rsr"] - float(self._fujiko_params_live["min_rsr"])) <= 10
             ],
         }
         with _rsr_dist_path.open("a", encoding="utf-8") as _f:
@@ -2800,6 +3021,7 @@ class SignalBridge:
             top_k_symbols  = top_k_syms,
             portfolio_summary = {
                 "available_cash":   available_cash,
+                "cash_for_calc":    round(calc_available_cash, 0),
                 "current_equity":   round(current_equity, 0),
                 "equity_peak":      round(equity_peak, 0),
                 "current_drawdown": round(
@@ -2809,6 +3031,9 @@ class SignalBridge:
                 "max_positions":       self.max_positions,
                 "equity_based_max_pos": _equity_based_max,   # 資本連動上限（360万→3, 480万→4, 600万→5）
                 "open_slots":          max(0, _effective_max_pos - len(current_positions)),
+                "portfolio_mode":      "actual" if self._positions_api_status["ok"] else "virtual",
+                "positions_api":       self._positions_api_status.copy(),
+                "wallet_api":          self._wallet_api_status.copy(),
                 "cb_state":            portfolio_state["cb_state"],
                 "cb_cooldown_end":     portfolio_state.get("cb_cooldown_end_date"),
             },
