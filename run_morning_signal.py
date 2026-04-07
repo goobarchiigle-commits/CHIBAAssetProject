@@ -30,8 +30,8 @@ run_morning_signal.py
   このスクリプト自体に認証情報を記述しないこと。
 """
 
-import sys
 import os
+import sys
 import argparse
 import logging
 import json
@@ -43,7 +43,9 @@ sys.path.insert(0, str(_here))           # C:/ai-trading/src/ → backtest.xxx i
 sys.path.insert(0, str(_here.parent))    # C:/ai-trading/     → src.xxx imports
 sys.stdout.reconfigure(encoding="utf-8")
 
-from src.paths import SIGNALS_DIR  # .env の読み込みも paths.py が担う
+from src.config_loader import load_strategy_config
+from src.paths import SIGNALS_DIR, LIVE_UNIVERSE_FILE, ORDER_LOCK_FILE  # .env の読み込みも paths.py が担う
+from src.utils.morning_smoke_test import run_morning_smoke_test
 
 JST = timezone(timedelta(hours=9))
 
@@ -53,6 +55,11 @@ logging.basicConfig(
     datefmt = "%H:%M:%S",
 )
 logger = logging.getLogger("morning_signal")
+cfg = load_strategy_config()
+
+# token reuse DEBUG 確認用（確認後は削除またはコメントアウト可）
+import logging as _logging
+_logging.getLogger("src.kabusapi.client").setLevel(_logging.DEBUG)
 
 
 def parse_args() -> argparse.Namespace:
@@ -136,6 +143,15 @@ def print_signals(result) -> None:
             print(f"  {s['symbol']:<10} {s['sector']:<10}  {s['reason']}")
 
 
+def assert_live_mode_env() -> None:
+    """LIVE_MODE 環境変数が 'true' でない限り --live フラグを無効化して終了する。"""
+    live_mode_env = os.getenv("LIVE_MODE", "false").lower()
+    if live_mode_env != "true":
+        print(f"[GUARD] LIVE_MODE={live_mode_env!r}. --live フラグが指定されましたが LIVE_MODE=true でないため終了します。")
+        print("  発注を行うには: export LIVE_MODE=true または .env に LIVE_MODE=true を設定してください。")
+        sys.exit(0)  # エラーではなく正常終了（スクリプト誤実行の保護）
+
+
 def confirm_live_orders(orders: list) -> bool:
     """発注前に確認プロンプトを表示する。"""
     buy_orders  = [o for o in orders if o["side"] == "BUY"]
@@ -164,31 +180,258 @@ def save_signal_json(result, output_dir: str) -> Path:
     return file_path
 
 
+def already_ordered_today(symbol: str) -> bool:
+    """当日すでに発注済みか確認する（同一銘柄・同日の重複発注防止）。"""
+    today = datetime.now(JST).date().isoformat()
+    if not ORDER_LOCK_FILE.exists():
+        return False
+    try:
+        lock = json.loads(ORDER_LOCK_FILE.read_text(encoding="utf-8"))
+        return bool(lock.get(today, {}).get(symbol))
+    except Exception:
+        return False
+
+
+def mark_ordered(symbol: str, side: str) -> None:
+    """発注成功後にロックを書き込む（再実行時の二重発注防止）。"""
+    today = datetime.now(JST).date().isoformat()
+    lock: dict = {}
+    if ORDER_LOCK_FILE.exists():
+        try:
+            lock = json.loads(ORDER_LOCK_FILE.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    ORDER_LOCK_FILE.parent.mkdir(parents=True, exist_ok=True)
+    lock.setdefault(today, {})[symbol] = side
+    ORDER_LOCK_FILE.write_text(json.dumps(lock, ensure_ascii=False, indent=2), encoding="utf-8")
+    logger.info("idempotency lock: %s %s を記録", side, symbol)
+
+
+def check_api_connection() -> bool:
+    """
+    kabuステーションAPI ping（fetch_token で疎通確認）。
+    接続成功なら True、失敗なら False を返す（例外は握りつぶす）。
+    注: fetch_token() は毎回新規トークンを取得するためトークン失効問題は発生しない。
+    """
+    try:
+        from src.kabusapi.client import KabuClient
+        KabuClient().fetch_token()
+        logger.info("kabuステーション API: 接続OK ✅")
+        return True
+    except Exception as exc:
+        logger.warning("kabuステーション API: 未接続 → %s", exc)
+        return False
+
+
+def sync_portfolio_from_api() -> "dict | None":
+    """
+    kabuステーション API から現在の保有ポジションを取得し、
+    portfolio_state.json と突き合わせて同期する。
+
+    - broker にあるが portfolio_state にない銘柄 → 追加（entry_date=今日、entry_price=broker avg_price）
+    - portfolio_state にあるが broker にない銘柄 → 削除（実際に決済済みとみなす）
+    - API 未接続の場合は何もしない（ドライランでも安全に動作）
+    """
+    from pathlib import Path as _Path
+    import json as _json
+
+    PORTFOLIO_STATE_FILE = _Path(__file__).resolve().parent.parent / "runtime" / "portfolio_state.json"
+    TODAY = datetime.now(JST).strftime("%Y-%m-%d")
+
+    try:
+        from src.kabusapi.client import KabuClient
+        client = KabuClient()
+        client.fetch_token()
+        raw_positions = client.get_positions()
+    except Exception as exc:
+        logger.info("ポジション同期スキップ（API未接続）: %s", exc)
+        return None
+
+    # broker から保有銘柄を収集（.T サフィックス付きに正規化）
+    broker_positions: dict[str, float] = {}
+    for p in raw_positions:
+        sym_code = p.get("Symbol", "")
+        if sym_code:
+            sym = f"{sym_code}.T" if not sym_code.endswith(".T") else sym_code
+            avg_price = float(p.get("Price", 0.0))
+            qty = int(p.get("LeavesQty", 0))
+            if qty > 0:
+                broker_positions[sym] = avg_price
+
+    # portfolio_state.json 読み込み
+    default_state: dict = {
+        "cb_state": "NORMAL",
+        "equity_peak": 3000000,
+        "cb_cooldown_end_date": None,
+        "recovery_threshold": None,
+        "position_entry_dates": {},
+        "position_entry_prices": {},
+        "position_entry_atrs": {},
+        "position_highest_closes": {},
+        "reentry_blocked": {},
+        "last_updated": None,
+        "shadow_virtual_positions": {},
+    }
+    if PORTFOLIO_STATE_FILE.exists():
+        try:
+            state = _json.loads(PORTFOLIO_STATE_FILE.read_text(encoding="utf-8"))
+        except Exception:
+            state = default_state.copy()
+    else:
+        state = default_state.copy()
+
+    entry_dates  = state.setdefault("position_entry_dates",   {})
+    entry_prices = state.setdefault("position_entry_prices",  {})
+    highest_cls  = state.setdefault("position_highest_closes", {})
+    changed = False
+
+    # broker にあるが portfolio_state にない → 追加
+    for sym, avg_price in broker_positions.items():
+        if sym not in entry_dates:
+            logger.warning("ポジション同期: %s を portfolio_state に追加（entry_date=%s, price=%.1f）", sym, TODAY, avg_price)
+            entry_dates[sym]  = TODAY
+            entry_prices[sym] = avg_price
+            highest_cls[sym]  = avg_price
+            changed = True
+
+    # portfolio_state にあるが broker にない → 削除
+    stale = [sym for sym in list(entry_dates.keys()) if sym not in broker_positions]
+    for sym in stale:
+        logger.warning("ポジション同期: %s を portfolio_state から削除（broker に保有なし）", sym)
+        entry_dates.pop(sym, None)
+        entry_prices.pop(sym, None)
+        highest_cls.pop(sym, None)
+        state.get("position_entry_atrs", {}).pop(sym, None)
+        changed = True
+
+    if changed:
+        state["last_updated"] = TODAY
+        PORTFOLIO_STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
+        PORTFOLIO_STATE_FILE.write_text(
+            _json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+        logger.info("portfolio_state.json を API から同期しました（broker: %d銘柄）", len(broker_positions))
+    else:
+        logger.info("portfolio_state.json は最新（差分なし・broker: %d銘柄）", len(broker_positions))
+
+    return broker_positions
+
+
+def load_live_universe() -> dict[str, str]:
+    """
+    LIVE_UNIVERSE_FILE（configs/universe/rsr42_trading.json）から
+    {symbol: sector} を読み込む。ファイル不在・銘柄数不足は RuntimeError。
+    """
+    if not LIVE_UNIVERSE_FILE.exists():
+        raise RuntimeError(
+            f"ユニバースファイルが見つかりません: {LIVE_UNIVERSE_FILE}\n"
+            "LIVE_UNIVERSE_FILE 環境変数または configs/universe/ を確認してください。"
+        )
+    data = json.loads(LIVE_UNIVERSE_FILE.read_text(encoding="utf-8"))
+    symbols: dict[str, str] = data.get("symbols", {})
+    if len(symbols) < 10:
+        raise RuntimeError(
+            f"ユニバース銘柄数 {len(symbols)} < 最小要件 10。"
+            "ファイルが壊れている可能性があります。"
+        )
+    logger.info(
+        "ユニバース読み込み: %d銘柄 (%s)",
+        len(symbols), LIVE_UNIVERSE_FILE.name,
+    )
+    return symbols
+
+
+def _write_shadow_log(record: dict) -> None:
+    """仮想約定ログを runtime/shadow_orders.jsonl に追記する。"""
+    path = Path("runtime/shadow_orders.jsonl")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        with open(path, "a", encoding="utf-8") as f:
+            f.write(json.dumps(record, ensure_ascii=False) + "\n")
+    except Exception as e:
+        logger.error("[SHADOW] Write failed: %s", e)
+
+
 def main() -> int:
     args = parse_args()
     print_banner(args.live)
 
-    # ---- インポート ----
     import warnings
     warnings.filterwarnings("ignore")
 
-    from backtest.topix100_backtest import TOPIX100_TICKERS, FUJIKO_PARAMS, PORT_PARAMS
-    from kabusapi.signal_bridge     import SignalBridge
+    # ---- ユニバース読み込み（旧: backtest.topix100_backtest → 現: configs/universe/） ----
+    try:
+        universe_tickers = load_live_universe()
+    except RuntimeError as exc:
+        logger.error("ユニバース読み込み失敗: %s", exc)
+        return 1
+
+    # ---- kabuステーション API ping ----
+    api_connected = check_api_connection()
+    if not api_connected:
+        logger.error("API unavailable - skip all signal generation")
+        return 1
+    api_ok = True  # downstream の sync_portfolio_from_api() 参照用
+
+    # ---- ポジション同期（API 接続時のみ）----
+    # portfolio_state.json と broker の保有ポジションを突き合わせ、乖離を修正する。
+    # これにより「発注成功したのに state が更新されていない」状態を自動修復する。
+    if api_ok:
+        positions = sync_portfolio_from_api()
+        try:
+            from src.kabusapi.client import KabuClient
+            cash_info = KabuClient().get_wallet_cash()
+        except Exception:
+            cash_info = None
+        if cash_info is None or positions is None:
+            logger.error(
+                "Broker state unavailable (cash=%s, positions=%s) - halt execution",
+                cash_info,
+                positions,
+            )
+            raise RuntimeError("broker state unavailable")
+
+    from src.kabusapi.signal_bridge import SignalBridge
 
     # ---- ブリッジ初期化 ----
-    bridge = SignalBridge(
-        universe_tickers  = TOPIX100_TICKERS,
-        fujiko_params     = FUJIKO_PARAMS,
-        capital           = PORT_PARAMS["capital"],
-        max_positions     = PORT_PARAMS["max_positions"],
-        max_dd_limit      = PORT_PARAMS["max_dd_limit"],
-        min_sectors       = PORT_PARAMS["min_sectors"],
-        live              = args.live,
-    )
+    try:
+        bridge = SignalBridge(
+            universe_tickers   = universe_tickers,
+            fujiko_params      = {
+                "min_sepa":         cfg.fujiko.min_sepa,
+                "min_rsr":          cfg.fujiko.min_rsr,
+                "mom_period":       cfg.fujiko.mom_period,
+                "turtle_entry":     cfg.fujiko.turtle_entry,
+                "turtle_exit":      cfg.fujiko.turtle_exit,
+                "use_turtle_entry": cfg.fujiko.use_turtle_entry,
+            },
+            capital            = cfg.portfolio.capital,
+            max_positions      = cfg.portfolio.max_positions,
+            max_dd_limit       = 0.15,
+            min_sectors        = 1,
+            live               = args.live,
+            min_hold_days      = cfg.risk.min_hold_days,
+            emergency_exit_pct = cfg.risk.emergency_exit_pct,
+            cfg                = cfg,
+        )
+    except Exception as exc:
+        logger.error("SignalBridge 初期化失敗: %s", exc)
+        return 1
 
     # ---- シグナル生成 ----
     logger.info("シグナル生成開始...")
     result, order_objects = bridge.run()
+
+    # ---- 朝イチ smoke test（bridge.run() 完了後・発注前） ----
+    # bear_filter_log.jsonl から当日の bear 判定情報を自動取得。
+    # active_count < 3 のみ WARNING を出すが、発注は止めない。
+    try:
+        run_morning_smoke_test(
+            today=datetime.now(JST).date(),
+            universe_tickers=universe_tickers,  # bull 時の全銘柄（active_syms 推定用）
+        )
+    except Exception as _smoke_exc:
+        logger.warning("smoke test 実行失敗（発注は継続）: %s", _smoke_exc)
 
     # ---- 表示 ----
     print(f"\n  データ基準日 : {result.data_as_of}")
@@ -215,6 +458,48 @@ def main() -> int:
         print("=" * 60)
         return 0
 
+    # ---- P0-3: LIVE_MODE 環境変数ガード（--live 指定時のみ） ----
+    assert_live_mode_env()
+
+    # ---- Shadow mode 設定読み込み ----
+    SHADOW_MODE: bool = cfg.live_execution.shadow_mode
+
+    # ---- OrderLedger 初期化（重複チェック・当日カウント） ----
+    from src.live.order_ledger import OrderLedger
+    today = datetime.now(JST).date()
+    ledger = OrderLedger(trade_date=today)
+
+    # ---- 発注直前 hard guard ----
+    from src.live.execution_guard import check_execution_preconditions
+    guard_result = check_execution_preconditions(
+        active_syms=list(universe_tickers.keys()),
+        signals=result.orders,
+        current_positions={},
+        daily_order_count=ledger.daily_count(),
+    )
+    if guard_result["status"] == "BLOCKED":
+        logger.error(
+            "[GUARD] Execution BLOCKED: reason=%s, detail=%s",
+            guard_result["reason"],
+            guard_result.get("detail", ""),
+        )
+        return 1
+    if guard_result["status"] == "NO_SIGNAL":
+        logger.info("[GUARD] No signals today. Skipping execution.")
+        return 0
+
+    # ---- P0-1: 起動時 broker positions 取得 + drift チェック ----
+    from src.live.position_sync import sync_and_validate_state
+    sync_result = sync_and_validate_state(bridge)
+    if sync_result["drift_detected"] and sync_result["halt_trading"]:
+        logger.critical(
+            "[STARTUP] State drift detected. HALTING. "
+            "broker_syms=%s, local_syms=%s",
+            sync_result["broker_syms"],
+            sync_result["local_syms"],
+        )
+        sys.exit(1)
+
     if not order_objects:
         print("\n発注なし。終了します。")
         return 0
@@ -227,8 +512,65 @@ def main() -> int:
             print("発注をキャンセルしました。")
             return 0
 
+    # ---- idempotency チェック（OrderLedger による重複発注防止）----
+    deduped = []
+    for o in order_objects:
+        check = ledger.check_and_record(
+            o.symbol, o.side,
+            qty=getattr(o, "qty", 0),
+            price=getattr(o, "estimated_price", 0.0),
+        )
+        if not check["allowed"]:
+            logger.warning("重複発注スキップ: %s（%s）", o.symbol, check["reason"])
+            print(f"  ⚠ {o.symbol}: 発注スキップ（{check['reason']}）")
+        else:
+            deduped.append(o)
+    order_objects = deduped
+
+    if not order_objects:
+        print("\n発注可能な注文なし（重複除外後）。終了します。")
+        return 0
+
+    # ---- 執行前二重ガード（research層capとは独立した実行直前チェック）----
+    exec_checked = []
+    for _o in order_objects:
+        if _o.side != "BUY" or bridge.pre_trade_risk_check(_o):
+            exec_checked.append(_o)
+        else:
+            logger.warning(
+                "RISK_CHECK_REJECT (execution layer): %s %s をスキップ",
+                _o.side, _o.symbol,
+            )
+            print(f"  ⚠ {_o.symbol}: 執行前リスクチェック不合格（sector/symbol cap）→ スキップ")
+    order_objects = exec_checked
+    if not order_objects:
+        print("\n発注可能な注文なし（二重ガード除外後）。終了します。")
+        return 0
+
+    # ---- Shadow mode: 実発注せずログのみ ----
+    if SHADOW_MODE:
+        print("\n[SHADOW MODE] 実発注をスキップしてログ記録のみ行います。")
+        print(f"  shadow_mode_reason: {cfg.live_execution.shadow_mode_reason}")
+        for o in order_objects:
+            shadow_record = {
+                "shadow_order": {
+                    "symbol": o.symbol,
+                    "side": o.side,
+                    "qty": getattr(o, "qty", 0),
+                    "price": getattr(o, "estimated_price", 0.0),
+                    "reason": "shadow_mode=true",
+                }
+            }
+            logger.info("[SHADOW] %s", json.dumps(shadow_record, ensure_ascii=False))
+            _write_shadow_log(shadow_record)
+            print(f"  [SHADOW] {o.side} {o.symbol} qty={getattr(o, 'qty', 0)}")
+        print("\n  shadow_orders.jsonl に記録しました。")
+        print("  本番発注には strategy.yaml の live_execution.shadow_mode: false が必要です。")
+        return 0
+
     # 発注実行
     print("\n発注中...")
+    # P1-4: idempotency ロックは OrderLedger.check_and_record() が発注前に記録済み。
     send_results = bridge._send_orders(order_objects)
 
     # 発注結果表示
@@ -237,6 +579,12 @@ def main() -> int:
         status = "✅ 成功" if r.get("success") else "❌ 失敗"
         order_id = r.get("order_id", r.get("error", ""))
         print(f"  {r['side']} {r['symbol']} {r['qty']}株 → {status}  ({order_id})")
+
+    # ── ポートフォリオ状態更新（約定確認後）────────────────────────────
+    # 発注成功した銘柄のエントリー日・価格・ATR を portfolio_state.json に記録する。
+    # これがないと次回起動時に「ポジションなし」と誤認され二重発注が起きる。
+    today_str = datetime.now(JST).strftime("%Y-%m-%d")
+    bridge.update_state_after_execution(send_results, today_str)
 
     # 結果を JSON に追記して再保存
     result_dict = json.loads(result.to_json())

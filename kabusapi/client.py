@@ -19,10 +19,14 @@ import logging
 from dataclasses import dataclass, field
 from typing import Any
 
+from pathlib import Path as _Path
+
 import requests
 from dotenv import load_dotenv
 
-load_dotenv()
+# client.py は src/kabusapi/client.py → src/.env は parents[1]/.env
+_ENV_PATH = _Path(__file__).resolve().parents[1] / ".env"
+load_dotenv(dotenv_path=_ENV_PATH, override=False)
 
 logger = logging.getLogger(__name__)
 
@@ -99,6 +103,38 @@ class Board:
         )
 
 
+def parse_order_response(data: dict) -> dict:
+    """
+    kabuステーション sendorder レスポンスを解析して成否を判定する。
+
+    kabu Station の正常レスポンスは OrderId のみを返し Result キーを含まない場合がある。
+    （2026-03-16 の実運用で確認: {"OrderId": "20260316A02N80057402"}）
+
+    Returns:
+        {
+            "success":     bool,
+            "order_id":    str,
+            "result_code": int,   # 正常時 0、エラー時は API の値
+        }
+    """
+    order_id    = data.get("OrderId") or data.get("order_id") or data.get("ID") or ""
+    result_code = data.get("Result", data.get("ResultCode", None))
+
+    logger.debug("[ORDER_RESPONSE] full=%s", data)
+
+    if order_id and result_code is None:
+        # OrderId が存在して Result キーが欠落 = kabu Station の正常レスポンス
+        logger.info("[ORDER] OrderId=%s (Result key absent, treating as success)", order_id)
+        return {"success": True, "order_id": order_id, "result_code": 0}
+    elif result_code == 0:
+        return {"success": True, "order_id": order_id, "result_code": 0}
+    elif result_code is not None:
+        return {"success": False, "order_id": order_id, "result_code": result_code}
+    else:
+        # OrderId も Result も存在しない = 空レスポンスまたは不明エラー
+        return {"success": False, "order_id": "", "result_code": -1}
+
+
 @dataclass
 class OrderResult:
     """注文送信結果"""
@@ -112,13 +148,51 @@ class OrderResult:
 
     @classmethod
     def from_response(cls, data: dict) -> "OrderResult":
-        # kabuステーションAPIは "Result" キーで返す（"ResultCode" は旧仕様）
-        result_code = data.get("Result", data.get("ResultCode", -1))
+        parsed = parse_order_response(data)
         return cls(
-            order_id    = data.get("OrderId", ""),
-            result_code = result_code,
+            order_id    = parsed["order_id"],
+            result_code = parsed["result_code"],
             raw         = data,
         )
+
+
+# ------------------------------------------------------------------ #
+# process 内 singleton token キャッシュ
+# ------------------------------------------------------------------ #
+class _TokenCache:
+    """
+    process 内 singleton: kabu Station token を TTL 期間再利用する。
+
+    同一プロセス内で複数の KabuClient インスタンスが生成されても
+    token 取得は最大 1 回に抑える。
+    """
+
+    _token: str = ""
+    _fetched_at: float = 0.0
+    _fetch_count: int = 0
+    _TTL_SEC: int = 3000  # 50 分（kabu Station 有効期間 60 分 - 10 分マージン）
+
+    def is_valid(self) -> bool:
+        return bool(self._token) and (time.time() - self._fetched_at) < self._TTL_SEC
+
+    def set(self, token: str) -> None:
+        self._token = token
+        self._fetched_at = time.time()
+        self._fetch_count += 1
+
+    def age(self) -> float:
+        return time.time() - self._fetched_at
+
+    def remaining(self) -> float:
+        return max(0.0, self._TTL_SEC - self.age())
+
+    def invalidate(self) -> None:
+        self._token = ""
+        self._fetched_at = 0.0
+        logger.debug("token cache invalidated")
+
+
+_CACHE = _TokenCache()
 
 
 # ------------------------------------------------------------------ #
@@ -158,6 +232,7 @@ class KabuClient:
     def fetch_token(self) -> str:
         """
         APIトークンを取得してセッションに設定する。
+        TTL 内はキャッシュを再利用し HTTP リクエストを発行しない。
         kabuステーション起動後・取引時間中のみ有効。
         """
         if not self._api_password:
@@ -165,15 +240,45 @@ class KabuClient:
                 "KABU_API_PASSWORD が未設定です。.env を確認してください。"
             )
 
+        if _CACHE.is_valid():
+            self._token = _CACHE._token
+            self._session.headers.update({"X-API-KEY": self._token})
+            logger.debug(
+                "token reused: age=%.0fs remaining=%.0fs fetch_count=%d",
+                _CACHE.age(), _CACHE.remaining(), _CACHE._fetch_count,
+            )
+            return self._token
+
+        # キャッシュ miss → 実際に取得
         resp = self._session.post(
             f"{BASE_URL}/token",
             json={"APIPassword": self._api_password},
         )
         resp.raise_for_status()
         self._token = resp.json()["Token"]
+        _CACHE.set(self._token)
         self._session.headers.update({"X-API-KEY": self._token})
         logger.info("トークン取得成功")
+        logger.debug("token fetched: fetch_count=%d", _CACHE._fetch_count)
         return self._token
+
+    # ------------------------------------------------------------------ #
+    # 内部ヘルパ
+    # ------------------------------------------------------------------ #
+    def _request_with_token_retry(self, method: str, url: str, **kwargs) -> "requests.Response":
+        """
+        HTTP リクエストを発行し、401 を受けた場合はキャッシュを破棄して
+        fetch_token() を再実行した上で 1 回だけリトライする。
+        無限ループ防止のため最大リトライ回数は 1 回。
+        """
+        resp = getattr(self._session, method)(url, **kwargs)
+        if resp.status_code == 401:
+            logger.warning("401 received, invalidating token cache and retrying once")
+            _CACHE.invalidate()
+            self.fetch_token()
+            resp = getattr(self._session, method)(url, **kwargs)
+        resp.raise_for_status()
+        return resp
 
     # ------------------------------------------------------------------ #
     # 株価取得
@@ -189,8 +294,7 @@ class KabuClient:
         Returns:
             Board オブジェクト
         """
-        resp = self._session.get(f"{BASE_URL}/board/{symbol}@{exchange}")
-        resp.raise_for_status()
+        resp = self._request_with_token_retry("get", f"{BASE_URL}/board/{symbol}@{exchange}")
         return Board.from_response(resp.json())
 
     # ------------------------------------------------------------------ #
@@ -245,8 +349,7 @@ class KabuClient:
             "Price":           price,
             "ExpireDay":       expire_day,
         }
-        resp = self._session.post(f"{BASE_URL}/sendorder", json=payload)
-        resp.raise_for_status()
+        resp = self._request_with_token_retry("post", f"{BASE_URL}/sendorder", json=payload)
         result = OrderResult.from_response(resp.json())
         if result.success:
             logger.info("注文送信成功: OrderId=%s", result.order_id)
@@ -259,17 +362,15 @@ class KabuClient:
     # ------------------------------------------------------------------ #
     def get_positions(self) -> list[dict]:
         """現在の保有ポジション一覧を取得する。"""
-        resp = self._session.get(f"{BASE_URL}/positions")
-        resp.raise_for_status()
+        resp = self._request_with_token_retry("get", f"{BASE_URL}/positions")
         return resp.json() or []
 
     def get_wallet_cash(self) -> dict:
         """現物買付余力を取得する。"""
-        resp = self._session.get(
-            f"{BASE_URL}/wallet/cash",
+        resp = self._request_with_token_retry(
+            "get", f"{BASE_URL}/wallet/cash",
             params={"symbol": "", "exchange": Exchange.TSE},
         )
-        resp.raise_for_status()
         return resp.json()
 
     def get_orders(self, only_open: bool = True) -> list[dict]:
@@ -282,8 +383,7 @@ class KabuClient:
         params = {"details": "true"}
         if only_open:
             params["product"] = "0"
-        resp = self._session.get(f"{BASE_URL}/orders", params=params)
-        resp.raise_for_status()
+        resp = self._request_with_token_retry("get", f"{BASE_URL}/orders", params=params)
         return resp.json() or []
 
     def get_filled_orders(self) -> list[dict]:
@@ -298,11 +398,10 @@ class KabuClient:
         Returns:
             約定済み注文リスト（各要素に Details: [{Price, Qty, ...}] が含まれる）
         """
-        resp = self._session.get(
-            f"{BASE_URL}/orders",
+        resp = self._request_with_token_retry(
+            "get", f"{BASE_URL}/orders",
             params={"product": "1", "state": "5", "details": "true"},
         )
-        resp.raise_for_status()
         return resp.json() or []
 
     def cancel_order(self, order_id: str) -> dict:
@@ -311,6 +410,5 @@ class KabuClient:
             "OrderId":  order_id,
             "Password": self._trade_password,
         }
-        resp = self._session.put(f"{BASE_URL}/cancelorder", json=payload)
-        resp.raise_for_status()
+        resp = self._request_with_token_retry("put", f"{BASE_URL}/cancelorder", json=payload)
         return resp.json()

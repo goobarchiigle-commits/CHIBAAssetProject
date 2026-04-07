@@ -33,7 +33,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.stdout.reconfigure(encoding="utf-8")
 
-from paths import LIVE_LOG_DIR  # .env 読み込みも paths.py が担う
+from src.paths import LIVE_LOG_DIR  # .env 読み込みも paths.py が担う
 
 import pandas as pd
 
@@ -58,7 +58,7 @@ def fetch_fills_from_api() -> list[dict]:
 
     返り値: [{date, symbol, side, qty, price, amount, fee, source}, ...]
     """
-    from kabusapi.client import KabuClient
+    from src.kabusapi.client import KabuClient
     client = KabuClient()
     client.fetch_token()
     raw_orders = client.get_filled_orders()
