@@ -1,17 +1,35 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-04（Final Research Roadmap — Study01-73正式完結）
+# Single Source of Truth / 最終更新: 2026-07-04（Stage1 M1-M6実行結果反映）
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
 
 ---
 
-## ★ 2026-07-04 Complete Execution Roadmap — **Sonnet引き継ぎ用 完全実行手順書**
+## ★ 2026-07-04 Stage1 M1-M6 実行結果 — **M1/M2 REG FAIL（重大発見）/ M3-M6 完了**
 
-**レポート**: `reports/complete_execution_roadmap_2026-07-04.md`（正典=final_research_roadmapの実行手順版）
-- **Stage1 軽微修正（数日）**: M1 Addon執行価格PATCH（`_addon_px` close→open, L1666付近, REG必須）/ M2 max_single_weight×1.5バイパス解消（L1685付近）/ M3 CLAUDE.mdにfresh_run_required追加 / M4 stale記述訂正 / M5 **git復旧（.git不在確認済み）** / M6 DISCARD候補注記のみ
-- **Stage2 短期（数週）**: S1 CAND_B移行（rsr_exit 70→75, dry-runでRSR75跨ぎExit確認必須）/ S2 QR Phase9判定（8月中旬自動）/ S3 Study78 RoR+MC+感度（BT不要・仕様固定済み）
-- **Stage3-6**: Study74（CP1目標改定）→75→76→77/80（CP2 MN実在）→81/79/82/83/84→86→85（CP4 30%/1.5最終判定）
-- **到達方程式**: Core18-22%(¥20-30M) ⊕ MNスプレッド(α≥8%×レバ2-2.5x・β≈0) ⊕ Satellites → 結合CAGR≥30%∧MaxDD≤20%∧RoR<1%。成功確率<30%・フォールバック目標常設
-- **引き継ぎ規約**: 起動READ順 / 禁止14項チェック / 採用ゲート機械判定 / Study標準11手順 / 申し送り5点
+**実行元**: `reports/complete_execution_roadmap_2026-07-04.md` Section 2
+
+### M1+M2 PATCH → REG FAIL → ロールバック（コード未適用）
+
+- **M1単独**（addon執行価格 close→open）: REG実測 OOS ΔCAGR=**-2.06pp**（閾値0.5pp超過）/ 2022 CAGR **-2.65%→-2.95%（悪化）** → roadmap想定「|Δ|≤0.3pp」を大幅超過。ゲート抵触。
+- **M1+M2**（+max_single_weight×1.5バイパス撤廃・0.25厳格化）: addon発火が**完全にゼロ化**（IS/OOS/WF全fold で addon_cnt=0、CAND_A(EQ Scale完全除去)と数値が完全一致）。
+  - **根本原因**: `max_positions=3`均等配分による通常エントリーの目標ウェイトが約33.3%（capital/3）であり、これは`max_single_weight=0.25`（CIRCUIT値）を**エントリー時点で既に超過**している。旧`×1.5`（37.5%上限）はCIRCUIT違反ではなく、addon機能が動作するための必須の実務的ヘッドルームだった。strategy.yamlの`symbol_cap=0.40`が意図的に0.333超に設定されているのも同じ理由（コメント参照）。
+  - **結論**: design_philosophy_review「例外を持つ上限は規律の不在」という評価は、現行の均等配分ロジックとの整合性を欠く。M2の単純撤廃は**Study45/52でADOPT済みのEQ Scale addon機能を実質的に無効化**する重大な副作用があり、ロードマップ自身のゲート「|ΔCAGR|>0.5pp または 2022悪化 → 停止」に抵触。
+  - **処置**: `src/backtest/composite_alpha_bt.py` は**PATCH前の状態に完全ロールバック済み**（close_mat実行・×1.5維持）。REG結果は `backtests/reg_m1m2_addon_patch_2026-07-04.json` に保存。検証用スクリプトは `src/backtest/reg_m1m2_addon_patch_2026-07-04.py`。
+  - **次のアクション（ユーザー決裁待ち）**: (a) M1/M2を完全放棄し現状維持、(b) max_single_weightの解釈を「新規エントリーのみ」に限定しaddon分は別枠として再設計、(c) M1のみ採用しM2は放棄、のいずれかを検討要。
+
+### M3: CLAUDE.md 恒久化 — 完了
+`# OVERFIT_GUARD` に `fresh_run_required=true` 追加済み。
+
+### M4: research_state.md stale記述訂正 — 完了
+「SELL/BUY非対称」記述を訂正（現エンジンはSELL/BUYとも翌日始値執行）。§重要な既知問題・注意事項 参照。
+
+### M5: git復旧 — 完了（想定と異なる実態を発見・統合済み）
+- **発見**: `.git`は`C:/ai-trading`直下ではなく`src/`配下に既存（origin=CHIBAAssetProject.git, branch=main, HEAD=origin/main一致、最終コミット2026-04-07）。2026-04-07以降の作業（src/内の再編・reports/backtests/docs/scripts/tools/tests等ルート直下の新規ディレクトリ）は全て未コミットだった。
+- **対処**: ユーザー承認により`src/.git`を`C:/ai-trading/.git`へ移動し単一リポジトリに統合。data/・.env除外を再確認（ルート+src/両方の.gitignore、履歴上も混入なし確認済み）。統合コミット`8641863`作成。
+- **未実施**: push（ASK_FIRST対象のため実施せず）。
+
+### M6: DISCARD候補注記 — 完了
+`src/configs/strategy.yaml`に4箇所（turtle_exit=55 / fraction.bull=0.0 / vol_adj残置 / entry_timing.boost_weight=0.06）へ`⚠ DISCARD候補`コメント追加。動作変更なし。
 
 ---
 
