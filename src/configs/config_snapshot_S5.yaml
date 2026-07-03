@@ -1,0 +1,65 @@
+# config_snapshot_S5.yaml — Current (2026-06-25) snapshot
+# engine: composite_alpha_bt.run_scenario
+# 出典: strategy_snapshot_manifest.md §1-15 列S5
+snapshot_id: S5
+snapshot_date: "2026-06-25"
+engine: composite_alpha_bt
+confidence: CONFIRMED
+
+universe:
+  type: rsr42_dynamic
+  dynamic_universe_enabled: true
+
+fujiko:
+  min_sepa: 6
+  min_rsr: 75.0
+  turtle_entry: 20
+  turtle_exit: 55
+  use_turtle_entry: true
+  mom_period: 21
+
+portfolio:
+  capital: 3_000_000
+  max_positions: 3          # CONFIRMED triple-clamped (fujiko_strategy_spec_v202606.md §8)
+  max_single_weight: 0.25
+  max_dd_limit: 0.15
+
+risk:
+  min_hold_days: 3
+
+rsr_exit:
+  enable_simple_rsr_exit: true
+  rsr_exit_threshold: 70.0
+  enable_multilayer_rsr: true
+  ml_exit_single_only: false
+
+trailing_stop:
+  mode: atr_prod
+  enable_atr_trailing_prod: true
+
+mtf:
+  enabled: false            # CONFIRMED removed 2026-06-24 20:50 (signal_bridge.py:1634,2085)
+
+sizing:
+  mode: existing             # CONFIRMED reverted 2026-06-24 20:50 ("4/13仕様" comment, signal_bridge.py:3312)
+  enable_atr_risk_sizing: false
+
+sector_gate:
+  enabled: true
+
+shock_exit:
+  mode: composite
+
+bear_filter:
+  enabled: true
+
+addon:
+  enabled: true
+
+entry_timing:
+  enabled: true
+  boost_weight: 0.06
+
+costs:
+  slippage_rate: 0.001
+  commission_rate: 0.00055

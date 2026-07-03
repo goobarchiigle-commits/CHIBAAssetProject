@@ -1,0 +1,571 @@
+{
+  "study": "Study71_ProductionFeatureProvenanceAudit",
+  "date": "2026-07-02",
+  "phase0_catalog": [
+    {
+      "id": "F1_RSR_EXIT_70",
+      "name": "RSR Exit 70",
+      "introduced_study": "Exit RSR70 WF (2026-06-05)",
+      "adoption_reason": "WF4/5, avg_ΔCAGR=+2.72pp vs RSR75",
+      "adoption_metric": {
+        "avg_wf_delta_cagr_pp": 2.72,
+        "wf_pass": "4/5"
+      },
+      "current_param": {
+        "rsr_exit": 70.0
+      },
+      "prior_param": {
+        "rsr_exit": 75.0
+      },
+      "config_path": "strategy.yaml → fujiko.rsr_exit",
+      "current_enabled": true,
+      "execution_impact": "PRIMARY",
+      "notes": "⚠2022弱気 -8.80pp; Bull時限定推奨が原則"
+    },
+    {
+      "id": "F2_ATR_EXTENSION",
+      "name": "ATR Extension Exit",
+      "introduced_study": "Study40/52 (2026-06-26/28)",
+      "adoption_reason": "D_ATR_EQ WF5/5, OOS_ΔCAGR=+1.84pp vs Baseline; Seg3_2022=-2.65%(vs-5.11%)",
+      "adoption_metric": {
+        "is_delta_cagr_pp": -0.26,
+        "oos_delta_cagr_pp": 1.84,
+        "wf_pass": "5/5",
+        "seg3_delta_pp": 2.46
+      },
+      "current_param": {
+        "exit_policy": "A",
+        "atr_mult": 1.0,
+        "defer_days": 5
+      },
+      "prior_param": {
+        "exit_policy": "NONE"
+      },
+      "config_path": "strategy.yaml → research_candidates.atr_extension",
+      "current_enabled": true,
+      "execution_impact": "PRIMARY",
+      "notes": "Study52 B_ATR_EXT のみ(WF4/5,+2.23pp OOS)はSeg3=0改善なし→REJECT; D_ATR_EQ=採用"
+    },
+    {
+      "id": "F3_EQ_SCALE_ADDON",
+      "name": "EQ Scale Add-on",
+      "introduced_study": "Study45/52 (2026-06-27/28)",
+      "adoption_reason": "D_ATR_EQ WF5/5; Seg3_2022改善(-5.11→-2.65); Robustness Enhancer",
+      "adoption_metric": {
+        "is_delta_cagr_pp": -0.47,
+        "oos_delta_cagr_pp": -0.42,
+        "wf_pass": "5/5",
+        "seg3_delta_pp": 2.46
+      },
+      "current_param": {
+        "addon_policy": "D",
+        "atr_mult": 1.0,
+        "size_frac": 0.25
+      },
+      "prior_param": {
+        "addon_policy": "NONE"
+      },
+      "config_path": "strategy.yaml → research_candidates.eq_scale_addon",
+      "current_enabled": true,
+      "execution_impact": "PRIMARY",
+      "notes": "Study70確認: ADD-ON vs NO-ADDON = -0.44pp IS / -0.39pp OOS → 純ドラッグ"
+    },
+    {
+      "id": "F4_DYNAMIC_UNIVERSE",
+      "name": "Dynamic Universe (dyn_rsr42_bear_rs0)",
+      "introduced_study": "dyn_rsr42 WF study (2026-04-05)",
+      "adoption_reason": "WF5/5, Seg3_2022=+0.258, 2025 OOS=0.805",
+      "adoption_metric": {
+        "wf_pass": "5/5",
+        "seg3_delta": 0.258,
+        "oos_sharpe_2025": 0.805
+      },
+      "current_param": {
+        "enabled": true,
+        "bull_n": 30,
+        "bear_n": 20
+      },
+      "prior_param": {
+        "enabled": false
+      },
+      "config_path": "strategy.yaml → dynamic_universe.enabled",
+      "current_enabled": true,
+      "execution_impact": "PRIMARY",
+      "notes": "Study52全シナリオに統合済み(sym_active_df); 単独LOB不実施"
+    },
+    {
+      "id": "F5_BEAR_UNIVERSE_FILTER",
+      "name": "Bear Universe Filter (sector exclusion)",
+      "introduced_study": "Bear Universe WF (2026-04-07)",
+      "adoption_reason": "WF5/5; Bear時に機械/鉄鋼/銀行/保険/輸送/海運/化学を除外",
+      "adoption_metric": {
+        "wf_pass": "5/5"
+      },
+      "current_param": {
+        "enabled": true,
+        "excluded_sectors": 7
+      },
+      "prior_param": {
+        "enabled": false
+      },
+      "config_path": "strategy.yaml → bear_universe_filter.enabled",
+      "current_enabled": true,
+      "execution_impact": "PRIMARY",
+      "notes": "F4と密接結合; Study52全シナリオに統合済み"
+    },
+    {
+      "id": "F6_SHOCK_EXIT_COMPOSITE",
+      "name": "Shock Exit Composite",
+      "introduced_study": "market_shock_comparison (2026-04-05)",
+      "adoption_reason": "composite=full_exit+partial混合; Seg3_2022改善; WF検証済み",
+      "adoption_metric": {
+        "wf_pass": "verified"
+      },
+      "current_param": {
+        "shock_exit_mode": "composite"
+      },
+      "prior_param": {
+        "shock_exit_mode": "full_exit"
+      },
+      "config_path": "strategy.yaml → risk_controls.shock_exit_mode",
+      "current_enabled": true,
+      "execution_impact": "PRIMARY",
+      "notes": "Study52全シナリオでmarket_shock_mode='composite'が固定値"
+    },
+    {
+      "id": "F7_QUALITY_REPLACEMENT",
+      "name": "Quality Replacement (Shadow)",
+      "introduced_study": "Study57/58A (2026-06-29)",
+      "adoption_reason": "WF5/5, Calmar+0.075, Seg3_2022+3.81pp (Case E)",
+      "adoption_metric": {
+        "wf_pass": "5/5",
+        "calmar_delta": 0.075
+      },
+      "current_param": {
+        "enabled": false,
+        "shadow_only": true
+      },
+      "prior_param": {
+        "n/a": true
+      },
+      "config_path": "strategy.yaml → research_candidates.quality_replacement.enabled",
+      "current_enabled": false,
+      "execution_impact": "NONE (shadow/log only)",
+      "notes": "enabled=false 固定; ASK_FIRST必須; 実行経路に影響なし"
+    }
+  ],
+  "phase2_config_audit": {
+    "F1_RSR_EXIT_70": {
+      "current_param": {
+        "rsr_exit": 70.0
+      },
+      "adoption_param": {
+        "rsr_exit": 75.0
+      },
+      "drift_detected": false,
+      "notes": [
+        "採用時エンジン(capital_allocation_abc) vs 現在エンジン(composite_alpha_bt)が異なる"
+      ]
+    },
+    "F2_ATR_EXTENSION": {
+      "current_param": {
+        "exit_policy": "A",
+        "atr_mult": 1.0,
+        "defer_days": 5
+      },
+      "adoption_param": {
+        "exit_policy": "NONE"
+      },
+      "drift_detected": false,
+      "notes": []
+    },
+    "F3_EQ_SCALE_ADDON": {
+      "current_param": {
+        "addon_policy": "D",
+        "atr_mult": 1.0,
+        "size_frac": 0.25
+      },
+      "adoption_param": {
+        "addon_policy": "NONE"
+      },
+      "drift_detected": true,
+      "notes": [
+        "Study70: -0.44pp IS/-0.39pp OOS → 純ドラッグ確認済み"
+      ]
+    },
+    "F4_DYNAMIC_UNIVERSE": {
+      "current_param": {
+        "enabled": true,
+        "bull_n": 30,
+        "bear_n": 20
+      },
+      "adoption_param": {
+        "enabled": false
+      },
+      "drift_detected": false,
+      "notes": []
+    },
+    "F5_BEAR_UNIVERSE_FILTER": {
+      "current_param": {
+        "enabled": true,
+        "excluded_sectors": 7
+      },
+      "adoption_param": {
+        "enabled": false
+      },
+      "drift_detected": false,
+      "notes": []
+    },
+    "F6_SHOCK_EXIT_COMPOSITE": {
+      "current_param": {
+        "shock_exit_mode": "composite"
+      },
+      "adoption_param": {
+        "shock_exit_mode": "full_exit"
+      },
+      "drift_detected": false,
+      "notes": []
+    },
+    "F7_QUALITY_REPLACEMENT": {
+      "current_param": {
+        "enabled": false,
+        "shadow_only": true
+      },
+      "adoption_param": {
+        "n/a": true
+      },
+      "drift_detected": false,
+      "notes": []
+    }
+  },
+  "phase3_reproduction": {
+    "IS": {
+      "reported_cagr": 12.37,
+      "reproduced_cagr": 12.37,
+      "error_pp": 0.0,
+      "reproduced_calmar": 0.683,
+      "reported_calmar": 0.683,
+      "pass": true
+    },
+    "OOS": {
+      "reported_cagr": 13.48,
+      "reproduced_cagr": 13.48,
+      "error_pp": 0.0,
+      "reproduced_calmar": 1.329,
+      "reported_calmar": 1.329,
+      "pass": true
+    }
+  },
+  "phase4_loo_results": {
+    "A_BASELINE": {
+      "IS": 12.63,
+      "OOS": 11.64,
+      "WF": {
+        "wf_count": 4,
+        "avg_oos_cagr": 17.5,
+        "avg_oos_sharpe": 0.833,
+        "avg_oos_dd": -16.81,
+        "avg_oos_calmar": 1.497,
+        "avg_oos_exp": 46.9,
+        "seg3_2022_cagr": -5.11,
+        "fold_std_cagr": 19.14
+      },
+      "source": "Study52_cache"
+    },
+    "B_ATR_EXT": {
+      "IS": 12.81,
+      "OOS": 13.87,
+      "WF": {
+        "wf_count": 4,
+        "avg_oos_cagr": 18.02,
+        "avg_oos_sharpe": 0.858,
+        "avg_oos_dd": -16.7,
+        "avg_oos_calmar": 1.616,
+        "avg_oos_exp": 47.1,
+        "seg3_2022_cagr": -5.11,
+        "fold_std_cagr": 19.86
+      },
+      "source": "Study52_cache"
+    },
+    "C_EQ_SCALE": {
+      "IS": 12.16,
+      "OOS": 11.22,
+      "WF": {
+        "wf_count": 5,
+        "avg_oos_cagr": 17.91,
+        "avg_oos_sharpe": 0.853,
+        "avg_oos_dd": -17.03,
+        "avg_oos_calmar": 1.502,
+        "avg_oos_exp": 46.9,
+        "seg3_2022_cagr": -2.65,
+        "fold_std_cagr": 18.79
+      },
+      "source": "Study52_cache"
+    },
+    "D_ATR_EQ": {
+      "IS": 12.37,
+      "OOS": 13.48,
+      "WF": {
+        "wf_count": 5,
+        "avg_oos_cagr": 18.37,
+        "avg_oos_sharpe": 0.876,
+        "avg_oos_dd": -16.91,
+        "seg3_2022_cagr": -2.65,
+        "fold_std_cagr": 19.41
+      },
+      "source": "Study52_cache"
+    },
+    "RSR70_current": {
+      "IS": 11.72,
+      "OOS": 8.5,
+      "WF": {
+        "wf_count": 4,
+        "avg_oos_cagr": 15.1,
+        "seg3_2022_cagr": -5.6,
+        "fold_std_cagr": 16.42,
+        "segments": [
+          {
+            "seg": 1,
+            "oos_year": "2020",
+            "wf_pass": true,
+            "cagr": 6.33,
+            "sharpe": 0.351,
+            "max_dd": -17.63,
+            "calmar": 0.359,
+            "n_trades": 30,
+            "avg_exp": 42.5,
+            "addon_cnt": 0
+          },
+          {
+            "seg": 2,
+            "oos_year": "2021",
+            "wf_pass": true,
+            "cagr": 6.08,
+            "sharpe": 0.346,
+            "max_dd": -20.6,
+            "calmar": 0.295,
+            "n_trades": 54,
+            "avg_exp": 47.9,
+            "addon_cnt": 0
+          },
+          {
+            "seg": 3,
+            "oos_year": "2022",
+            "wf_pass": false,
+            "cagr": -5.6,
+            "sharpe": -0.046,
+            "max_dd": -20.93,
+            "calmar": -0.268,
+            "n_trades": 43,
+            "avg_exp": 49.8,
+            "addon_cnt": 0
+          },
+          {
+            "seg": 4,
+            "oos_year": "2023",
+            "wf_pass": true,
+            "cagr": 37.59,
+            "sharpe": 1.638,
+            "max_dd": -9.17,
+            "calmar": 4.098,
+            "n_trades": 50,
+            "avg_exp": 45.1,
+            "addon_cnt": 0
+          },
+          {
+            "seg": 5,
+            "oos_year": "2024",
+            "wf_pass": true,
+            "cagr": 31.08,
+            "sharpe": 1.623,
+            "max_dd": -14.72,
+            "calmar": 2.112,
+            "n_trades": 34,
+            "avg_exp": 41.8,
+            "addon_cnt": 0
+          }
+        ]
+      },
+      "source": "fresh_run"
+    },
+    "RSR75_prior": {
+      "IS": 11.1,
+      "OOS": 9.39,
+      "WF": {
+        "wf_count": 5,
+        "avg_oos_cagr": 13.74,
+        "seg3_2022_cagr": 0.28,
+        "fold_std_cagr": 12.46,
+        "segments": [
+          {
+            "seg": 1,
+            "oos_year": "2020",
+            "wf_pass": true,
+            "cagr": 7.36,
+            "sharpe": 0.376,
+            "max_dd": -17.86,
+            "calmar": 0.412,
+            "n_trades": 32,
+            "avg_exp": 42.7,
+            "addon_cnt": 0
+          },
+          {
+            "seg": 2,
+            "oos_year": "2021",
+            "wf_pass": true,
+            "cagr": 5.16,
+            "sharpe": 0.322,
+            "max_dd": -19.07,
+            "calmar": 0.271,
+            "n_trades": 53,
+            "avg_exp": 48.4,
+            "addon_cnt": 0
+          },
+          {
+            "seg": 3,
+            "oos_year": "2022",
+            "wf_pass": true,
+            "cagr": 0.28,
+            "sharpe": 0.153,
+            "max_dd": -19.13,
+            "calmar": 0.014,
+            "n_trades": 45,
+            "avg_exp": 46.0,
+            "addon_cnt": 0
+          },
+          {
+            "seg": 4,
+            "oos_year": "2023",
+            "wf_pass": true,
+            "cagr": 34.13,
+            "sharpe": 1.463,
+            "max_dd": -9.03,
+            "calmar": 3.778,
+            "n_trades": 52,
+            "avg_exp": 43.8,
+            "addon_cnt": 0
+          },
+          {
+            "seg": 5,
+            "oos_year": "2024",
+            "wf_pass": true,
+            "cagr": 21.78,
+            "sharpe": 1.201,
+            "max_dd": -15.26,
+            "calmar": 1.427,
+            "n_trades": 39,
+            "avg_exp": 43.7,
+            "addon_cnt": 0
+          }
+        ]
+      },
+      "source": "fresh_run"
+    }
+  },
+  "phase4_marginal": {
+    "F1_RSR_EXIT_70": {
+      "with": "RSR70_current",
+      "without": "RSR75_prior",
+      "IS_delta_cagr": 0.62,
+      "OOS_delta_cagr": -0.89,
+      "WF_delta_avg_cagr": 0.62
+    },
+    "F2_ATR_EXTENSION": {
+      "with": "D_ATR_EQ",
+      "without": "C_EQ_SCALE",
+      "IS_delta_cagr": 0.21,
+      "OOS_delta_cagr": 2.26
+    },
+    "F3_EQ_SCALE_ADDON": {
+      "with": "D_ATR_EQ",
+      "without": "B_ATR_EXT",
+      "IS_delta_cagr": -0.44,
+      "OOS_delta_cagr": -0.39
+    }
+  },
+  "phase5_interaction": {
+    "ATR_EXT_x_EQ_SCALE": {
+      "IS": 0.03,
+      "OOS": 0.03,
+      "formula": "D - B - C + A (CAGR pp)",
+      "interpretation": "near-zero → near-additive; EQ_SCALE adds complexity without return"
+    }
+  },
+  "phase6_consistency": {
+    "F1_RSR_EXIT_70": {
+      "adoption_delta_pp": 2.72,
+      "current_oos_delta_pp": -0.89,
+      "score": 0.0,
+      "note": "採用時エンジン差異あり; WF avg vs 単年OOS比較"
+    },
+    "F2_ATR_EXTENSION": {
+      "adoption_delta_pp": 1.84,
+      "current_oos_delta_pp": 2.26,
+      "score": 1.0,
+      "note": "D-C = ATR_EXT marginal (within D_ATR_EQ)"
+    },
+    "F3_EQ_SCALE_ADDON": {
+      "adoption_seg3_delta_pp": 2.46,
+      "current_oos_delta_pp": -0.39,
+      "score": 0.5,
+      "note": "Study70: -0.44pp IS/-0.39pp OOS; 採用理由=Seg3改善→実態はOOSドラッグ"
+    },
+    "F4_DYNAMIC_UNIVERSE": {
+      "score": 0.8,
+      "note": "WF5/5確認済; Study52全シナリオに統合"
+    },
+    "F5_BEAR_UNIVERSE_FILTER": {
+      "score": 0.8,
+      "note": "WF5/5確認済; F4と密接結合"
+    },
+    "F6_SHOCK_EXIT_COMPOSITE": {
+      "score": 0.7,
+      "note": "WF検証済; 定量LOB未実施"
+    },
+    "F7_QUALITY_REPLACEMENT": {
+      "score": 1.0,
+      "note": "enabled=false; 実行経路非影響"
+    }
+  },
+  "phase7_verdict": {
+    "F1_RSR_EXIT_70": {
+      "verdict": "REVIEW",
+      "score": 0.0,
+      "rationale": "OOS ΔCAGR=-0.89pp; 再確認要"
+    },
+    "F2_ATR_EXTENSION": {
+      "verdict": "KEEP",
+      "score": 1.0,
+      "rationale": "OOS++2.26pp; WF5/5維持"
+    },
+    "F3_EQ_SCALE_ADDON": {
+      "verdict": "REVIEW",
+      "score": 0.5,
+      "rationale": "Study70/LOO: IS=-0.44pp OOS=-0.39pp → B_ATR_EXTが優勢; 無効化検討要"
+    },
+    "F4_DYNAMIC_UNIVERSE": {
+      "verdict": "KEEP",
+      "score": 0.8,
+      "rationale": "score=0.80; 採用理由成立"
+    },
+    "F5_BEAR_UNIVERSE_FILTER": {
+      "verdict": "KEEP",
+      "score": 0.8,
+      "rationale": "score=0.80; 採用理由成立"
+    },
+    "F6_SHOCK_EXIT_COMPOSITE": {
+      "verdict": "KEEP",
+      "score": 0.7,
+      "rationale": "score=0.70; 採用理由成立"
+    },
+    "F7_QUALITY_REPLACEMENT": {
+      "verdict": "SHADOW",
+      "score": 1.0,
+      "rationale": "実行経路非影響"
+    }
+  },
+  "overall_consistency_score": 0.63,
+  "keep_count": 4,
+  "review_count": 2,
+  "reject_count": 0
+}

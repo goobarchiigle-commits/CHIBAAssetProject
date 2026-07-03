@@ -1,0 +1,981 @@
+{
+  "study": "Study66",
+  "title": "RSR Economic Audit",
+  "date": "2026-07-01",
+  "params": {
+    "capital": 3000000,
+    "fwd_days": 60,
+    "post_exit_days": [
+      5,
+      10,
+      20,
+      40,
+      60
+    ],
+    "rsr_reasons": [
+      "RSR_MOMENTUM_EXIT",
+      "RSR_EXIT"
+    ],
+    "s65_rsr_plb_pct": 82.8,
+    "s65_pre_peak_pct": 80.0,
+    "s65_bw_fwd40": 27.7
+  },
+  "phase0_integrity": {
+    "n_valid": 291,
+    "study63_n_match": true,
+    "study63_expected": 291,
+    "bigwinner_n": 30,
+    "rsr_exit_total_n": 248,
+    "rsr_exit_n": 129,
+    "rsr_momentum_exit_n": 119,
+    "study65_rsr_exit_match": true,
+    "study65_rsr_mom_match": true,
+    "lookahead": 0,
+    "survivorship": 0
+  },
+  "phase1_forward_dist": {
+    "RSR_EXIT": {
+      "n": 129,
+      "by_horizon": {
+        "fwd_5d": {
+          "label": "RSR_EXIT fwd+5d",
+          "n": 129,
+          "mean": 0.5349,
+          "median": 0.4682,
+          "std": 4.5871,
+          "win_rate": 55.814,
+          "p10": -3.394,
+          "p25": -1.3647,
+          "p50": 0.4682,
+          "p75": 2.6673,
+          "p90": 5.514
+        },
+        "fwd_10d": {
+          "label": "RSR_EXIT fwd+10d",
+          "n": 129,
+          "mean": 0.7682,
+          "median": 1.2518,
+          "std": 7.3636,
+          "win_rate": 61.2403,
+          "p10": -7.7017,
+          "p25": -2.3489,
+          "p50": 1.2518,
+          "p75": 4.7709,
+          "p90": 7.5961
+        },
+        "fwd_20d": {
+          "label": "RSR_EXIT fwd+20d",
+          "n": 129,
+          "mean": 2.616,
+          "median": 2.6931,
+          "std": 8.5941,
+          "win_rate": 63.5659,
+          "p10": -7.0628,
+          "p25": -2.3165,
+          "p50": 2.6931,
+          "p75": 7.8913,
+          "p90": 11.4061
+        },
+        "fwd_40d": {
+          "label": "RSR_EXIT fwd+40d",
+          "n": 129,
+          "mean": 4.9613,
+          "median": 3.9956,
+          "std": 15.3642,
+          "win_rate": 70.5426,
+          "p10": -11.5251,
+          "p25": -1.3354,
+          "p50": 3.9956,
+          "p75": 10.3125,
+          "p90": 16.8125
+        },
+        "fwd_60d": {
+          "label": "RSR_EXIT fwd+60d",
+          "n": 129,
+          "mean": 8.378,
+          "median": 6.5349,
+          "std": 19.82,
+          "win_rate": 73.6434,
+          "p10": -12.1054,
+          "p25": -1.1309,
+          "p50": 6.5349,
+          "p75": 14.1232,
+          "p90": 28.7399
+        }
+      }
+    },
+    "RSR_MOMENTUM_EXIT": {
+      "n": 119,
+      "by_horizon": {
+        "fwd_5d": {
+          "label": "RSR_MOMENTUM_EXIT fwd+5d",
+          "n": 119,
+          "mean": 0.7811,
+          "median": 0.9027,
+          "std": 4.768,
+          "win_rate": 57.1429,
+          "p10": -4.714,
+          "p25": -2.3826,
+          "p50": 0.9027,
+          "p75": 3.4096,
+          "p90": 5.9628
+        },
+        "fwd_10d": {
+          "label": "RSR_MOMENTUM_EXIT fwd+10d",
+          "n": 119,
+          "mean": 0.8582,
+          "median": 1.2766,
+          "std": 6.8422,
+          "win_rate": 58.8235,
+          "p10": -6.8687,
+          "p25": -3.0935,
+          "p50": 1.2766,
+          "p75": 4.3513,
+          "p90": 9.0571
+        },
+        "fwd_20d": {
+          "label": "RSR_MOMENTUM_EXIT fwd+20d",
+          "n": 119,
+          "mean": 2.071,
+          "median": 2.4691,
+          "std": 10.923,
+          "win_rate": 61.3445,
+          "p10": -10.5377,
+          "p25": -4.786,
+          "p50": 2.4691,
+          "p75": 8.3347,
+          "p90": 15.0009
+        },
+        "fwd_40d": {
+          "label": "RSR_MOMENTUM_EXIT fwd+40d",
+          "n": 119,
+          "mean": 6.8952,
+          "median": 5.962,
+          "std": 20.2094,
+          "win_rate": 61.3445,
+          "p10": -13.903,
+          "p25": -5.4935,
+          "p50": 5.962,
+          "p75": 16.3379,
+          "p90": 28.5573
+        },
+        "fwd_60d": {
+          "label": "RSR_MOMENTUM_EXIT fwd+60d",
+          "n": 118,
+          "mean": 8.2918,
+          "median": 4.6237,
+          "std": 20.5493,
+          "win_rate": 64.4068,
+          "p10": -13.1663,
+          "p25": -4.2203,
+          "p50": 4.6237,
+          "p75": 19.0325,
+          "p90": 35.9119
+        }
+      }
+    },
+    "RSR_COMBINED": {
+      "n": 248,
+      "by_horizon": {
+        "fwd_5d": {
+          "label": "RSR_COMBINED fwd+5d",
+          "n": 248,
+          "mean": 0.653,
+          "median": 0.7078,
+          "std": 4.6669,
+          "win_rate": 56.4516,
+          "p10": -4.5962,
+          "p25": -1.8145,
+          "p50": 0.7078,
+          "p75": 3.1498,
+          "p90": 5.5793
+        },
+        "fwd_10d": {
+          "label": "RSR_COMBINED fwd+10d",
+          "n": 248,
+          "mean": 0.8114,
+          "median": 1.2642,
+          "std": 7.104,
+          "win_rate": 60.0806,
+          "p10": -7.3038,
+          "p25": -2.6037,
+          "p50": 1.2642,
+          "p75": 4.6705,
+          "p90": 8.6092
+        },
+        "fwd_20d": {
+          "label": "RSR_COMBINED fwd+20d",
+          "n": 248,
+          "mean": 2.3545,
+          "median": 2.562,
+          "std": 9.7646,
+          "win_rate": 62.5,
+          "p10": -9.3218,
+          "p25": -3.5024,
+          "p50": 2.562,
+          "p75": 7.9215,
+          "p90": 14.0355
+        },
+        "fwd_40d": {
+          "label": "RSR_COMBINED fwd+40d",
+          "n": 248,
+          "mean": 5.8893,
+          "median": 4.1892,
+          "std": 17.8433,
+          "win_rate": 66.129,
+          "p10": -12.835,
+          "p25": -4.0964,
+          "p50": 4.1892,
+          "p75": 13.2538,
+          "p90": 24.9621
+        },
+        "fwd_60d": {
+          "label": "RSR_COMBINED fwd+60d",
+          "n": 247,
+          "mean": 8.3369,
+          "median": 6.1453,
+          "std": 20.1306,
+          "win_rate": 69.2308,
+          "p10": -13.2369,
+          "p25": -3.2774,
+          "p50": 6.1453,
+          "p75": 16.5947,
+          "p90": 31.1501
+        }
+      }
+    },
+    "NON_RSR": {
+      "n": 43,
+      "by_horizon": {
+        "fwd_5d": {
+          "label": "NON_RSR fwd+5d",
+          "n": 43,
+          "mean": -0.4184,
+          "median": 0.0,
+          "std": 4.7338,
+          "win_rate": 48.8372,
+          "p10": -6.9222,
+          "p25": -2.6486,
+          "p50": 0.0,
+          "p75": 2.3402,
+          "p90": 4.7064
+        },
+        "fwd_10d": {
+          "label": "NON_RSR fwd+10d",
+          "n": 43,
+          "mean": 0.1462,
+          "median": -0.1857,
+          "std": 4.7393,
+          "win_rate": 44.186,
+          "p10": -5.4904,
+          "p25": -1.8845,
+          "p50": -0.1857,
+          "p75": 2.5905,
+          "p90": 5.3046
+        },
+        "fwd_20d": {
+          "label": "NON_RSR fwd+20d",
+          "n": 43,
+          "mean": 1.3468,
+          "median": 2.5412,
+          "std": 9.2386,
+          "win_rate": 58.1395,
+          "p10": -7.2828,
+          "p25": -5.156,
+          "p50": 2.5412,
+          "p75": 7.3103,
+          "p90": 12.9932
+        },
+        "fwd_40d": {
+          "label": "NON_RSR fwd+40d",
+          "n": 43,
+          "mean": 2.3037,
+          "median": 1.1472,
+          "std": 10.8022,
+          "win_rate": 60.4651,
+          "p10": -10.2558,
+          "p25": -5.2417,
+          "p50": 1.1472,
+          "p75": 8.4372,
+          "p90": 14.2545
+        },
+        "fwd_60d": {
+          "label": "NON_RSR fwd+60d",
+          "n": 42,
+          "mean": 7.0899,
+          "median": 2.7646,
+          "std": 16.1909,
+          "win_rate": 61.9048,
+          "p10": -9.0048,
+          "p25": -4.5162,
+          "p50": 2.7646,
+          "p75": 15.2381,
+          "p90": 29.9838
+        }
+      }
+    },
+    "ALL": {
+      "n": 291,
+      "by_horizon": {
+        "fwd_5d": {
+          "label": "ALL fwd+5d",
+          "n": 291,
+          "mean": 0.4947,
+          "median": 0.6098,
+          "std": 4.6841,
+          "win_rate": 55.3265,
+          "p10": -4.8834,
+          "p25": -1.8952,
+          "p50": 0.6098,
+          "p75": 3.0137,
+          "p90": 5.5011
+        },
+        "fwd_10d": {
+          "label": "ALL fwd+10d",
+          "n": 291,
+          "mean": 0.7131,
+          "median": 1.1918,
+          "std": 6.8038,
+          "win_rate": 57.732,
+          "p10": -7.2298,
+          "p25": -2.3914,
+          "p50": 1.1918,
+          "p75": 4.442,
+          "p90": 7.6471
+        },
+        "fwd_20d": {
+          "label": "ALL fwd+20d",
+          "n": 291,
+          "mean": 2.2056,
+          "median": 2.5412,
+          "std": 9.6799,
+          "win_rate": 61.8557,
+          "p10": -9.2728,
+          "p25": -3.6534,
+          "p50": 2.5412,
+          "p75": 7.8944,
+          "p90": 13.8743
+        },
+        "fwd_40d": {
+          "label": "ALL fwd+40d",
+          "n": 291,
+          "mean": 5.3594,
+          "median": 3.9956,
+          "std": 17.0205,
+          "win_rate": 65.2921,
+          "p10": -11.9849,
+          "p25": -4.1939,
+          "p50": 3.9956,
+          "p75": 12.6874,
+          "p90": 23.9622
+        },
+        "fwd_60d": {
+          "label": "ALL fwd+60d",
+          "n": 289,
+          "mean": 8.1556,
+          "median": 5.6653,
+          "std": 19.5871,
+          "win_rate": 68.1661,
+          "p10": -12.2472,
+          "p25": -3.4813,
+          "p50": 5.6653,
+          "p75": 16.2339,
+          "p90": 31.146
+        }
+      }
+    },
+    "comparison_rsr_vs_non_rsr_fwd40d": {
+      "rsr_mean": 5.8893,
+      "non_rsr_mean": 2.3037,
+      "mwu_p": 0.1809,
+      "cohens_d": 0.2109,
+      "cliffs_delta": 0.1279
+    }
+  },
+  "phase2_classification": {
+    "n_rsr_total": 248,
+    "classification": {
+      "A_CORRECT": {
+        "n": 48,
+        "pct": 19.3548,
+        "bw_n": 0,
+        "bw_pct": 0.0,
+        "fwd40d_mean": -12.6219,
+        "pnl_sum_yen": 696130.9608
+      },
+      "B_MIXED": {
+        "n": 75,
+        "pct": 30.2419,
+        "bw_n": 4,
+        "bw_pct": 5.3333,
+        "fwd40d_mean": 0.9435,
+        "pnl_sum_yen": 808417.1417
+      },
+      "C_PREMATURE": {
+        "n": 124,
+        "pct": 50.0,
+        "bw_n": 19,
+        "bw_pct": 15.3226,
+        "fwd40d_mean": 15.987,
+        "pnl_sum_yen": 625367.8207
+      },
+      "UNKNOWN": {
+        "n": 1,
+        "pct": 0.4032,
+        "bw_n": 0,
+        "bw_pct": 0.0,
+        "fwd40d_mean": 13.2399,
+        "pnl_sum_yen": 146379.6387
+      }
+    },
+    "bw_classification": {
+      "C_PREMATURE": 19,
+      "B_MIXED": 4
+    },
+    "nbw_classification": {
+      "C_PREMATURE": 105,
+      "B_MIXED": 71,
+      "A_CORRECT": 48,
+      "UNKNOWN": 1
+    },
+    "interpretation": "A_CORRECT=Exit後全期間でリターン負(exit有効)。C_PREMATURE=Exit後全期間でリターン正(exit早計)。B_MIXED=期間によって方向が変わる。"
+  },
+  "phase3_bw_vs_nbw": {
+    "bigwinner": {
+      "label": "BigWinner RSR exits",
+      "n": 23,
+      "fwd_5d": {
+        "label": "",
+        "n": 23,
+        "mean": 3.5023,
+        "median": 3.7538,
+        "std": 6.9854,
+        "win_rate": 69.5652,
+        "p10": -4.6451,
+        "p25": -1.3727,
+        "p50": 3.7538,
+        "p75": 7.6887,
+        "p90": 12.2004
+      },
+      "fwd_10d": {
+        "label": "",
+        "n": 23,
+        "mean": 4.7005,
+        "median": 4.1582,
+        "std": 9.01,
+        "win_rate": 65.2174,
+        "p10": -7.0543,
+        "p25": -2.0432,
+        "p50": 4.1582,
+        "p75": 8.9946,
+        "p90": 16.434
+      },
+      "fwd_20d": {
+        "label": "",
+        "n": 23,
+        "mean": 11.2438,
+        "median": 8.4835,
+        "std": 11.6248,
+        "win_rate": 82.6087,
+        "p10": -1.1226,
+        "p25": 3.3759,
+        "p50": 8.4835,
+        "p75": 16.1097,
+        "p90": 26.0325
+      },
+      "fwd_40d": {
+        "label": "",
+        "n": 23,
+        "mean": 35.1697,
+        "median": 28.5354,
+        "std": 30.8524,
+        "win_rate": 95.6522,
+        "p10": 11.2393,
+        "p25": 18.7267,
+        "p50": 28.5354,
+        "p75": 39.6876,
+        "p90": 65.7518
+      },
+      "fwd_60d": {
+        "label": "",
+        "n": 23,
+        "mean": 42.7842,
+        "median": 38.8303,
+        "std": 24.5974,
+        "win_rate": 100.0,
+        "p10": 20.8402,
+        "p25": 29.1149,
+        "p50": 38.8303,
+        "p75": 47.2365,
+        "p90": 69.3028
+      }
+    },
+    "non_bigwinner": {
+      "label": "Non-BigWinner RSR exits",
+      "n": 225,
+      "fwd_5d": {
+        "label": "",
+        "n": 225,
+        "mean": 0.3618,
+        "median": 0.6135,
+        "std": 4.2784,
+        "win_rate": 55.1111,
+        "p10": -4.5532,
+        "p25": -1.811,
+        "p50": 0.6135,
+        "p75": 2.8846,
+        "p90": 4.8673
+      },
+      "fwd_10d": {
+        "label": "",
+        "n": 225,
+        "mean": 0.4138,
+        "median": 1.227,
+        "std": 6.7796,
+        "win_rate": 59.5556,
+        "p10": -7.2327,
+        "p25": -2.6512,
+        "p50": 1.227,
+        "p75": 4.3806,
+        "p90": 7.4546
+      },
+      "fwd_20d": {
+        "label": "",
+        "n": 225,
+        "mean": 1.4458,
+        "median": 2.1288,
+        "std": 9.1062,
+        "win_rate": 60.4444,
+        "p10": -10.4235,
+        "p25": -3.7976,
+        "p50": 2.1288,
+        "p75": 7.0456,
+        "p90": 11.8702
+      },
+      "fwd_40d": {
+        "label": "",
+        "n": 225,
+        "mean": 2.8962,
+        "median": 3.0709,
+        "std": 12.6711,
+        "win_rate": 63.1111,
+        "p10": -14.1347,
+        "p25": -4.6302,
+        "p50": 3.0709,
+        "p75": 10.0766,
+        "p90": 17.5248
+      },
+      "fwd_60d": {
+        "label": "",
+        "n": 224,
+        "mean": 4.7999,
+        "median": 4.5274,
+        "std": 15.8869,
+        "win_rate": 66.0714,
+        "p10": -14.0152,
+        "p25": -3.8233,
+        "p50": 4.5274,
+        "p75": 12.293,
+        "p90": 25.332
+      }
+    },
+    "comparisons": {
+      "fwd_5d": {
+        "bw_mean": 3.5023,
+        "nbw_mean": 0.3618,
+        "diff_bw_nbw": 3.1405,
+        "mwu_p": 0.0344,
+        "cohens_d": 0.6848,
+        "cliffs_delta": 0.268,
+        "significant": true
+      },
+      "fwd_10d": {
+        "bw_mean": 4.7005,
+        "nbw_mean": 0.4138,
+        "diff_bw_nbw": 4.2867,
+        "mwu_p": 0.0494,
+        "cohens_d": 0.6117,
+        "cliffs_delta": 0.2491,
+        "significant": true
+      },
+      "fwd_20d": {
+        "bw_mean": 11.2438,
+        "nbw_mean": 1.4458,
+        "diff_bw_nbw": 9.798,
+        "mwu_p": 0.0001,
+        "cohens_d": 1.0469,
+        "cliffs_delta": 0.486,
+        "significant": true
+      },
+      "fwd_40d": {
+        "bw_mean": 35.1697,
+        "nbw_mean": 2.8962,
+        "diff_bw_nbw": 32.2735,
+        "mwu_p": 0.0,
+        "cohens_d": 2.122,
+        "cliffs_delta": 0.7925,
+        "significant": true
+      },
+      "fwd_60d": {
+        "bw_mean": 42.7842,
+        "nbw_mean": 4.7999,
+        "diff_bw_nbw": 37.9844,
+        "mwu_p": 0.0,
+        "cohens_d": 2.2537,
+        "cliffs_delta": 0.875,
+        "significant": true
+      }
+    },
+    "bw_n": 23,
+    "nbw_n": 225,
+    "interpretation": "BWのRSR exit後fwd40d > NBWのRSR exit後fwd40d ならBWにとってRSR exitが特に有害。"
+  },
+  "phase4_nev": {
+    "RSR_COMBINED": {
+      "n": 248,
+      "by_horizon": {
+        "h20": {
+          "label": "RSR_COMBINED",
+          "horizon": 20,
+          "n": 248,
+          "n_loss_avoided": 93,
+          "n_profit_lost": 155,
+          "loss_avoided_yen": 3875529.5269,
+          "profit_lost_yen": 7286113.7902,
+          "net_ev_yen": -3410584.2633,
+          "net_ev_positive": false,
+          "loss_avoided_pct_of_pl": 53.1906,
+          "avg_gain_if_held": 13752.3559,
+          "avg_loss_if_held_avoided": 41672.3605,
+          "avg_gain_if_held_lost": 47007.1857
+        },
+        "h40": {
+          "label": "RSR_COMBINED",
+          "horizon": 40,
+          "n": 248,
+          "n_loss_avoided": 84,
+          "n_profit_lost": 164,
+          "loss_avoided_yen": 4953230.0875,
+          "profit_lost_yen": 13148921.8459,
+          "net_ev_yen": -8195691.7585,
+          "net_ev_positive": false,
+          "loss_avoided_pct_of_pl": 37.6702,
+          "avg_gain_if_held": 33047.1442,
+          "avg_loss_if_held_avoided": 58967.0249,
+          "avg_gain_if_held_lost": 80176.3527
+        },
+        "h60": {
+          "label": "RSR_COMBINED",
+          "horizon": 60,
+          "n": 247,
+          "n_loss_avoided": 76,
+          "n_profit_lost": 171,
+          "loss_avoided_yen": 4927294.9243,
+          "profit_lost_yen": 16684823.3344,
+          "net_ev_yen": -11757528.4101,
+          "net_ev_positive": false,
+          "loss_avoided_pct_of_pl": 29.5316,
+          "avg_gain_if_held": 47601.3296,
+          "avg_loss_if_held_avoided": 64832.828,
+          "avg_gain_if_held_lost": 97572.0663
+        }
+      },
+      "h40_net_ev": -8195691.7585,
+      "h40_positive": false
+    },
+    "RSR_BigWinner": {
+      "n": 23,
+      "by_horizon": {
+        "h20": {
+          "label": "RSR_BigWinner",
+          "horizon": 20,
+          "n": 23,
+          "n_loss_avoided": 4,
+          "n_profit_lost": 19,
+          "loss_avoided_yen": 47973.4337,
+          "profit_lost_yen": 1523306.333,
+          "net_ev_yen": -1475332.8993,
+          "net_ev_positive": false,
+          "loss_avoided_pct_of_pl": 3.1493,
+          "avg_gain_if_held": 64144.9087,
+          "avg_loss_if_held_avoided": 11993.3584,
+          "avg_gain_if_held_lost": 80174.0175
+        },
+        "h40": {
+          "label": "RSR_BigWinner",
+          "horizon": 40,
+          "n": 23,
+          "n_loss_avoided": 1,
+          "n_profit_lost": 22,
+          "loss_avoided_yen": 30284.299,
+          "profit_lost_yen": 4478673.6871,
+          "net_ev_yen": -4448389.3882,
+          "net_ev_positive": false,
+          "loss_avoided_pct_of_pl": 0.6762,
+          "avg_gain_if_held": 193408.2343,
+          "avg_loss_if_held_avoided": 30284.299,
+          "avg_gain_if_held_lost": 203576.0767
+        },
+        "h60": {
+          "label": "RSR_BigWinner",
+          "horizon": 60,
+          "n": 23,
+          "n_loss_avoided": 0,
+          "n_profit_lost": 23,
+          "loss_avoided_yen": 0.0,
+          "profit_lost_yen": 5526538.0978,
+          "net_ev_yen": -5526538.0978,
+          "net_ev_positive": false,
+          "loss_avoided_pct_of_pl": 0.0,
+          "avg_gain_if_held": 240284.2651,
+          "avg_loss_if_held_avoided": null,
+          "avg_gain_if_held_lost": 240284.2651
+        }
+      },
+      "h40_net_ev": -4448389.3882,
+      "h40_positive": false
+    },
+    "RSR_NonBigWinner": {
+      "n": 225,
+      "by_horizon": {
+        "h20": {
+          "label": "RSR_NonBigWinner",
+          "horizon": 20,
+          "n": 225,
+          "n_loss_avoided": 89,
+          "n_profit_lost": 136,
+          "loss_avoided_yen": 3827556.0931,
+          "profit_lost_yen": 5762807.4572,
+          "net_ev_yen": -1935251.364,
+          "net_ev_positive": false,
+          "loss_avoided_pct_of_pl": 66.4183,
+          "avg_gain_if_held": 8601.1172,
+          "avg_loss_if_held_avoided": 43006.2482,
+          "avg_gain_if_held_lost": 42373.5842
+        },
+        "h40": {
+          "label": "RSR_NonBigWinner",
+          "horizon": 40,
+          "n": 225,
+          "n_loss_avoided": 83,
+          "n_profit_lost": 142,
+          "loss_avoided_yen": 4922945.7885,
+          "profit_lost_yen": 8670248.1588,
+          "net_ev_yen": -3747302.3703,
+          "net_ev_positive": false,
+          "loss_avoided_pct_of_pl": 56.7798,
+          "avg_gain_if_held": 16654.6772,
+          "avg_loss_if_held_avoided": 59312.5999,
+          "avg_gain_if_held_lost": 61058.0856
+        },
+        "h60": {
+          "label": "RSR_NonBigWinner",
+          "horizon": 60,
+          "n": 224,
+          "n_loss_avoided": 76,
+          "n_profit_lost": 148,
+          "loss_avoided_yen": 4927294.9243,
+          "profit_lost_yen": 11158285.2366,
+          "net_ev_yen": -6230990.3123,
+          "net_ev_positive": false,
+          "loss_avoided_pct_of_pl": 44.1582,
+          "avg_gain_if_held": 27816.921,
+          "avg_loss_if_held_avoided": 64832.828,
+          "avg_gain_if_held_lost": 75393.8192
+        }
+      },
+      "h40_net_ev": -3747302.3703,
+      "h40_positive": false
+    },
+    "summary": {
+      "rsr_combined_h40_nev_yen": -8195691.7585,
+      "rsr_bw_h40_nev_yen": -4448389.3882,
+      "rsr_nbw_h40_nev_yen": -3747302.3703,
+      "rsr_overall_positive": false,
+      "bw_positive": false,
+      "nbw_positive": false,
+      "interpretation": "NEV>0 = ExitがLoss AvoidedをProfit Lostより大きく、純プラス貢献。NEV<0 = Exit早計が多く、純マイナス貢献。"
+    }
+  },
+  "phase5_decomposition": {
+    "RSR_EXIT": {
+      "n": 129,
+      "bw_n": 10,
+      "nbw_n": 119,
+      "fwd40d_mean": 4.9613,
+      "fwd40d_median": 3.9956,
+      "fwd40d_win_rate": 70.5426,
+      "h40_net_ev_yen": -3754606.2153,
+      "h40_loss_avoided_yen": 2048373.7584,
+      "h40_profit_lost_yen": 5802979.9737,
+      "h40_net_ev_positive": false,
+      "by_horizon": {
+        "h20": {
+          "label": "RSR_EXIT",
+          "horizon": 20,
+          "n": 129,
+          "n_loss_avoided": 47,
+          "n_profit_lost": 82,
+          "loss_avoided_yen": 1502248.5247,
+          "profit_lost_yen": 3388791.7289,
+          "net_ev_yen": -1886543.2042,
+          "net_ev_positive": false,
+          "loss_avoided_pct_of_pl": 44.3299,
+          "avg_gain_if_held": 14624.3659,
+          "avg_loss_if_held_avoided": 31962.7346,
+          "avg_gain_if_held_lost": 41326.7284
+        },
+        "h40": {
+          "label": "RSR_EXIT",
+          "horizon": 40,
+          "n": 129,
+          "n_loss_avoided": 38,
+          "n_profit_lost": 91,
+          "loss_avoided_yen": 2048373.7584,
+          "profit_lost_yen": 5802979.9737,
+          "net_ev_yen": -3754606.2153,
+          "net_ev_positive": false,
+          "loss_avoided_pct_of_pl": 35.2987,
+          "avg_gain_if_held": 29105.4745,
+          "avg_loss_if_held_avoided": 53904.5726,
+          "avg_gain_if_held_lost": 63769.0107
+        },
+        "h60": {
+          "label": "RSR_EXIT",
+          "horizon": 60,
+          "n": 129,
+          "n_loss_avoided": 34,
+          "n_profit_lost": 95,
+          "loss_avoided_yen": 2117292.1375,
+          "profit_lost_yen": 8293326.6003,
+          "net_ev_yen": -6176034.4627,
+          "net_ev_positive": false,
+          "loss_avoided_pct_of_pl": 25.5301,
+          "avg_gain_if_held": 47876.2361,
+          "avg_loss_if_held_avoided": 62273.2982,
+          "avg_gain_if_held_lost": 87298.1747
+        }
+      }
+    },
+    "RSR_MOMENTUM_EXIT": {
+      "n": 119,
+      "bw_n": 13,
+      "nbw_n": 106,
+      "fwd40d_mean": 6.8952,
+      "fwd40d_median": 5.962,
+      "fwd40d_win_rate": 61.3445,
+      "h40_net_ev_yen": -4441085.5431,
+      "h40_loss_avoided_yen": 2904856.3291,
+      "h40_profit_lost_yen": 7345941.8722,
+      "h40_net_ev_positive": false,
+      "by_horizon": {
+        "h20": {
+          "label": "RSR_MOMENTUM_EXIT",
+          "horizon": 20,
+          "n": 119,
+          "n_loss_avoided": 46,
+          "n_profit_lost": 73,
+          "loss_avoided_yen": 2373281.0022,
+          "profit_lost_yen": 3897322.0613,
+          "net_ev_yen": -1524041.0591,
+          "net_ev_positive": false,
+          "loss_avoided_pct_of_pl": 60.8952,
+          "avg_gain_if_held": 12807.0677,
+          "avg_loss_if_held_avoided": 51593.0653,
+          "avg_gain_if_held_lost": 53387.9734
+        },
+        "h40": {
+          "label": "RSR_MOMENTUM_EXIT",
+          "horizon": 40,
+          "n": 119,
+          "n_loss_avoided": 46,
+          "n_profit_lost": 73,
+          "loss_avoided_yen": 2904856.3291,
+          "profit_lost_yen": 7345941.8722,
+          "net_ev_yen": -4441085.5431,
+          "net_ev_positive": false,
+          "loss_avoided_pct_of_pl": 39.5437,
+          "avg_gain_if_held": 37320.0466,
+          "avg_loss_if_held_avoided": 63149.0506,
+          "avg_gain_if_held_lost": 100629.3407
+        },
+        "h60": {
+          "label": "RSR_MOMENTUM_EXIT",
+          "horizon": 60,
+          "n": 118,
+          "n_loss_avoided": 42,
+          "n_profit_lost": 76,
+          "loss_avoided_yen": 2810002.7868,
+          "profit_lost_yen": 8391496.7342,
+          "net_ev_yen": -5581493.9474,
+          "net_ev_positive": false,
+          "loss_avoided_pct_of_pl": 33.4863,
+          "avg_gain_if_held": 47300.7962,
+          "avg_loss_if_held_avoided": 66904.8283,
+          "avg_gain_if_held_lost": 110414.4307
+        }
+      }
+    },
+    "comparison": {
+      "rsr_exit_h40_nev": -3754606.2153,
+      "rsr_mom_exit_h40_nev": -4441085.5431,
+      "worse_reason": "RSR_MOMENTUM_EXIT",
+      "rsr_exit_fwd40_mean": 4.9613,
+      "rsr_mom_fwd40_mean": 6.8952
+    }
+  },
+  "phase6_sensitivity": {
+    "nev_by_horizon": {
+      "h20": {
+        "net_ev_yen": -3410584.2633,
+        "net_ev_positive": false,
+        "loss_avoided": 3875529.5269,
+        "profit_lost": 7286113.7902
+      },
+      "h40": {
+        "net_ev_yen": -8195691.7585,
+        "net_ev_positive": false,
+        "loss_avoided": 4953230.0875,
+        "profit_lost": 13148921.8459
+      },
+      "h60": {
+        "net_ev_yen": -11757528.4101,
+        "net_ev_positive": false,
+        "loss_avoided": 4927294.9243,
+        "profit_lost": 16684823.3344
+      }
+    },
+    "nev_direction_consistent": true,
+    "nev_signs": [
+      false,
+      false,
+      false
+    ],
+    "bw_rsr_fwd40_mean": 35.1697,
+    "all_rsr_fwd40_mean": 5.8893,
+    "study65_bw_fwd40_expected": 27.7,
+    "study65_consistent": false,
+    "interpretation": "全ホライゾンでNEV方向一致 → 結論STABLE。不一致 → 短中長期で評価が変わる複雑な構造。"
+  },
+  "phase7_verdict": {
+    "1_rsr_net_ev_h40_yen": -8195691.7585,
+    "1_rsr_net_ev_positive": false,
+    "2_bw_rsr_nev_h40": -4448389.3882,
+    "2_bw_is_problem": true,
+    "3_nbw_rsr_nev_h40": -3747302.3703,
+    "3_nbw_protecting": false,
+    "3_nbw_fwd40_mean": 2.8962,
+    "4_improvement_candidate": "RSR_MOMENTUM_EXIT",
+    "4_rsr_exit_h40_nev": -3754606.2153,
+    "4_rsr_mom_h40_nev": -4441085.5431,
+    "5_recommended_next": "B_BigWinner_Exception",
+    "5_rationale": "RSR ExitがNEV負 + BW問題が支配的 → BW向け例外ロジック研究",
+    "6_sensitivity_consistent": true,
+    "rsr_fwd40_win_rate": 66.129,
+    "priority_themes": [
+      "A: RSR_EXIT_Improvement (低優先)",
+      "B: BigWinner_Exception",
+      "C: Retention_Signal Research (低優先)"
+    ]
+  }
+}

@@ -1,0 +1,496 @@
+{
+  "study": "Study69",
+  "title": "BigWinner Protection Stability Audit",
+  "date": "2026-07-01",
+  "params": {
+    "capital": 3000000,
+    "min_set": [
+      "rsr_abs",
+      "ma5_slope"
+    ],
+    "top_pct": 0.2,
+    "n_bootstrap": 1000,
+    "bw_delta_pp": 26.67,
+    "nonbw_cost_pp": 2.0,
+    "s64_oracle_dcagr": 6.37,
+    "pass_criteria": {
+      "oracle_mean_ge30": 30.0,
+      "all_folds_ge20": 20.0,
+      "all_dcagr_pos": 0.0
+    }
+  },
+  "phase0_integrity": {
+    "n_total": 291,
+    "s66_n_match": true,
+    "bw_total": 30,
+    "s66_bw_match": true,
+    "rsr_total": 248,
+    "s66_rsr_match": true,
+    "bw_rsr": 23,
+    "s67_bw_rsr_match": true,
+    "lookahead": 0,
+    "annual_breakdown": {
+      "2018": {
+        "n_rsr": 6,
+        "n_bw": 0
+      },
+      "2019": {
+        "n_rsr": 32,
+        "n_bw": 1
+      },
+      "2020": {
+        "n_rsr": 27,
+        "n_bw": 2
+      },
+      "2021": {
+        "n_rsr": 52,
+        "n_bw": 7
+      },
+      "2022": {
+        "n_rsr": 39,
+        "n_bw": 4
+      },
+      "2023": {
+        "n_rsr": 47,
+        "n_bw": 7
+      },
+      "2024": {
+        "n_rsr": 26,
+        "n_bw": 0
+      },
+      "2025": {
+        "n_rsr": 19,
+        "n_bw": 2
+      }
+    }
+  },
+  "phase1_walkforward": {
+    "Fold1_2020": {
+      "train_n": 38,
+      "train_bw_n": 1,
+      "test_year": 2020,
+      "directions": {
+        "rsr_abs": "asc",
+        "ma5_slope": "asc"
+      },
+      "result": {
+        "n_total": 27,
+        "n_bw": 2,
+        "n_rsr_exit": 27,
+        "oracle_gain_jpy": 332721.2725,
+        "n_selected": 5,
+        "n_bw_captured": 1,
+        "n_nonbw_captured": 4,
+        "bw_capture_rate": 0.5,
+        "fp_rate": 0.16,
+        "eco_val_jpy": 129787.4858,
+        "oracle_ratio_pct": 39.0079,
+        "realistic_dcagr_pp": 2.4848,
+        "realistic_dcalmar": 0.2426,
+        "realistic_ddd_pp": 0.2301
+      }
+    },
+    "Fold2_2021": {
+      "train_n": 59,
+      "train_bw_n": 3,
+      "test_year": 2021,
+      "directions": {
+        "rsr_abs": "desc",
+        "ma5_slope": "asc"
+      },
+      "result": {
+        "n_total": 52,
+        "n_bw": 7,
+        "n_rsr_exit": 52,
+        "oracle_gain_jpy": 1026300.3435,
+        "n_selected": 10,
+        "n_bw_captured": 1,
+        "n_nonbw_captured": 9,
+        "bw_capture_rate": 0.1429,
+        "fp_rate": 0.2,
+        "eco_val_jpy": 49797.0704,
+        "oracle_ratio_pct": 4.8521,
+        "realistic_dcagr_pp": 0.3091,
+        "realistic_dcalmar": 0.0302,
+        "realistic_ddd_pp": 0.0286
+      }
+    },
+    "Fold3_2022": {
+      "train_n": 79,
+      "train_bw_n": 9,
+      "test_year": 2022,
+      "directions": {
+        "rsr_abs": "asc",
+        "ma5_slope": "asc"
+      },
+      "result": {
+        "n_total": 39,
+        "n_bw": 4,
+        "n_rsr_exit": 39,
+        "oracle_gain_jpy": 588517.146,
+        "n_selected": 7,
+        "n_bw_captured": 1,
+        "n_nonbw_captured": 6,
+        "bw_capture_rate": 0.25,
+        "fp_rate": 0.1714,
+        "eco_val_jpy": 64539.8554,
+        "oracle_ratio_pct": 10.9665,
+        "realistic_dcagr_pp": 0.6986,
+        "realistic_dcalmar": 0.0682,
+        "realistic_ddd_pp": 0.0647
+      }
+    },
+    "Fold4_2023": {
+      "train_n": 91,
+      "train_bw_n": 11,
+      "test_year": 2023,
+      "directions": {
+        "rsr_abs": "asc",
+        "ma5_slope": "asc"
+      },
+      "result": {
+        "n_total": 47,
+        "n_bw": 7,
+        "n_rsr_exit": 47,
+        "oracle_gain_jpy": 1019429.584,
+        "n_selected": 9,
+        "n_bw_captured": 2,
+        "n_nonbw_captured": 7,
+        "bw_capture_rate": 0.2857,
+        "fp_rate": 0.175,
+        "eco_val_jpy": 163956.397,
+        "oracle_ratio_pct": 16.0832,
+        "realistic_dcagr_pp": 1.0245,
+        "realistic_dcalmar": 0.1,
+        "realistic_ddd_pp": 0.0949
+      }
+    },
+    "Fold5_2024": {
+      "train_n": 86,
+      "train_bw_n": 11,
+      "test_year": 2024,
+      "directions": {
+        "rsr_abs": "asc",
+        "ma5_slope": "asc"
+      },
+      "result": {
+        "n_total": 26,
+        "n_bw": 0,
+        "n_rsr_exit": 26,
+        "oracle_gain_jpy": 0.0,
+        "n_selected": 5,
+        "n_bw_captured": 0,
+        "n_nonbw_captured": 5,
+        "bw_capture_rate": 0.0,
+        "fp_rate": 0.1923,
+        "eco_val_jpy": -65313.7568,
+        "oracle_ratio_pct": null,
+        "realistic_dcagr_pp": 0.0,
+        "realistic_dcalmar": 0.0,
+        "realistic_ddd_pp": 0.0
+      }
+    },
+    "Fold6_2025": {
+      "train_n": 73,
+      "train_bw_n": 7,
+      "test_year": 2025,
+      "directions": {
+        "rsr_abs": "asc",
+        "ma5_slope": "asc"
+      },
+      "result": {
+        "n_total": 19,
+        "n_bw": 2,
+        "n_rsr_exit": 19,
+        "oracle_gain_jpy": 396978.8023,
+        "n_selected": 3,
+        "n_bw_captured": 0,
+        "n_nonbw_captured": 3,
+        "bw_capture_rate": 0.0,
+        "fp_rate": 0.1765,
+        "eco_val_jpy": -45767.9429,
+        "oracle_ratio_pct": -11.5291,
+        "realistic_dcagr_pp": -0.7344,
+        "realistic_dcalmar": -0.0717,
+        "realistic_ddd_pp": -0.068
+      }
+    }
+  },
+  "phase2_economic_stability": {
+    "n_folds_with_bw": 5,
+    "oracle_ratio": {
+      "label": "Oracle比(%)",
+      "n": 5,
+      "mean": 11.8761,
+      "median": 10.9665,
+      "std": 18.3834,
+      "min": -11.5291,
+      "max": 39.0079,
+      "cv": 1.5479
+    },
+    "realistic_dcagr": {
+      "label": "realistic ΔCAGR(pp)",
+      "n": 6,
+      "mean": 0.6304,
+      "median": 0.5039,
+      "std": 1.092,
+      "min": -0.7344,
+      "max": 2.4848,
+      "cv": 1.7321
+    },
+    "eco_val_jpy": {
+      "label": "eco_val(¥)",
+      "n": 6,
+      "mean": 49499.8515,
+      "median": 57168.4629,
+      "std": 91685.1268,
+      "min": -65313.7568,
+      "max": 163956.397,
+      "cv": 1.8522
+    },
+    "all_folds_dcagr_positive": false,
+    "all_folds_oracle_ge20": false
+  },
+  "phase3_feature_stability": {
+    "Fold1_2020": {
+      "n": 27,
+      "n_bw": 2,
+      "features": {
+        "rsr_abs": {
+          "ic": 0.45,
+          "rank_ic": 0.45,
+          "auc_best": 0.58,
+          "bw_capture_top10": 0.0
+        },
+        "ma5_slope": {
+          "ic": 0.4096,
+          "rank_ic": 0.4096,
+          "auc_best": 0.8,
+          "bw_capture_top10": 0.5
+        }
+      }
+    },
+    "Fold2_2021": {
+      "n": 52,
+      "n_bw": 7,
+      "features": {
+        "rsr_abs": {
+          "ic": -0.1074,
+          "rank_ic": -0.1074,
+          "auc_best": 0.573,
+          "bw_capture_top10": 0.2857
+        },
+        "ma5_slope": {
+          "ic": -0.1204,
+          "rank_ic": -0.1204,
+          "auc_best": 0.581,
+          "bw_capture_top10": 0.1429
+        }
+      }
+    },
+    "Fold3_2022": {
+      "n": 39,
+      "n_bw": 4,
+      "features": {
+        "rsr_abs": {
+          "ic": -0.19,
+          "rank_ic": -0.19,
+          "auc_best": 0.6107,
+          "bw_capture_top10": 0.25
+        },
+        "ma5_slope": {
+          "ic": -0.3304,
+          "rank_ic": -0.3304,
+          "auc_best": 0.5357,
+          "bw_capture_top10": 0.25
+        }
+      }
+    },
+    "Fold4_2023": {
+      "n": 47,
+      "n_bw": 7,
+      "features": {
+        "rsr_abs": {
+          "ic": 0.0281,
+          "rank_ic": 0.0281,
+          "auc_best": 0.6786,
+          "bw_capture_top10": 0.0
+        },
+        "ma5_slope": {
+          "ic": -0.0951,
+          "rank_ic": -0.0951,
+          "auc_best": 0.6321,
+          "bw_capture_top10": 0.1429
+        }
+      }
+    },
+    "Fold5_2024": {
+      "n": 26,
+      "n_bw": 0,
+      "features": {
+        "rsr_abs": {
+          "ic": -0.0149,
+          "rank_ic": -0.0149,
+          "auc_best": null,
+          "bw_capture_top10": 0.0
+        },
+        "ma5_slope": {
+          "ic": -0.2055,
+          "rank_ic": -0.2055,
+          "auc_best": null,
+          "bw_capture_top10": 0.0
+        }
+      }
+    },
+    "Fold6_2025": {
+      "n": 19,
+      "n_bw": 2,
+      "features": {
+        "rsr_abs": {
+          "ic": 0.1393,
+          "rank_ic": 0.1393,
+          "auc_best": 0.6618,
+          "bw_capture_top10": 0.0
+        },
+        "ma5_slope": {
+          "ic": -0.0404,
+          "rank_ic": -0.0404,
+          "auc_best": 0.5,
+          "bw_capture_top10": 0.0
+        }
+      }
+    }
+  },
+  "phase4_robustness": {
+    "fold_level": {
+      "best_fold": {
+        "fold": "Fold1_2020",
+        "oracle_ratio": 39.0079,
+        "dcagr": 2.4848,
+        "eco_val": 129787.4858,
+        "n_bw": 2
+      },
+      "worst_fold": {
+        "fold": "Fold6_2025",
+        "oracle_ratio": -11.5291,
+        "dcagr": -0.7344,
+        "eco_val": -45767.9429,
+        "n_bw": 2
+      },
+      "oracle_ratio_stats": {
+        "label": "Oracle比 fold",
+        "n": 5,
+        "mean": 11.8761,
+        "median": 10.9665,
+        "std": 18.3834,
+        "min": -11.5291,
+        "max": 39.0079,
+        "cv": 1.5479
+      },
+      "dcagr_stats": {
+        "label": "ΔCAGR fold",
+        "n": 5,
+        "mean": 0.7565,
+        "median": 0.6986,
+        "std": 1.171,
+        "min": -0.7344,
+        "max": 2.4848,
+        "cv": 1.5479
+      }
+    },
+    "bootstrap": {
+      "n_resamples": 1000,
+      "n_valid": 1000,
+      "oracle_ratio_mean": 35.2429,
+      "oracle_ratio_std": 12.84,
+      "oracle_ratio_ci95": [
+        9.3465,
+        58.4011
+      ],
+      "dcagr_ci95": [
+        0.5954,
+        3.7201
+      ]
+    }
+  },
+  "phase5_failure_analysis": {
+    "worst_fold": "Fold6_2025",
+    "test_year": 2025,
+    "n_total": 19,
+    "n_bw": 2,
+    "oracle_ratio_pct": -11.5291,
+    "reason_distribution": {
+      "RSR_MOMENTUM_EXIT": 11,
+      "RSR_EXIT": 8
+    },
+    "feature_comparison": {
+      "rsr_abs": {
+        "bw_mean": 67.8571,
+        "nonbw_mean": 72.8291,
+        "mwu_p": 0.5045
+      },
+      "ma5_slope": {
+        "bw_mean": 0.5442,
+        "nonbw_mean": 0.8883,
+        "mwu_p": 1.0
+      }
+    },
+    "bw_keep40d_mean": 55.4658,
+    "nonbw_keep40d_mean": 7.303
+  },
+  "phase6_frontier_update": {
+    "study63_failure": {
+      "dcagr_theory": 1.63,
+      "dcagr_real": -0.93,
+      "verdict": "EXHAUSTED"
+    },
+    "study64_bw_oracle": {
+      "dcagr_theory": 6.37,
+      "verdict": "UPPER_BOUND"
+    },
+    "study68_information_audit": {
+      "oracle_ratio_full": 35.3,
+      "dcagr_realistic": 2.2486099999999998,
+      "verdict": "CONTINUE (全データ)"
+    },
+    "study69_stability": {
+      "oracle_ratio_fold_mean": 11.8761,
+      "oracle_ratio_ci95": [
+        9.3465,
+        58.4011
+      ],
+      "dcagr_fold_mean": 0.6304,
+      "dcagr_realistic_mean": 0.7565,
+      "verdict": "TBD (Phase7で確定)"
+    },
+    "research_priority_updated": {
+      "1st": "Study69 → Study68_BW (oracle_mean=11.9%)",
+      "2nd": "Study64_Addon (validated ΔCAGR=+6.78pp)",
+      "3rd": "Study67_NonBW_Exit (+2.00pp, small)",
+      "4th": "Study63_Failure (EXHAUSTED)"
+    }
+  },
+  "phase7_verdict": {
+    "①_oracle_ratio_mean": 11.8761,
+    "②_realistic_dcagr_mean": 0.6304,
+    "③_fold_stability": {
+      "n_folds_with_bw": 5,
+      "all_folds_oracle_ge20": false,
+      "all_folds_dcagr_positive": false,
+      "cv": 1.5479
+    },
+    "④_bootstrap_95ci_oracle": [
+      9.3465,
+      58.4011
+    ],
+    "⑤_reproducibility": {
+      "cond_mean_ge30": false,
+      "cond_min_ge20": false,
+      "cond_dcagr_all_pos": false,
+      "cond_ci_lo_pos": true,
+      "n_pass": 1
+    },
+    "⑥_study70_recommendation": "STOP: BW保護のシンプル特徴量アプローチに限界 → 別アプローチ検討",
+    "final_verdict": "STOP"
+  }
+}

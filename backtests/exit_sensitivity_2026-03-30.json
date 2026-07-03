@@ -1,0 +1,238 @@
+{
+  "exit10d": {
+    "turtle_exit": 10,
+    "IS": {
+      "scenario": "BASELINE",
+      "dataset_version": "live_yfinance",
+      "cagr": 15.27,
+      "sharpe": 1.104,
+      "max_dd": -17.01,
+      "calmar": 0.898,
+      "n_trades": 340,
+      "n_trades_yr": 79.6,
+      "avg_hold_days": 6.0,
+      "win_rate": 49.4,
+      "avg_win_pct": 5.82,
+      "avg_lose_pct": -3.08,
+      "r_multiple": 1.89,
+      "avg_exposure": 36.9,
+      "avg_candidates": 0.68,
+      "avg_simultaneous_holdings": 2.22,
+      "annual_returns": {
+        "2020": 13.28,
+        "2021": 12.7,
+        "2022": 3.78,
+        "2023": 19.55,
+        "2024": 13.77
+      },
+      "exit_reason_counts": {
+        "STRATEGY_EXIT": 150,
+        "RSR_EXIT": 189,
+        "TIME_STOP": 1
+      }
+    },
+    "OOS": {
+      "scenario": "BASELINE",
+      "dataset_version": "live_yfinance",
+      "cagr": -4.58,
+      "sharpe": -0.289,
+      "max_dd": -14.34,
+      "calmar": -0.319,
+      "n_trades": 61,
+      "n_trades_yr": 63.3,
+      "avg_hold_days": 4.5,
+      "win_rate": 47.5,
+      "avg_win_pct": 4.41,
+      "avg_lose_pct": -3.82,
+      "r_multiple": 1.16,
+      "avg_exposure": 28.3,
+      "avg_candidates": 0.41,
+      "avg_simultaneous_holdings": 1.43,
+      "annual_returns": {
+        "2025": -4.42
+      },
+      "exit_reason_counts": {
+        "RSR_EXIT": 32,
+        "STRATEGY_EXIT": 29
+      }
+    },
+    "oos_trades_per_month": 5.08
+  },
+  "exit20d": {
+    "turtle_exit": 20,
+    "IS": {
+      "scenario": "BASELINE",
+      "dataset_version": "live_yfinance",
+      "cagr": 16.66,
+      "sharpe": 1.186,
+      "max_dd": -17.71,
+      "calmar": 0.941,
+      "n_trades": 288,
+      "n_trades_yr": 67.4,
+      "avg_hold_days": 7.9,
+      "win_rate": 47.9,
+      "avg_win_pct": 7.32,
+      "avg_lose_pct": -3.53,
+      "r_multiple": 2.07,
+      "avg_exposure": 36.8,
+      "avg_candidates": 0.68,
+      "avg_simultaneous_holdings": 2.39,
+      "annual_returns": {
+        "2020": 15.17,
+        "2021": 29.64,
+        "2022": 1.27,
+        "2023": 17.64,
+        "2024": 7.7
+      },
+      "exit_reason_counts": {
+        "STRATEGY_EXIT": 124,
+        "RSR_EXIT": 161,
+        "TIME_STOP": 3
+      }
+    },
+    "OOS": {
+      "scenario": "BASELINE",
+      "dataset_version": "live_yfinance",
+      "cagr": -5.7,
+      "sharpe": -0.369,
+      "max_dd": -14.14,
+      "calmar": -0.403,
+      "n_trades": 59,
+      "n_trades_yr": 61.2,
+      "avg_hold_days": 4.8,
+      "win_rate": 47.5,
+      "avg_win_pct": 4.4,
+      "avg_lose_pct": -3.61,
+      "r_multiple": 1.22,
+      "avg_exposure": 30.1,
+      "avg_candidates": 0.42,
+      "avg_simultaneous_holdings": 1.52,
+      "annual_returns": {
+        "2025": -5.5
+      },
+      "exit_reason_counts": {
+        "RSR_EXIT": 32,
+        "STRATEGY_EXIT": 27
+      }
+    },
+    "oos_trades_per_month": 4.92
+  },
+  "exit40d": {
+    "turtle_exit": 40,
+    "IS": {
+      "scenario": "BASELINE",
+      "dataset_version": "live_yfinance",
+      "cagr": 18.2,
+      "sharpe": 1.295,
+      "max_dd": -16.83,
+      "calmar": 1.081,
+      "n_trades": 278,
+      "n_trades_yr": 65.0,
+      "avg_hold_days": 8.4,
+      "win_rate": 49.6,
+      "avg_win_pct": 7.37,
+      "avg_lose_pct": -3.58,
+      "r_multiple": 2.06,
+      "avg_exposure": 36.8,
+      "avg_candidates": 0.68,
+      "avg_simultaneous_holdings": 2.45,
+      "annual_returns": {
+        "2020": 15.99,
+        "2021": 27.58,
+        "2022": 4.54,
+        "2023": 18.39,
+        "2024": 10.51
+      },
+      "exit_reason_counts": {
+        "STRATEGY_EXIT": 119,
+        "RSR_EXIT": 156,
+        "TIME_STOP": 3
+      }
+    },
+    "OOS": {
+      "scenario": "BASELINE",
+      "dataset_version": "live_yfinance",
+      "cagr": -5.96,
+      "sharpe": -0.378,
+      "max_dd": -14.38,
+      "calmar": -0.414,
+      "n_trades": 59,
+      "n_trades_yr": 61.2,
+      "avg_hold_days": 4.9,
+      "win_rate": 47.5,
+      "avg_win_pct": 4.4,
+      "avg_lose_pct": -3.64,
+      "r_multiple": 1.21,
+      "avg_exposure": 30.9,
+      "avg_candidates": 0.42,
+      "avg_simultaneous_holdings": 1.56,
+      "annual_returns": {
+        "2025": -5.75
+      },
+      "exit_reason_counts": {
+        "RSR_EXIT": 32,
+        "STRATEGY_EXIT": 27
+      }
+    },
+    "oos_trades_per_month": 4.92
+  },
+  "exit55d": {
+    "turtle_exit": 55,
+    "IS": {
+      "scenario": "BASELINE",
+      "dataset_version": "live_yfinance",
+      "cagr": 18.95,
+      "sharpe": 1.335,
+      "max_dd": -16.55,
+      "calmar": 1.145,
+      "n_trades": 279,
+      "n_trades_yr": 65.3,
+      "avg_hold_days": 8.5,
+      "win_rate": 50.2,
+      "avg_win_pct": 7.36,
+      "avg_lose_pct": -3.53,
+      "r_multiple": 2.08,
+      "avg_exposure": 37.0,
+      "avg_candidates": 0.68,
+      "avg_simultaneous_holdings": 2.47,
+      "annual_returns": {
+        "2020": 15.99,
+        "2021": 27.74,
+        "2022": 4.78,
+        "2023": 18.33,
+        "2024": 13.25
+      },
+      "exit_reason_counts": {
+        "STRATEGY_EXIT": 119,
+        "RSR_EXIT": 157,
+        "TIME_STOP": 3
+      }
+    },
+    "OOS": {
+      "scenario": "BASELINE",
+      "dataset_version": "live_yfinance",
+      "cagr": -5.96,
+      "sharpe": -0.378,
+      "max_dd": -14.38,
+      "calmar": -0.414,
+      "n_trades": 59,
+      "n_trades_yr": 61.2,
+      "avg_hold_days": 4.9,
+      "win_rate": 47.5,
+      "avg_win_pct": 4.4,
+      "avg_lose_pct": -3.64,
+      "r_multiple": 1.21,
+      "avg_exposure": 30.9,
+      "avg_candidates": 0.42,
+      "avg_simultaneous_holdings": 1.56,
+      "annual_returns": {
+        "2025": -5.75
+      },
+      "exit_reason_counts": {
+        "RSR_EXIT": 32,
+        "STRATEGY_EXIT": 27
+      }
+    },
+    "oos_trades_per_month": 4.92
+  }
+}

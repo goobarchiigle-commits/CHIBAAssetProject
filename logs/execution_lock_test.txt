@@ -1,0 +1,11 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.0.2, pluggy-1.6.0 -- C:\Users\owner\AppData\Local\Programs\Python\Python312\python.exe
+cachedir: .pytest_cache
+rootdir: C:\ai-trading
+plugins: anyio-4.12.1
+collecting ... collected 43 items
+
+tests/runtime/test_execution_lock.py::TestStaleLockRecovery::test_dead_pid_lock_recovered PASSED [  2%]
+tests/runtime/test_execution_lock.py::TestStaleLockRecovery::test_recovery_event_emitted PASSED [  4%]
+tests/runtime/test_execution_lock.py::TestStaleLockRecovery::test_no_recovery_for_live_lock FAILED [  6%]
+tests/runtime/test_execution_lock.py::TestPIDReuseSimulation::test_create_time_mismatch_is_stale FAILED [  9%]

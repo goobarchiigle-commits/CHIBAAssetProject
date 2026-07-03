@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m backtest.composite_alpha_bt --start 2025-01-01 --end 2025-12-31)",
+      "Bash(python -c \":*)",
+      "Bash(python src/backtest/study47_production_candidate_verification.py)"
+    ]
+  }
+}

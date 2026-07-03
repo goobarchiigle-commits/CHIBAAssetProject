@@ -1,0 +1,50 @@
+{
+  "_meta": {
+    "schema_version": "1.0",
+    "description": "Strategy registry — canonical source of truth for all strategy states. Edit manually; consistency_check.py validates.",
+    "maintained_by": "tools/consistency_check.py",
+    "last_updated": "2026-05-09",
+    "valid_statuses": ["active", "experimental", "deprecated", "archived"]
+  },
+  "fujiko_composite": {
+    "status": "active",
+    "owner": "CHIBAAssetProject",
+    "description": "Production momentum strategy: RSR42 universe, dynamic universe filter (dyn_rsr42_bear_rs0), turtle exit 55d, sector/symbol caps, zero_bull fraction",
+    "created_at": "2026-03-15",
+    "last_validated_at": "2026-04-13",
+    "oos_period": "2025-01-01/2025-12-31",
+    "is_sharpe": 1.582,
+    "oos_sharpe": 1.612,
+    "oos_max_dd": -0.037,
+    "oos_cagr": 0.123,
+    "wf_result": "5/5 PASS",
+    "active_config": "src/configs/strategy.yaml",
+    "source_file": "src/backtest/composite_alpha_bt.py",
+    "live_entrypoints": [
+      "src/run_live_signal.py",
+      "src/run_morning_signal.py"
+    ],
+    "supersedes": null,
+    "deprecated": false,
+    "notes": "Phase 2 live since 2026-03-27. max_positions=4 (4th slot requires RSR>=80, adopted 2026-04-18). zero_bull fraction active since 2026-05-03 (bull=0.0 improves OOS Sharpe from 1.827 to 2.226). dynamic_universe WF 5/5. OOS numbers are for the dynamic universe variant."
+  },
+  "mean_reversion": {
+    "status": "experimental",
+    "owner": "CHIBAAssetProject",
+    "description": "Mean reversion overlay: RSI<25 entry, RSI>65 exit, 200d MA trend filter, 7% stop-loss, max 10d hold",
+    "created_at": "2026-03-15",
+    "last_validated_at": "2026-03-20",
+    "oos_period": null,
+    "is_sharpe": null,
+    "oos_sharpe": null,
+    "oos_max_dd": null,
+    "oos_cagr": null,
+    "wf_result": null,
+    "active_config": "src/configs/strategy.yaml",
+    "source_file": "src/backtest/mean_reversion_strategy.py",
+    "live_entrypoints": [],
+    "supersedes": null,
+    "deprecated": false,
+    "notes": "Research-only. NOT deployed to production. Parameters defined in strategy.yaml#mean_reversion. No walk-forward validation completed."
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "generated_at": "2026-03-20T16:57:58",
+  "period": "2018-01-01/2024-12-31",
+  "clenow_period": 90,
+  "A_rsr_only": {
+    "CAGR%": 5.05,
+    "MaxDD%": -14.23,
+    "Calmar": 0.355,
+    "Sharpe": 0.525,
+    "取引数": 287,
+    "勝率%": 51.6,
+    "avg_pos": 1.63
+  },
+  "B_rsr_clenow": {
+    "CAGR%": -2.17,
+    "MaxDD%": -15.05,
+    "Calmar": -0.144,
+    "Sharpe": -0.47,
+    "取引数": 58,
+    "勝率%": 41.4,
+    "avg_pos": 0.29
+  },
+  "C_clenow_only": {
+    "CAGR%": -2.24,
+    "MaxDD%": -15.47,
+    "Calmar": -0.145,
+    "Sharpe": -0.546,
+    "取引数": 43,
+    "勝率%": 34.9,
+    "avg_pos": 0.21
+  },
+  "best": "A",
+  "effect": "→ Clenow フィルター効果なし: Calmar 0.355→-0.144"
+}

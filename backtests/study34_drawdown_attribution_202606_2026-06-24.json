@@ -1,0 +1,205 @@
+{
+  "period": [
+    "2018-01-01",
+    "2026-06-23"
+  ],
+  "results_summary": {
+    "A_APRIL_REPRO": {
+      "max_dd": -15.71,
+      "cagr": 16.12,
+      "sharpe": 0.781,
+      "peak_date": "2020-12-02",
+      "trough_date": "2020-12-23",
+      "recovery_date": "2021-01-13",
+      "dd_window_days": 15,
+      "top20_losers": [
+        {
+          "symbol": "9104.T",
+          "entry_idx": 88,
+          "exit_idx": 91,
+          "pnl": -37333.36181640625
+        },
+        {
+          "symbol": "6506.T",
+          "entry_idx": 71,
+          "exit_idx": 76,
+          "pnl": 3000.0
+        },
+        {
+          "symbol": "8309.T",
+          "entry_idx": 88,
+          "exit_idx": 91,
+          "pnl": 6200.0
+        },
+        {
+          "symbol": "8306.T",
+          "entry_idx": 83,
+          "exit_idx": 86,
+          "pnl": 12800.0
+        },
+        {
+          "symbol": "6981.T",
+          "entry_idx": 64,
+          "exit_idx": 82,
+          "pnl": 57400.0
+        },
+        {
+          "symbol": "6857.T",
+          "entry_idx": 63,
+          "exit_idx": 87,
+          "pnl": 61000.0
+        },
+        {
+          "symbol": "9107.T",
+          "entry_idx": 77,
+          "exit_idx": 102,
+          "pnl": 144000.0
+        }
+      ],
+      "window_total_pnl": 247066.63818359375,
+      "window_top20_pnl": 247066.63818359375,
+      "n_window_trades": 7,
+      "portfolio": {
+        "avg_holdings": 2.2478197674418605,
+        "avg_correlation": 0.4564195428636149,
+        "avg_sector_hhi": 0.6005982905982906,
+        "avg_cluster_hhi": 0.8033333333333335
+      },
+      "annual_local_max_dd": {
+        "2020": -15.71,
+        "2021": -15.12,
+        "2022": -9.24,
+        "2023": -8.88,
+        "2024": -12.6,
+        "2025": -4.78,
+        "2026": -5.64
+      }
+    },
+    "C_PROD_MINUS_ATR": {
+      "max_dd": -19.37,
+      "cagr": 19.75,
+      "sharpe": 0.798,
+      "peak_date": "2021-07-29",
+      "trough_date": "2021-08-20",
+      "recovery_date": "2021-09-07",
+      "dd_window_days": 15,
+      "top20_losers": [
+        {
+          "symbol": "6857.T",
+          "entry_idx": 244,
+          "exit_idx": 247,
+          "pnl": -64500.0
+        },
+        {
+          "symbol": "8058.T",
+          "entry_idx": 250,
+          "exit_idx": 253,
+          "pnl": -17100.0
+        },
+        {
+          "symbol": "3382.T",
+          "entry_idx": 237,
+          "exit_idx": 240,
+          "pnl": -3600.0
+        },
+        {
+          "symbol": "6501.T",
+          "entry_idx": 201,
+          "exit_idx": 239,
+          "pnl": 16479.98046875
+        },
+        {
+          "symbol": "8015.T",
+          "entry_idx": 239,
+          "exit_idx": 244,
+          "pnl": 36666.68701171875
+        },
+        {
+          "symbol": "9101.T",
+          "entry_idx": 245,
+          "exit_idx": 269,
+          "pnl": 250000.048828125
+        },
+        {
+          "symbol": "9104.T",
+          "entry_idx": 240,
+          "exit_idx": 262,
+          "pnl": 342666.6015625
+        }
+      ],
+      "window_total_pnl": 560613.3178710938,
+      "window_top20_pnl": 560613.3178710938,
+      "n_window_trades": 7,
+      "portfolio": {
+        "avg_holdings": 1.931686046511628,
+        "avg_correlation": 0.4107971507428424,
+        "avg_sector_hhi": 0.6065573770491803,
+        "avg_cluster_hhi": 0.7697111631537861
+      },
+      "annual_local_max_dd": {
+        "2020": -12.63,
+        "2021": -19.37,
+        "2022": -10.47,
+        "2023": -12.96,
+        "2024": -9.65,
+        "2025": -5.99,
+        "2026": -3.54
+      }
+    }
+  },
+  "feature_isolation_max_dd": [
+    {
+      "label": "0_APRIL_REPRO",
+      "max_dd": -15.71,
+      "delta_max_dd_pp": null,
+      "avg_exposure": 31.0,
+      "n_trades": 280
+    },
+    {
+      "label": "1_+UNIVERSE",
+      "max_dd": -18.25,
+      "delta_max_dd_pp": -2.54,
+      "avg_exposure": 30.3,
+      "n_trades": 251
+    },
+    {
+      "label": "2_+ATR_TRAILING",
+      "max_dd": -18.25,
+      "delta_max_dd_pp": 0.0,
+      "avg_exposure": 30.4,
+      "n_trades": 255
+    },
+    {
+      "label": "3_+MULTILAYER_RSR",
+      "max_dd": -18.25,
+      "delta_max_dd_pp": 0.0,
+      "avg_exposure": 30.4,
+      "n_trades": 255
+    },
+    {
+      "label": "4_+MTF_FILTER(参考)",
+      "max_dd": -18.51,
+      "delta_max_dd_pp": -0.26,
+      "avg_exposure": 30.4,
+      "n_trades": 242
+    },
+    {
+      "label": "5_+SIZING_EQUAL(=C, 参考)",
+      "max_dd": -19.37,
+      "delta_max_dd_pp": -0.86,
+      "avg_exposure": 35.2,
+      "n_trades": 220
+    }
+  ],
+  "attribution": {
+    "total_dd_increase_pp": 3.66,
+    "universe_contrib_pp": -2.54,
+    "universe_pct_of_total": -69.4,
+    "exit_contrib_pp": -0.26,
+    "exit_pct_of_total": -7.1,
+    "sizing_contrib_pp": -0.86,
+    "sizing_pct_of_total": -23.5,
+    "worst_year": "2021",
+    "worst_year_delta_pp": -4.25
+  }
+}

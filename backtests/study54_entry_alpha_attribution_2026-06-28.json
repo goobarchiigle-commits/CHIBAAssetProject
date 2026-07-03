@@ -1,0 +1,1124 @@
+{
+  "study": "Study54_EntryAlphaAttribution",
+  "date": "2026-06-28",
+  "config": "D_ATR_EQ (ATR_Extension + EQ_SCALE, VOL_ADJ除外)",
+  "period": {
+    "is_start": "2018-01-01",
+    "is_end": "2024-12-31"
+  },
+  "capital": 3000000,
+  "bt_summary": {
+    "cagr": 12.37,
+    "sharpe": 0.586,
+    "max_dd": -18.12,
+    "n_trades": 263
+  },
+  "phase1_entry_pool": {
+    "group_A": {
+      "label": "RSR未達",
+      "n": 3008,
+      "fwd20d": {
+        "mean": 1.09,
+        "median": 0.69,
+        "win_rate": 54.5,
+        "top10pct": 10.45,
+        "bottom10pct": -7.71,
+        "n": 3008
+      },
+      "fwd60d": {
+        "mean": 5.17,
+        "median": 4.19,
+        "win_rate": 63.9,
+        "top10pct": 22.89,
+        "bottom10pct": -10.73,
+        "n": 3008
+      },
+      "fwd120d": {
+        "mean": 10.17,
+        "median": 8.16,
+        "win_rate": 68.3,
+        "top10pct": 40.07,
+        "bottom10pct": -19.49,
+        "n": 3008
+      },
+      "max_runup60_avg": 12.38,
+      "max_drawdown60_avg": -7.5,
+      "avg_rsr": 53.7
+    },
+    "group_B": {
+      "label": "MAX_POS",
+      "n": 427,
+      "avg_rsr": 74.3,
+      "fwd20d": {
+        "mean": 3.15,
+        "median": 2.64,
+        "win_rate": 63.9,
+        "top10pct": 13.75,
+        "bottom10pct": -7.59,
+        "n": 427
+      },
+      "fwd60d": {
+        "mean": 7.37,
+        "median": 5.42,
+        "win_rate": 65.8,
+        "top10pct": 31.43,
+        "bottom10pct": -13.75,
+        "n": 427
+      },
+      "fwd120d": {
+        "mean": 13.08,
+        "median": 7.65,
+        "win_rate": 65.6,
+        "top10pct": 44.41,
+        "bottom10pct": -18.05,
+        "n": 427
+      },
+      "max_runup60_avg": 16.33,
+      "max_drawdown60_avg": -8.3
+    },
+    "group_C": {
+      "label": "SECTOR_CAP",
+      "n": 73,
+      "fwd20d": {
+        "mean": -0.65,
+        "median": -1.3,
+        "win_rate": 42.5,
+        "top10pct": 8.8,
+        "bottom10pct": -9.91,
+        "n": 73
+      },
+      "fwd60d": {
+        "mean": 8.17,
+        "median": 3.19,
+        "win_rate": 64.4,
+        "top10pct": 31.07,
+        "bottom10pct": -9.57,
+        "n": 73
+      },
+      "fwd120d": {
+        "mean": 23.27,
+        "median": 18.71,
+        "win_rate": 87.7,
+        "top10pct": 60.58,
+        "bottom10pct": -1.56,
+        "n": 73
+      },
+      "max_runup60_avg": 16.91,
+      "max_drawdown60_avg": -8.97,
+      "avg_rsr": 87.8
+    },
+    "group_D": {
+      "label": "CLUSTER_CAP",
+      "n": 57,
+      "fwd20d": {
+        "mean": 4.69,
+        "median": 3.88,
+        "win_rate": 71.9,
+        "top10pct": 15.15,
+        "bottom10pct": -5.2,
+        "n": 57
+      },
+      "fwd60d": {
+        "mean": 10.11,
+        "median": 7.56,
+        "win_rate": 68.4,
+        "top10pct": 35.16,
+        "bottom10pct": -6.0,
+        "n": 57
+      },
+      "fwd120d": {
+        "mean": 11.03,
+        "median": 4.15,
+        "win_rate": 61.4,
+        "top10pct": 50.39,
+        "bottom10pct": -17.16,
+        "n": 57
+      },
+      "max_runup60_avg": 20.61,
+      "max_drawdown60_avg": -6.5,
+      "avg_rsr": 83.7
+    },
+    "group_E": {
+      "label": "LOT_REJECT",
+      "n": 10,
+      "fwd20d": {
+        "mean": 6.77,
+        "median": 7.22,
+        "win_rate": 80.0,
+        "top10pct": 14.04,
+        "bottom10pct": -0.54,
+        "n": 10
+      },
+      "fwd60d": {
+        "mean": 8.26,
+        "median": 9.07,
+        "win_rate": 70.0,
+        "top10pct": 26.63,
+        "bottom10pct": -12.8,
+        "n": 10
+      },
+      "fwd120d": {
+        "mean": 22.58,
+        "median": 31.89,
+        "win_rate": 80.0,
+        "top10pct": 41.19,
+        "bottom10pct": -4.19,
+        "n": 10
+      },
+      "max_runup60_avg": 17.07,
+      "max_drawdown60_avg": -11.34,
+      "avg_rsr": 89.6
+    },
+    "group_F": {
+      "label": "EXECUTED",
+      "n": 263,
+      "fwd20d": {
+        "mean": 2.91,
+        "median": 2.23,
+        "win_rate": 62.0,
+        "top10pct": 13.56,
+        "bottom10pct": -7.37,
+        "n": 263
+      },
+      "fwd60d": {
+        "mean": 8.13,
+        "median": 6.29,
+        "win_rate": 68.1,
+        "top10pct": 31.24,
+        "bottom10pct": -12.51,
+        "n": 263
+      },
+      "fwd120d": {
+        "mean": 15.73,
+        "median": 10.69,
+        "win_rate": 75.7,
+        "top10pct": 56.03,
+        "bottom10pct": -15.73,
+        "n": 263
+      },
+      "max_runup60_avg": 17.0,
+      "max_drawdown60_avg": -7.88,
+      "avg_rsr": null
+    }
+  },
+  "alpha_leakage_ranking": [
+    {
+      "group": "D",
+      "n": 57,
+      "fwd60d_mean": 10.11,
+      "alpha_vs_exec": 1.98,
+      "win_rate60d": 68.4,
+      "alpha_rank": 1
+    },
+    {
+      "group": "E",
+      "n": 10,
+      "fwd60d_mean": 8.26,
+      "alpha_vs_exec": 0.13,
+      "win_rate60d": 70.0,
+      "alpha_rank": 2
+    },
+    {
+      "group": "C",
+      "n": 73,
+      "fwd60d_mean": 8.17,
+      "alpha_vs_exec": 0.04,
+      "win_rate60d": 64.4,
+      "alpha_rank": 3
+    },
+    {
+      "group": "B",
+      "n": 427,
+      "fwd60d_mean": 7.37,
+      "alpha_vs_exec": -0.76,
+      "win_rate60d": 65.8,
+      "alpha_rank": 4
+    },
+    {
+      "group": "A",
+      "n": 3008,
+      "fwd60d_mean": 5.17,
+      "alpha_vs_exec": -2.96,
+      "win_rate60d": 63.9,
+      "alpha_rank": 5
+    }
+  ],
+  "phase2_winner_attribution": {
+    "n_total": 263,
+    "top20pct": {
+      "n": 53,
+      "threshold_pct": 5.95,
+      "avg_return": 17.31,
+      "avg_hold": 27.8
+    },
+    "mid60pct": {
+      "n": 157,
+      "avg_return": 0.5
+    },
+    "bot20pct": {
+      "n": 53,
+      "threshold_pct": -4.11,
+      "avg_return": -8.27,
+      "avg_hold": 9.3
+    },
+    "feature_comparison": {
+      "rsr": {
+        "top_mean": 85.079,
+        "bot_mean": 83.525,
+        "all_mean": 77.393,
+        "top_vs_bot": 1.555,
+        "coverage_pct": 97.7
+      },
+      "rsr_rank_pct": {
+        "top_mean": 45.451,
+        "bot_mean": 38.77,
+        "all_mean": 32.9,
+        "top_vs_bot": 6.681,
+        "coverage_pct": 97.7
+      },
+      "rsr_slope": {
+        "top_mean": 0.622,
+        "bot_mean": 0.656,
+        "all_mean": 0.44,
+        "top_vs_bot": -0.034,
+        "coverage_pct": 97.0
+      },
+      "rs_accel": {
+        "top_mean": 0.333,
+        "bot_mean": 0.229,
+        "all_mean": 0.191,
+        "top_vs_bot": 0.104,
+        "coverage_pct": 97.0
+      },
+      "vol_expansion": {
+        "top_mean": 1.68,
+        "bot_mean": 1.737,
+        "all_mean": 1.512,
+        "top_vs_bot": -0.056,
+        "coverage_pct": 100.0
+      },
+      "atr_compression": {
+        "top_mean": 1.111,
+        "bot_mean": 1.108,
+        "all_mean": 1.069,
+        "top_vs_bot": 0.003,
+        "coverage_pct": 100.0
+      },
+      "atr_pct": {
+        "top_mean": 17.668,
+        "bot_mean": 16.169,
+        "all_mean": 15.679,
+        "top_vs_bot": 1.499,
+        "coverage_pct": 100.0
+      },
+      "breakout_dist_pct": {
+        "top_mean": 0.79,
+        "bot_mean": -0.464,
+        "all_mean": -1.431,
+        "top_vs_bot": 1.254,
+        "coverage_pct": 100.0
+      },
+      "ma20_dev_pct": {
+        "top_mean": 7.48,
+        "bot_mean": 5.652,
+        "all_mean": 3.607,
+        "top_vs_bot": 1.828,
+        "coverage_pct": 100.0
+      },
+      "mkt_rs_20d": {
+        "top_mean": 9.86,
+        "bot_mean": 9.537,
+        "all_mean": 5.996,
+        "top_vs_bot": 0.323,
+        "coverage_pct": 100.0
+      }
+    },
+    "rank_correlations": {
+      "rsr": {
+        "spearman": -0.009,
+        "p_value": 0.8905,
+        "n": 257
+      },
+      "rsr_rank_pct": {
+        "spearman": -0.001,
+        "p_value": 0.9886,
+        "n": 257
+      },
+      "rsr_slope": {
+        "spearman": -0.058,
+        "p_value": 0.3567,
+        "n": 255
+      },
+      "rs_accel": {
+        "spearman": 0.061,
+        "p_value": 0.331,
+        "n": 255
+      },
+      "vol_expansion": {
+        "spearman": -0.01,
+        "p_value": 0.8706,
+        "n": 263
+      },
+      "atr_compression": {
+        "spearman": -0.041,
+        "p_value": 0.51,
+        "n": 263
+      },
+      "atr_pct": {
+        "spearman": 0.019,
+        "p_value": 0.7576,
+        "n": 263
+      },
+      "breakout_dist_pct": {
+        "spearman": -0.006,
+        "p_value": 0.922,
+        "n": 263
+      },
+      "ma20_dev_pct": {
+        "spearman": -0.014,
+        "p_value": 0.8246,
+        "n": 263
+      },
+      "mkt_rs_20d": {
+        "spearman": -0.032,
+        "p_value": 0.6035,
+        "n": 263
+      }
+    },
+    "effect_sizes": {
+      "rsr": 0.115,
+      "rsr_rank_pct": 0.217,
+      "rsr_slope": -0.039,
+      "rs_accel": 0.211,
+      "vol_expansion": -0.049,
+      "atr_compression": 0.018,
+      "atr_pct": 0.1,
+      "breakout_dist_pct": 0.22,
+      "ma20_dev_pct": 0.231,
+      "mkt_rs_20d": 0.032
+    }
+  },
+  "phase3_feature_screening": {
+    "by_feature": {
+      "rsr": {
+        "coverage_pct": 97.7,
+        "n_valid": 257,
+        "ic_spearman": -0.009,
+        "p_value": 0.8905,
+        "auc": 0.556,
+        "top_feat_decile_avg_ret": 3.32,
+        "bot_feat_decile_avg_ret": 1.66,
+        "base_avg_return": 2.12,
+        "lift": 1.57
+      },
+      "rsr_rank_pct": {
+        "coverage_pct": 97.7,
+        "n_valid": 257,
+        "ic_spearman": -0.001,
+        "p_value": 0.9886,
+        "auc": 0.558,
+        "top_feat_decile_avg_ret": 3.32,
+        "bot_feat_decile_avg_ret": 1.6,
+        "base_avg_return": 2.12,
+        "lift": 1.57
+      },
+      "rsr_slope": {
+        "coverage_pct": 97.0,
+        "n_valid": 255,
+        "ic_spearman": -0.058,
+        "p_value": 0.3567,
+        "auc": 0.489,
+        "top_feat_decile_avg_ret": 1.42,
+        "bot_feat_decile_avg_ret": 1.78,
+        "base_avg_return": 2.12,
+        "lift": 0.67
+      },
+      "rs_accel": {
+        "coverage_pct": 97.0,
+        "n_valid": 255,
+        "ic_spearman": 0.061,
+        "p_value": 0.331,
+        "auc": 0.589,
+        "top_feat_decile_avg_ret": 3.97,
+        "bot_feat_decile_avg_ret": 0.19,
+        "base_avg_return": 2.12,
+        "lift": 1.87
+      },
+      "vol_expansion": {
+        "coverage_pct": 100.0,
+        "n_valid": 263,
+        "ic_spearman": -0.01,
+        "p_value": 0.8706,
+        "auc": 0.523,
+        "top_feat_decile_avg_ret": 2.92,
+        "bot_feat_decile_avg_ret": 3.49,
+        "base_avg_return": 2.12,
+        "lift": 1.38
+      },
+      "atr_compression": {
+        "coverage_pct": 100.0,
+        "n_valid": 263,
+        "ic_spearman": -0.041,
+        "p_value": 0.51,
+        "auc": 0.464,
+        "top_feat_decile_avg_ret": 6.57,
+        "bot_feat_decile_avg_ret": 5.9,
+        "base_avg_return": 2.12,
+        "lift": 3.1
+      },
+      "atr_pct": {
+        "coverage_pct": 100.0,
+        "n_valid": 263,
+        "ic_spearman": 0.019,
+        "p_value": 0.7576,
+        "auc": 0.503,
+        "top_feat_decile_avg_ret": 6.67,
+        "bot_feat_decile_avg_ret": 6.95,
+        "base_avg_return": 2.12,
+        "lift": 3.14
+      },
+      "breakout_dist_pct": {
+        "coverage_pct": 100.0,
+        "n_valid": 263,
+        "ic_spearman": -0.006,
+        "p_value": 0.922,
+        "auc": 0.557,
+        "top_feat_decile_avg_ret": 5.39,
+        "bot_feat_decile_avg_ret": 1.25,
+        "base_avg_return": 2.12,
+        "lift": 2.54
+      },
+      "ma20_dev_pct": {
+        "coverage_pct": 100.0,
+        "n_valid": 263,
+        "ic_spearman": -0.014,
+        "p_value": 0.8246,
+        "auc": 0.532,
+        "top_feat_decile_avg_ret": 4.24,
+        "bot_feat_decile_avg_ret": -0.44,
+        "base_avg_return": 2.12,
+        "lift": 2.0
+      },
+      "mkt_rs_20d": {
+        "coverage_pct": 100.0,
+        "n_valid": 263,
+        "ic_spearman": -0.032,
+        "p_value": 0.6035,
+        "auc": 0.552,
+        "top_feat_decile_avg_ret": 3.18,
+        "bot_feat_decile_avg_ret": 1.81,
+        "base_avg_return": 2.12,
+        "lift": 1.5
+      }
+    },
+    "ranked_by_ic": [
+      "rs_accel",
+      "rsr_slope",
+      "atr_compression",
+      "mkt_rs_20d",
+      "atr_pct",
+      "ma20_dev_pct",
+      "vol_expansion",
+      "rsr",
+      "breakout_dist_pct",
+      "rsr_rank_pct"
+    ],
+    "top5_candidates": [
+      {
+        "rank": 1,
+        "feature": "rs_accel",
+        "ic": 0.061,
+        "auc": 0.589,
+        "lift": 1.87,
+        "coverage_pct": 97.0
+      },
+      {
+        "rank": 2,
+        "feature": "rsr_slope",
+        "ic": -0.058,
+        "auc": 0.489,
+        "lift": 0.67,
+        "coverage_pct": 97.0
+      },
+      {
+        "rank": 3,
+        "feature": "atr_compression",
+        "ic": -0.041,
+        "auc": 0.464,
+        "lift": 3.1,
+        "coverage_pct": 100.0
+      },
+      {
+        "rank": 4,
+        "feature": "mkt_rs_20d",
+        "ic": -0.032,
+        "auc": 0.552,
+        "lift": 1.5,
+        "coverage_pct": 100.0
+      },
+      {
+        "rank": 5,
+        "feature": "atr_pct",
+        "ic": 0.019,
+        "auc": 0.503,
+        "lift": 3.14,
+        "coverage_pct": 100.0
+      }
+    ]
+  },
+  "false_negatives": [
+    {
+      "date": "2021-06-08",
+      "symbol": "9104.T",
+      "sector": "海運",
+      "rsr": 92.7,
+      "rank_in_pool": 0,
+      "fwd60d": 73.51,
+      "fwd60_vs_exec_median": 67.22,
+      "ma20_dev_pct": 8.88,
+      "atr_pct": 44.97
+    },
+    {
+      "date": "2023-05-10",
+      "symbol": "6146.T",
+      "sector": "電機精密",
+      "rsr": 97.6,
+      "rank_in_pool": 0,
+      "fwd60d": 63.7,
+      "fwd60_vs_exec_median": 57.41,
+      "ma20_dev_pct": 9.01,
+      "atr_pct": 3.93
+    },
+    {
+      "date": "2023-03-24",
+      "symbol": "6146.T",
+      "sector": "電機精密",
+      "rsr": 90.5,
+      "rank_in_pool": 0,
+      "fwd60d": 60.44,
+      "fwd60_vs_exec_median": 54.15,
+      "ma20_dev_pct": 2.55,
+      "atr_pct": 5.11
+    },
+    {
+      "date": "2023-03-23",
+      "symbol": "6146.T",
+      "sector": "電機精密",
+      "rsr": 90.5,
+      "rank_in_pool": 0,
+      "fwd60d": 59.42,
+      "fwd60_vs_exec_median": 53.13,
+      "ma20_dev_pct": 2.91,
+      "atr_pct": 5.03
+    },
+    {
+      "date": "2023-12-26",
+      "symbol": "8035.T",
+      "sector": "電機精密",
+      "rsr": 90.5,
+      "rank_in_pool": 1,
+      "fwd60d": 56.15,
+      "fwd60_vs_exec_median": 49.86,
+      "ma20_dev_pct": 5.35,
+      "atr_pct": 5.55
+    },
+    {
+      "date": "2019-07-02",
+      "symbol": "6857.T",
+      "sector": "電機精密",
+      "rsr": 100.0,
+      "rank_in_pool": 0,
+      "fwd60d": 51.71,
+      "fwd60_vs_exec_median": 45.42,
+      "ma20_dev_pct": 14.95,
+      "atr_pct": 8.85
+    },
+    {
+      "date": "2021-03-11",
+      "symbol": "9107.T",
+      "sector": "海運",
+      "rsr": 87.8,
+      "rank_in_pool": 0,
+      "fwd60d": 50.65,
+      "fwd60_vs_exec_median": 44.36,
+      "ma20_dev_pct": 8.73,
+      "atr_pct": 40.16
+    },
+    {
+      "date": "2024-01-12",
+      "symbol": "8035.T",
+      "sector": "電機精密",
+      "rsr": 90.5,
+      "rank_in_pool": 0,
+      "fwd60d": 50.61,
+      "fwd60_vs_exec_median": 44.32,
+      "ma20_dev_pct": 5.39,
+      "atr_pct": 5.98
+    },
+    {
+      "date": "2024-01-11",
+      "symbol": "8035.T",
+      "sector": "電機精密",
+      "rsr": 90.5,
+      "rank_in_pool": 1,
+      "fwd60d": 50.43,
+      "fwd60_vs_exec_median": 44.14,
+      "ma20_dev_pct": 5.4,
+      "atr_pct": 5.95
+    },
+    {
+      "date": "2024-07-03",
+      "symbol": "7013.T",
+      "sector": "機械",
+      "rsr": 78.6,
+      "rank_in_pool": 0,
+      "fwd60d": 50.06,
+      "fwd60_vs_exec_median": 43.77,
+      "ma20_dev_pct": 28.19,
+      "atr_pct": 3.6
+    },
+    {
+      "date": "2024-01-05",
+      "symbol": "8058.T",
+      "sector": "商社",
+      "rsr": 76.2,
+      "rank_in_pool": 1,
+      "fwd60d": 49.93,
+      "fwd60_vs_exec_median": 43.64,
+      "ma20_dev_pct": 4.74,
+      "atr_pct": 6.8
+    },
+    {
+      "date": "2021-03-12",
+      "symbol": "9107.T",
+      "sector": "海運",
+      "rsr": 92.7,
+      "rank_in_pool": 1,
+      "fwd60d": 49.69,
+      "fwd60_vs_exec_median": 43.4,
+      "ma20_dev_pct": 11.59,
+      "atr_pct": 39.16
+    },
+    {
+      "date": "2024-07-02",
+      "symbol": "7013.T",
+      "sector": "機械",
+      "rsr": 76.2,
+      "rank_in_pool": 0,
+      "fwd60d": 48.75,
+      "fwd60_vs_exec_median": 42.46,
+      "ma20_dev_pct": 22.66,
+      "atr_pct": 3.5
+    },
+    {
+      "date": "2019-10-15",
+      "symbol": "6920.T",
+      "sector": "電機精密",
+      "rsr": 100.0,
+      "rank_in_pool": 0,
+      "fwd60d": 47.59,
+      "fwd60_vs_exec_median": 41.3,
+      "ma20_dev_pct": 12.09,
+      "atr_pct": 6.49
+    },
+    {
+      "date": "2021-01-22",
+      "symbol": "5401.T",
+      "sector": "鉄鋼",
+      "rsr": 34.1,
+      "rank_in_pool": 0,
+      "fwd60d": 47.55,
+      "fwd60_vs_exec_median": 41.26,
+      "ma20_dev_pct": -4.72,
+      "atr_pct": 45.14
+    },
+    {
+      "date": "2021-02-22",
+      "symbol": "9107.T",
+      "sector": "海運",
+      "rsr": 87.8,
+      "rank_in_pool": 1,
+      "fwd60d": 46.0,
+      "fwd60_vs_exec_median": 39.71,
+      "ma20_dev_pct": 7.98,
+      "atr_pct": 40.53
+    },
+    {
+      "date": "2020-09-23",
+      "symbol": "5706.T",
+      "sector": "鉄鋼",
+      "rsr": 75.6,
+      "rank_in_pool": 1,
+      "fwd60d": 45.7,
+      "fwd60_vs_exec_median": 39.41,
+      "ma20_dev_pct": -0.7,
+      "atr_pct": 20.87
+    },
+    {
+      "date": "2019-09-09",
+      "symbol": "6920.T",
+      "sector": "電機精密",
+      "rsr": 100.0,
+      "rank_in_pool": 0,
+      "fwd60d": 45.59,
+      "fwd60_vs_exec_median": 39.3,
+      "ma20_dev_pct": 8.25,
+      "atr_pct": 7.34
+    },
+    {
+      "date": "2023-03-31",
+      "symbol": "6146.T",
+      "sector": "電機精密",
+      "rsr": 92.9,
+      "rank_in_pool": 0,
+      "fwd60d": 45.29,
+      "fwd60_vs_exec_median": 39.0,
+      "ma20_dev_pct": 6.38,
+      "atr_pct": 4.68
+    },
+    {
+      "date": "2020-10-28",
+      "symbol": "6981.T",
+      "sector": "電機精密",
+      "rsr": 87.8,
+      "rank_in_pool": 0,
+      "fwd60d": 44.8,
+      "fwd60_vs_exec_median": 38.51,
+      "ma20_dev_pct": 5.3,
+      "atr_pct": 10.46
+    },
+    {
+      "date": "2021-03-04",
+      "symbol": "9107.T",
+      "sector": "海運",
+      "rsr": 87.8,
+      "rank_in_pool": 0,
+      "fwd60d": 44.71,
+      "fwd60_vs_exec_median": 38.42,
+      "ma20_dev_pct": 8.01,
+      "atr_pct": 40.55
+    },
+    {
+      "date": "2023-12-15",
+      "symbol": "8725.T",
+      "sector": "保険",
+      "rsr": 50.0,
+      "rank_in_pool": 0,
+      "fwd60d": 43.82,
+      "fwd60_vs_exec_median": 37.53,
+      "ma20_dev_pct": -3.04,
+      "atr_pct": 9.64
+    },
+    {
+      "date": "2023-03-02",
+      "symbol": "4055.T",
+      "sector": "情報通信",
+      "rsr": 95.2,
+      "rank_in_pool": 0,
+      "fwd60d": 42.86,
+      "fwd60_vs_exec_median": 36.57,
+      "ma20_dev_pct": 19.56,
+      "atr_pct": 4.24
+    },
+    {
+      "date": "2023-11-08",
+      "symbol": "6920.T",
+      "sector": "電機精密",
+      "rsr": 90.5,
+      "rank_in_pool": 0,
+      "fwd60d": 41.36,
+      "fwd60_vs_exec_median": 35.07,
+      "ma20_dev_pct": 6.71,
+      "atr_pct": 5.56
+    },
+    {
+      "date": "2022-03-17",
+      "symbol": "7013.T",
+      "sector": "機械",
+      "rsr": 88.1,
+      "rank_in_pool": 0,
+      "fwd60d": 41.14,
+      "fwd60_vs_exec_median": 34.85,
+      "ma20_dev_pct": 4.4,
+      "atr_pct": 10.68
+    },
+    {
+      "date": "2021-03-17",
+      "symbol": "9107.T",
+      "sector": "海運",
+      "rsr": 95.1,
+      "rank_in_pool": 0,
+      "fwd60d": 39.59,
+      "fwd60_vs_exec_median": 33.3,
+      "ma20_dev_pct": 20.83,
+      "atr_pct": 36.36
+    },
+    {
+      "date": "2021-03-16",
+      "symbol": "9107.T",
+      "sector": "海運",
+      "rsr": 95.1,
+      "rank_in_pool": 0,
+      "fwd60d": 39.4,
+      "fwd60_vs_exec_median": 33.11,
+      "ma20_dev_pct": 20.95,
+      "atr_pct": 36.51
+    },
+    {
+      "date": "2023-05-09",
+      "symbol": "8058.T",
+      "sector": "商社",
+      "rsr": 81.0,
+      "rank_in_pool": 1,
+      "fwd60d": 39.11,
+      "fwd60_vs_exec_median": 32.82,
+      "ma20_dev_pct": 3.45,
+      "atr_pct": 8.4
+    },
+    {
+      "date": "2023-04-25",
+      "symbol": "5411.T",
+      "sector": "鉄鋼",
+      "rsr": 19.0,
+      "rank_in_pool": 2,
+      "fwd60d": 39.0,
+      "fwd60_vs_exec_median": 32.71,
+      "ma20_dev_pct": -3.31,
+      "atr_pct": 13.51
+    },
+    {
+      "date": "2022-03-01",
+      "symbol": "7011.T",
+      "sector": "機械",
+      "rsr": 83.3,
+      "rank_in_pool": 0,
+      "fwd60d": 38.92,
+      "fwd60_vs_exec_median": 32.63,
+      "ma20_dev_pct": 9.74,
+      "atr_pct": 8.46
+    },
+    {
+      "date": "2023-04-21",
+      "symbol": "6146.T",
+      "sector": "電機精密",
+      "rsr": 97.6,
+      "rank_in_pool": 0,
+      "fwd60d": 38.85,
+      "fwd60_vs_exec_median": 32.56,
+      "ma20_dev_pct": 13.81,
+      "atr_pct": 3.84
+    },
+    {
+      "date": "2023-04-19",
+      "symbol": "8058.T",
+      "sector": "商社",
+      "rsr": 78.6,
+      "rank_in_pool": 1,
+      "fwd60d": 36.88,
+      "fwd60_vs_exec_median": 30.59,
+      "ma20_dev_pct": 5.76,
+      "atr_pct": 8.85
+    },
+    {
+      "date": "2024-07-04",
+      "symbol": "7013.T",
+      "sector": "機械",
+      "rsr": 85.7,
+      "rank_in_pool": 1,
+      "fwd60d": 35.76,
+      "fwd60_vs_exec_median": 29.47,
+      "ma20_dev_pct": 33.17,
+      "atr_pct": 3.67
+    },
+    {
+      "date": "2023-12-14",
+      "symbol": "7203.T",
+      "sector": "輸送機器",
+      "rsr": 45.2,
+      "rank_in_pool": 2,
+      "fwd60d": 35.64,
+      "fwd60_vs_exec_median": 29.35,
+      "ma20_dev_pct": -6.88,
+      "atr_pct": 7.3
+    },
+    {
+      "date": "2023-05-24",
+      "symbol": "6146.T",
+      "sector": "電機精密",
+      "rsr": 100.0,
+      "rank_in_pool": 0,
+      "fwd60d": 35.63,
+      "fwd60_vs_exec_median": 29.34,
+      "ma20_dev_pct": 12.24,
+      "atr_pct": 3.92
+    },
+    {
+      "date": "2023-05-18",
+      "symbol": "6146.T",
+      "sector": "電機精密",
+      "rsr": 100.0,
+      "rank_in_pool": 0,
+      "fwd60d": 35.04,
+      "fwd60_vs_exec_median": 28.75,
+      "ma20_dev_pct": 14.38,
+      "atr_pct": 4.3
+    },
+    {
+      "date": "2023-11-09",
+      "symbol": "8035.T",
+      "sector": "電機精密",
+      "rsr": 81.0,
+      "rank_in_pool": 0,
+      "fwd60d": 34.74,
+      "fwd60_vs_exec_median": 28.45,
+      "ma20_dev_pct": 6.22,
+      "atr_pct": 5.2
+    },
+    {
+      "date": "2023-06-12",
+      "symbol": "7011.T",
+      "sector": "機械",
+      "rsr": 83.3,
+      "rank_in_pool": 2,
+      "fwd60d": 33.75,
+      "fwd60_vs_exec_median": 27.46,
+      "ma20_dev_pct": 11.27,
+      "atr_pct": 4.6
+    },
+    {
+      "date": "2023-04-14",
+      "symbol": "8058.T",
+      "sector": "商社",
+      "rsr": 76.2,
+      "rank_in_pool": 2,
+      "fwd60d": 33.7,
+      "fwd60_vs_exec_median": 27.41,
+      "ma20_dev_pct": 7.17,
+      "atr_pct": 9.15
+    },
+    {
+      "date": "2022-03-01",
+      "symbol": "7013.T",
+      "sector": "機械",
+      "rsr": 81.0,
+      "rank_in_pool": 1,
+      "fwd60d": 33.35,
+      "fwd60_vs_exec_median": 27.06,
+      "ma20_dev_pct": 8.45,
+      "atr_pct": 10.63
+    },
+    {
+      "date": "2020-09-18",
+      "symbol": "6981.T",
+      "sector": "電機精密",
+      "rsr": 85.4,
+      "rank_in_pool": 0,
+      "fwd60d": 31.79,
+      "fwd60_vs_exec_median": 25.5,
+      "ma20_dev_pct": 3.76,
+      "atr_pct": 11.08
+    },
+    {
+      "date": "2023-06-14",
+      "symbol": "7011.T",
+      "sector": "機械",
+      "rsr": 83.3,
+      "rank_in_pool": 2,
+      "fwd60d": 31.52,
+      "fwd60_vs_exec_median": 25.23,
+      "ma20_dev_pct": 12.45,
+      "atr_pct": 4.64
+    },
+    {
+      "date": "2023-05-26",
+      "symbol": "7011.T",
+      "sector": "機械",
+      "rsr": 76.2,
+      "rank_in_pool": 1,
+      "fwd60d": 31.49,
+      "fwd60_vs_exec_median": 25.2,
+      "ma20_dev_pct": 9.73,
+      "atr_pct": 4.35
+    },
+    {
+      "date": "2023-06-09",
+      "symbol": "8015.T",
+      "sector": "商社",
+      "rsr": 83.3,
+      "rank_in_pool": 1,
+      "fwd60d": 31.39,
+      "fwd60_vs_exec_median": 25.1,
+      "ma20_dev_pct": 8.79,
+      "atr_pct": 9.48
+    },
+    {
+      "date": "2024-01-09",
+      "symbol": "6501.T",
+      "sector": "電機",
+      "rsr": 78.6,
+      "rank_in_pool": 0,
+      "fwd60d": 31.18,
+      "fwd60_vs_exec_median": 24.89,
+      "ma20_dev_pct": 5.81,
+      "atr_pct": 3.51
+    },
+    {
+      "date": "2021-01-05",
+      "symbol": "6857.T",
+      "sector": "電機精密",
+      "rsr": 95.1,
+      "rank_in_pool": 0,
+      "fwd60d": 30.73,
+      "fwd60_vs_exec_median": 24.44,
+      "ma20_dev_pct": 7.91,
+      "atr_pct": 6.04
+    },
+    {
+      "date": "2020-11-26",
+      "symbol": "8035.T",
+      "sector": "電機精密",
+      "rsr": 92.7,
+      "rank_in_pool": 0,
+      "fwd60d": 30.57,
+      "fwd60_vs_exec_median": 24.28,
+      "ma20_dev_pct": 13.87,
+      "atr_pct": 13.18
+    },
+    {
+      "date": "2024-01-11",
+      "symbol": "6501.T",
+      "sector": "電機",
+      "rsr": 78.6,
+      "rank_in_pool": 2,
+      "fwd60d": 29.99,
+      "fwd60_vs_exec_median": 23.7,
+      "ma20_dev_pct": 8.88,
+      "atr_pct": 3.67
+    },
+    {
+      "date": "2024-01-15",
+      "symbol": "6501.T",
+      "sector": "電機",
+      "rsr": 78.6,
+      "rank_in_pool": 2,
+      "fwd60d": 29.93,
+      "fwd60_vs_exec_median": 23.64,
+      "ma20_dev_pct": 9.88,
+      "atr_pct": 3.6
+    },
+    {
+      "date": "2019-11-19",
+      "symbol": "6702.T",
+      "sector": "電機",
+      "rsr": 87.8,
+      "rank_in_pool": 0,
+      "fwd60d": 29.27,
+      "fwd60_vs_exec_median": 22.98,
+      "ma20_dev_pct": 4.78,
+      "atr_pct": 8.56
+    }
+  ],
+  "false_negatives_total": 203,
+  "study55_recommend": "RECOMMEND: TOP20% avg_hold=27.8d > BOT20% 9.3d (×1.3): 保有延長で追加利益示唆 / rsr_slope TOP=0.622: exit 判断への組込み余地あり",
+  "study56_recommend": "RECOMMEND: Group A fwd60d=5.17%, WR=63.9% → 早期エントリーで追加アルファ示唆 / rsr_slope が Phase3 Top3 に入る → RSR slope ゲートで早期参入候補絞り込み可能"
+}

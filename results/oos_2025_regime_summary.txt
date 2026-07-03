@@ -1,0 +1,16 @@
+OOS 2025 Regime Summary
+overall_sharpe=1.006
+overall_trade_count=4
+worst_regime=RISING
+worst_regime_sharpe=0.000
+worst_regime_expectancy=0.000
+worst_regime_delta_vs_overall=-1.006
+best_regime=RISING
+best_regime_sharpe=0.000
+usd_jpy_threshold=145.0
+elapsed_total_sec=1.01
+USDJPY data unavailable; YEN_STRONG days set to 0.
+scenario_count=5
+best_sharpe=0.000
+baseline_sharpe=1.006
+rss=129.8 MB

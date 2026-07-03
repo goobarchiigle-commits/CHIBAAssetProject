@@ -1,0 +1,106 @@
+{
+  "period": [
+    "2018-01-01",
+    "2026-06-23"
+  ],
+  "headline": {
+    "A_APRIL_REPRO": {
+      "label": "A_APRIL_REPRO",
+      "cagr": 16.12,
+      "sharpe": 0.781,
+      "max_dd": -15.71,
+      "calmar": 1.026,
+      "profit_factor": 2.277,
+      "avg_exposure": 31.0,
+      "n_trades": 280
+    },
+    "B_CURRENT_PROD": {
+      "label": "B_CURRENT_PROD",
+      "cagr": 10.43,
+      "sharpe": 0.713,
+      "max_dd": -16.27,
+      "calmar": 0.641,
+      "profit_factor": 2.02,
+      "avg_exposure": 23.6,
+      "n_trades": 246
+    },
+    "C_PROD_MINUS_ATR": {
+      "label": "C_PROD_MINUS_ATR",
+      "cagr": 19.75,
+      "sharpe": 0.798,
+      "max_dd": -19.37,
+      "calmar": 1.02,
+      "profit_factor": 2.42,
+      "avg_exposure": 35.2,
+      "n_trades": 220
+    }
+  },
+  "waterfall_existing_sizing": [
+    {
+      "label": "0_APRIL_REPRO",
+      "cagr": 16.12,
+      "sharpe": 0.781,
+      "max_dd": -15.71,
+      "calmar": 1.026,
+      "profit_factor": 2.277,
+      "avg_exposure": 31.0,
+      "n_trades": 280,
+      "delta_cagr_pp": null,
+      "delta_sharpe": null
+    },
+    {
+      "label": "1_+UNIVERSE",
+      "cagr": 16.89,
+      "sharpe": 0.836,
+      "max_dd": -18.25,
+      "calmar": 0.925,
+      "profit_factor": 2.524,
+      "avg_exposure": 30.3,
+      "n_trades": 251,
+      "delta_cagr_pp": 0.77,
+      "delta_sharpe": 0.055
+    },
+    {
+      "label": "2_+ATR_TRAILING",
+      "cagr": 17.19,
+      "sharpe": 0.849,
+      "max_dd": -18.25,
+      "calmar": 0.942,
+      "profit_factor": 2.528,
+      "avg_exposure": 30.4,
+      "n_trades": 255,
+      "delta_cagr_pp": 0.3,
+      "delta_sharpe": 0.013
+    },
+    {
+      "label": "3_+MULTILAYER_RSR",
+      "cagr": 17.19,
+      "sharpe": 0.849,
+      "max_dd": -18.25,
+      "calmar": 0.942,
+      "profit_factor": 2.528,
+      "avg_exposure": 30.4,
+      "n_trades": 255,
+      "delta_cagr_pp": 0.0,
+      "delta_sharpe": 0.0
+    },
+    {
+      "label": "4_+MTF_FILTER",
+      "cagr": 15.63,
+      "sharpe": 0.77,
+      "max_dd": -18.51,
+      "calmar": 0.844,
+      "profit_factor": 2.293,
+      "avg_exposure": 30.4,
+      "n_trades": 242,
+      "delta_cagr_pp": -1.56,
+      "delta_sharpe": -0.079
+    }
+  ],
+  "sizing_mode_correction": {
+    "from": "4_+MTF_FILTER(existing)",
+    "to": "C_PROD_MINUS_ATR(equal)",
+    "delta_cagr_pp": 4.12,
+    "delta_sharpe": 0.028
+  }
+}

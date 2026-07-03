@@ -1,0 +1,21 @@
+{
+  "_meta": {
+    "schema_version": "1.0",
+    "description": "Append-only experiment registry. Never edit manually.",
+    "fields": [
+      "experiment_id",
+      "strategy_id",
+      "runtime_mode",
+      "seed",
+      "git_commit",
+      "config_hash",
+      "dataset_hash",
+      "strategy_hash",
+      "parent_experiment",
+      "result_artifact_hashes",
+      "notes",
+      "created_at"
+    ]
+  },
+  "experiments": {}
+}

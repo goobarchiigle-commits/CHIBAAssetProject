@@ -1,0 +1,36 @@
+{
+  "date": "2026-04-06",
+  "description": "Step 3 動的cap vs 固定cap OOS比較",
+  "2022_oos": {
+    "period": "2022-01-01 to 2022-12-31",
+    "fixed_cap": {
+      "cagr": 2.5,
+      "sharpe": 0.227,
+      "max_dd": -14.6
+    },
+    "dynamic_cap": {
+      "cagr": -1.1,
+      "sharpe": -0.014,
+      "max_dd": -10.7
+    },
+    "avg_symbol_cap_pct": 8.0,
+    "symbol_cap_range": "7.6-8.0%",
+    "note": "MaxDD -14.6→-10.7（-3.9pt改善）。CAGRは-3.6pt悪化。cap自体は8%上限に張り付き、主に集中キャップ有効化の効果。"
+  },
+  "2025_oos": {
+    "period": "2025-01-01 to 2025-03-31",
+    "fixed_cap": {
+      "cagr": 16.0,
+      "sharpe": 2.203,
+      "max_dd": -1.3
+    },
+    "dynamic_cap": {
+      "cagr": 12.7,
+      "sharpe": 2.011,
+      "max_dd": -1.4
+    },
+    "avg_symbol_cap_pct": 8.0,
+    "symbol_cap_range": "6.9-8.0%",
+    "note": "MaxDD同等（-1.3→-1.4）。CAGRは-3.3pt。高ボラ期（2025/1）でも cap は8%上限に張り付き。"
+  }
+}

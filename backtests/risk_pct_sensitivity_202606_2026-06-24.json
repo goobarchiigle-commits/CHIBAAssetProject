@@ -1,0 +1,110 @@
+[
+  {
+    "risk_pct": 0.005,
+    "cagr": 5.82,
+    "sharpe": 0.597,
+    "max_dd": -14.64,
+    "calmar": 0.398,
+    "profit_factor": 1.675,
+    "n_trades": 251,
+    "avg_exposure": 17.6,
+    "win_rate": 56.2,
+    "avg_simultaneous_holdings": 2.29
+  },
+  {
+    "risk_pct": 0.0075,
+    "cagr": 7.53,
+    "sharpe": 0.594,
+    "max_dd": -14.36,
+    "calmar": 0.525,
+    "profit_factor": 1.781,
+    "n_trades": 248,
+    "avg_exposure": 21.2,
+    "win_rate": 56.5,
+    "avg_simultaneous_holdings": 2.26
+  },
+  {
+    "risk_pct": 0.01,
+    "cagr": 9.33,
+    "sharpe": 0.685,
+    "max_dd": -16.05,
+    "calmar": 0.581,
+    "profit_factor": 1.959,
+    "n_trades": 242,
+    "avg_exposure": 22.6,
+    "win_rate": 57.4,
+    "avg_simultaneous_holdings": 2.24
+  },
+  {
+    "risk_pct": 0.0125,
+    "cagr": 10.43,
+    "sharpe": 0.713,
+    "max_dd": -16.27,
+    "calmar": 0.641,
+    "profit_factor": 2.02,
+    "n_trades": 246,
+    "avg_exposure": 23.6,
+    "win_rate": 56.5,
+    "avg_simultaneous_holdings": 2.25
+  },
+  {
+    "risk_pct": 0.015,
+    "cagr": 10.87,
+    "sharpe": 0.71,
+    "max_dd": -17.62,
+    "calmar": 0.617,
+    "profit_factor": 2.005,
+    "n_trades": 246,
+    "avg_exposure": 25.2,
+    "win_rate": 56.5,
+    "avg_simultaneous_holdings": 2.25
+  },
+  {
+    "risk_pct": 0.0175,
+    "cagr": 11.96,
+    "sharpe": 0.753,
+    "max_dd": -17.84,
+    "calmar": 0.67,
+    "profit_factor": 2.125,
+    "n_trades": 247,
+    "avg_exposure": 25.6,
+    "win_rate": 57.9,
+    "avg_simultaneous_holdings": 2.25
+  },
+  {
+    "risk_pct": 0.02,
+    "cagr": 12.77,
+    "sharpe": 0.786,
+    "max_dd": -18.05,
+    "calmar": 0.707,
+    "profit_factor": 2.189,
+    "n_trades": 245,
+    "avg_exposure": 26.2,
+    "win_rate": 58.0,
+    "avg_simultaneous_holdings": 2.25
+  },
+  {
+    "risk_pct": 0.025,
+    "cagr": 13.9,
+    "sharpe": 0.831,
+    "max_dd": -17.82,
+    "calmar": 0.78,
+    "profit_factor": 2.292,
+    "n_trades": 244,
+    "avg_exposure": 26.8,
+    "win_rate": 57.4,
+    "avg_simultaneous_holdings": 2.24
+  },
+  {
+    "risk_pct": 0.03,
+    "cagr": 13.84,
+    "sharpe": 0.784,
+    "max_dd": -18.26,
+    "calmar": 0.758,
+    "profit_factor": 2.241,
+    "n_trades": 243,
+    "avg_exposure": 27.4,
+    "win_rate": 57.2,
+    "avg_simultaneous_holdings": 2.22
+  }
+]

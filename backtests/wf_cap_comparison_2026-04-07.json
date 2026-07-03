@@ -1,0 +1,209 @@
+{
+  "run_at": "2026-04-07T08:11:25",
+  "patterns": [
+    {
+      "pattern": "A_fixed_only",
+      "cluster_cap": 1.0,
+      "bear_sector_cap": 0.25,
+      "bear_cluster_cap": 1.0,
+      "wf_wins": 4,
+      "seg_results": [
+        {
+          "seg": 1,
+          "oos_year": "2020",
+          "is_sharpe": 0,
+          "oos_sharpe": 1.334,
+          "oos_max_dd": -4.64,
+          "win": true
+        },
+        {
+          "seg": 2,
+          "oos_year": "2021",
+          "is_sharpe": 1.334,
+          "oos_sharpe": 0.084,
+          "oos_max_dd": -11.43,
+          "win": true
+        },
+        {
+          "seg": 3,
+          "oos_year": "2022",
+          "is_sharpe": 0.642,
+          "oos_sharpe": -0.02,
+          "oos_max_dd": -13.02,
+          "win": false
+        },
+        {
+          "seg": 4,
+          "oos_year": "2023",
+          "is_sharpe": 0.371,
+          "oos_sharpe": 1.069,
+          "oos_max_dd": -7.62,
+          "win": true
+        },
+        {
+          "seg": 5,
+          "oos_year": "2024",
+          "is_sharpe": 0.528,
+          "oos_sharpe": 0.494,
+          "oos_max_dd": -9.61,
+          "win": true
+        }
+      ],
+      "full_is": {
+        "cagr": 9.22,
+        "sharpe": 0.724,
+        "max_dd": -10.76
+      },
+      "oos_2022": {
+        "max_dd": -13.02,
+        "sharpe": -0.02
+      },
+      "oos_2025": {
+        "cagr": 12.27,
+        "sharpe": 1.612,
+        "max_dd": -3.72
+      },
+      "cluster_dd_contribution": {
+        "cyclical_macro": 68.2,
+        "growth_tech": 29.8,
+        "defensive": 1.9
+      }
+    },
+    {
+      "pattern": "B_cluster35",
+      "cluster_cap": 0.35,
+      "bear_sector_cap": 0.25,
+      "bear_cluster_cap": 0.35,
+      "wf_wins": 4,
+      "seg_results": [
+        {
+          "seg": 1,
+          "oos_year": "2020",
+          "is_sharpe": 0,
+          "oos_sharpe": 1.334,
+          "oos_max_dd": -4.64,
+          "win": true
+        },
+        {
+          "seg": 2,
+          "oos_year": "2021",
+          "is_sharpe": 1.334,
+          "oos_sharpe": 0.084,
+          "oos_max_dd": -11.43,
+          "win": true
+        },
+        {
+          "seg": 3,
+          "oos_year": "2022",
+          "is_sharpe": 0.642,
+          "oos_sharpe": -0.035,
+          "oos_max_dd": -13.02,
+          "win": false
+        },
+        {
+          "seg": 4,
+          "oos_year": "2023",
+          "is_sharpe": 0.377,
+          "oos_sharpe": 1.069,
+          "oos_max_dd": -7.62,
+          "win": true
+        },
+        {
+          "seg": 5,
+          "oos_year": "2024",
+          "is_sharpe": 0.539,
+          "oos_sharpe": 0.463,
+          "oos_max_dd": -9.61,
+          "win": true
+        }
+      ],
+      "full_is": {
+        "cagr": 9.14,
+        "sharpe": 0.728,
+        "max_dd": -10.76
+      },
+      "oos_2022": {
+        "max_dd": -13.02,
+        "sharpe": -0.035
+      },
+      "oos_2025": {
+        "cagr": 12.27,
+        "sharpe": 1.612,
+        "max_dd": -3.72
+      },
+      "cluster_dd_contribution": {
+        "cyclical_macro": 68.2,
+        "growth_tech": 29.8,
+        "defensive": 1.9
+      }
+    },
+    {
+      "pattern": "C_bear_adaptive",
+      "cluster_cap": 0.35,
+      "bear_sector_cap": 0.18,
+      "bear_cluster_cap": 0.25,
+      "wf_wins": 4,
+      "seg_results": [
+        {
+          "seg": 1,
+          "oos_year": "2020",
+          "is_sharpe": 0,
+          "oos_sharpe": 1.334,
+          "oos_max_dd": -4.64,
+          "win": true
+        },
+        {
+          "seg": 2,
+          "oos_year": "2021",
+          "is_sharpe": 1.334,
+          "oos_sharpe": 0.084,
+          "oos_max_dd": -11.43,
+          "win": true
+        },
+        {
+          "seg": 3,
+          "oos_year": "2022",
+          "is_sharpe": 0.642,
+          "oos_sharpe": -0.035,
+          "oos_max_dd": -13.02,
+          "win": false
+        },
+        {
+          "seg": 4,
+          "oos_year": "2023",
+          "is_sharpe": 0.377,
+          "oos_sharpe": 1.069,
+          "oos_max_dd": -7.62,
+          "win": true
+        },
+        {
+          "seg": 5,
+          "oos_year": "2024",
+          "is_sharpe": 0.534,
+          "oos_sharpe": 0.368,
+          "oos_max_dd": -9.61,
+          "win": true
+        }
+      ],
+      "full_is": {
+        "cagr": 8.88,
+        "sharpe": 0.711,
+        "max_dd": -10.76
+      },
+      "oos_2022": {
+        "max_dd": -13.02,
+        "sharpe": -0.035
+      },
+      "oos_2025": {
+        "cagr": 12.27,
+        "sharpe": 1.612,
+        "max_dd": -3.72
+      },
+      "cluster_dd_contribution": {
+        "cyclical_macro": 68.2,
+        "growth_tech": 29.8,
+        "defensive": 1.9
+      }
+    }
+  ]
+}

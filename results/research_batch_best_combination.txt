@@ -1,0 +1,5 @@
+Best Combination Candidate
+filter=baseline
+exit_tuning=atr_mult=2.5
+worst_regime_to_watch=RISING
+candidate_note=Use the best filter-ablation winner, apply the best single exit tweak, and monitor the worst regime first.

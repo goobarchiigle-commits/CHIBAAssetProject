@@ -1,0 +1,269 @@
+{
+  "pattern_A": {
+    "IS": {
+      "cagr": 18.12,
+      "sharpe": 0.779,
+      "sortino": 1.001,
+      "max_dd": -16.66,
+      "calmar": 1.087,
+      "profit_factor": 2.408,
+      "win_rate": 56.0,
+      "avg_win_pct": 8.0,
+      "avg_lose_pct": -4.35,
+      "r_multiple": 1.84,
+      "n_trades": 207,
+      "n_trades_yr": 48.4,
+      "avg_hold_days": 11.8,
+      "avg_exposure": 35.0,
+      "idle_cash": 65.0,
+      "turnover_yr": 6.98,
+      "annual_returns": {
+        "2020": 7.83,
+        "2021": 15.76,
+        "2022": 17.62,
+        "2023": 23.37,
+        "2024": 11.08
+      },
+      "eq_final": 6112784.0,
+      "exit_reasons": {
+        "STRATEGY_EXIT": 96,
+        "RSR_EXIT": 105,
+        "TIME_STOP": 4,
+        "MARKET_SHOCK_EXIT": 2
+      },
+      "rotation_count": 0,
+      "missed_signals": 371,
+      "blocked_gross": 22
+    },
+    "OOS": {
+      "cagr": 9.99,
+      "sharpe": 1.007,
+      "sortino": 1.133,
+      "max_dd": -10.11,
+      "calmar": 0.988,
+      "profit_factor": 2.005,
+      "win_rate": 64.4,
+      "avg_win_pct": 4.49,
+      "avg_lose_pct": -3.8,
+      "r_multiple": 1.18,
+      "n_trades": 45,
+      "n_trades_yr": 46.7,
+      "avg_hold_days": 7.1,
+      "avg_exposure": 27.8,
+      "idle_cash": 72.2,
+      "turnover_yr": 8.61,
+      "annual_returns": {
+        "2025": 9.62
+      },
+      "eq_final": 3288457.0,
+      "exit_reasons": {
+        "RSR_EXIT": 24,
+        "STRATEGY_EXIT": 20,
+        "MARKET_SHOCK_EXIT": 1
+      },
+      "rotation_count": 0,
+      "missed_signals": 23,
+      "blocked_gross": 3
+    }
+  },
+  "pattern_B": {
+    "IS": {
+      "cagr": 4.13,
+      "sharpe": 0.289,
+      "sortino": 0.27,
+      "max_dd": -29.23,
+      "calmar": 0.141,
+      "profit_factor": 1.333,
+      "win_rate": 53.9,
+      "avg_win_pct": 6.35,
+      "avg_lose_pct": -4.87,
+      "r_multiple": 1.3,
+      "n_trades": 102,
+      "n_trades_yr": 23.9,
+      "avg_hold_days": 10.6,
+      "avg_exposure": 31.5,
+      "idle_cash": 68.5,
+      "turnover_yr": 7.37,
+      "annual_returns": {
+        "2020": 4.03,
+        "2021": 16.42,
+        "2022": -7.21,
+        "2023": 8.69,
+        "2024": -2.8
+      },
+      "eq_final": 3565860.0,
+      "exit_reasons": {
+        "STRATEGY_EXIT": 44,
+        "RSR_EXIT": 41,
+        "MARKET_SHOCK_EXIT": 3
+      },
+      "rotation_count": 14,
+      "missed_signals": 0,
+      "blocked_gross": 6
+    },
+    "OOS": {
+      "cagr": 23.71,
+      "sharpe": 1.36,
+      "sortino": 1.631,
+      "max_dd": -14.04,
+      "calmar": 1.688,
+      "profit_factor": 2.287,
+      "win_rate": 64.3,
+      "avg_win_pct": 5.63,
+      "avg_lose_pct": -4.43,
+      "r_multiple": 1.27,
+      "n_trades": 42,
+      "n_trades_yr": 43.6,
+      "avg_hold_days": 8.4,
+      "avg_exposure": 48.4,
+      "idle_cash": 51.6,
+      "turnover_yr": 12.58,
+      "annual_returns": {
+        "2025": 22.77
+      },
+      "eq_final": 3683064.0,
+      "exit_reasons": {
+        "RSR_EXIT": 18,
+        "STRATEGY_EXIT": 20,
+        "MARKET_SHOCK_EXIT": 1
+      },
+      "rotation_count": 3,
+      "missed_signals": 0,
+      "blocked_gross": 3
+    }
+  },
+  "pattern_C": {
+    "IS": {
+      "cagr": 21.01,
+      "sharpe": 0.631,
+      "sortino": 0.806,
+      "max_dd": -29.98,
+      "calmar": 0.701,
+      "profit_factor": 1.963,
+      "win_rate": 55.3,
+      "avg_win_pct": 7.13,
+      "avg_lose_pct": -4.65,
+      "r_multiple": 1.53,
+      "n_trades": 170,
+      "n_trades_yr": 39.8,
+      "avg_hold_days": 11.0,
+      "avg_exposure": 58.6,
+      "idle_cash": 41.4,
+      "turnover_yr": 11.19,
+      "annual_returns": {
+        "2020": -0.55,
+        "2021": 12.48,
+        "2022": 34.23,
+        "2023": 43.55,
+        "2024": 1.97
+      },
+      "eq_final": 6778197.0,
+      "exit_reasons": {
+        "STRATEGY_EXIT": 71,
+        "RSR_EXIT": 62,
+        "TIME_STOP": 3,
+        "MARKET_SHOCK_EXIT": 2
+      },
+      "rotation_count": 32,
+      "missed_signals": 0,
+      "blocked_gross": 23
+    },
+    "OOS": {
+      "cagr": 10.18,
+      "sharpe": 0.556,
+      "sortino": 0.587,
+      "max_dd": -15.95,
+      "calmar": 0.638,
+      "profit_factor": 1.587,
+      "win_rate": 59.0,
+      "avg_win_pct": 4.62,
+      "avg_lose_pct": -4.27,
+      "r_multiple": 1.08,
+      "n_trades": 39,
+      "n_trades_yr": 40.4,
+      "avg_hold_days": 6.9,
+      "avg_exposure": 48.0,
+      "idle_cash": 52.0,
+      "turnover_yr": 12.08,
+      "annual_returns": {
+        "2025": 9.8
+      },
+      "eq_final": 3293889.0,
+      "exit_reasons": {
+        "STRATEGY_EXIT": 15,
+        "RSR_EXIT": 16,
+        "MARKET_SHOCK_EXIT": 2
+      },
+      "rotation_count": 6,
+      "missed_signals": 0,
+      "blocked_gross": 7
+    }
+  },
+  "pattern_D": {
+    "IS": {
+      "cagr": 9.66,
+      "sharpe": 0.431,
+      "sortino": 0.478,
+      "max_dd": -40.14,
+      "calmar": 0.241,
+      "profit_factor": 1.524,
+      "win_rate": 50.0,
+      "avg_win_pct": 6.82,
+      "avg_lose_pct": -3.93,
+      "r_multiple": 1.73,
+      "n_trades": 124,
+      "n_trades_yr": 29.0,
+      "avg_hold_days": 11.8,
+      "avg_exposure": 54.2,
+      "idle_cash": 45.8,
+      "turnover_yr": 10.57,
+      "annual_returns": {
+        "2020": -3.9,
+        "2021": 31.09,
+        "2022": 7.63,
+        "2023": 6.65,
+        "2024": -1.22
+      },
+      "eq_final": 4449451.0,
+      "exit_reasons": {
+        "STRATEGY_EXIT": 54,
+        "RSR_EXIT": 67,
+        "TIME_STOP": 1,
+        "MARKET_SHOCK_EXIT": 2
+      },
+      "rotation_count": 0,
+      "missed_signals": 101,
+      "blocked_gross": 56
+    },
+    "OOS": {
+      "cagr": -13.75,
+      "sharpe": -0.763,
+      "sortino": -0.448,
+      "max_dd": -20.7,
+      "calmar": -0.664,
+      "profit_factor": 0.539,
+      "win_rate": 30.0,
+      "avg_win_pct": 6.92,
+      "avg_lose_pct": -5.58,
+      "r_multiple": 1.24,
+      "n_trades": 10,
+      "n_trades_yr": 10.4,
+      "avg_hold_days": 6.8,
+      "avg_exposure": 20.0,
+      "idle_cash": 80.0,
+      "turnover_yr": 5.12,
+      "annual_returns": {
+        "2025": -13.3
+      },
+      "eq_final": 2601085.0,
+      "exit_reasons": {
+        "STRATEGY_EXIT": 4,
+        "RSR_EXIT": 5,
+        "MARKET_SHOCK_EXIT": 1
+      },
+      "rotation_count": 0,
+      "missed_signals": 3,
+      "blocked_gross": 10
+    }
+  }
+}

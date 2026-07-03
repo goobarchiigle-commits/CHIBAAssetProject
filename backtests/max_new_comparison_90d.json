@@ -1,0 +1,44 @@
+{
+  "period": [
+    "2024-08-01",
+    "2024-12-31"
+  ],
+  "results": {
+    "base_no_limit": {
+      "cagr": 48.48,
+      "pf": 9.955,
+      "wr": 61.5,
+      "max_dd": -6.64,
+      "n_buys": 16,
+      "n_entry_days": 16,
+      "multi_entry_days": 0,
+      "same_sector_events": 0,
+      "top_sector": "海運",
+      "top_sector_pct": 18.8
+    },
+    "mx1_live_proxy": {
+      "cagr": 48.48,
+      "pf": 9.955,
+      "wr": 61.5,
+      "max_dd": -6.64,
+      "n_buys": 16,
+      "n_entry_days": 16,
+      "multi_entry_days": 0,
+      "same_sector_events": 0,
+      "top_sector": "海運",
+      "top_sector_pct": 18.8
+    },
+    "mx2_candidate": {
+      "cagr": 48.48,
+      "pf": 9.955,
+      "wr": 61.5,
+      "max_dd": -6.64,
+      "n_buys": 16,
+      "n_entry_days": 16,
+      "multi_entry_days": 0,
+      "same_sector_events": 0,
+      "top_sector": "海運",
+      "top_sector_pct": 18.8
+    }
+  }
+}

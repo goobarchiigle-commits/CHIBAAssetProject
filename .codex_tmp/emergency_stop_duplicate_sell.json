@@ -1,0 +1,14 @@
+{
+  "date": "2026-07-03",
+  "orders": {
+    "2026-07-03_7203.T_SELL": {
+      "symbol": "7203.T",
+      "side": "SELL",
+      "qty": 100,
+      "price": 0.0,
+      "recorded_at": "2026-07-03",
+      "execution_status": "pending"
+    }
+  },
+  "count": 1
+}

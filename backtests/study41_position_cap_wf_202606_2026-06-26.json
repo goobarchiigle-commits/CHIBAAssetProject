@@ -1,0 +1,1307 @@
+{
+  "study": "Study41_Position_Cap_Equity_Linked_WF",
+  "date": "2026-06-26",
+  "capital": 3000000,
+  "min_hold": 3,
+  "params": {
+    "eq_linked_step": 0.1,
+    "eq_linked_max": 5,
+    "vol_calm_threshold": 0.008,
+    "vol_calm_days_pct": 21.3
+  },
+  "baseline_summary": {
+    "wf_pass_count": 4,
+    "avg_oos_cagr": 16.96,
+    "seg3_2022_oos_cagr": -5.6,
+    "worst_oos_dd": -20.93,
+    "full_is_2018_2024": {
+      "cagr": 19.37,
+      "sharpe": 0.855,
+      "max_dd": -18.25,
+      "calmar": 1.062,
+      "n_trades": 199,
+      "sortino": 1.09,
+      "profit_factor": 2.426
+    },
+    "true_oos_2025": {
+      "cagr": 8.5,
+      "sharpe": 0.953,
+      "max_dd": -8.07,
+      "calmar": 1.054,
+      "n_trades": 44,
+      "sortino": 1.058,
+      "profit_factor": 1.858
+    }
+  },
+  "case_results": {
+    "A_CONTROL": {
+      "wf_segments": [
+        {
+          "seg": 1,
+          "oos_year": "2020",
+          "is_sharpe": 0.0,
+          "oos_sharpe": 0.611,
+          "oos_cagr": 15.66,
+          "oos_max_dd": -11.41,
+          "oos_calmar": 1.373,
+          "oos_is_ratio": null,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 56.5,
+            "days_at_max_positions": 64,
+            "cap_saturation_rate_pct": 66.0,
+            "missed_by_cap_count": 24,
+            "avg_exposure": 44.8,
+            "avg_simultaneous_holdings": 2.41
+          }
+        },
+        {
+          "seg": 2,
+          "oos_year": "2021",
+          "is_sharpe": 0.611,
+          "oos_sharpe": 0.346,
+          "oos_cagr": 6.08,
+          "oos_max_dd": -20.6,
+          "oos_calmar": 0.295,
+          "oos_is_ratio": 0.566,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 56.1,
+            "days_at_max_positions": 183,
+            "cap_saturation_rate_pct": 74.7,
+            "missed_by_cap_count": 100,
+            "avg_exposure": 47.9,
+            "avg_simultaneous_holdings": 2.67
+          }
+        },
+        {
+          "seg": 3,
+          "oos_year": "2022",
+          "is_sharpe": 0.596,
+          "oos_sharpe": -0.046,
+          "oos_cagr": -5.6,
+          "oos_max_dd": -20.93,
+          "oos_calmar": -0.268,
+          "oos_is_ratio": -0.077,
+          "wf_pass": false,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 46.7,
+            "days_at_max_positions": 156,
+            "cap_saturation_rate_pct": 63.9,
+            "missed_by_cap_count": 70,
+            "avg_exposure": 49.8,
+            "avg_simultaneous_holdings": 2.43
+          }
+        },
+        {
+          "seg": 4,
+          "oos_year": "2023",
+          "is_sharpe": 0.504,
+          "oos_sharpe": 1.638,
+          "oos_cagr": 37.59,
+          "oos_max_dd": -9.17,
+          "oos_calmar": 4.098,
+          "oos_is_ratio": 3.25,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 65.4,
+            "days_at_max_positions": 145,
+            "cap_saturation_rate_pct": 58.9,
+            "missed_by_cap_count": 120,
+            "avg_exposure": 45.1,
+            "avg_simultaneous_holdings": 2.37
+          }
+        },
+        {
+          "seg": 5,
+          "oos_year": "2024",
+          "is_sharpe": 0.724,
+          "oos_sharpe": 1.623,
+          "oos_cagr": 31.08,
+          "oos_max_dd": -14.72,
+          "oos_calmar": 2.112,
+          "oos_is_ratio": 2.242,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 68.3,
+            "days_at_max_positions": 98,
+            "cap_saturation_rate_pct": 40.0,
+            "missed_by_cap_count": 71,
+            "avg_exposure": 41.8,
+            "avg_simultaneous_holdings": 2.11
+          }
+        }
+      ],
+      "true_oos_2025": {
+        "cagr": 8.5,
+        "sharpe": 0.953,
+        "max_dd": -8.07,
+        "calmar": 1.054,
+        "n_trades": 44,
+        "sortino": 1.058,
+        "profit_factor": 1.858
+      },
+      "true_oos_util": {
+        "avg_idle_cash_ratio_pct": 72.2,
+        "days_at_max_positions": 59,
+        "cap_saturation_rate_pct": 24.3,
+        "missed_by_cap_count": 20,
+        "avg_exposure": 29.4,
+        "avg_simultaneous_holdings": 1.62
+      },
+      "full_is_2018_2024": {
+        "cagr": 19.37,
+        "sharpe": 0.855,
+        "max_dd": -18.25,
+        "calmar": 1.062,
+        "n_trades": 199,
+        "sortino": 1.09,
+        "profit_factor": 2.426
+      },
+      "full_is_util": {
+        "avg_idle_cash_ratio_pct": 100.6,
+        "days_at_max_positions": 649,
+        "cap_saturation_rate_pct": 60.3,
+        "missed_by_cap_count": 383,
+        "avg_exposure": 34.9,
+        "avg_simultaneous_holdings": 2.42
+      },
+      "missed_fwd20d": {
+        "avg_fwd_ret_pct": 3.37,
+        "n": 385,
+        "pct_positive": 63.6
+      },
+      "missed_fwd60d": {
+        "avg_fwd_ret_pct": 8.85,
+        "n": 385,
+        "pct_positive": 67.5
+      },
+      "missed_cands_total": 385
+    },
+    "B_EQUITY_LINKED": {
+      "wf_segments": [
+        {
+          "seg": 1,
+          "oos_year": "2020",
+          "is_sharpe": 0.0,
+          "oos_sharpe": 0.729,
+          "oos_cagr": 22.89,
+          "oos_max_dd": -16.37,
+          "oos_calmar": 1.398,
+          "oos_is_ratio": null,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 51.1,
+            "days_at_max_positions": 71,
+            "cap_saturation_rate_pct": 73.2,
+            "missed_by_cap_count": 20,
+            "avg_exposure": 49.1,
+            "avg_simultaneous_holdings": 2.64
+          }
+        },
+        {
+          "seg": 2,
+          "oos_year": "2021",
+          "is_sharpe": 0.729,
+          "oos_sharpe": 0.174,
+          "oos_cagr": -1.54,
+          "oos_max_dd": -22.48,
+          "oos_calmar": -0.069,
+          "oos_is_ratio": 0.239,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 50.6,
+            "days_at_max_positions": 158,
+            "cap_saturation_rate_pct": 64.5,
+            "missed_by_cap_count": 88,
+            "avg_exposure": 51.8,
+            "avg_simultaneous_holdings": 2.92
+          }
+        },
+        {
+          "seg": 3,
+          "oos_year": "2022",
+          "is_sharpe": 0.608,
+          "oos_sharpe": -0.046,
+          "oos_cagr": -5.6,
+          "oos_max_dd": -20.93,
+          "oos_calmar": -0.268,
+          "oos_is_ratio": -0.076,
+          "wf_pass": false,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 46.7,
+            "days_at_max_positions": 156,
+            "cap_saturation_rate_pct": 63.9,
+            "missed_by_cap_count": 70,
+            "avg_exposure": 49.8,
+            "avg_simultaneous_holdings": 2.43
+          }
+        },
+        {
+          "seg": 4,
+          "oos_year": "2023",
+          "is_sharpe": 0.369,
+          "oos_sharpe": 1.788,
+          "oos_cagr": 46.71,
+          "oos_max_dd": -9.17,
+          "oos_calmar": 5.093,
+          "oos_is_ratio": 4.846,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 62.3,
+            "days_at_max_positions": 95,
+            "cap_saturation_rate_pct": 38.6,
+            "missed_by_cap_count": 86,
+            "avg_exposure": 49.5,
+            "avg_simultaneous_holdings": 2.72
+          }
+        },
+        {
+          "seg": 5,
+          "oos_year": "2024",
+          "is_sharpe": 0.819,
+          "oos_sharpe": 1.3,
+          "oos_cagr": 25.43,
+          "oos_max_dd": -16.43,
+          "oos_calmar": 1.548,
+          "oos_is_ratio": 1.587,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 63.6,
+            "days_at_max_positions": 61,
+            "cap_saturation_rate_pct": 24.9,
+            "missed_by_cap_count": 49,
+            "avg_exposure": 44.8,
+            "avg_simultaneous_holdings": 2.35
+          }
+        }
+      ],
+      "true_oos_2025": {
+        "cagr": 7.44,
+        "sharpe": 0.832,
+        "max_dd": -8.07,
+        "calmar": 0.923,
+        "n_trades": 45,
+        "sortino": 0.914,
+        "profit_factor": 1.722
+      },
+      "true_oos_util": {
+        "avg_idle_cash_ratio_pct": 71.9,
+        "days_at_max_positions": 59,
+        "cap_saturation_rate_pct": 24.3,
+        "missed_by_cap_count": 19,
+        "avg_exposure": 29.6,
+        "avg_simultaneous_holdings": 1.63
+      },
+      "full_is_2018_2024": {
+        "cagr": 21.6,
+        "sharpe": 0.849,
+        "max_dd": -19.62,
+        "calmar": 1.101,
+        "n_trades": 262,
+        "sortino": 1.064,
+        "profit_factor": 2.416
+      },
+      "full_is_util": {
+        "avg_idle_cash_ratio_pct": 94.4,
+        "days_at_max_positions": 275,
+        "cap_saturation_rate_pct": 25.5,
+        "missed_by_cap_count": 150,
+        "avg_exposure": 41.5,
+        "avg_simultaneous_holdings": 2.96
+      },
+      "missed_fwd20d": {
+        "avg_fwd_ret_pct": 3.93,
+        "n": 313,
+        "pct_positive": 66.5
+      },
+      "missed_fwd60d": {
+        "avg_fwd_ret_pct": 10.63,
+        "n": 313,
+        "pct_positive": 71.2
+      },
+      "missed_cands_total": 313
+    },
+    "C_3": {
+      "wf_segments": [
+        {
+          "seg": 1,
+          "oos_year": "2020",
+          "is_sharpe": 0.0,
+          "oos_sharpe": 0.611,
+          "oos_cagr": 15.66,
+          "oos_max_dd": -11.41,
+          "oos_calmar": 1.373,
+          "oos_is_ratio": null,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 56.5,
+            "days_at_max_positions": 64,
+            "cap_saturation_rate_pct": 66.0,
+            "missed_by_cap_count": 24,
+            "avg_exposure": 44.8,
+            "avg_simultaneous_holdings": 2.41
+          }
+        },
+        {
+          "seg": 2,
+          "oos_year": "2021",
+          "is_sharpe": 0.611,
+          "oos_sharpe": 0.346,
+          "oos_cagr": 6.08,
+          "oos_max_dd": -20.6,
+          "oos_calmar": 0.295,
+          "oos_is_ratio": 0.566,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 56.1,
+            "days_at_max_positions": 183,
+            "cap_saturation_rate_pct": 74.7,
+            "missed_by_cap_count": 100,
+            "avg_exposure": 47.9,
+            "avg_simultaneous_holdings": 2.67
+          }
+        },
+        {
+          "seg": 3,
+          "oos_year": "2022",
+          "is_sharpe": 0.596,
+          "oos_sharpe": -0.046,
+          "oos_cagr": -5.6,
+          "oos_max_dd": -20.93,
+          "oos_calmar": -0.268,
+          "oos_is_ratio": -0.077,
+          "wf_pass": false,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 46.7,
+            "days_at_max_positions": 156,
+            "cap_saturation_rate_pct": 63.9,
+            "missed_by_cap_count": 70,
+            "avg_exposure": 49.8,
+            "avg_simultaneous_holdings": 2.43
+          }
+        },
+        {
+          "seg": 4,
+          "oos_year": "2023",
+          "is_sharpe": 0.504,
+          "oos_sharpe": 1.638,
+          "oos_cagr": 37.59,
+          "oos_max_dd": -9.17,
+          "oos_calmar": 4.098,
+          "oos_is_ratio": 3.25,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 65.4,
+            "days_at_max_positions": 145,
+            "cap_saturation_rate_pct": 58.9,
+            "missed_by_cap_count": 120,
+            "avg_exposure": 45.1,
+            "avg_simultaneous_holdings": 2.37
+          }
+        },
+        {
+          "seg": 5,
+          "oos_year": "2024",
+          "is_sharpe": 0.724,
+          "oos_sharpe": 1.623,
+          "oos_cagr": 31.08,
+          "oos_max_dd": -14.72,
+          "oos_calmar": 2.112,
+          "oos_is_ratio": 2.242,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 68.3,
+            "days_at_max_positions": 98,
+            "cap_saturation_rate_pct": 40.0,
+            "missed_by_cap_count": 71,
+            "avg_exposure": 41.8,
+            "avg_simultaneous_holdings": 2.11
+          }
+        }
+      ],
+      "true_oos_2025": {
+        "cagr": 8.5,
+        "sharpe": 0.953,
+        "max_dd": -8.07,
+        "calmar": 1.054,
+        "n_trades": 44,
+        "sortino": 1.058,
+        "profit_factor": 1.858
+      },
+      "true_oos_util": {
+        "avg_idle_cash_ratio_pct": 72.2,
+        "days_at_max_positions": 59,
+        "cap_saturation_rate_pct": 24.3,
+        "missed_by_cap_count": 20,
+        "avg_exposure": 29.4,
+        "avg_simultaneous_holdings": 1.62
+      },
+      "full_is_2018_2024": {
+        "cagr": 19.37,
+        "sharpe": 0.855,
+        "max_dd": -18.25,
+        "calmar": 1.062,
+        "n_trades": 199,
+        "sortino": 1.09,
+        "profit_factor": 2.426
+      },
+      "full_is_util": {
+        "avg_idle_cash_ratio_pct": 100.6,
+        "days_at_max_positions": 649,
+        "cap_saturation_rate_pct": 60.3,
+        "missed_by_cap_count": 383,
+        "avg_exposure": 34.9,
+        "avg_simultaneous_holdings": 2.42
+      },
+      "missed_fwd20d": {
+        "avg_fwd_ret_pct": 3.37,
+        "n": 385,
+        "pct_positive": 63.6
+      },
+      "missed_fwd60d": {
+        "avg_fwd_ret_pct": 8.85,
+        "n": 385,
+        "pct_positive": 67.5
+      },
+      "missed_cands_total": 385
+    },
+    "C_4": {
+      "wf_segments": [
+        {
+          "seg": 1,
+          "oos_year": "2020",
+          "is_sharpe": 0.0,
+          "oos_sharpe": 0.757,
+          "oos_cagr": 24.82,
+          "oos_max_dd": -15.48,
+          "oos_calmar": 1.603,
+          "oos_is_ratio": null,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 48.9,
+            "days_at_max_positions": 16,
+            "cap_saturation_rate_pct": 16.5,
+            "missed_by_cap_count": 8,
+            "avg_exposure": 51.5,
+            "avg_simultaneous_holdings": 2.76
+          }
+        },
+        {
+          "seg": 2,
+          "oos_year": "2021",
+          "is_sharpe": 0.757,
+          "oos_sharpe": 0.242,
+          "oos_cagr": 0.83,
+          "oos_max_dd": -23.09,
+          "oos_calmar": 0.036,
+          "oos_is_ratio": 0.32,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 48.2,
+            "days_at_max_positions": 133,
+            "cap_saturation_rate_pct": 54.3,
+            "missed_by_cap_count": 68,
+            "avg_exposure": 55.1,
+            "avg_simultaneous_holdings": 3.34
+          }
+        },
+        {
+          "seg": 3,
+          "oos_year": "2022",
+          "is_sharpe": 0.64,
+          "oos_sharpe": -0.01,
+          "oos_cagr": -5.65,
+          "oos_max_dd": -20.06,
+          "oos_calmar": -0.281,
+          "oos_is_ratio": -0.016,
+          "wf_pass": false,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 37.0,
+            "days_at_max_positions": 102,
+            "cap_saturation_rate_pct": 41.8,
+            "missed_by_cap_count": 48,
+            "avg_exposure": 59.2,
+            "avg_simultaneous_holdings": 3.08
+          }
+        },
+        {
+          "seg": 4,
+          "oos_year": "2023",
+          "is_sharpe": 0.403,
+          "oos_sharpe": 1.565,
+          "oos_cagr": 43.73,
+          "oos_max_dd": -14.23,
+          "oos_calmar": 3.074,
+          "oos_is_ratio": 3.883,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 57.6,
+            "days_at_max_positions": 105,
+            "cap_saturation_rate_pct": 42.7,
+            "missed_by_cap_count": 90,
+            "avg_exposure": 53.8,
+            "avg_simultaneous_holdings": 2.84
+          }
+        },
+        {
+          "seg": 5,
+          "oos_year": "2024",
+          "is_sharpe": 0.738,
+          "oos_sharpe": 1.45,
+          "oos_cagr": 29.35,
+          "oos_max_dd": -15.97,
+          "oos_calmar": 1.838,
+          "oos_is_ratio": 1.965,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 64.0,
+            "days_at_max_positions": 71,
+            "cap_saturation_rate_pct": 29.0,
+            "missed_by_cap_count": 47,
+            "avg_exposure": 46.2,
+            "avg_simultaneous_holdings": 2.48
+          }
+        }
+      ],
+      "true_oos_2025": {
+        "cagr": 5.07,
+        "sharpe": 0.551,
+        "max_dd": -8.67,
+        "calmar": 0.585,
+        "n_trades": 51,
+        "sortino": 0.636,
+        "profit_factor": 1.473
+      },
+      "true_oos_util": {
+        "avg_idle_cash_ratio_pct": 66.0,
+        "days_at_max_positions": 32,
+        "cap_saturation_rate_pct": 13.2,
+        "missed_by_cap_count": 7,
+        "avg_exposure": 34.4,
+        "avg_simultaneous_holdings": 1.87
+      },
+      "full_is_2018_2024": {
+        "cagr": 19.95,
+        "sharpe": 0.814,
+        "max_dd": -22.07,
+        "calmar": 0.904,
+        "n_trades": 248,
+        "sortino": 0.996,
+        "profit_factor": 2.238
+      },
+      "full_is_util": {
+        "avg_idle_cash_ratio_pct": 91.9,
+        "days_at_max_positions": 409,
+        "cap_saturation_rate_pct": 38.0,
+        "missed_by_cap_count": 250,
+        "avg_exposure": 41.4,
+        "avg_simultaneous_holdings": 2.91
+      },
+      "missed_fwd20d": {
+        "avg_fwd_ret_pct": 3.38,
+        "n": 261,
+        "pct_positive": 64.8
+      },
+      "missed_fwd60d": {
+        "avg_fwd_ret_pct": 9.53,
+        "n": 261,
+        "pct_positive": 69.0
+      },
+      "missed_cands_total": 261
+    },
+    "C_5": {
+      "wf_segments": [
+        {
+          "seg": 1,
+          "oos_year": "2020",
+          "is_sharpe": 0.0,
+          "oos_sharpe": 0.715,
+          "oos_cagr": 23.49,
+          "oos_max_dd": -15.25,
+          "oos_calmar": 1.54,
+          "oos_is_ratio": null,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 46.4,
+            "days_at_max_positions": 6,
+            "cap_saturation_rate_pct": 6.2,
+            "missed_by_cap_count": 3,
+            "avg_exposure": 53.7,
+            "avg_simultaneous_holdings": 2.87
+          }
+        },
+        {
+          "seg": 2,
+          "oos_year": "2021",
+          "is_sharpe": 0.715,
+          "oos_sharpe": 0.136,
+          "oos_cagr": -4.55,
+          "oos_max_dd": -23.48,
+          "oos_calmar": -0.194,
+          "oos_is_ratio": 0.19,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 43.3,
+            "days_at_max_positions": 82,
+            "cap_saturation_rate_pct": 33.5,
+            "missed_by_cap_count": 29,
+            "avg_exposure": 58.2,
+            "avg_simultaneous_holdings": 3.78
+          }
+        },
+        {
+          "seg": 3,
+          "oos_year": "2022",
+          "is_sharpe": 0.724,
+          "oos_sharpe": -0.121,
+          "oos_cagr": -8.35,
+          "oos_max_dd": -20.48,
+          "oos_calmar": -0.408,
+          "oos_is_ratio": -0.167,
+          "wf_pass": false,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 41.3,
+            "days_at_max_positions": 53,
+            "cap_saturation_rate_pct": 21.7,
+            "missed_by_cap_count": 28,
+            "avg_exposure": 54.1,
+            "avg_simultaneous_holdings": 3.3
+          }
+        },
+        {
+          "seg": 4,
+          "oos_year": "2023",
+          "is_sharpe": 0.435,
+          "oos_sharpe": 1.426,
+          "oos_cagr": 39.11,
+          "oos_max_dd": -15.3,
+          "oos_calmar": 2.557,
+          "oos_is_ratio": 3.278,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 55.7,
+            "days_at_max_positions": 64,
+            "cap_saturation_rate_pct": 26.0,
+            "missed_by_cap_count": 55,
+            "avg_exposure": 53.8,
+            "avg_simultaneous_holdings": 3.16
+          }
+        },
+        {
+          "seg": 5,
+          "oos_year": "2024",
+          "is_sharpe": 0.625,
+          "oos_sharpe": 1.493,
+          "oos_cagr": 30.66,
+          "oos_max_dd": -15.78,
+          "oos_calmar": 1.942,
+          "oos_is_ratio": 2.389,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 65.5,
+            "days_at_max_positions": 20,
+            "cap_saturation_rate_pct": 8.2,
+            "missed_by_cap_count": 17,
+            "avg_exposure": 45.7,
+            "avg_simultaneous_holdings": 2.47
+          }
+        }
+      ],
+      "true_oos_2025": {
+        "cagr": 2.45,
+        "sharpe": 0.297,
+        "max_dd": -8.64,
+        "calmar": 0.284,
+        "n_trades": 55,
+        "sortino": 0.339,
+        "profit_factor": 1.29
+      },
+      "true_oos_util": {
+        "avg_idle_cash_ratio_pct": 65.0,
+        "days_at_max_positions": 7,
+        "cap_saturation_rate_pct": 2.9,
+        "missed_by_cap_count": 2,
+        "avg_exposure": 35.2,
+        "avg_simultaneous_holdings": 1.95
+      },
+      "full_is_2018_2024": {
+        "cagr": 23.0,
+        "sharpe": 0.882,
+        "max_dd": -21.33,
+        "calmar": 1.078,
+        "n_trades": 276,
+        "sortino": 1.098,
+        "profit_factor": 2.505
+      },
+      "full_is_util": {
+        "avg_idle_cash_ratio_pct": 101.4,
+        "days_at_max_positions": 179,
+        "cap_saturation_rate_pct": 16.6,
+        "missed_by_cap_count": 105,
+        "avg_exposure": 41.2,
+        "avg_simultaneous_holdings": 3.06
+      },
+      "missed_fwd20d": {
+        "avg_fwd_ret_pct": 2.78,
+        "n": 132,
+        "pct_positive": 62.1
+      },
+      "missed_fwd60d": {
+        "avg_fwd_ret_pct": 8.11,
+        "n": 132,
+        "pct_positive": 65.9
+      },
+      "missed_cands_total": 132
+    },
+    "C_6": {
+      "wf_segments": [
+        {
+          "seg": 1,
+          "oos_year": "2020",
+          "is_sharpe": 0.0,
+          "oos_sharpe": 0.701,
+          "oos_cagr": 22.97,
+          "oos_max_dd": -15.41,
+          "oos_calmar": 1.49,
+          "oos_is_ratio": null,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 46.2,
+            "days_at_max_positions": 4,
+            "cap_saturation_rate_pct": 4.1,
+            "missed_by_cap_count": 2,
+            "avg_exposure": 53.9,
+            "avg_simultaneous_holdings": 2.91
+          }
+        },
+        {
+          "seg": 2,
+          "oos_year": "2021",
+          "is_sharpe": 0.701,
+          "oos_sharpe": 0.183,
+          "oos_cagr": -2.82,
+          "oos_max_dd": -24.04,
+          "oos_calmar": -0.117,
+          "oos_is_ratio": 0.261,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 43.7,
+            "days_at_max_positions": 36,
+            "cap_saturation_rate_pct": 14.7,
+            "missed_by_cap_count": 9,
+            "avg_exposure": 57.1,
+            "avg_simultaneous_holdings": 3.97
+          }
+        },
+        {
+          "seg": 3,
+          "oos_year": "2022",
+          "is_sharpe": 0.714,
+          "oos_sharpe": -0.086,
+          "oos_cagr": -7.99,
+          "oos_max_dd": -22.12,
+          "oos_calmar": -0.361,
+          "oos_is_ratio": -0.12,
+          "wf_pass": false,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 43.3,
+            "days_at_max_positions": 17,
+            "cap_saturation_rate_pct": 7.0,
+            "missed_by_cap_count": 15,
+            "avg_exposure": 52.1,
+            "avg_simultaneous_holdings": 3.41
+          }
+        },
+        {
+          "seg": 4,
+          "oos_year": "2023",
+          "is_sharpe": 0.311,
+          "oos_sharpe": 1.697,
+          "oos_cagr": 49.65,
+          "oos_max_dd": -16.24,
+          "oos_calmar": 3.058,
+          "oos_is_ratio": 5.457,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 56.1,
+            "days_at_max_positions": 30,
+            "cap_saturation_rate_pct": 12.2,
+            "missed_by_cap_count": 15,
+            "avg_exposure": 56.3,
+            "avg_simultaneous_holdings": 3.35
+          }
+        },
+        {
+          "seg": 5,
+          "oos_year": "2024",
+          "is_sharpe": 0.658,
+          "oos_sharpe": 1.288,
+          "oos_cagr": 27.16,
+          "oos_max_dd": -16.19,
+          "oos_calmar": 1.678,
+          "oos_is_ratio": 1.957,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 62.5,
+            "days_at_max_positions": 6,
+            "cap_saturation_rate_pct": 2.4,
+            "missed_by_cap_count": 4,
+            "avg_exposure": 47.0,
+            "avg_simultaneous_holdings": 2.52
+          }
+        }
+      ],
+      "true_oos_2025": {
+        "cagr": 2.75,
+        "sharpe": 0.329,
+        "max_dd": -8.64,
+        "calmar": 0.318,
+        "n_trades": 54,
+        "sortino": 0.373,
+        "profit_factor": 1.309
+      },
+      "true_oos_util": {
+        "avg_idle_cash_ratio_pct": 65.4,
+        "days_at_max_positions": 0,
+        "cap_saturation_rate_pct": 0.0,
+        "missed_by_cap_count": 0,
+        "avg_exposure": 34.9,
+        "avg_simultaneous_holdings": 1.93
+      },
+      "full_is_2018_2024": {
+        "cagr": 22.68,
+        "sharpe": 0.878,
+        "max_dd": -20.43,
+        "calmar": 1.11,
+        "n_trades": 278,
+        "sortino": 1.097,
+        "profit_factor": 2.49
+      },
+      "full_is_util": {
+        "avg_idle_cash_ratio_pct": 99.7,
+        "days_at_max_positions": 17,
+        "cap_saturation_rate_pct": 1.6,
+        "missed_by_cap_count": 5,
+        "avg_exposure": 41.8,
+        "avg_simultaneous_holdings": 3.13
+      },
+      "missed_fwd20d": {
+        "avg_fwd_ret_pct": 1.45,
+        "n": 45,
+        "pct_positive": 60.0
+      },
+      "missed_fwd60d": {
+        "avg_fwd_ret_pct": 4.86,
+        "n": 45,
+        "pct_positive": 57.8
+      },
+      "missed_cands_total": 45
+    },
+    "C_7": {
+      "wf_segments": [
+        {
+          "seg": 1,
+          "oos_year": "2020",
+          "is_sharpe": 0.0,
+          "oos_sharpe": 0.701,
+          "oos_cagr": 22.97,
+          "oos_max_dd": -15.41,
+          "oos_calmar": 1.49,
+          "oos_is_ratio": null,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 46.2,
+            "days_at_max_positions": 0,
+            "cap_saturation_rate_pct": 0.0,
+            "missed_by_cap_count": 0,
+            "avg_exposure": 53.9,
+            "avg_simultaneous_holdings": 2.91
+          }
+        },
+        {
+          "seg": 2,
+          "oos_year": "2021",
+          "is_sharpe": 0.701,
+          "oos_sharpe": 0.208,
+          "oos_cagr": -1.65,
+          "oos_max_dd": -24.1,
+          "oos_calmar": -0.068,
+          "oos_is_ratio": 0.297,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 44.5,
+            "days_at_max_positions": 4,
+            "cap_saturation_rate_pct": 1.6,
+            "missed_by_cap_count": 3,
+            "avg_exposure": 56.5,
+            "avg_simultaneous_holdings": 3.98
+          }
+        },
+        {
+          "seg": 3,
+          "oos_year": "2022",
+          "is_sharpe": 0.729,
+          "oos_sharpe": -0.01,
+          "oos_cagr": -6.14,
+          "oos_max_dd": -21.55,
+          "oos_calmar": -0.285,
+          "oos_is_ratio": -0.014,
+          "wf_pass": false,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 39.6,
+            "days_at_max_positions": 7,
+            "cap_saturation_rate_pct": 2.9,
+            "missed_by_cap_count": 7,
+            "avg_exposure": 56.8,
+            "avg_simultaneous_holdings": 3.61
+          }
+        },
+        {
+          "seg": 4,
+          "oos_year": "2023",
+          "is_sharpe": 0.333,
+          "oos_sharpe": 1.45,
+          "oos_cagr": 40.51,
+          "oos_max_dd": -15.38,
+          "oos_calmar": 2.635,
+          "oos_is_ratio": 4.354,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 51.0,
+            "days_at_max_positions": 8,
+            "cap_saturation_rate_pct": 3.3,
+            "missed_by_cap_count": 5,
+            "avg_exposure": 58.2,
+            "avg_simultaneous_holdings": 3.48
+          }
+        },
+        {
+          "seg": 5,
+          "oos_year": "2024",
+          "is_sharpe": 0.779,
+          "oos_sharpe": 1.358,
+          "oos_cagr": 28.97,
+          "oos_max_dd": -15.98,
+          "oos_calmar": 1.813,
+          "oos_is_ratio": 1.743,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 64.4,
+            "days_at_max_positions": 4,
+            "cap_saturation_rate_pct": 1.6,
+            "missed_by_cap_count": 2,
+            "avg_exposure": 46.1,
+            "avg_simultaneous_holdings": 2.54
+          }
+        }
+      ],
+      "true_oos_2025": {
+        "cagr": 2.75,
+        "sharpe": 0.329,
+        "max_dd": -8.64,
+        "calmar": 0.318,
+        "n_trades": 54,
+        "sortino": 0.373,
+        "profit_factor": 1.309
+      },
+      "true_oos_util": {
+        "avg_idle_cash_ratio_pct": 65.4,
+        "days_at_max_positions": 0,
+        "cap_saturation_rate_pct": 0.0,
+        "missed_by_cap_count": 0,
+        "avg_exposure": 34.9,
+        "avg_simultaneous_holdings": 1.93
+      },
+      "full_is_2018_2024": {
+        "cagr": 22.14,
+        "sharpe": 0.854,
+        "max_dd": -20.42,
+        "calmar": 1.084,
+        "n_trades": 290,
+        "sortino": 1.075,
+        "profit_factor": 2.43
+      },
+      "full_is_util": {
+        "avg_idle_cash_ratio_pct": 97.9,
+        "days_at_max_positions": 4,
+        "cap_saturation_rate_pct": 0.4,
+        "missed_by_cap_count": 5,
+        "avg_exposure": 42.1,
+        "avg_simultaneous_holdings": 3.23
+      },
+      "missed_fwd20d": {
+        "avg_fwd_ret_pct": 0.62,
+        "n": 17,
+        "pct_positive": 52.9
+      },
+      "missed_fwd60d": {
+        "avg_fwd_ret_pct": -2.07,
+        "n": 17,
+        "pct_positive": 41.2
+      },
+      "missed_cands_total": 17
+    },
+    "D_VOL_ADJ": {
+      "wf_segments": [
+        {
+          "seg": 1,
+          "oos_year": "2020",
+          "is_sharpe": 0.0,
+          "oos_sharpe": 0.68,
+          "oos_cagr": 18.46,
+          "oos_max_dd": -11.31,
+          "oos_calmar": 1.632,
+          "oos_is_ratio": null,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 56.2,
+            "days_at_max_positions": 54,
+            "cap_saturation_rate_pct": 55.7,
+            "missed_by_cap_count": 22,
+            "avg_exposure": 45.5,
+            "avg_simultaneous_holdings": 2.46
+          }
+        },
+        {
+          "seg": 2,
+          "oos_year": "2021",
+          "is_sharpe": 0.68,
+          "oos_sharpe": 0.301,
+          "oos_cagr": 3.8,
+          "oos_max_dd": -20.82,
+          "oos_calmar": 0.182,
+          "oos_is_ratio": 0.443,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 53.8,
+            "days_at_max_positions": 175,
+            "cap_saturation_rate_pct": 71.4,
+            "missed_by_cap_count": 97,
+            "avg_exposure": 49.8,
+            "avg_simultaneous_holdings": 2.75
+          }
+        },
+        {
+          "seg": 3,
+          "oos_year": "2022",
+          "is_sharpe": 0.529,
+          "oos_sharpe": -0.046,
+          "oos_cagr": -5.6,
+          "oos_max_dd": -20.93,
+          "oos_calmar": -0.268,
+          "oos_is_ratio": -0.087,
+          "wf_pass": false,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 46.7,
+            "days_at_max_positions": 141,
+            "cap_saturation_rate_pct": 57.8,
+            "missed_by_cap_count": 69,
+            "avg_exposure": 49.8,
+            "avg_simultaneous_holdings": 2.43
+          }
+        },
+        {
+          "seg": 4,
+          "oos_year": "2023",
+          "is_sharpe": 0.37,
+          "oos_sharpe": 1.699,
+          "oos_cagr": 43.92,
+          "oos_max_dd": -13.23,
+          "oos_calmar": 3.318,
+          "oos_is_ratio": 4.592,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 63.5,
+            "days_at_max_positions": 133,
+            "cap_saturation_rate_pct": 54.1,
+            "missed_by_cap_count": 107,
+            "avg_exposure": 49.0,
+            "avg_simultaneous_holdings": 2.61
+          }
+        },
+        {
+          "seg": 5,
+          "oos_year": "2024",
+          "is_sharpe": 0.793,
+          "oos_sharpe": 1.77,
+          "oos_cagr": 34.36,
+          "oos_max_dd": -14.43,
+          "oos_calmar": 2.381,
+          "oos_is_ratio": 2.232,
+          "wf_pass": true,
+          "cap_util": {
+            "avg_idle_cash_ratio_pct": 68.3,
+            "days_at_max_positions": 91,
+            "cap_saturation_rate_pct": 37.1,
+            "missed_by_cap_count": 64,
+            "avg_exposure": 43.1,
+            "avg_simultaneous_holdings": 2.21
+          }
+        }
+      ],
+      "true_oos_2025": {
+        "cagr": 6.8,
+        "sharpe": 0.759,
+        "max_dd": -8.62,
+        "calmar": 0.788,
+        "n_trades": 47,
+        "sortino": 0.849,
+        "profit_factor": 1.661
+      },
+      "true_oos_util": {
+        "avg_idle_cash_ratio_pct": 69.0,
+        "days_at_max_positions": 46,
+        "cap_saturation_rate_pct": 18.9,
+        "missed_by_cap_count": 14,
+        "avg_exposure": 31.8,
+        "avg_simultaneous_holdings": 1.73
+      },
+      "full_is_2018_2024": {
+        "cagr": 19.86,
+        "sharpe": 0.855,
+        "max_dd": -20.0,
+        "calmar": 0.993,
+        "n_trades": 205,
+        "sortino": 1.064,
+        "profit_factor": 2.382
+      },
+      "full_is_util": {
+        "avg_idle_cash_ratio_pct": 97.3,
+        "days_at_max_positions": 594,
+        "cap_saturation_rate_pct": 55.2,
+        "missed_by_cap_count": 358,
+        "avg_exposure": 36.8,
+        "avg_simultaneous_holdings": 2.52
+      },
+      "missed_fwd20d": {
+        "avg_fwd_ret_pct": 3.21,
+        "n": 359,
+        "pct_positive": 63.8
+      },
+      "missed_fwd60d": {
+        "avg_fwd_ret_pct": 8.67,
+        "n": 359,
+        "pct_positive": 66.6
+      },
+      "missed_cands_total": 359
+    }
+  },
+  "gate_results": {
+    "B_EQUITY_LINKED": {
+      "wf_pass_count": 4,
+      "avg_oos_cagr": 17.58,
+      "delta_cagr_vs_baseline": 0.62,
+      "seg3_2022_oos_cagr": -5.6,
+      "worst_oos_dd": -22.48,
+      "delta_dd_vs_baseline": -1.55,
+      "G1_wf_pass": true,
+      "G2_cagr_pos": true,
+      "G3_2022_nondeg": true,
+      "G4_dd_nonworse": false,
+      "gates_passed": 3,
+      "overall": "FAIL"
+    },
+    "C_3": {
+      "wf_pass_count": 4,
+      "avg_oos_cagr": 16.96,
+      "delta_cagr_vs_baseline": 0.0,
+      "seg3_2022_oos_cagr": -5.6,
+      "worst_oos_dd": -20.93,
+      "delta_dd_vs_baseline": 0.0,
+      "G1_wf_pass": true,
+      "G2_cagr_pos": false,
+      "G3_2022_nondeg": true,
+      "G4_dd_nonworse": true,
+      "gates_passed": 3,
+      "overall": "FAIL"
+    },
+    "C_4": {
+      "wf_pass_count": 4,
+      "avg_oos_cagr": 18.62,
+      "delta_cagr_vs_baseline": 1.65,
+      "seg3_2022_oos_cagr": -5.65,
+      "worst_oos_dd": -23.09,
+      "delta_dd_vs_baseline": -2.16,
+      "G1_wf_pass": true,
+      "G2_cagr_pos": true,
+      "G3_2022_nondeg": false,
+      "G4_dd_nonworse": false,
+      "gates_passed": 2,
+      "overall": "FAIL"
+    },
+    "C_5": {
+      "wf_pass_count": 4,
+      "avg_oos_cagr": 16.07,
+      "delta_cagr_vs_baseline": -0.89,
+      "seg3_2022_oos_cagr": -8.35,
+      "worst_oos_dd": -23.48,
+      "delta_dd_vs_baseline": -2.55,
+      "G1_wf_pass": true,
+      "G2_cagr_pos": false,
+      "G3_2022_nondeg": false,
+      "G4_dd_nonworse": false,
+      "gates_passed": 1,
+      "overall": "FAIL"
+    },
+    "C_6": {
+      "wf_pass_count": 4,
+      "avg_oos_cagr": 17.79,
+      "delta_cagr_vs_baseline": 0.83,
+      "seg3_2022_oos_cagr": -7.99,
+      "worst_oos_dd": -24.04,
+      "delta_dd_vs_baseline": -3.11,
+      "G1_wf_pass": true,
+      "G2_cagr_pos": true,
+      "G3_2022_nondeg": false,
+      "G4_dd_nonworse": false,
+      "gates_passed": 2,
+      "overall": "FAIL"
+    },
+    "C_7": {
+      "wf_pass_count": 4,
+      "avg_oos_cagr": 16.93,
+      "delta_cagr_vs_baseline": -0.03,
+      "seg3_2022_oos_cagr": -6.14,
+      "worst_oos_dd": -24.1,
+      "delta_dd_vs_baseline": -3.17,
+      "G1_wf_pass": true,
+      "G2_cagr_pos": false,
+      "G3_2022_nondeg": false,
+      "G4_dd_nonworse": false,
+      "gates_passed": 1,
+      "overall": "FAIL"
+    },
+    "D_VOL_ADJ": {
+      "wf_pass_count": 4,
+      "avg_oos_cagr": 18.99,
+      "delta_cagr_vs_baseline": 2.03,
+      "seg3_2022_oos_cagr": -5.6,
+      "worst_oos_dd": -20.93,
+      "delta_dd_vs_baseline": 0.0,
+      "G1_wf_pass": true,
+      "G2_cagr_pos": true,
+      "G3_2022_nondeg": true,
+      "G4_dd_nonworse": true,
+      "gates_passed": 4,
+      "overall": "PASS"
+    }
+  },
+  "elasticity_pp_per_slot": {
+    "3→4": 1.65,
+    "4→5": -2.54,
+    "5→6": 1.72,
+    "6→7": -0.86
+  },
+  "diminishing_return_point": "4→5",
+  "cagr_ceiling": {
+    "s5_is_cagr_pct": 19.37,
+    "best_cap_is_cagr_pct": 23.0,
+    "cash_only_low_pct": 24.8,
+    "cash_only_high_pct": 25.8,
+    "leveraged_1_3x_low_pct": 32.2,
+    "leveraged_1_3x_high_pct": 33.5
+  },
+  "decision": "MEANINGFUL_BOTTLENECK",
+  "decision_detail": "Best: D_VOL_ADJ  ΔCAGR=+2.03pp"
+}

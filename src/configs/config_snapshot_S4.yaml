@@ -1,0 +1,69 @@
+# config_snapshot_S4.yaml — 2026-06-15 snapshot
+# engine: composite_alpha_bt.run_scenario
+# 出典: strategy_snapshot_manifest.md §1-15 列S4
+# NOTE: max_positions に2バリアントあり（config値=3 / CDOS override上限相当=5）。
+#       runner は両方を実行し S4(config) と S4_CDOS_OVERRIDE_VARIANT として記録する。
+snapshot_id: S4
+snapshot_date: "2026-06-15"
+engine: composite_alpha_bt
+confidence: MIXED  # rsr_exit/ATR-sizing/MTF/entry_timing/addon=CONFIRMED, trailing_stop switch date/CDOS override exact effective slots=UNKNOWN
+
+universe:
+  type: rsr42_dynamic
+  dynamic_universe_enabled: true
+
+fujiko:
+  min_sepa: 6
+  min_rsr: 75.0
+  turtle_entry: 20
+  turtle_exit: 55
+  use_turtle_entry: true
+  mom_period: 21
+
+portfolio:
+  capital: 3_000_000
+  max_positions: 3          # CONFIRMED config value (restored 2026-05-31)
+  max_positions_cdos_override_variant: 5   # LIKELY effective ceiling per 2026-06-11 Full Audit finding (CDOS override, fix date unconfirmed)
+  max_single_weight: 0.25
+  max_dd_limit: 0.15
+
+risk:
+  min_hold_days: 3
+
+rsr_exit:
+  enable_simple_rsr_exit: true      # CONFIRMED — absolute threshold added 2026-06-05
+  rsr_exit_threshold: 70.0
+  enable_multilayer_rsr: true
+  ml_exit_single_only: false        # CONFIRMED — full 4-condition multilayer present by 2026-06-24 audit, carried back as present at this date
+
+trailing_stop:
+  mode: atr_prod                    # LIKELY — ATR-based 3.0xATR20 confirmed present by 06-24; exact switch date from fixed_pct UNKNOWN, placed here as nearest-confirmed-state
+  enable_atr_trailing_prod: true
+
+mtf:
+  enabled: true             # CONFIRMED — removed only 2026-06-24 20:50, after this snapshot
+
+sizing:
+  mode: atr_risk_based
+  enable_atr_risk_sizing: true      # CONFIRMED live by 2026-06-11 audit
+  risk_pct: 0.0125
+
+sector_gate:
+  enabled: true
+
+shock_exit:
+  mode: composite
+
+bear_filter:
+  enabled: true
+
+addon:
+  enabled: true             # CONFIRMED present by 2026-05-31 audit
+
+entry_timing:
+  enabled: true              # CONFIRMED introduced 2026-05-31
+  boost_weight: 0.06
+
+costs:
+  slippage_rate: 0.001
+  commission_rate: 0.00055

@@ -1,0 +1,150 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.0.2, pluggy-1.6.0 -- C:\Users\owner\AppData\Local\Programs\Python\Python312\python.exe
+cachedir: .pytest_cache
+rootdir: C:\ai-trading
+plugins: anyio-4.12.1
+collecting ... collected 43 items
+
+tests/runtime/test_execution_lock.py::TestStaleLockRecovery::test_dead_pid_lock_recovered PASSED [  2%]
+tests/runtime/test_execution_lock.py::TestStaleLockRecovery::test_recovery_event_emitted PASSED [  4%]
+tests/runtime/test_execution_lock.py::TestStaleLockRecovery::test_no_recovery_for_live_lock PASSED [  6%]
+tests/runtime/test_execution_lock.py::TestPIDReuseSimulation::test_create_time_mismatch_is_stale PASSED [  9%]
+tests/runtime/test_execution_lock.py::TestInterruptedProcessRecovery::test_expired_heartbeat_is_stale PASSED [ 11%]
+tests/runtime/test_execution_lock.py::TestInterruptedProcessRecovery::test_none_heartbeat_is_stale PASSED [ 13%]
+tests/runtime/test_execution_lock.py::TestConcurrentStartupRejection::test_second_acquire_raises PASSED [ 16%]
+tests/runtime/test_execution_lock.py::TestConcurrentStartupRejection::test_after_release_second_can_acquire PASSED [ 18%]
+tests/runtime/test_execution_lock.py::TestHeartbeatExpiry::test_heartbeat_not_expired_within_window PASSED [ 20%]
+tests/runtime/test_execution_lock.py::TestHeartbeatExpiry::test_heartbeat_expired_past_window PASSED [ 23%]
+tests/runtime/test_execution_lock.py::TestHeartbeatExpiry::test_none_heartbeat_always_expired PASSED [ 25%]
+tests/runtime/test_execution_lock.py::TestHeartbeatExpiry::test_update_heartbeat_writes_fresh_ts PASSED [ 27%]
+tests/runtime/test_execution_lock.py::TestAtomicAcquisitionRace::test_only_one_thread_acquires PASSED [ 30%]
+tests/runtime/test_execution_lock.py::TestAtomicAcquisitionRace::test_lock_metadata_complete PASSED [ 32%]
+tests/runtime/test_execution_lock.py::TestAtomicAcquisitionRace::test_release_without_acquire_is_noop PASSED [ 34%]
+tests/runtime/test_execution_lock.py::TestAtomicAcquisitionRace::test_context_manager PASSED [ 37%]
+tests/runtime/test_execution_lock.py::TestHeartbeatThread::test_heartbeat_thread_updates_ts PASSED [ 39%]
+tests/runtime/test_execution_lock.py::TestHeartbeatThread::test_heartbeat_thread_stops_cleanly PASSED [ 41%]
+tests/execution/test_deployability.py::TestScoreCandidate::test_fully_deployable_score_bounded_by_alpha PASSED [ 44%]
+tests/execution/test_deployability.py::TestScoreCandidate::test_zero_price_not_deployable PASSED [ 46%]
+tests/execution/test_deployability.py::TestScoreCandidate::test_zero_qty_not_deployable PASSED [ 48%]
+tests/execution/test_deployability.py::TestScoreCandidate::test_max_positions_reached PASSED [ 51%]
+tests/execution/test_deployability.py::TestScoreCandidate::test_insufficient_cash_1_lot PASSED [ 53%]
+tests/execution/test_deployability.py::TestScoreCandidate::test_sector_cap_full_rejected PASSED [ 55%]
+tests/execution/test_deployability.py::TestScoreCandidate::test_sector_partial_capacity PASSED [ 58%]
+tests/execution/test_deployability.py::TestScoreCandidate::test_alloc_survival_bounded PASSED [ 60%]
+tests/execution/test_deployability.py::TestScoreCandidate::test_capital_fit_does_not_exceed_one PASSED [ 62%]
+tests/execution/test_deployability.py::TestScoreCandidate::test_high_alpha_preserved_in_score PASSED [ 65%]
+tests/execution/test_deployability.py::TestRankByDeployability::test_deployable_before_undeployable PASSED [ 67%]
+tests/execution/test_deployability.py::TestRankByDeployability::test_same_score_tie_broken_by_alpha_then_symbol PASSED [ 69%]
+tests/execution/test_deployability.py::TestRankByDeployability::test_deterministic_same_input_same_output PASSED [ 72%]
+tests/execution/test_deployability.py::TestRankByDeployability::test_deployability_fields_added PASSED [ 74%]
+tests/execution/test_deployability.py::TestRankByDeployability::test_empty_candidates_returns_empty PASSED [ 76%]
+tests/execution/test_deployability.py::TestRankByDeployability::test_all_undeployable_returns_all_with_zero_score PASSED [ 79%]
+tests/execution/test_deployability.py::TestDeployabilityDiagnostics::test_alloc_survival_rate_correct PASSED [ 81%]
+tests/execution/test_deployability.py::TestDeployabilityDiagnostics::test_rejection_reason_breakdown_populated PASSED [ 83%]
+tests/execution/test_deployability.py::TestDeployabilityDiagnostics::test_idle_cash_ratio_zero_when_fully_deployed PASSED [ 86%]
+tests/execution/test_deployability.py::TestDeployabilityDiagnostics::test_undeployable_alpha_count_only_nonzero_alpha PASSED [ 88%]
+tests/execution/test_deployability.py::TestMetricsEmission::test_emit_writes_jsonl PASSED [ 90%]
+tests/execution/test_deployability.py::TestMetricsEmission::test_emit_no_log_path_returns_dict PASSED [ 93%]
+tests/execution/test_deployability.py::TestMetricsEmission::test_capital_efficiency_bounded PASSED [ 95%]
+tests/execution/test_deployability.py::TestAdaptiveAllocIntegration::test_pre_rank_returns_ranked_and_diag PASSED [ 97%]
+tests/execution/test_deployability.py::TestAdaptiveAllocIntegration::test_pre_rank_does_not_mutate_sector_weights PASSED [100%]
+
+============================== warnings summary ===============================
+tests/runtime/test_execution_lock.py::TestAtomicAcquisitionRace::test_only_one_thread_acquires
+  C:\Users\owner\AppData\Local\Programs\Python\Python312\Lib\site-packages\_pytest\threadexception.py:58: PytestUnhandledThreadExceptionWarning: Exception in thread Thread-3 (_try_acquire)
+  
+  Traceback (most recent call last):
+    File "C:\Users\owner\AppData\Local\Programs\Python\Python312\Lib\threading.py", line 1075, in _bootstrap_inner
+      self.run()
+    File "C:\Users\owner\AppData\Local\Programs\Python\Python312\Lib\threading.py", line 1012, in run
+      self._target(*self._args, **self._kwargs)
+    File "C:\ai-trading\tests\runtime\test_execution_lock.py", line 288, in _try_acquire
+      lock.acquire()
+    File "C:\ai-trading\src\runtime\execution_lock.py", line 173, in acquire
+      self._write_lock_record()
+    File "C:\ai-trading\src\runtime\execution_lock.py", line 254, in _write_lock_record
+      self._write_raw(data)
+    File "C:\ai-trading\src\runtime\execution_lock.py", line 259, in _write_raw
+      tmp.replace(self._path)
+    File "C:\Users\owner\AppData\Local\Programs\Python\Python312\Lib\pathlib.py", line 1376, in replace
+      os.replace(self, target)
+  PermissionError: [WinError 32] プロセスはファイルにアクセスできません。別のプロセスが使用中です。: 'C:\\Users\\owner\\AppData\\Local\\Temp\\pytest-of-owner\\pytest-64\\test_only_one_thread_acquires0\\order_lock.tmp' -> 'C:\\Users\\owner\\AppData\\Local\\Temp\\pytest-of-owner\\pytest-64\\test_only_one_thread_acquires0\\order_lock.json'
+  
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+    warnings.warn(pytest.PytestUnhandledThreadExceptionWarning(msg))
+
+tests/runtime/test_execution_lock.py::TestAtomicAcquisitionRace::test_only_one_thread_acquires
+  C:\Users\owner\AppData\Local\Programs\Python\Python312\Lib\site-packages\_pytest\threadexception.py:58: PytestUnhandledThreadExceptionWarning: Exception in thread Thread-2 (_try_acquire)
+  
+  Traceback (most recent call last):
+    File "C:\Users\owner\AppData\Local\Programs\Python\Python312\Lib\threading.py", line 1075, in _bootstrap_inner
+      self.run()
+    File "C:\Users\owner\AppData\Local\Programs\Python\Python312\Lib\threading.py", line 1012, in run
+      self._target(*self._args, **self._kwargs)
+    File "C:\ai-trading\tests\runtime\test_execution_lock.py", line 288, in _try_acquire
+      lock.acquire()
+    File "C:\ai-trading\src\runtime\execution_lock.py", line 173, in acquire
+      self._write_lock_record()
+    File "C:\ai-trading\src\runtime\execution_lock.py", line 254, in _write_lock_record
+      self._write_raw(data)
+    File "C:\ai-trading\src\runtime\execution_lock.py", line 259, in _write_raw
+      tmp.replace(self._path)
+    File "C:\Users\owner\AppData\Local\Programs\Python\Python312\Lib\pathlib.py", line 1376, in replace
+      os.replace(self, target)
+  PermissionError: [WinError 32] プロセスはファイルにアクセスできません。別のプロセスが使用中です。: 'C:\\Users\\owner\\AppData\\Local\\Temp\\pytest-of-owner\\pytest-64\\test_only_one_thread_acquires0\\order_lock.tmp' -> 'C:\\Users\\owner\\AppData\\Local\\Temp\\pytest-of-owner\\pytest-64\\test_only_one_thread_acquires0\\order_lock.json'
+  
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+    warnings.warn(pytest.PytestUnhandledThreadExceptionWarning(msg))
+
+tests/runtime/test_execution_lock.py::TestAtomicAcquisitionRace::test_only_one_thread_acquires
+  C:\Users\owner\AppData\Local\Programs\Python\Python312\Lib\site-packages\_pytest\threadexception.py:58: PytestUnhandledThreadExceptionWarning: Exception in thread Thread-1 (_try_acquire)
+  
+  Traceback (most recent call last):
+    File "C:\Users\owner\AppData\Local\Programs\Python\Python312\Lib\threading.py", line 1075, in _bootstrap_inner
+      self.run()
+    File "C:\Users\owner\AppData\Local\Programs\Python\Python312\Lib\threading.py", line 1012, in run
+      self._target(*self._args, **self._kwargs)
+    File "C:\ai-trading\tests\runtime\test_execution_lock.py", line 288, in _try_acquire
+      lock.acquire()
+    File "C:\ai-trading\src\runtime\execution_lock.py", line 173, in acquire
+      self._write_lock_record()
+    File "C:\ai-trading\src\runtime\execution_lock.py", line 254, in _write_lock_record
+      self._write_raw(data)
+    File "C:\ai-trading\src\runtime\execution_lock.py", line 259, in _write_raw
+      tmp.replace(self._path)
+    File "C:\Users\owner\AppData\Local\Programs\Python\Python312\Lib\pathlib.py", line 1376, in replace
+      os.replace(self, target)
+  PermissionError: [WinError 32] プロセスはファイルにアクセスできません。別のプロセスが使用中です。: 'C:\\Users\\owner\\AppData\\Local\\Temp\\pytest-of-owner\\pytest-64\\test_only_one_thread_acquires0\\order_lock.tmp' -> 'C:\\Users\\owner\\AppData\\Local\\Temp\\pytest-of-owner\\pytest-64\\test_only_one_thread_acquires0\\order_lock.json'
+  
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+    warnings.warn(pytest.PytestUnhandledThreadExceptionWarning(msg))
+
+tests/runtime/test_execution_lock.py::TestAtomicAcquisitionRace::test_only_one_thread_acquires
+  C:\Users\owner\AppData\Local\Programs\Python\Python312\Lib\site-packages\_pytest\threadexception.py:58: PytestUnhandledThreadExceptionWarning: Exception in thread Thread-5 (_try_acquire)
+  
+  Traceback (most recent call last):
+    File "C:\Users\owner\AppData\Local\Programs\Python\Python312\Lib\threading.py", line 1075, in _bootstrap_inner
+      self.run()
+    File "C:\Users\owner\AppData\Local\Programs\Python\Python312\Lib\threading.py", line 1012, in run
+      self._target(*self._args, **self._kwargs)
+    File "C:\ai-trading\tests\runtime\test_execution_lock.py", line 288, in _try_acquire
+      lock.acquire()
+    File "C:\ai-trading\src\runtime\execution_lock.py", line 173, in acquire
+      self._write_lock_record()
+    File "C:\ai-trading\src\runtime\execution_lock.py", line 254, in _write_lock_record
+      self._write_raw(data)
+    File "C:\ai-trading\src\runtime\execution_lock.py", line 259, in _write_raw
+      tmp.replace(self._path)
+    File "C:\Users\owner\AppData\Local\Programs\Python\Python312\Lib\pathlib.py", line 1376, in replace
+      os.replace(self, target)
+  PermissionError: [WinError 32] プロセスはファイルにアクセスできません。別のプロセスが使用中です。: 'C:\\Users\\owner\\AppData\\Local\\Temp\\pytest-of-owner\\pytest-64\\test_only_one_thread_acquires0\\order_lock.tmp' -> 'C:\\Users\\owner\\AppData\\Local\\Temp\\pytest-of-owner\\pytest-64\\test_only_one_thread_acquires0\\order_lock.json'
+  
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+    warnings.warn(pytest.PytestUnhandledThreadExceptionWarning(msg))
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= 43 passed, 4 warnings in 1.13s ========================

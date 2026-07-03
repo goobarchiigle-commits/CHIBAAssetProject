@@ -1,0 +1,52 @@
+# config_snapshot_S1.yaml — 2026-03-15 snapshot
+# engine: topk_live_equivalent (別アーキテクチャ, composite_alpha_bt非対応)
+# 出典: strategy_snapshot_manifest.md §1-15 列S1
+snapshot_id: S1
+snapshot_date: "2026-03-15"
+engine: topk_live_equivalent
+confidence: CONFIRMED
+
+universe:
+  type: temporal24
+  source_file: src/configs/universe/2026Q1_temporal24.json
+
+fujiko:
+  min_sepa: 6
+  min_rsr: 0.0          # CONFIRMED — top_k ランクで代替、閾値無効
+  turtle_entry: 20
+  turtle_exit: 20        # CONFIRMED — 55dへの変更は2026-03-31（このスナップショットの後）
+  use_turtle_entry: true
+  mom_period: 21
+  rsr_exit_mechanism: null   # N/A — topk engineに該当機構なし（RANK_EXIT/TIME_STOP/STRATEGY_EXITのみ）
+
+portfolio:
+  capital: 3_000_000     # 比較正規化値。実歴史値は2,000,000（manifest §15参照）
+  max_positions: 4       # = top_k（このアーキテクチャの定義）
+  max_single_weight: 0.25
+  max_dd_limit: 0.15
+
+risk:
+  min_hold_days: null    # N/A — topk engineにmin_holdフィルターなし
+
+trailing_stop:
+  mode: null             # N/A
+mtf:
+  enabled: false          # CONFIRMED — 実装前（2026-03-24より前）
+sizing:
+  mode: topk_engine_native   # cash / effective_slots, capped by max_single_weight
+sector_gate:
+  enabled: false
+shock_exit:
+  mode: null              # N/A
+bear_filter:
+  enabled: false
+addon:
+  enabled: false
+entry_timing:
+  enabled: false
+dynamic_universe:
+  enabled: false           # N/A — dyn_rsr42概念自体が未導入
+
+costs:
+  slippage_rate: 0.001
+  commission_rate: 0.00055

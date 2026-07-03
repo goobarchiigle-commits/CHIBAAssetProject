@@ -1,0 +1,292 @@
+{
+  "comparison": {
+    "before": {
+      "n_strategies": 12,
+      "mean_oos_sharpe": 0.6775,
+      "mean_sharpe_std": 0.4504,
+      "survival_rate": 0.8333,
+      "n_broken": 2
+    },
+    "after": {
+      "n_strategies": 12,
+      "mean_oos_sharpe": 0.6347,
+      "mean_sharpe_std": 0.1925,
+      "survival_rate": 0.8333,
+      "n_broken": 2
+    }
+  },
+  "improved": false,
+  "hypotheses": [
+    "[entry構造] sharpe_std: 0.450→0.193 (Δ=+0.258) | 改善: entry+filter 2層構造が期間間安定性に寄与",
+    "[filter条件] std>1.0 破綻: 0→0件 (Δ=+0) | 変化なし: ボラ/トレンドフィルタが不安定戦略を排除できていない",
+    "[hold_days制約] OOS Sharpe<0 破綻: 2→2件, OOS mean Δ=-0.043 | 効果軽微: 時間exit必須化が損失期間を削減できていない"
+  ],
+  "before_strategies": [
+    {
+      "strategy_id": "S01",
+      "is_sharpe": 1.2558799999999999,
+      "oos_sharpe_mean": 1.27786,
+      "oos_sharpe_max": 1.8477,
+      "sharpe_std": 0.6851450817162742,
+      "trades_total": 215,
+      "max_dd_worst": -0.1504,
+      "broken": false,
+      "broken_reason": "OK"
+    },
+    {
+      "strategy_id": "S02",
+      "is_sharpe": 1.59908,
+      "oos_sharpe_mean": 1.86164,
+      "oos_sharpe_max": 2.2027,
+      "sharpe_std": 0.32122915185269224,
+      "trades_total": 160,
+      "max_dd_worst": -0.3477,
+      "broken": false,
+      "broken_reason": "OK"
+    },
+    {
+      "strategy_id": "S03",
+      "is_sharpe": 1.08086,
+      "oos_sharpe_mean": 0.75388,
+      "oos_sharpe_max": 1.2489,
+      "sharpe_std": 0.472815774906041,
+      "trades_total": 152,
+      "max_dd_worst": -0.3,
+      "broken": false,
+      "broken_reason": "OK"
+    },
+    {
+      "strategy_id": "S04",
+      "is_sharpe": 0.80274,
+      "oos_sharpe_mean": 0.6164999999999999,
+      "oos_sharpe_max": 1.2792,
+      "sharpe_std": 0.5319494712846323,
+      "trades_total": 158,
+      "max_dd_worst": -0.2656,
+      "broken": false,
+      "broken_reason": "OK"
+    },
+    {
+      "strategy_id": "S05",
+      "is_sharpe": 0.41944,
+      "oos_sharpe_mean": -0.19541999999999998,
+      "oos_sharpe_max": 0.4706,
+      "sharpe_std": 0.45608944517495686,
+      "trades_total": 179,
+      "max_dd_worst": -0.2628,
+      "broken": true,
+      "broken_reason": "oos_sharpe<0"
+    },
+    {
+      "strategy_id": "S06",
+      "is_sharpe": 1.13844,
+      "oos_sharpe_mean": 1.0286,
+      "oos_sharpe_max": 1.8033,
+      "sharpe_std": 0.5429453609710648,
+      "trades_total": 151,
+      "max_dd_worst": -0.3384,
+      "broken": false,
+      "broken_reason": "OK"
+    },
+    {
+      "strategy_id": "S07",
+      "is_sharpe": 1.23692,
+      "oos_sharpe_mean": 1.4022000000000001,
+      "oos_sharpe_max": 2.0263,
+      "sharpe_std": 0.56317901239304,
+      "trades_total": 156,
+      "max_dd_worst": -0.3091,
+      "broken": false,
+      "broken_reason": "OK"
+    },
+    {
+      "strategy_id": "S08",
+      "is_sharpe": 0.66902,
+      "oos_sharpe_mean": 0.25094000000000005,
+      "oos_sharpe_max": 1.1205,
+      "sharpe_std": 0.5114419302325535,
+      "trades_total": 132,
+      "max_dd_worst": -0.2201,
+      "broken": false,
+      "broken_reason": "OK"
+    },
+    {
+      "strategy_id": "S09",
+      "is_sharpe": 1.1591799999999999,
+      "oos_sharpe_mean": 0.7125600000000001,
+      "oos_sharpe_max": 1.1069,
+      "sharpe_std": 0.3389389517302489,
+      "trades_total": 199,
+      "max_dd_worst": -0.3365,
+      "broken": false,
+      "broken_reason": "OK"
+    },
+    {
+      "strategy_id": "S10",
+      "is_sharpe": 0.46326,
+      "oos_sharpe_mean": -0.07347999999999999,
+      "oos_sharpe_max": 0.1434,
+      "sharpe_std": 0.21330043834929172,
+      "trades_total": 196,
+      "max_dd_worst": -0.3193,
+      "broken": true,
+      "broken_reason": "oos_sharpe<0"
+    },
+    {
+      "strategy_id": "S11",
+      "is_sharpe": 0.28162,
+      "oos_sharpe_mean": 0.16888,
+      "oos_sharpe_max": 0.686,
+      "sharpe_std": 0.29137080670513305,
+      "trades_total": 196,
+      "max_dd_worst": -0.3205,
+      "broken": false,
+      "broken_reason": "OK"
+    },
+    {
+      "strategy_id": "S12",
+      "is_sharpe": 1.28468,
+      "oos_sharpe_mean": 0.3255,
+      "oos_sharpe_max": 0.8148,
+      "sharpe_std": 0.47644661295889174,
+      "trades_total": 160,
+      "max_dd_worst": -0.3205,
+      "broken": false,
+      "broken_reason": "OK"
+    }
+  ],
+  "after_strategies": [
+    {
+      "strategy_id": "S01",
+      "is_sharpe": 0.1025,
+      "oos_sharpe_mean": -0.21398,
+      "oos_sharpe_max": 0.1566,
+      "sharpe_std": 0.32934501969818825,
+      "trades_total": 309,
+      "max_dd_worst": -0.2129,
+      "broken": true,
+      "broken_reason": "oos_sharpe<0"
+    },
+    {
+      "strategy_id": "S02",
+      "is_sharpe": 0.26406,
+      "oos_sharpe_mean": 0.07794,
+      "oos_sharpe_max": 0.1324,
+      "sharpe_std": 0.060576340265816646,
+      "trades_total": 260,
+      "max_dd_worst": -0.322,
+      "broken": false,
+      "broken_reason": "OK"
+    },
+    {
+      "strategy_id": "S03",
+      "is_sharpe": 1.25558,
+      "oos_sharpe_mean": 1.04708,
+      "oos_sharpe_max": 1.1935,
+      "sharpe_std": 0.1534670876768046,
+      "trades_total": 242,
+      "max_dd_worst": -0.3369,
+      "broken": false,
+      "broken_reason": "OK"
+    },
+    {
+      "strategy_id": "S04",
+      "is_sharpe": 0.61268,
+      "oos_sharpe_mean": 0.61002,
+      "oos_sharpe_max": 0.6803,
+      "sharpe_std": 0.05128154638854025,
+      "trades_total": 248,
+      "max_dd_worst": -0.2825,
+      "broken": false,
+      "broken_reason": "OK"
+    },
+    {
+      "strategy_id": "S05",
+      "is_sharpe": 1.00702,
+      "oos_sharpe_mean": 1.20752,
+      "oos_sharpe_max": 1.2842,
+      "sharpe_std": 0.09018307490876554,
+      "trades_total": 307,
+      "max_dd_worst": -0.3454,
+      "broken": false,
+      "broken_reason": "OK"
+    },
+    {
+      "strategy_id": "S06",
+      "is_sharpe": 1.22236,
+      "oos_sharpe_mean": 0.9686600000000001,
+      "oos_sharpe_max": 1.3224,
+      "sharpe_std": 0.3021088926198631,
+      "trades_total": 252,
+      "max_dd_worst": -0.2992,
+      "broken": false,
+      "broken_reason": "OK"
+    },
+    {
+      "strategy_id": "S07",
+      "is_sharpe": 1.5216999999999998,
+      "oos_sharpe_mean": 1.2833999999999999,
+      "oos_sharpe_max": 1.4328,
+      "sharpe_std": 0.13252141336402962,
+      "trades_total": 252,
+      "max_dd_worst": -0.295,
+      "broken": false,
+      "broken_reason": "OK"
+    },
+    {
+      "strategy_id": "S08",
+      "is_sharpe": 0.9594999999999999,
+      "oos_sharpe_mean": 0.72298,
+      "oos_sharpe_max": 1.1711,
+      "sharpe_std": 0.31526037968637927,
+      "trades_total": 358,
+      "max_dd_worst": -0.2426,
+      "broken": false,
+      "broken_reason": "OK"
+    },
+    {
+      "strategy_id": "S09",
+      "is_sharpe": 1.7421,
+      "oos_sharpe_mean": 1.6045200000000002,
+      "oos_sharpe_max": 1.8762,
+      "sharpe_std": 0.20461411730376777,
+      "trades_total": 263,
+      "max_dd_worst": -0.3348,
+      "broken": false,
+      "broken_reason": "OK"
+    },
+    {
+      "strategy_id": "S10",
+      "is_sharpe": 0.38180000000000003,
+      "oos_sharpe_mean": 0.27243999999999996,
+      "oos_sharpe_max": 0.6504,
+      "sharpe_std": 0.2620617541725614,
+      "trades_total": 283,
+      "max_dd_worst": -0.2436,
+      "broken": false,
+      "broken_reason": "OK"
+    },
+    {
+      "strategy_id": "S11",
+      "is_sharpe": 0.41788,
+      "oos_sharpe_mean": 0.34576,
+      "oos_sharpe_max": 0.5962,
+      "sharpe_std": 0.2593505504139137,
+      "trades_total": 293,
+      "max_dd_worst": -0.2771,
+      "broken": false,
+      "broken_reason": "OK"
+    },
+    {
+      "strategy_id": "S12",
+      "is_sharpe": -0.17074,
+      "oos_sharpe_mean": -0.3094,
+      "oos_sharpe_max": -0.1065,
+      "sharpe_std": 0.14888131178895492,
+      "trades_total": 180,
+      "max_dd_worst": -0.3153,
+      "broken": true,
+      "broken_reason": "oos_sharpe<0"
+    }
+  ]
+}

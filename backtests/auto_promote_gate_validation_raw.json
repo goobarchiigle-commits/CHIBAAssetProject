@@ -1,0 +1,3651 @@
+{
+  "cases": {
+    "A": {
+      "si_threshold": 90.0,
+      "allow_unclassified": false,
+      "n_promotions": 40,
+      "n_unique_syms": 5,
+      "avg_interval_days": 91,
+      "fwd30_mean": 3.61,
+      "fwd30_median": 4.32,
+      "fwd30_win_rate": 62.5,
+      "fwd30_n": 40,
+      "type_dist": {
+        "MEAN_REVERSION": 58,
+        "UNCLASSIFIED": 106,
+        "EARLY_IGNITION": 63,
+        "HIGH_RSR": 9,
+        "MATURE_LEADER": 98,
+        "CONTINUATION": 16
+      },
+      "promotions": [
+        {
+          "sym": "6857.T",
+          "date": "2019-02-15",
+          "type": "HIGH_RSR",
+          "rsr": 100.0,
+          "si": 96.7,
+          "comp": 50.0,
+          "fwd30": -0.0341
+        },
+        {
+          "sym": "6920.T",
+          "date": "2019-02-15",
+          "type": "HIGH_RSR",
+          "rsr": 93.1,
+          "si": 96.7,
+          "comp": 50.0,
+          "fwd30": 0.0717
+        },
+        {
+          "sym": "8035.T",
+          "date": "2019-02-15",
+          "type": "EARLY_IGNITION",
+          "rsr": 37.9,
+          "si": 96.7,
+          "comp": 20.7,
+          "fwd30": 0.0408
+        },
+        {
+          "sym": "8035.T",
+          "date": "2019-04-17",
+          "type": "EARLY_IGNITION",
+          "rsr": 44.8,
+          "si": 100.0,
+          "comp": 24.7,
+          "fwd30": -0.1448
+        },
+        {
+          "sym": "6146.T",
+          "date": "2019-08-23",
+          "type": "CONTINUATION",
+          "rsr": 86.2,
+          "si": 100.0,
+          "comp": 31.7,
+          "fwd30": 0.0636
+        },
+        {
+          "sym": "6857.T",
+          "date": "2019-08-23",
+          "type": "HIGH_RSR",
+          "rsr": 96.6,
+          "si": 100.0,
+          "comp": 36.5,
+          "fwd30": 0.1908
+        },
+        {
+          "sym": "6920.T",
+          "date": "2019-08-23",
+          "type": "HIGH_RSR",
+          "rsr": 100.0,
+          "si": 100.0,
+          "comp": 44.1,
+          "fwd30": 0.2309
+        },
+        {
+          "sym": "8035.T",
+          "date": "2019-08-23",
+          "type": "EARLY_IGNITION",
+          "rsr": 82.8,
+          "si": 100.0,
+          "comp": 47.5,
+          "fwd30": 0.099
+        },
+        {
+          "sym": "5706.T",
+          "date": "2019-09-25",
+          "type": "EARLY_IGNITION",
+          "rsr": 13.8,
+          "si": 100.0,
+          "comp": 22.3,
+          "fwd30": 0.2862
+        },
+        {
+          "sym": "6146.T",
+          "date": "2019-09-25",
+          "type": "EARLY_IGNITION",
+          "rsr": 72.4,
+          "si": 100.0,
+          "comp": 6.1,
+          "fwd30": 0.126
+        },
+        {
+          "sym": "5706.T",
+          "date": "2019-10-28",
+          "type": "EARLY_IGNITION",
+          "rsr": 58.6,
+          "si": 100.0,
+          "comp": 50.0,
+          "fwd30": -0.0922
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-03-04",
+          "type": "EARLY_IGNITION",
+          "rsr": 55.2,
+          "si": 96.7,
+          "comp": 19.1,
+          "fwd30": -0.2088
+        },
+        {
+          "sym": "6146.T",
+          "date": "2020-03-04",
+          "type": "CONTINUATION",
+          "rsr": 86.2,
+          "si": 96.7,
+          "comp": 29.2,
+          "fwd30": 0.0819
+        },
+        {
+          "sym": "6146.T",
+          "date": "2020-05-08",
+          "type": "HIGH_RSR",
+          "rsr": 93.1,
+          "si": 100.0,
+          "comp": 37.8,
+          "fwd30": 0.0069
+        },
+        {
+          "sym": "8035.T",
+          "date": "2020-05-08",
+          "type": "CONTINUATION",
+          "rsr": 86.2,
+          "si": 100.0,
+          "comp": 29.0,
+          "fwd30": 0.07
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-06-08",
+          "type": "EARLY_IGNITION",
+          "rsr": 72.4,
+          "si": 100.0,
+          "comp": 37.9,
+          "fwd30": -0.0492
+        },
+        {
+          "sym": "6146.T",
+          "date": "2020-06-08",
+          "type": "HIGH_RSR",
+          "rsr": 93.1,
+          "si": 90.0,
+          "comp": 49.5,
+          "fwd30": 0.0456
+        },
+        {
+          "sym": "6857.T",
+          "date": "2020-06-08",
+          "type": "HIGH_RSR",
+          "rsr": 96.6,
+          "si": 90.0,
+          "comp": 45.8,
+          "fwd30": 0.1201
+        },
+        {
+          "sym": "6920.T",
+          "date": "2020-06-08",
+          "type": "HIGH_RSR",
+          "rsr": 100.0,
+          "si": 90.0,
+          "comp": 44.7,
+          "fwd30": 0.0529
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-09-08",
+          "type": "EARLY_IGNITION",
+          "rsr": 82.8,
+          "si": 100.0,
+          "comp": 19.5,
+          "fwd30": -0.0276
+        },
+        {
+          "sym": "6857.T",
+          "date": "2020-10-12",
+          "type": "EARLY_IGNITION",
+          "rsr": 72.4,
+          "si": 93.3,
+          "comp": 9.2,
+          "fwd30": 0.327
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-11-11",
+          "type": "EARLY_IGNITION",
+          "rsr": 62.1,
+          "si": 100.0,
+          "comp": 20.3,
+          "fwd30": 0.2234
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-12-11",
+          "type": "EARLY_IGNITION",
+          "rsr": 75.9,
+          "si": 100.0,
+          "comp": 35.1,
+          "fwd30": 0.0614
+        },
+        {
+          "sym": "6146.T",
+          "date": "2020-12-11",
+          "type": "EARLY_IGNITION",
+          "rsr": 82.8,
+          "si": 100.0,
+          "comp": 23.4,
+          "fwd30": 0.114
+        },
+        {
+          "sym": "6857.T",
+          "date": "2020-12-11",
+          "type": "EARLY_IGNITION",
+          "rsr": 79.3,
+          "si": 100.0,
+          "comp": 36.1,
+          "fwd30": 0.1902
+        },
+        {
+          "sym": "6146.T",
+          "date": "2021-01-14",
+          "type": "EARLY_IGNITION",
+          "rsr": 82.8,
+          "si": 100.0,
+          "comp": 27.6,
+          "fwd30": -0.103
+        },
+        {
+          "sym": "6857.T",
+          "date": "2021-01-14",
+          "type": "EARLY_IGNITION",
+          "rsr": 79.3,
+          "si": 100.0,
+          "comp": 24.9,
+          "fwd30": 0.0387
+        },
+        {
+          "sym": "8035.T",
+          "date": "2021-01-14",
+          "type": "HIGH_RSR",
+          "rsr": 93.1,
+          "si": 100.0,
+          "comp": 36.1,
+          "fwd30": 0.0558
+        },
+        {
+          "sym": "5706.T",
+          "date": "2021-10-21",
+          "type": "EARLY_IGNITION",
+          "rsr": 44.8,
+          "si": 100.0,
+          "comp": 13.4,
+          "fwd30": -0.1278
+        },
+        {
+          "sym": "6146.T",
+          "date": "2021-11-22",
+          "type": "EARLY_IGNITION",
+          "rsr": 37.9,
+          "si": 90.0,
+          "comp": 32.8,
+          "fwd30": 0.0299
+        },
+        {
+          "sym": "6857.T",
+          "date": "2021-11-22",
+          "type": "EARLY_IGNITION",
+          "rsr": 79.3,
+          "si": 90.0,
+          "comp": 45.8,
+          "fwd30": 0.0637
+        },
+        {
+          "sym": "5706.T",
+          "date": "2022-03-29",
+          "type": "EARLY_IGNITION",
+          "rsr": 10.3,
+          "si": 100.0,
+          "comp": 29.3,
+          "fwd30": -0.0717
+        },
+        {
+          "sym": "5706.T",
+          "date": "2022-06-01",
+          "type": "EARLY_IGNITION",
+          "rsr": 24.1,
+          "si": 100.0,
+          "comp": 27.7,
+          "fwd30": -0.111
+        },
+        {
+          "sym": "5706.T",
+          "date": "2023-02-06",
+          "type": "EARLY_IGNITION",
+          "rsr": 31.0,
+          "si": 100.0,
+          "comp": 42.9,
+          "fwd30": -0.0561
+        },
+        {
+          "sym": "5706.T",
+          "date": "2023-09-08",
+          "type": "EARLY_IGNITION",
+          "rsr": 27.6,
+          "si": 100.0,
+          "comp": 38.3,
+          "fwd30": -0.0175
+        },
+        {
+          "sym": "5706.T",
+          "date": "2023-12-12",
+          "type": "EARLY_IGNITION",
+          "rsr": 58.6,
+          "si": 100.0,
+          "comp": 22.0,
+          "fwd30": 0.0475
+        },
+        {
+          "sym": "5706.T",
+          "date": "2024-01-16",
+          "type": "EARLY_IGNITION",
+          "rsr": 51.7,
+          "si": 100.0,
+          "comp": 26.3,
+          "fwd30": -0.0412
+        },
+        {
+          "sym": "5706.T",
+          "date": "2024-04-17",
+          "type": "EARLY_IGNITION",
+          "rsr": 51.7,
+          "si": 100.0,
+          "comp": 19.2,
+          "fwd30": 0.0359
+        },
+        {
+          "sym": "5706.T",
+          "date": "2024-05-21",
+          "type": "EARLY_IGNITION",
+          "rsr": 65.5,
+          "si": 100.0,
+          "comp": 23.0,
+          "fwd30": -0.0128
+        },
+        {
+          "sym": "5706.T",
+          "date": "2024-07-19",
+          "type": "EARLY_IGNITION",
+          "rsr": 79.3,
+          "si": 100.0,
+          "comp": 23.2,
+          "fwd30": -0.1338
+        }
+      ]
+    },
+    "B": {
+      "si_threshold": 0.0,
+      "allow_unclassified": false,
+      "n_promotions": 78,
+      "n_unique_syms": 5,
+      "avg_interval_days": 89,
+      "fwd30_mean": 4.23,
+      "fwd30_median": 4.66,
+      "fwd30_win_rate": 62.8,
+      "fwd30_n": 78,
+      "type_dist": {
+        "MEAN_REVERSION": 58,
+        "UNCLASSIFIED": 106,
+        "EARLY_IGNITION": 63,
+        "HIGH_RSR": 9,
+        "MATURE_LEADER": 98,
+        "CONTINUATION": 16
+      },
+      "promotions": [
+        {
+          "sym": "6857.T",
+          "date": "2019-02-15",
+          "type": "HIGH_RSR",
+          "rsr": 100.0,
+          "si": 96.7,
+          "comp": 50.0,
+          "fwd30": -0.0341
+        },
+        {
+          "sym": "6920.T",
+          "date": "2019-02-15",
+          "type": "HIGH_RSR",
+          "rsr": 93.1,
+          "si": 96.7,
+          "comp": 50.0,
+          "fwd30": 0.0717
+        },
+        {
+          "sym": "8035.T",
+          "date": "2019-02-15",
+          "type": "EARLY_IGNITION",
+          "rsr": 37.9,
+          "si": 96.7,
+          "comp": 20.7,
+          "fwd30": 0.0408
+        },
+        {
+          "sym": "8035.T",
+          "date": "2019-04-17",
+          "type": "EARLY_IGNITION",
+          "rsr": 44.8,
+          "si": 100.0,
+          "comp": 24.7,
+          "fwd30": -0.1448
+        },
+        {
+          "sym": "6857.T",
+          "date": "2019-05-24",
+          "type": "CONTINUATION",
+          "rsr": 86.2,
+          "si": 73.3,
+          "comp": 28.8,
+          "fwd30": 0.1778
+        },
+        {
+          "sym": "6146.T",
+          "date": "2019-07-24",
+          "type": "CONTINUATION",
+          "rsr": 79.3,
+          "si": 73.3,
+          "comp": 34.0,
+          "fwd30": -0.0001
+        },
+        {
+          "sym": "6146.T",
+          "date": "2019-08-23",
+          "type": "CONTINUATION",
+          "rsr": 86.2,
+          "si": 100.0,
+          "comp": 31.7,
+          "fwd30": 0.0636
+        },
+        {
+          "sym": "6857.T",
+          "date": "2019-08-23",
+          "type": "HIGH_RSR",
+          "rsr": 96.6,
+          "si": 100.0,
+          "comp": 36.5,
+          "fwd30": 0.1908
+        },
+        {
+          "sym": "6920.T",
+          "date": "2019-08-23",
+          "type": "HIGH_RSR",
+          "rsr": 100.0,
+          "si": 100.0,
+          "comp": 44.1,
+          "fwd30": 0.2309
+        },
+        {
+          "sym": "8035.T",
+          "date": "2019-08-23",
+          "type": "EARLY_IGNITION",
+          "rsr": 82.8,
+          "si": 100.0,
+          "comp": 47.5,
+          "fwd30": 0.099
+        },
+        {
+          "sym": "5706.T",
+          "date": "2019-09-25",
+          "type": "EARLY_IGNITION",
+          "rsr": 13.8,
+          "si": 100.0,
+          "comp": 22.3,
+          "fwd30": 0.2862
+        },
+        {
+          "sym": "6146.T",
+          "date": "2019-09-25",
+          "type": "EARLY_IGNITION",
+          "rsr": 72.4,
+          "si": 100.0,
+          "comp": 6.1,
+          "fwd30": 0.126
+        },
+        {
+          "sym": "5706.T",
+          "date": "2019-10-28",
+          "type": "EARLY_IGNITION",
+          "rsr": 58.6,
+          "si": 100.0,
+          "comp": 50.0,
+          "fwd30": -0.0922
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-03-04",
+          "type": "EARLY_IGNITION",
+          "rsr": 55.2,
+          "si": 96.7,
+          "comp": 19.1,
+          "fwd30": -0.2088
+        },
+        {
+          "sym": "6146.T",
+          "date": "2020-03-04",
+          "type": "CONTINUATION",
+          "rsr": 86.2,
+          "si": 96.7,
+          "comp": 29.2,
+          "fwd30": 0.0819
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-04-03",
+          "type": "EARLY_IGNITION",
+          "rsr": 13.8,
+          "si": 76.7,
+          "comp": 30.9,
+          "fwd30": 0.2496
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-05-08",
+          "type": "EARLY_IGNITION",
+          "rsr": 20.7,
+          "si": 80.0,
+          "comp": 23.7,
+          "fwd30": 0.1349
+        },
+        {
+          "sym": "6146.T",
+          "date": "2020-05-08",
+          "type": "HIGH_RSR",
+          "rsr": 93.1,
+          "si": 100.0,
+          "comp": 37.8,
+          "fwd30": 0.0069
+        },
+        {
+          "sym": "8035.T",
+          "date": "2020-05-08",
+          "type": "CONTINUATION",
+          "rsr": 86.2,
+          "si": 100.0,
+          "comp": 29.0,
+          "fwd30": 0.07
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-06-08",
+          "type": "EARLY_IGNITION",
+          "rsr": 72.4,
+          "si": 100.0,
+          "comp": 37.9,
+          "fwd30": -0.0492
+        },
+        {
+          "sym": "6146.T",
+          "date": "2020-06-08",
+          "type": "HIGH_RSR",
+          "rsr": 93.1,
+          "si": 90.0,
+          "comp": 49.5,
+          "fwd30": 0.0456
+        },
+        {
+          "sym": "6857.T",
+          "date": "2020-06-08",
+          "type": "HIGH_RSR",
+          "rsr": 96.6,
+          "si": 90.0,
+          "comp": 45.8,
+          "fwd30": 0.1201
+        },
+        {
+          "sym": "6920.T",
+          "date": "2020-06-08",
+          "type": "HIGH_RSR",
+          "rsr": 100.0,
+          "si": 90.0,
+          "comp": 44.7,
+          "fwd30": 0.0529
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-08-07",
+          "type": "EARLY_IGNITION",
+          "rsr": 65.5,
+          "si": 80.0,
+          "comp": 11.6,
+          "fwd30": 0.0949
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-09-08",
+          "type": "EARLY_IGNITION",
+          "rsr": 82.8,
+          "si": 100.0,
+          "comp": 19.5,
+          "fwd30": -0.0276
+        },
+        {
+          "sym": "6857.T",
+          "date": "2020-10-12",
+          "type": "EARLY_IGNITION",
+          "rsr": 72.4,
+          "si": 93.3,
+          "comp": 9.2,
+          "fwd30": 0.327
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-11-11",
+          "type": "EARLY_IGNITION",
+          "rsr": 62.1,
+          "si": 100.0,
+          "comp": 20.3,
+          "fwd30": 0.2234
+        },
+        {
+          "sym": "6146.T",
+          "date": "2020-11-11",
+          "type": "CONTINUATION",
+          "rsr": 79.3,
+          "si": 46.7,
+          "comp": 50.0,
+          "fwd30": 0.1606
+        },
+        {
+          "sym": "6857.T",
+          "date": "2020-11-11",
+          "type": "CONTINUATION",
+          "rsr": 72.4,
+          "si": 46.7,
+          "comp": 45.0,
+          "fwd30": 0.1489
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-12-11",
+          "type": "EARLY_IGNITION",
+          "rsr": 75.9,
+          "si": 100.0,
+          "comp": 35.1,
+          "fwd30": 0.0614
+        },
+        {
+          "sym": "6146.T",
+          "date": "2020-12-11",
+          "type": "EARLY_IGNITION",
+          "rsr": 82.8,
+          "si": 100.0,
+          "comp": 23.4,
+          "fwd30": 0.114
+        },
+        {
+          "sym": "6857.T",
+          "date": "2020-12-11",
+          "type": "EARLY_IGNITION",
+          "rsr": 79.3,
+          "si": 100.0,
+          "comp": 36.1,
+          "fwd30": 0.1902
+        },
+        {
+          "sym": "6146.T",
+          "date": "2021-01-14",
+          "type": "EARLY_IGNITION",
+          "rsr": 82.8,
+          "si": 100.0,
+          "comp": 27.6,
+          "fwd30": -0.103
+        },
+        {
+          "sym": "6857.T",
+          "date": "2021-01-14",
+          "type": "EARLY_IGNITION",
+          "rsr": 79.3,
+          "si": 100.0,
+          "comp": 24.9,
+          "fwd30": 0.0387
+        },
+        {
+          "sym": "8035.T",
+          "date": "2021-01-14",
+          "type": "HIGH_RSR",
+          "rsr": 93.1,
+          "si": 100.0,
+          "comp": 36.1,
+          "fwd30": 0.0558
+        },
+        {
+          "sym": "5706.T",
+          "date": "2021-07-19",
+          "type": "EARLY_IGNITION",
+          "rsr": 48.3,
+          "si": 86.7,
+          "comp": 9.7,
+          "fwd30": 0.0784
+        },
+        {
+          "sym": "5706.T",
+          "date": "2021-08-20",
+          "type": "EARLY_IGNITION",
+          "rsr": 44.8,
+          "si": 86.7,
+          "comp": 14.6,
+          "fwd30": -0.0803
+        },
+        {
+          "sym": "6857.T",
+          "date": "2021-08-20",
+          "type": "CONTINUATION",
+          "rsr": 79.3,
+          "si": 40.0,
+          "comp": 41.4,
+          "fwd30": 0.0222
+        },
+        {
+          "sym": "8035.T",
+          "date": "2021-08-20",
+          "type": "CONTINUATION",
+          "rsr": 72.4,
+          "si": 40.0,
+          "comp": 41.9,
+          "fwd30": 0.0705
+        },
+        {
+          "sym": "8035.T",
+          "date": "2021-09-21",
+          "type": "CONTINUATION",
+          "rsr": 82.8,
+          "si": 43.3,
+          "comp": 44.2,
+          "fwd30": 0.0653
+        },
+        {
+          "sym": "5706.T",
+          "date": "2021-10-21",
+          "type": "EARLY_IGNITION",
+          "rsr": 44.8,
+          "si": 100.0,
+          "comp": 13.4,
+          "fwd30": -0.1278
+        },
+        {
+          "sym": "6857.T",
+          "date": "2021-10-21",
+          "type": "CONTINUATION",
+          "rsr": 75.9,
+          "si": 36.7,
+          "comp": 50.0,
+          "fwd30": 0.1067
+        },
+        {
+          "sym": "8035.T",
+          "date": "2021-10-21",
+          "type": "CONTINUATION",
+          "rsr": 79.3,
+          "si": 36.7,
+          "comp": 50.0,
+          "fwd30": 0.2008
+        },
+        {
+          "sym": "6146.T",
+          "date": "2021-11-22",
+          "type": "EARLY_IGNITION",
+          "rsr": 37.9,
+          "si": 90.0,
+          "comp": 32.8,
+          "fwd30": 0.0299
+        },
+        {
+          "sym": "6857.T",
+          "date": "2021-11-22",
+          "type": "EARLY_IGNITION",
+          "rsr": 79.3,
+          "si": 90.0,
+          "comp": 45.8,
+          "fwd30": 0.0637
+        },
+        {
+          "sym": "6146.T",
+          "date": "2021-12-22",
+          "type": "EARLY_IGNITION",
+          "rsr": 17.2,
+          "si": 76.7,
+          "comp": 42.7,
+          "fwd30": -0.0571
+        },
+        {
+          "sym": "6857.T",
+          "date": "2021-12-22",
+          "type": "EARLY_IGNITION",
+          "rsr": 72.4,
+          "si": 76.7,
+          "comp": 42.2,
+          "fwd30": -0.1377
+        },
+        {
+          "sym": "6920.T",
+          "date": "2022-02-25",
+          "type": "CONTINUATION",
+          "rsr": 82.8,
+          "si": 40.0,
+          "comp": 45.5,
+          "fwd30": -0.0974
+        },
+        {
+          "sym": "5706.T",
+          "date": "2022-03-29",
+          "type": "EARLY_IGNITION",
+          "rsr": 10.3,
+          "si": 100.0,
+          "comp": 29.3,
+          "fwd30": -0.0717
+        },
+        {
+          "sym": "6146.T",
+          "date": "2022-04-27",
+          "type": "EARLY_IGNITION",
+          "rsr": 13.8,
+          "si": 76.7,
+          "comp": 42.1,
+          "fwd30": -0.0031
+        },
+        {
+          "sym": "6920.T",
+          "date": "2022-04-27",
+          "type": "EARLY_IGNITION",
+          "rsr": 20.7,
+          "si": 76.7,
+          "comp": 9.8,
+          "fwd30": -0.0606
+        },
+        {
+          "sym": "8035.T",
+          "date": "2022-04-27",
+          "type": "EARLY_IGNITION",
+          "rsr": 55.2,
+          "si": 76.7,
+          "comp": 25.9,
+          "fwd30": -0.0653
+        },
+        {
+          "sym": "5706.T",
+          "date": "2022-06-01",
+          "type": "EARLY_IGNITION",
+          "rsr": 24.1,
+          "si": 100.0,
+          "comp": 27.7,
+          "fwd30": -0.111
+        },
+        {
+          "sym": "8035.T",
+          "date": "2022-06-01",
+          "type": "CONTINUATION",
+          "rsr": 79.3,
+          "si": 56.7,
+          "comp": 50.0,
+          "fwd30": -0.2856
+        },
+        {
+          "sym": "5706.T",
+          "date": "2022-10-03",
+          "type": "EARLY_IGNITION",
+          "rsr": 27.6,
+          "si": 76.7,
+          "comp": 34.2,
+          "fwd30": 0.0401
+        },
+        {
+          "sym": "6146.T",
+          "date": "2022-10-03",
+          "type": "EARLY_IGNITION",
+          "rsr": 44.8,
+          "si": 76.7,
+          "comp": 19.2,
+          "fwd30": 0.2748
+        },
+        {
+          "sym": "8035.T",
+          "date": "2022-10-03",
+          "type": "EARLY_IGNITION",
+          "rsr": 10.3,
+          "si": 76.7,
+          "comp": 17.9,
+          "fwd30": 0.2934
+        },
+        {
+          "sym": "5706.T",
+          "date": "2023-02-06",
+          "type": "EARLY_IGNITION",
+          "rsr": 31.0,
+          "si": 100.0,
+          "comp": 42.9,
+          "fwd30": -0.0561
+        },
+        {
+          "sym": "6857.T",
+          "date": "2023-04-07",
+          "type": "EARLY_IGNITION",
+          "rsr": 72.4,
+          "si": 76.7,
+          "comp": 9.3,
+          "fwd30": 0.2283
+        },
+        {
+          "sym": "6920.T",
+          "date": "2023-04-07",
+          "type": "EARLY_IGNITION",
+          "rsr": 44.8,
+          "si": 76.7,
+          "comp": 5.7,
+          "fwd30": -0.0048
+        },
+        {
+          "sym": "5706.T",
+          "date": "2023-09-08",
+          "type": "EARLY_IGNITION",
+          "rsr": 27.6,
+          "si": 100.0,
+          "comp": 38.3,
+          "fwd30": -0.0175
+        },
+        {
+          "sym": "6920.T",
+          "date": "2023-11-10",
+          "type": "EARLY_IGNITION",
+          "rsr": 34.5,
+          "si": 80.0,
+          "comp": 26.0,
+          "fwd30": 0.2518
+        },
+        {
+          "sym": "8035.T",
+          "date": "2023-11-10",
+          "type": "EARLY_IGNITION",
+          "rsr": 82.8,
+          "si": 80.0,
+          "comp": 9.0,
+          "fwd30": 0.1479
+        },
+        {
+          "sym": "5706.T",
+          "date": "2023-12-12",
+          "type": "EARLY_IGNITION",
+          "rsr": 58.6,
+          "si": 100.0,
+          "comp": 22.0,
+          "fwd30": 0.0475
+        },
+        {
+          "sym": "6920.T",
+          "date": "2023-12-12",
+          "type": "EARLY_IGNITION",
+          "rsr": 20.7,
+          "si": 80.0,
+          "comp": 31.0,
+          "fwd30": 0.1232
+        },
+        {
+          "sym": "8035.T",
+          "date": "2023-12-12",
+          "type": "EARLY_IGNITION",
+          "rsr": 79.3,
+          "si": 80.0,
+          "comp": 29.9,
+          "fwd30": 0.1574
+        },
+        {
+          "sym": "5706.T",
+          "date": "2024-01-16",
+          "type": "EARLY_IGNITION",
+          "rsr": 51.7,
+          "si": 100.0,
+          "comp": 26.3,
+          "fwd30": -0.0412
+        },
+        {
+          "sym": "5706.T",
+          "date": "2024-04-17",
+          "type": "EARLY_IGNITION",
+          "rsr": 51.7,
+          "si": 100.0,
+          "comp": 19.2,
+          "fwd30": 0.0359
+        },
+        {
+          "sym": "5706.T",
+          "date": "2024-05-21",
+          "type": "EARLY_IGNITION",
+          "rsr": 65.5,
+          "si": 100.0,
+          "comp": 23.0,
+          "fwd30": -0.0128
+        },
+        {
+          "sym": "6857.T",
+          "date": "2024-06-19",
+          "type": "EARLY_IGNITION",
+          "rsr": 27.6,
+          "si": 86.7,
+          "comp": 4.6,
+          "fwd30": 0.2259
+        },
+        {
+          "sym": "6920.T",
+          "date": "2024-06-19",
+          "type": "EARLY_IGNITION",
+          "rsr": 79.3,
+          "si": 86.7,
+          "comp": 42.5,
+          "fwd30": -0.2534
+        },
+        {
+          "sym": "5706.T",
+          "date": "2024-07-19",
+          "type": "EARLY_IGNITION",
+          "rsr": 79.3,
+          "si": 100.0,
+          "comp": 23.2,
+          "fwd30": -0.1338
+        },
+        {
+          "sym": "5706.T",
+          "date": "2024-08-20",
+          "type": "CONTINUATION",
+          "rsr": 79.3,
+          "si": 56.7,
+          "comp": 29.1,
+          "fwd30": 0.0794
+        },
+        {
+          "sym": "6146.T",
+          "date": "2024-08-20",
+          "type": "CONTINUATION",
+          "rsr": 86.2,
+          "si": 76.7,
+          "comp": 42.1,
+          "fwd30": -0.1682
+        },
+        {
+          "sym": "6857.T",
+          "date": "2024-08-20",
+          "type": "EARLY_IGNITION",
+          "rsr": 82.8,
+          "si": 76.7,
+          "comp": 37.8,
+          "fwd30": 0.0221
+        },
+        {
+          "sym": "6920.T",
+          "date": "2024-08-20",
+          "type": "EARLY_IGNITION",
+          "rsr": 55.2,
+          "si": 76.7,
+          "comp": 23.6,
+          "fwd30": -0.1995
+        },
+        {
+          "sym": "8035.T",
+          "date": "2024-08-20",
+          "type": "EARLY_IGNITION",
+          "rsr": 69.0,
+          "si": 76.7,
+          "comp": 35.0,
+          "fwd30": -0.0845
+        },
+        {
+          "sym": "5706.T",
+          "date": "2024-10-22",
+          "type": "EARLY_IGNITION",
+          "rsr": 72.4,
+          "si": 76.7,
+          "comp": 22.6,
+          "fwd30": 0.0015
+        }
+      ]
+    },
+    "C": {
+      "si_threshold": 50.0,
+      "allow_unclassified": false,
+      "n_promotions": 70,
+      "n_unique_syms": 5,
+      "avg_interval_days": 100,
+      "fwd30_mean": 3.75,
+      "fwd30_median": 4.04,
+      "fwd30_win_rate": 60.0,
+      "fwd30_n": 70,
+      "type_dist": {
+        "MEAN_REVERSION": 58,
+        "UNCLASSIFIED": 106,
+        "EARLY_IGNITION": 63,
+        "HIGH_RSR": 9,
+        "MATURE_LEADER": 98,
+        "CONTINUATION": 16
+      },
+      "promotions": [
+        {
+          "sym": "6857.T",
+          "date": "2019-02-15",
+          "type": "HIGH_RSR",
+          "rsr": 100.0,
+          "si": 96.7,
+          "comp": 50.0,
+          "fwd30": -0.0341
+        },
+        {
+          "sym": "6920.T",
+          "date": "2019-02-15",
+          "type": "HIGH_RSR",
+          "rsr": 93.1,
+          "si": 96.7,
+          "comp": 50.0,
+          "fwd30": 0.0717
+        },
+        {
+          "sym": "8035.T",
+          "date": "2019-02-15",
+          "type": "EARLY_IGNITION",
+          "rsr": 37.9,
+          "si": 96.7,
+          "comp": 20.7,
+          "fwd30": 0.0408
+        },
+        {
+          "sym": "8035.T",
+          "date": "2019-04-17",
+          "type": "EARLY_IGNITION",
+          "rsr": 44.8,
+          "si": 100.0,
+          "comp": 24.7,
+          "fwd30": -0.1448
+        },
+        {
+          "sym": "6857.T",
+          "date": "2019-05-24",
+          "type": "CONTINUATION",
+          "rsr": 86.2,
+          "si": 73.3,
+          "comp": 28.8,
+          "fwd30": 0.1778
+        },
+        {
+          "sym": "6146.T",
+          "date": "2019-07-24",
+          "type": "CONTINUATION",
+          "rsr": 79.3,
+          "si": 73.3,
+          "comp": 34.0,
+          "fwd30": -0.0001
+        },
+        {
+          "sym": "6146.T",
+          "date": "2019-08-23",
+          "type": "CONTINUATION",
+          "rsr": 86.2,
+          "si": 100.0,
+          "comp": 31.7,
+          "fwd30": 0.0636
+        },
+        {
+          "sym": "6857.T",
+          "date": "2019-08-23",
+          "type": "HIGH_RSR",
+          "rsr": 96.6,
+          "si": 100.0,
+          "comp": 36.5,
+          "fwd30": 0.1908
+        },
+        {
+          "sym": "6920.T",
+          "date": "2019-08-23",
+          "type": "HIGH_RSR",
+          "rsr": 100.0,
+          "si": 100.0,
+          "comp": 44.1,
+          "fwd30": 0.2309
+        },
+        {
+          "sym": "8035.T",
+          "date": "2019-08-23",
+          "type": "EARLY_IGNITION",
+          "rsr": 82.8,
+          "si": 100.0,
+          "comp": 47.5,
+          "fwd30": 0.099
+        },
+        {
+          "sym": "5706.T",
+          "date": "2019-09-25",
+          "type": "EARLY_IGNITION",
+          "rsr": 13.8,
+          "si": 100.0,
+          "comp": 22.3,
+          "fwd30": 0.2862
+        },
+        {
+          "sym": "6146.T",
+          "date": "2019-09-25",
+          "type": "EARLY_IGNITION",
+          "rsr": 72.4,
+          "si": 100.0,
+          "comp": 6.1,
+          "fwd30": 0.126
+        },
+        {
+          "sym": "5706.T",
+          "date": "2019-10-28",
+          "type": "EARLY_IGNITION",
+          "rsr": 58.6,
+          "si": 100.0,
+          "comp": 50.0,
+          "fwd30": -0.0922
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-03-04",
+          "type": "EARLY_IGNITION",
+          "rsr": 55.2,
+          "si": 96.7,
+          "comp": 19.1,
+          "fwd30": -0.2088
+        },
+        {
+          "sym": "6146.T",
+          "date": "2020-03-04",
+          "type": "CONTINUATION",
+          "rsr": 86.2,
+          "si": 96.7,
+          "comp": 29.2,
+          "fwd30": 0.0819
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-04-03",
+          "type": "EARLY_IGNITION",
+          "rsr": 13.8,
+          "si": 76.7,
+          "comp": 30.9,
+          "fwd30": 0.2496
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-05-08",
+          "type": "EARLY_IGNITION",
+          "rsr": 20.7,
+          "si": 80.0,
+          "comp": 23.7,
+          "fwd30": 0.1349
+        },
+        {
+          "sym": "6146.T",
+          "date": "2020-05-08",
+          "type": "HIGH_RSR",
+          "rsr": 93.1,
+          "si": 100.0,
+          "comp": 37.8,
+          "fwd30": 0.0069
+        },
+        {
+          "sym": "8035.T",
+          "date": "2020-05-08",
+          "type": "CONTINUATION",
+          "rsr": 86.2,
+          "si": 100.0,
+          "comp": 29.0,
+          "fwd30": 0.07
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-06-08",
+          "type": "EARLY_IGNITION",
+          "rsr": 72.4,
+          "si": 100.0,
+          "comp": 37.9,
+          "fwd30": -0.0492
+        },
+        {
+          "sym": "6146.T",
+          "date": "2020-06-08",
+          "type": "HIGH_RSR",
+          "rsr": 93.1,
+          "si": 90.0,
+          "comp": 49.5,
+          "fwd30": 0.0456
+        },
+        {
+          "sym": "6857.T",
+          "date": "2020-06-08",
+          "type": "HIGH_RSR",
+          "rsr": 96.6,
+          "si": 90.0,
+          "comp": 45.8,
+          "fwd30": 0.1201
+        },
+        {
+          "sym": "6920.T",
+          "date": "2020-06-08",
+          "type": "HIGH_RSR",
+          "rsr": 100.0,
+          "si": 90.0,
+          "comp": 44.7,
+          "fwd30": 0.0529
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-08-07",
+          "type": "EARLY_IGNITION",
+          "rsr": 65.5,
+          "si": 80.0,
+          "comp": 11.6,
+          "fwd30": 0.0949
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-09-08",
+          "type": "EARLY_IGNITION",
+          "rsr": 82.8,
+          "si": 100.0,
+          "comp": 19.5,
+          "fwd30": -0.0276
+        },
+        {
+          "sym": "6857.T",
+          "date": "2020-10-12",
+          "type": "EARLY_IGNITION",
+          "rsr": 72.4,
+          "si": 93.3,
+          "comp": 9.2,
+          "fwd30": 0.327
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-11-11",
+          "type": "EARLY_IGNITION",
+          "rsr": 62.1,
+          "si": 100.0,
+          "comp": 20.3,
+          "fwd30": 0.2234
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-12-11",
+          "type": "EARLY_IGNITION",
+          "rsr": 75.9,
+          "si": 100.0,
+          "comp": 35.1,
+          "fwd30": 0.0614
+        },
+        {
+          "sym": "6146.T",
+          "date": "2020-12-11",
+          "type": "EARLY_IGNITION",
+          "rsr": 82.8,
+          "si": 100.0,
+          "comp": 23.4,
+          "fwd30": 0.114
+        },
+        {
+          "sym": "6857.T",
+          "date": "2020-12-11",
+          "type": "EARLY_IGNITION",
+          "rsr": 79.3,
+          "si": 100.0,
+          "comp": 36.1,
+          "fwd30": 0.1902
+        },
+        {
+          "sym": "6146.T",
+          "date": "2021-01-14",
+          "type": "EARLY_IGNITION",
+          "rsr": 82.8,
+          "si": 100.0,
+          "comp": 27.6,
+          "fwd30": -0.103
+        },
+        {
+          "sym": "6857.T",
+          "date": "2021-01-14",
+          "type": "EARLY_IGNITION",
+          "rsr": 79.3,
+          "si": 100.0,
+          "comp": 24.9,
+          "fwd30": 0.0387
+        },
+        {
+          "sym": "8035.T",
+          "date": "2021-01-14",
+          "type": "HIGH_RSR",
+          "rsr": 93.1,
+          "si": 100.0,
+          "comp": 36.1,
+          "fwd30": 0.0558
+        },
+        {
+          "sym": "5706.T",
+          "date": "2021-07-19",
+          "type": "EARLY_IGNITION",
+          "rsr": 48.3,
+          "si": 86.7,
+          "comp": 9.7,
+          "fwd30": 0.0784
+        },
+        {
+          "sym": "5706.T",
+          "date": "2021-08-20",
+          "type": "EARLY_IGNITION",
+          "rsr": 44.8,
+          "si": 86.7,
+          "comp": 14.6,
+          "fwd30": -0.0803
+        },
+        {
+          "sym": "5706.T",
+          "date": "2021-10-21",
+          "type": "EARLY_IGNITION",
+          "rsr": 44.8,
+          "si": 100.0,
+          "comp": 13.4,
+          "fwd30": -0.1278
+        },
+        {
+          "sym": "6146.T",
+          "date": "2021-11-22",
+          "type": "EARLY_IGNITION",
+          "rsr": 37.9,
+          "si": 90.0,
+          "comp": 32.8,
+          "fwd30": 0.0299
+        },
+        {
+          "sym": "6857.T",
+          "date": "2021-11-22",
+          "type": "EARLY_IGNITION",
+          "rsr": 79.3,
+          "si": 90.0,
+          "comp": 45.8,
+          "fwd30": 0.0637
+        },
+        {
+          "sym": "6146.T",
+          "date": "2021-12-22",
+          "type": "EARLY_IGNITION",
+          "rsr": 17.2,
+          "si": 76.7,
+          "comp": 42.7,
+          "fwd30": -0.0571
+        },
+        {
+          "sym": "6857.T",
+          "date": "2021-12-22",
+          "type": "EARLY_IGNITION",
+          "rsr": 72.4,
+          "si": 76.7,
+          "comp": 42.2,
+          "fwd30": -0.1377
+        },
+        {
+          "sym": "5706.T",
+          "date": "2022-03-29",
+          "type": "EARLY_IGNITION",
+          "rsr": 10.3,
+          "si": 100.0,
+          "comp": 29.3,
+          "fwd30": -0.0717
+        },
+        {
+          "sym": "6146.T",
+          "date": "2022-04-27",
+          "type": "EARLY_IGNITION",
+          "rsr": 13.8,
+          "si": 76.7,
+          "comp": 42.1,
+          "fwd30": -0.0031
+        },
+        {
+          "sym": "6920.T",
+          "date": "2022-04-27",
+          "type": "EARLY_IGNITION",
+          "rsr": 20.7,
+          "si": 76.7,
+          "comp": 9.8,
+          "fwd30": -0.0606
+        },
+        {
+          "sym": "8035.T",
+          "date": "2022-04-27",
+          "type": "EARLY_IGNITION",
+          "rsr": 55.2,
+          "si": 76.7,
+          "comp": 25.9,
+          "fwd30": -0.0653
+        },
+        {
+          "sym": "5706.T",
+          "date": "2022-06-01",
+          "type": "EARLY_IGNITION",
+          "rsr": 24.1,
+          "si": 100.0,
+          "comp": 27.7,
+          "fwd30": -0.111
+        },
+        {
+          "sym": "8035.T",
+          "date": "2022-06-01",
+          "type": "CONTINUATION",
+          "rsr": 79.3,
+          "si": 56.7,
+          "comp": 50.0,
+          "fwd30": -0.2856
+        },
+        {
+          "sym": "5706.T",
+          "date": "2022-10-03",
+          "type": "EARLY_IGNITION",
+          "rsr": 27.6,
+          "si": 76.7,
+          "comp": 34.2,
+          "fwd30": 0.0401
+        },
+        {
+          "sym": "6146.T",
+          "date": "2022-10-03",
+          "type": "EARLY_IGNITION",
+          "rsr": 44.8,
+          "si": 76.7,
+          "comp": 19.2,
+          "fwd30": 0.2748
+        },
+        {
+          "sym": "8035.T",
+          "date": "2022-10-03",
+          "type": "EARLY_IGNITION",
+          "rsr": 10.3,
+          "si": 76.7,
+          "comp": 17.9,
+          "fwd30": 0.2934
+        },
+        {
+          "sym": "5706.T",
+          "date": "2023-02-06",
+          "type": "EARLY_IGNITION",
+          "rsr": 31.0,
+          "si": 100.0,
+          "comp": 42.9,
+          "fwd30": -0.0561
+        },
+        {
+          "sym": "6857.T",
+          "date": "2023-04-07",
+          "type": "EARLY_IGNITION",
+          "rsr": 72.4,
+          "si": 76.7,
+          "comp": 9.3,
+          "fwd30": 0.2283
+        },
+        {
+          "sym": "6920.T",
+          "date": "2023-04-07",
+          "type": "EARLY_IGNITION",
+          "rsr": 44.8,
+          "si": 76.7,
+          "comp": 5.7,
+          "fwd30": -0.0048
+        },
+        {
+          "sym": "5706.T",
+          "date": "2023-09-08",
+          "type": "EARLY_IGNITION",
+          "rsr": 27.6,
+          "si": 100.0,
+          "comp": 38.3,
+          "fwd30": -0.0175
+        },
+        {
+          "sym": "6920.T",
+          "date": "2023-11-10",
+          "type": "EARLY_IGNITION",
+          "rsr": 34.5,
+          "si": 80.0,
+          "comp": 26.0,
+          "fwd30": 0.2518
+        },
+        {
+          "sym": "8035.T",
+          "date": "2023-11-10",
+          "type": "EARLY_IGNITION",
+          "rsr": 82.8,
+          "si": 80.0,
+          "comp": 9.0,
+          "fwd30": 0.1479
+        },
+        {
+          "sym": "5706.T",
+          "date": "2023-12-12",
+          "type": "EARLY_IGNITION",
+          "rsr": 58.6,
+          "si": 100.0,
+          "comp": 22.0,
+          "fwd30": 0.0475
+        },
+        {
+          "sym": "6920.T",
+          "date": "2023-12-12",
+          "type": "EARLY_IGNITION",
+          "rsr": 20.7,
+          "si": 80.0,
+          "comp": 31.0,
+          "fwd30": 0.1232
+        },
+        {
+          "sym": "8035.T",
+          "date": "2023-12-12",
+          "type": "EARLY_IGNITION",
+          "rsr": 79.3,
+          "si": 80.0,
+          "comp": 29.9,
+          "fwd30": 0.1574
+        },
+        {
+          "sym": "5706.T",
+          "date": "2024-01-16",
+          "type": "EARLY_IGNITION",
+          "rsr": 51.7,
+          "si": 100.0,
+          "comp": 26.3,
+          "fwd30": -0.0412
+        },
+        {
+          "sym": "5706.T",
+          "date": "2024-04-17",
+          "type": "EARLY_IGNITION",
+          "rsr": 51.7,
+          "si": 100.0,
+          "comp": 19.2,
+          "fwd30": 0.0359
+        },
+        {
+          "sym": "5706.T",
+          "date": "2024-05-21",
+          "type": "EARLY_IGNITION",
+          "rsr": 65.5,
+          "si": 100.0,
+          "comp": 23.0,
+          "fwd30": -0.0128
+        },
+        {
+          "sym": "6857.T",
+          "date": "2024-06-19",
+          "type": "EARLY_IGNITION",
+          "rsr": 27.6,
+          "si": 86.7,
+          "comp": 4.6,
+          "fwd30": 0.2259
+        },
+        {
+          "sym": "6920.T",
+          "date": "2024-06-19",
+          "type": "EARLY_IGNITION",
+          "rsr": 79.3,
+          "si": 86.7,
+          "comp": 42.5,
+          "fwd30": -0.2534
+        },
+        {
+          "sym": "5706.T",
+          "date": "2024-07-19",
+          "type": "EARLY_IGNITION",
+          "rsr": 79.3,
+          "si": 100.0,
+          "comp": 23.2,
+          "fwd30": -0.1338
+        },
+        {
+          "sym": "5706.T",
+          "date": "2024-08-20",
+          "type": "CONTINUATION",
+          "rsr": 79.3,
+          "si": 56.7,
+          "comp": 29.1,
+          "fwd30": 0.0794
+        },
+        {
+          "sym": "6146.T",
+          "date": "2024-08-20",
+          "type": "CONTINUATION",
+          "rsr": 86.2,
+          "si": 76.7,
+          "comp": 42.1,
+          "fwd30": -0.1682
+        },
+        {
+          "sym": "6857.T",
+          "date": "2024-08-20",
+          "type": "EARLY_IGNITION",
+          "rsr": 82.8,
+          "si": 76.7,
+          "comp": 37.8,
+          "fwd30": 0.0221
+        },
+        {
+          "sym": "6920.T",
+          "date": "2024-08-20",
+          "type": "EARLY_IGNITION",
+          "rsr": 55.2,
+          "si": 76.7,
+          "comp": 23.6,
+          "fwd30": -0.1995
+        },
+        {
+          "sym": "8035.T",
+          "date": "2024-08-20",
+          "type": "EARLY_IGNITION",
+          "rsr": 69.0,
+          "si": 76.7,
+          "comp": 35.0,
+          "fwd30": -0.0845
+        },
+        {
+          "sym": "5706.T",
+          "date": "2024-10-22",
+          "type": "EARLY_IGNITION",
+          "rsr": 72.4,
+          "si": 76.7,
+          "comp": 22.6,
+          "fwd30": 0.0015
+        }
+      ]
+    },
+    "D": {
+      "si_threshold": 90.0,
+      "allow_unclassified": true,
+      "n_promotions": 43,
+      "n_unique_syms": 5,
+      "avg_interval_days": 83,
+      "fwd30_mean": 3.93,
+      "fwd30_median": 4.56,
+      "fwd30_win_rate": 62.8,
+      "fwd30_n": 43,
+      "type_dist": {
+        "MEAN_REVERSION": 58,
+        "UNCLASSIFIED": 106,
+        "EARLY_IGNITION": 63,
+        "HIGH_RSR": 9,
+        "MATURE_LEADER": 98,
+        "CONTINUATION": 16
+      },
+      "promotions": [
+        {
+          "sym": "6857.T",
+          "date": "2019-02-15",
+          "type": "HIGH_RSR",
+          "rsr": 100.0,
+          "si": 96.7,
+          "comp": 50.0,
+          "fwd30": -0.0341
+        },
+        {
+          "sym": "6920.T",
+          "date": "2019-02-15",
+          "type": "HIGH_RSR",
+          "rsr": 93.1,
+          "si": 96.7,
+          "comp": 50.0,
+          "fwd30": 0.0717
+        },
+        {
+          "sym": "8035.T",
+          "date": "2019-02-15",
+          "type": "EARLY_IGNITION",
+          "rsr": 37.9,
+          "si": 96.7,
+          "comp": 20.7,
+          "fwd30": 0.0408
+        },
+        {
+          "sym": "8035.T",
+          "date": "2019-04-17",
+          "type": "EARLY_IGNITION",
+          "rsr": 44.8,
+          "si": 100.0,
+          "comp": 24.7,
+          "fwd30": -0.1448
+        },
+        {
+          "sym": "6146.T",
+          "date": "2019-08-23",
+          "type": "CONTINUATION",
+          "rsr": 86.2,
+          "si": 100.0,
+          "comp": 31.7,
+          "fwd30": 0.0636
+        },
+        {
+          "sym": "6857.T",
+          "date": "2019-08-23",
+          "type": "HIGH_RSR",
+          "rsr": 96.6,
+          "si": 100.0,
+          "comp": 36.5,
+          "fwd30": 0.1908
+        },
+        {
+          "sym": "6920.T",
+          "date": "2019-08-23",
+          "type": "HIGH_RSR",
+          "rsr": 100.0,
+          "si": 100.0,
+          "comp": 44.1,
+          "fwd30": 0.2309
+        },
+        {
+          "sym": "8035.T",
+          "date": "2019-08-23",
+          "type": "EARLY_IGNITION",
+          "rsr": 82.8,
+          "si": 100.0,
+          "comp": 47.5,
+          "fwd30": 0.099
+        },
+        {
+          "sym": "5706.T",
+          "date": "2019-09-25",
+          "type": "EARLY_IGNITION",
+          "rsr": 13.8,
+          "si": 100.0,
+          "comp": 22.3,
+          "fwd30": 0.2862
+        },
+        {
+          "sym": "6146.T",
+          "date": "2019-09-25",
+          "type": "EARLY_IGNITION",
+          "rsr": 72.4,
+          "si": 100.0,
+          "comp": 6.1,
+          "fwd30": 0.126
+        },
+        {
+          "sym": "5706.T",
+          "date": "2019-10-28",
+          "type": "EARLY_IGNITION",
+          "rsr": 58.6,
+          "si": 100.0,
+          "comp": 50.0,
+          "fwd30": -0.0922
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-03-04",
+          "type": "EARLY_IGNITION",
+          "rsr": 55.2,
+          "si": 96.7,
+          "comp": 19.1,
+          "fwd30": -0.2088
+        },
+        {
+          "sym": "6146.T",
+          "date": "2020-03-04",
+          "type": "CONTINUATION",
+          "rsr": 86.2,
+          "si": 96.7,
+          "comp": 29.2,
+          "fwd30": 0.0819
+        },
+        {
+          "sym": "6146.T",
+          "date": "2020-05-08",
+          "type": "HIGH_RSR",
+          "rsr": 93.1,
+          "si": 100.0,
+          "comp": 37.8,
+          "fwd30": 0.0069
+        },
+        {
+          "sym": "8035.T",
+          "date": "2020-05-08",
+          "type": "CONTINUATION",
+          "rsr": 86.2,
+          "si": 100.0,
+          "comp": 29.0,
+          "fwd30": 0.07
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-06-08",
+          "type": "EARLY_IGNITION",
+          "rsr": 72.4,
+          "si": 100.0,
+          "comp": 37.9,
+          "fwd30": -0.0492
+        },
+        {
+          "sym": "6146.T",
+          "date": "2020-06-08",
+          "type": "HIGH_RSR",
+          "rsr": 93.1,
+          "si": 90.0,
+          "comp": 49.5,
+          "fwd30": 0.0456
+        },
+        {
+          "sym": "6857.T",
+          "date": "2020-06-08",
+          "type": "HIGH_RSR",
+          "rsr": 96.6,
+          "si": 90.0,
+          "comp": 45.8,
+          "fwd30": 0.1201
+        },
+        {
+          "sym": "6920.T",
+          "date": "2020-06-08",
+          "type": "HIGH_RSR",
+          "rsr": 100.0,
+          "si": 90.0,
+          "comp": 44.7,
+          "fwd30": 0.0529
+        },
+        {
+          "sym": "8035.T",
+          "date": "2020-06-08",
+          "type": "UNCLASSIFIED",
+          "rsr": 89.7,
+          "si": 90.0,
+          "comp": 50.0,
+          "fwd30": 0.1843
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-09-08",
+          "type": "EARLY_IGNITION",
+          "rsr": 82.8,
+          "si": 100.0,
+          "comp": 19.5,
+          "fwd30": -0.0276
+        },
+        {
+          "sym": "6146.T",
+          "date": "2020-10-12",
+          "type": "UNCLASSIFIED",
+          "rsr": 86.2,
+          "si": 93.3,
+          "comp": 26.1,
+          "fwd30": 0.1563
+        },
+        {
+          "sym": "6857.T",
+          "date": "2020-10-12",
+          "type": "EARLY_IGNITION",
+          "rsr": 72.4,
+          "si": 93.3,
+          "comp": 9.2,
+          "fwd30": 0.327
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-11-11",
+          "type": "EARLY_IGNITION",
+          "rsr": 62.1,
+          "si": 100.0,
+          "comp": 20.3,
+          "fwd30": 0.2234
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-12-11",
+          "type": "EARLY_IGNITION",
+          "rsr": 75.9,
+          "si": 100.0,
+          "comp": 35.1,
+          "fwd30": 0.0614
+        },
+        {
+          "sym": "6146.T",
+          "date": "2020-12-11",
+          "type": "EARLY_IGNITION",
+          "rsr": 82.8,
+          "si": 100.0,
+          "comp": 23.4,
+          "fwd30": 0.114
+        },
+        {
+          "sym": "6857.T",
+          "date": "2020-12-11",
+          "type": "EARLY_IGNITION",
+          "rsr": 79.3,
+          "si": 100.0,
+          "comp": 36.1,
+          "fwd30": 0.1902
+        },
+        {
+          "sym": "5706.T",
+          "date": "2021-01-14",
+          "type": "UNCLASSIFIED",
+          "rsr": 86.2,
+          "si": 100.0,
+          "comp": 22.2,
+          "fwd30": -0.0939
+        },
+        {
+          "sym": "6146.T",
+          "date": "2021-01-14",
+          "type": "EARLY_IGNITION",
+          "rsr": 82.8,
+          "si": 100.0,
+          "comp": 27.6,
+          "fwd30": -0.103
+        },
+        {
+          "sym": "6857.T",
+          "date": "2021-01-14",
+          "type": "EARLY_IGNITION",
+          "rsr": 79.3,
+          "si": 100.0,
+          "comp": 24.9,
+          "fwd30": 0.0387
+        },
+        {
+          "sym": "8035.T",
+          "date": "2021-01-14",
+          "type": "HIGH_RSR",
+          "rsr": 93.1,
+          "si": 100.0,
+          "comp": 36.1,
+          "fwd30": 0.0558
+        },
+        {
+          "sym": "5706.T",
+          "date": "2021-10-21",
+          "type": "EARLY_IGNITION",
+          "rsr": 44.8,
+          "si": 100.0,
+          "comp": 13.4,
+          "fwd30": -0.1278
+        },
+        {
+          "sym": "6146.T",
+          "date": "2021-11-22",
+          "type": "EARLY_IGNITION",
+          "rsr": 37.9,
+          "si": 90.0,
+          "comp": 32.8,
+          "fwd30": 0.0299
+        },
+        {
+          "sym": "6857.T",
+          "date": "2021-11-22",
+          "type": "EARLY_IGNITION",
+          "rsr": 79.3,
+          "si": 90.0,
+          "comp": 45.8,
+          "fwd30": 0.0637
+        },
+        {
+          "sym": "5706.T",
+          "date": "2022-03-29",
+          "type": "EARLY_IGNITION",
+          "rsr": 10.3,
+          "si": 100.0,
+          "comp": 29.3,
+          "fwd30": -0.0717
+        },
+        {
+          "sym": "5706.T",
+          "date": "2022-06-01",
+          "type": "EARLY_IGNITION",
+          "rsr": 24.1,
+          "si": 100.0,
+          "comp": 27.7,
+          "fwd30": -0.111
+        },
+        {
+          "sym": "5706.T",
+          "date": "2023-02-06",
+          "type": "EARLY_IGNITION",
+          "rsr": 31.0,
+          "si": 100.0,
+          "comp": 42.9,
+          "fwd30": -0.0561
+        },
+        {
+          "sym": "5706.T",
+          "date": "2023-09-08",
+          "type": "EARLY_IGNITION",
+          "rsr": 27.6,
+          "si": 100.0,
+          "comp": 38.3,
+          "fwd30": -0.0175
+        },
+        {
+          "sym": "5706.T",
+          "date": "2023-12-12",
+          "type": "EARLY_IGNITION",
+          "rsr": 58.6,
+          "si": 100.0,
+          "comp": 22.0,
+          "fwd30": 0.0475
+        },
+        {
+          "sym": "5706.T",
+          "date": "2024-01-16",
+          "type": "EARLY_IGNITION",
+          "rsr": 51.7,
+          "si": 100.0,
+          "comp": 26.3,
+          "fwd30": -0.0412
+        },
+        {
+          "sym": "5706.T",
+          "date": "2024-04-17",
+          "type": "EARLY_IGNITION",
+          "rsr": 51.7,
+          "si": 100.0,
+          "comp": 19.2,
+          "fwd30": 0.0359
+        },
+        {
+          "sym": "5706.T",
+          "date": "2024-05-21",
+          "type": "EARLY_IGNITION",
+          "rsr": 65.5,
+          "si": 100.0,
+          "comp": 23.0,
+          "fwd30": -0.0128
+        },
+        {
+          "sym": "5706.T",
+          "date": "2024-07-19",
+          "type": "EARLY_IGNITION",
+          "rsr": 79.3,
+          "si": 100.0,
+          "comp": 23.2,
+          "fwd30": -0.1338
+        }
+      ]
+    },
+    "E": {
+      "si_threshold": 50.0,
+      "allow_unclassified": true,
+      "n_promotions": 127,
+      "n_unique_syms": 5,
+      "avg_interval_days": 55,
+      "fwd30_mean": 4.77,
+      "fwd30_median": 4.08,
+      "fwd30_win_rate": 60.8,
+      "fwd30_n": 125,
+      "type_dist": {
+        "MEAN_REVERSION": 58,
+        "UNCLASSIFIED": 106,
+        "EARLY_IGNITION": 63,
+        "HIGH_RSR": 9,
+        "MATURE_LEADER": 98,
+        "CONTINUATION": 16
+      },
+      "promotions": [
+        {
+          "sym": "6857.T",
+          "date": "2019-02-15",
+          "type": "HIGH_RSR",
+          "rsr": 100.0,
+          "si": 96.7,
+          "comp": 50.0,
+          "fwd30": -0.0341
+        },
+        {
+          "sym": "6920.T",
+          "date": "2019-02-15",
+          "type": "HIGH_RSR",
+          "rsr": 93.1,
+          "si": 96.7,
+          "comp": 50.0,
+          "fwd30": 0.0717
+        },
+        {
+          "sym": "8035.T",
+          "date": "2019-02-15",
+          "type": "EARLY_IGNITION",
+          "rsr": 37.9,
+          "si": 96.7,
+          "comp": 20.7,
+          "fwd30": 0.0408
+        },
+        {
+          "sym": "8035.T",
+          "date": "2019-04-17",
+          "type": "EARLY_IGNITION",
+          "rsr": 44.8,
+          "si": 100.0,
+          "comp": 24.7,
+          "fwd30": -0.1448
+        },
+        {
+          "sym": "6146.T",
+          "date": "2019-05-24",
+          "type": "UNCLASSIFIED",
+          "rsr": 31.0,
+          "si": 73.3,
+          "comp": 35.4,
+          "fwd30": 0.2075
+        },
+        {
+          "sym": "6857.T",
+          "date": "2019-05-24",
+          "type": "CONTINUATION",
+          "rsr": 86.2,
+          "si": 73.3,
+          "comp": 28.8,
+          "fwd30": 0.1778
+        },
+        {
+          "sym": "8035.T",
+          "date": "2019-05-24",
+          "type": "UNCLASSIFIED",
+          "rsr": 17.2,
+          "si": 73.3,
+          "comp": 35.6,
+          "fwd30": 0.1192
+        },
+        {
+          "sym": "6146.T",
+          "date": "2019-06-24",
+          "type": "UNCLASSIFIED",
+          "rsr": 27.6,
+          "si": 73.3,
+          "comp": 29.7,
+          "fwd30": 0.1284
+        },
+        {
+          "sym": "8035.T",
+          "date": "2019-06-24",
+          "type": "UNCLASSIFIED",
+          "rsr": 13.8,
+          "si": 73.3,
+          "comp": 35.6,
+          "fwd30": 0.1617
+        },
+        {
+          "sym": "6146.T",
+          "date": "2019-07-24",
+          "type": "CONTINUATION",
+          "rsr": 79.3,
+          "si": 73.3,
+          "comp": 34.0,
+          "fwd30": -0.0001
+        },
+        {
+          "sym": "8035.T",
+          "date": "2019-07-24",
+          "type": "UNCLASSIFIED",
+          "rsr": 65.5,
+          "si": 73.3,
+          "comp": 36.3,
+          "fwd30": 0.0761
+        },
+        {
+          "sym": "6146.T",
+          "date": "2019-08-23",
+          "type": "CONTINUATION",
+          "rsr": 86.2,
+          "si": 100.0,
+          "comp": 31.7,
+          "fwd30": 0.0636
+        },
+        {
+          "sym": "6857.T",
+          "date": "2019-08-23",
+          "type": "HIGH_RSR",
+          "rsr": 96.6,
+          "si": 100.0,
+          "comp": 36.5,
+          "fwd30": 0.1908
+        },
+        {
+          "sym": "6920.T",
+          "date": "2019-08-23",
+          "type": "HIGH_RSR",
+          "rsr": 100.0,
+          "si": 100.0,
+          "comp": 44.1,
+          "fwd30": 0.2309
+        },
+        {
+          "sym": "8035.T",
+          "date": "2019-08-23",
+          "type": "EARLY_IGNITION",
+          "rsr": 82.8,
+          "si": 100.0,
+          "comp": 47.5,
+          "fwd30": 0.099
+        },
+        {
+          "sym": "5706.T",
+          "date": "2019-09-25",
+          "type": "EARLY_IGNITION",
+          "rsr": 13.8,
+          "si": 100.0,
+          "comp": 22.3,
+          "fwd30": 0.2862
+        },
+        {
+          "sym": "6146.T",
+          "date": "2019-09-25",
+          "type": "EARLY_IGNITION",
+          "rsr": 72.4,
+          "si": 100.0,
+          "comp": 6.1,
+          "fwd30": 0.126
+        },
+        {
+          "sym": "5706.T",
+          "date": "2019-10-28",
+          "type": "EARLY_IGNITION",
+          "rsr": 58.6,
+          "si": 100.0,
+          "comp": 50.0,
+          "fwd30": -0.0922
+        },
+        {
+          "sym": "6146.T",
+          "date": "2019-11-27",
+          "type": "UNCLASSIFIED",
+          "rsr": 86.2,
+          "si": 56.7,
+          "comp": 13.1,
+          "fwd30": 0.1411
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-03-04",
+          "type": "EARLY_IGNITION",
+          "rsr": 55.2,
+          "si": 96.7,
+          "comp": 19.1,
+          "fwd30": -0.2088
+        },
+        {
+          "sym": "6146.T",
+          "date": "2020-03-04",
+          "type": "CONTINUATION",
+          "rsr": 86.2,
+          "si": 96.7,
+          "comp": 29.2,
+          "fwd30": 0.0819
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-04-03",
+          "type": "EARLY_IGNITION",
+          "rsr": 13.8,
+          "si": 76.7,
+          "comp": 30.9,
+          "fwd30": 0.2496
+        },
+        {
+          "sym": "6146.T",
+          "date": "2020-04-03",
+          "type": "UNCLASSIFIED",
+          "rsr": 93.1,
+          "si": 76.7,
+          "comp": 41.0,
+          "fwd30": 0.1828
+        },
+        {
+          "sym": "6857.T",
+          "date": "2020-04-03",
+          "type": "UNCLASSIFIED",
+          "rsr": 96.6,
+          "si": 76.7,
+          "comp": 38.4,
+          "fwd30": 0.2555
+        },
+        {
+          "sym": "8035.T",
+          "date": "2020-04-03",
+          "type": "UNCLASSIFIED",
+          "rsr": 89.7,
+          "si": 76.7,
+          "comp": 50.0,
+          "fwd30": 0.1101
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-05-08",
+          "type": "EARLY_IGNITION",
+          "rsr": 20.7,
+          "si": 80.0,
+          "comp": 23.7,
+          "fwd30": 0.1349
+        },
+        {
+          "sym": "6146.T",
+          "date": "2020-05-08",
+          "type": "HIGH_RSR",
+          "rsr": 93.1,
+          "si": 100.0,
+          "comp": 37.8,
+          "fwd30": 0.0069
+        },
+        {
+          "sym": "8035.T",
+          "date": "2020-05-08",
+          "type": "CONTINUATION",
+          "rsr": 86.2,
+          "si": 100.0,
+          "comp": 29.0,
+          "fwd30": 0.07
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-06-08",
+          "type": "EARLY_IGNITION",
+          "rsr": 72.4,
+          "si": 100.0,
+          "comp": 37.9,
+          "fwd30": -0.0492
+        },
+        {
+          "sym": "6146.T",
+          "date": "2020-06-08",
+          "type": "HIGH_RSR",
+          "rsr": 93.1,
+          "si": 90.0,
+          "comp": 49.5,
+          "fwd30": 0.0456
+        },
+        {
+          "sym": "6857.T",
+          "date": "2020-06-08",
+          "type": "HIGH_RSR",
+          "rsr": 96.6,
+          "si": 90.0,
+          "comp": 45.8,
+          "fwd30": 0.1201
+        },
+        {
+          "sym": "6920.T",
+          "date": "2020-06-08",
+          "type": "HIGH_RSR",
+          "rsr": 100.0,
+          "si": 90.0,
+          "comp": 44.7,
+          "fwd30": 0.0529
+        },
+        {
+          "sym": "8035.T",
+          "date": "2020-06-08",
+          "type": "UNCLASSIFIED",
+          "rsr": 89.7,
+          "si": 90.0,
+          "comp": 50.0,
+          "fwd30": 0.1843
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-08-07",
+          "type": "EARLY_IGNITION",
+          "rsr": 65.5,
+          "si": 80.0,
+          "comp": 11.6,
+          "fwd30": 0.0949
+        },
+        {
+          "sym": "6146.T",
+          "date": "2020-08-07",
+          "type": "UNCLASSIFIED",
+          "rsr": 75.9,
+          "si": 70.0,
+          "comp": 17.8,
+          "fwd30": 0.0331
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-09-08",
+          "type": "EARLY_IGNITION",
+          "rsr": 82.8,
+          "si": 100.0,
+          "comp": 19.5,
+          "fwd30": -0.0276
+        },
+        {
+          "sym": "6146.T",
+          "date": "2020-10-12",
+          "type": "UNCLASSIFIED",
+          "rsr": 86.2,
+          "si": 93.3,
+          "comp": 26.1,
+          "fwd30": 0.1563
+        },
+        {
+          "sym": "6857.T",
+          "date": "2020-10-12",
+          "type": "EARLY_IGNITION",
+          "rsr": 72.4,
+          "si": 93.3,
+          "comp": 9.2,
+          "fwd30": 0.327
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-11-11",
+          "type": "EARLY_IGNITION",
+          "rsr": 62.1,
+          "si": 100.0,
+          "comp": 20.3,
+          "fwd30": 0.2234
+        },
+        {
+          "sym": "5706.T",
+          "date": "2020-12-11",
+          "type": "EARLY_IGNITION",
+          "rsr": 75.9,
+          "si": 100.0,
+          "comp": 35.1,
+          "fwd30": 0.0614
+        },
+        {
+          "sym": "6146.T",
+          "date": "2020-12-11",
+          "type": "EARLY_IGNITION",
+          "rsr": 82.8,
+          "si": 100.0,
+          "comp": 23.4,
+          "fwd30": 0.114
+        },
+        {
+          "sym": "6857.T",
+          "date": "2020-12-11",
+          "type": "EARLY_IGNITION",
+          "rsr": 79.3,
+          "si": 100.0,
+          "comp": 36.1,
+          "fwd30": 0.1902
+        },
+        {
+          "sym": "5706.T",
+          "date": "2021-01-14",
+          "type": "UNCLASSIFIED",
+          "rsr": 86.2,
+          "si": 100.0,
+          "comp": 22.2,
+          "fwd30": -0.0939
+        },
+        {
+          "sym": "6146.T",
+          "date": "2021-01-14",
+          "type": "EARLY_IGNITION",
+          "rsr": 82.8,
+          "si": 100.0,
+          "comp": 27.6,
+          "fwd30": -0.103
+        },
+        {
+          "sym": "6857.T",
+          "date": "2021-01-14",
+          "type": "EARLY_IGNITION",
+          "rsr": 79.3,
+          "si": 100.0,
+          "comp": 24.9,
+          "fwd30": 0.0387
+        },
+        {
+          "sym": "8035.T",
+          "date": "2021-01-14",
+          "type": "HIGH_RSR",
+          "rsr": 93.1,
+          "si": 100.0,
+          "comp": 36.1,
+          "fwd30": 0.0558
+        },
+        {
+          "sym": "5706.T",
+          "date": "2021-04-15",
+          "type": "UNCLASSIFIED",
+          "rsr": 75.9,
+          "si": 53.3,
+          "comp": 4.0,
+          "fwd30": -0.1343
+        },
+        {
+          "sym": "6146.T",
+          "date": "2021-04-15",
+          "type": "UNCLASSIFIED",
+          "rsr": 58.6,
+          "si": 73.3,
+          "comp": 11.8,
+          "fwd30": -0.1021
+        },
+        {
+          "sym": "8035.T",
+          "date": "2021-04-15",
+          "type": "UNCLASSIFIED",
+          "rsr": 86.2,
+          "si": 73.3,
+          "comp": 11.0,
+          "fwd30": -0.0083
+        },
+        {
+          "sym": "6146.T",
+          "date": "2021-06-18",
+          "type": "UNCLASSIFIED",
+          "rsr": 55.2,
+          "si": 73.3,
+          "comp": 49.6,
+          "fwd30": -0.0944
+        },
+        {
+          "sym": "6857.T",
+          "date": "2021-06-18",
+          "type": "UNCLASSIFIED",
+          "rsr": 79.3,
+          "si": 73.3,
+          "comp": 17.9,
+          "fwd30": -0.0492
+        },
+        {
+          "sym": "5706.T",
+          "date": "2021-07-19",
+          "type": "EARLY_IGNITION",
+          "rsr": 48.3,
+          "si": 86.7,
+          "comp": 9.7,
+          "fwd30": 0.0784
+        },
+        {
+          "sym": "5706.T",
+          "date": "2021-08-20",
+          "type": "EARLY_IGNITION",
+          "rsr": 44.8,
+          "si": 86.7,
+          "comp": 14.6,
+          "fwd30": -0.0803
+        },
+        {
+          "sym": "5706.T",
+          "date": "2021-10-21",
+          "type": "EARLY_IGNITION",
+          "rsr": 44.8,
+          "si": 100.0,
+          "comp": 13.4,
+          "fwd30": -0.1278
+        },
+        {
+          "sym": "6146.T",
+          "date": "2021-11-22",
+          "type": "EARLY_IGNITION",
+          "rsr": 37.9,
+          "si": 90.0,
+          "comp": 32.8,
+          "fwd30": 0.0299
+        },
+        {
+          "sym": "6857.T",
+          "date": "2021-11-22",
+          "type": "EARLY_IGNITION",
+          "rsr": 79.3,
+          "si": 90.0,
+          "comp": 45.8,
+          "fwd30": 0.0637
+        },
+        {
+          "sym": "6146.T",
+          "date": "2021-12-22",
+          "type": "EARLY_IGNITION",
+          "rsr": 17.2,
+          "si": 76.7,
+          "comp": 42.7,
+          "fwd30": -0.0571
+        },
+        {
+          "sym": "6857.T",
+          "date": "2021-12-22",
+          "type": "EARLY_IGNITION",
+          "rsr": 72.4,
+          "si": 76.7,
+          "comp": 42.2,
+          "fwd30": -0.1377
+        },
+        {
+          "sym": "5706.T",
+          "date": "2022-03-29",
+          "type": "EARLY_IGNITION",
+          "rsr": 10.3,
+          "si": 100.0,
+          "comp": 29.3,
+          "fwd30": -0.0717
+        },
+        {
+          "sym": "6146.T",
+          "date": "2022-04-27",
+          "type": "EARLY_IGNITION",
+          "rsr": 13.8,
+          "si": 76.7,
+          "comp": 42.1,
+          "fwd30": -0.0031
+        },
+        {
+          "sym": "6920.T",
+          "date": "2022-04-27",
+          "type": "EARLY_IGNITION",
+          "rsr": 20.7,
+          "si": 76.7,
+          "comp": 9.8,
+          "fwd30": -0.0606
+        },
+        {
+          "sym": "8035.T",
+          "date": "2022-04-27",
+          "type": "EARLY_IGNITION",
+          "rsr": 55.2,
+          "si": 76.7,
+          "comp": 25.9,
+          "fwd30": -0.0653
+        },
+        {
+          "sym": "5706.T",
+          "date": "2022-06-01",
+          "type": "EARLY_IGNITION",
+          "rsr": 24.1,
+          "si": 100.0,
+          "comp": 27.7,
+          "fwd30": -0.111
+        },
+        {
+          "sym": "6146.T",
+          "date": "2022-06-01",
+          "type": "UNCLASSIFIED",
+          "rsr": 44.8,
+          "si": 56.7,
+          "comp": 39.8,
+          "fwd30": -0.1222
+        },
+        {
+          "sym": "6920.T",
+          "date": "2022-06-01",
+          "type": "UNCLASSIFIED",
+          "rsr": 17.2,
+          "si": 56.7,
+          "comp": 9.8,
+          "fwd30": -0.1108
+        },
+        {
+          "sym": "8035.T",
+          "date": "2022-06-01",
+          "type": "CONTINUATION",
+          "rsr": 79.3,
+          "si": 56.7,
+          "comp": 50.0,
+          "fwd30": -0.2856
+        },
+        {
+          "sym": "6146.T",
+          "date": "2022-08-01",
+          "type": "UNCLASSIFIED",
+          "rsr": 27.6,
+          "si": 56.7,
+          "comp": 26.5,
+          "fwd30": 0.0754
+        },
+        {
+          "sym": "6920.T",
+          "date": "2022-08-01",
+          "type": "UNCLASSIFIED",
+          "rsr": 10.3,
+          "si": 56.7,
+          "comp": 10.8,
+          "fwd30": 0.0101
+        },
+        {
+          "sym": "8035.T",
+          "date": "2022-08-01",
+          "type": "UNCLASSIFIED",
+          "rsr": 24.1,
+          "si": 56.7,
+          "comp": 37.9,
+          "fwd30": -0.0564
+        },
+        {
+          "sym": "6146.T",
+          "date": "2022-08-31",
+          "type": "UNCLASSIFIED",
+          "rsr": 31.0,
+          "si": 70.0,
+          "comp": 15.0,
+          "fwd30": -0.0871
+        },
+        {
+          "sym": "6920.T",
+          "date": "2022-08-31",
+          "type": "UNCLASSIFIED",
+          "rsr": 13.8,
+          "si": 70.0,
+          "comp": 37.4,
+          "fwd30": -0.1415
+        },
+        {
+          "sym": "8035.T",
+          "date": "2022-08-31",
+          "type": "UNCLASSIFIED",
+          "rsr": 17.2,
+          "si": 70.0,
+          "comp": 6.6,
+          "fwd30": -0.1548
+        },
+        {
+          "sym": "5706.T",
+          "date": "2022-10-03",
+          "type": "EARLY_IGNITION",
+          "rsr": 27.6,
+          "si": 76.7,
+          "comp": 34.2,
+          "fwd30": 0.0401
+        },
+        {
+          "sym": "6146.T",
+          "date": "2022-10-03",
+          "type": "EARLY_IGNITION",
+          "rsr": 44.8,
+          "si": 76.7,
+          "comp": 19.2,
+          "fwd30": 0.2748
+        },
+        {
+          "sym": "8035.T",
+          "date": "2022-10-03",
+          "type": "EARLY_IGNITION",
+          "rsr": 10.3,
+          "si": 76.7,
+          "comp": 17.9,
+          "fwd30": 0.2934
+        },
+        {
+          "sym": "6146.T",
+          "date": "2022-11-02",
+          "type": "UNCLASSIFIED",
+          "rsr": 62.1,
+          "si": 63.3,
+          "comp": 37.9,
+          "fwd30": 0.1086
+        },
+        {
+          "sym": "6857.T",
+          "date": "2022-11-02",
+          "type": "UNCLASSIFIED",
+          "rsr": 17.2,
+          "si": 63.3,
+          "comp": 30.1,
+          "fwd30": 0.221
+        },
+        {
+          "sym": "6920.T",
+          "date": "2022-11-02",
+          "type": "UNCLASSIFIED",
+          "rsr": 13.8,
+          "si": 63.3,
+          "comp": 50.0,
+          "fwd30": 0.1896
+        },
+        {
+          "sym": "8035.T",
+          "date": "2022-11-02",
+          "type": "UNCLASSIFIED",
+          "rsr": 10.3,
+          "si": 63.3,
+          "comp": 15.5,
+          "fwd30": 0.1235
+        },
+        {
+          "sym": "6146.T",
+          "date": "2022-12-05",
+          "type": "UNCLASSIFIED",
+          "rsr": 65.5,
+          "si": 70.0,
+          "comp": 50.0,
+          "fwd30": -0.0515
+        },
+        {
+          "sym": "6857.T",
+          "date": "2022-12-05",
+          "type": "UNCLASSIFIED",
+          "rsr": 13.8,
+          "si": 70.0,
+          "comp": 50.0,
+          "fwd30": 0.0048
+        },
+        {
+          "sym": "6920.T",
+          "date": "2022-12-05",
+          "type": "UNCLASSIFIED",
+          "rsr": 10.3,
+          "si": 70.0,
+          "comp": 50.0,
+          "fwd30": -0.0245
+        },
+        {
+          "sym": "5706.T",
+          "date": "2023-02-06",
+          "type": "EARLY_IGNITION",
+          "rsr": 31.0,
+          "si": 100.0,
+          "comp": 42.9,
+          "fwd30": -0.0561
+        },
+        {
+          "sym": "6146.T",
+          "date": "2023-02-06",
+          "type": "UNCLASSIFIED",
+          "rsr": 69.0,
+          "si": 53.3,
+          "comp": 18.3,
+          "fwd30": 0.0675
+        },
+        {
+          "sym": "5706.T",
+          "date": "2023-04-07",
+          "type": "UNCLASSIFIED",
+          "rsr": 24.1,
+          "si": 56.7,
+          "comp": 14.9,
+          "fwd30": -0.0063
+        },
+        {
+          "sym": "6857.T",
+          "date": "2023-04-07",
+          "type": "EARLY_IGNITION",
+          "rsr": 72.4,
+          "si": 76.7,
+          "comp": 9.3,
+          "fwd30": 0.2283
+        },
+        {
+          "sym": "6920.T",
+          "date": "2023-04-07",
+          "type": "EARLY_IGNITION",
+          "rsr": 44.8,
+          "si": 76.7,
+          "comp": 5.7,
+          "fwd30": -0.0048
+        },
+        {
+          "sym": "6857.T",
+          "date": "2023-05-11",
+          "type": "UNCLASSIFIED",
+          "rsr": 86.2,
+          "si": 50.0,
+          "comp": 6.6,
+          "fwd30": 0.6321
+        },
+        {
+          "sym": "6146.T",
+          "date": "2023-06-09",
+          "type": "UNCLASSIFIED",
+          "rsr": 96.6,
+          "si": 63.3,
+          "comp": 35.2,
+          "fwd30": 0.1289
+        },
+        {
+          "sym": "6920.T",
+          "date": "2023-06-09",
+          "type": "UNCLASSIFIED",
+          "rsr": 31.0,
+          "si": 63.3,
+          "comp": 20.9,
+          "fwd30": -0.0395
+        },
+        {
+          "sym": "8035.T",
+          "date": "2023-06-09",
+          "type": "UNCLASSIFIED",
+          "rsr": 17.2,
+          "si": 63.3,
+          "comp": 24.6,
+          "fwd30": 0.0522
+        },
+        {
+          "sym": "5706.T",
+          "date": "2023-09-08",
+          "type": "EARLY_IGNITION",
+          "rsr": 27.6,
+          "si": 100.0,
+          "comp": 38.3,
+          "fwd30": -0.0175
+        },
+        {
+          "sym": "6920.T",
+          "date": "2023-10-11",
+          "type": "UNCLASSIFIED",
+          "rsr": 62.1,
+          "si": 56.7,
+          "comp": 17.1,
+          "fwd30": 0.2842
+        },
+        {
+          "sym": "8035.T",
+          "date": "2023-10-11",
+          "type": "UNCLASSIFIED",
+          "rsr": 72.4,
+          "si": 56.7,
+          "comp": 5.8,
+          "fwd30": 0.1888
+        },
+        {
+          "sym": "6920.T",
+          "date": "2023-11-10",
+          "type": "EARLY_IGNITION",
+          "rsr": 34.5,
+          "si": 80.0,
+          "comp": 26.0,
+          "fwd30": 0.2518
+        },
+        {
+          "sym": "8035.T",
+          "date": "2023-11-10",
+          "type": "EARLY_IGNITION",
+          "rsr": 82.8,
+          "si": 80.0,
+          "comp": 9.0,
+          "fwd30": 0.1479
+        },
+        {
+          "sym": "5706.T",
+          "date": "2023-12-12",
+          "type": "EARLY_IGNITION",
+          "rsr": 58.6,
+          "si": 100.0,
+          "comp": 22.0,
+          "fwd30": 0.0475
+        },
+        {
+          "sym": "6920.T",
+          "date": "2023-12-12",
+          "type": "EARLY_IGNITION",
+          "rsr": 20.7,
+          "si": 80.0,
+          "comp": 31.0,
+          "fwd30": 0.1232
+        },
+        {
+          "sym": "8035.T",
+          "date": "2023-12-12",
+          "type": "EARLY_IGNITION",
+          "rsr": 79.3,
+          "si": 80.0,
+          "comp": 29.9,
+          "fwd30": 0.1574
+        },
+        {
+          "sym": "5706.T",
+          "date": "2024-01-16",
+          "type": "EARLY_IGNITION",
+          "rsr": 51.7,
+          "si": 100.0,
+          "comp": 26.3,
+          "fwd30": -0.0412
+        },
+        {
+          "sym": "6857.T",
+          "date": "2024-01-16",
+          "type": "UNCLASSIFIED",
+          "rsr": 96.6,
+          "si": 56.7,
+          "comp": 47.4,
+          "fwd30": 0.3298
+        },
+        {
+          "sym": "6920.T",
+          "date": "2024-01-16",
+          "type": "UNCLASSIFIED",
+          "rsr": 62.1,
+          "si": 56.7,
+          "comp": 16.3,
+          "fwd30": 0.1249
+        },
+        {
+          "sym": "6857.T",
+          "date": "2024-02-15",
+          "type": "UNCLASSIFIED",
+          "rsr": 96.6,
+          "si": 60.0,
+          "comp": 43.8,
+          "fwd30": -0.0274
+        },
+        {
+          "sym": "6920.T",
+          "date": "2024-02-15",
+          "type": "UNCLASSIFIED",
+          "rsr": 79.3,
+          "si": 60.0,
+          "comp": 9.8,
+          "fwd30": 0.0165
+        },
+        {
+          "sym": "5706.T",
+          "date": "2024-04-17",
+          "type": "EARLY_IGNITION",
+          "rsr": 51.7,
+          "si": 100.0,
+          "comp": 19.2,
+          "fwd30": 0.0359
+        },
+        {
+          "sym": "6857.T",
+          "date": "2024-04-17",
+          "type": "UNCLASSIFIED",
+          "rsr": 86.2,
+          "si": 56.7,
+          "comp": 17.1,
+          "fwd30": -0.0886
+        },
+        {
+          "sym": "6920.T",
+          "date": "2024-04-17",
+          "type": "UNCLASSIFIED",
+          "rsr": 72.4,
+          "si": 56.7,
+          "comp": 6.2,
+          "fwd30": -0.0226
+        },
+        {
+          "sym": "5706.T",
+          "date": "2024-05-21",
+          "type": "EARLY_IGNITION",
+          "rsr": 65.5,
+          "si": 100.0,
+          "comp": 23.0,
+          "fwd30": -0.0128
+        },
+        {
+          "sym": "6857.T",
+          "date": "2024-05-21",
+          "type": "UNCLASSIFIED",
+          "rsr": 75.9,
+          "si": 53.3,
+          "comp": 11.8,
+          "fwd30": 0.1379
+        },
+        {
+          "sym": "6920.T",
+          "date": "2024-06-19",
+          "type": "EARLY_IGNITION",
+          "rsr": 79.3,
+          "si": 86.7,
+          "comp": 42.5,
+          "fwd30": -0.2534
+        },
+        {
+          "sym": "5706.T",
+          "date": "2024-07-19",
+          "type": "EARLY_IGNITION",
+          "rsr": 79.3,
+          "si": 100.0,
+          "comp": 23.2,
+          "fwd30": -0.1338
+        },
+        {
+          "sym": "5706.T",
+          "date": "2024-08-20",
+          "type": "CONTINUATION",
+          "rsr": 79.3,
+          "si": 56.7,
+          "comp": 29.1,
+          "fwd30": 0.0794
+        },
+        {
+          "sym": "6146.T",
+          "date": "2024-08-20",
+          "type": "CONTINUATION",
+          "rsr": 86.2,
+          "si": 76.7,
+          "comp": 42.1,
+          "fwd30": -0.1682
+        },
+        {
+          "sym": "6857.T",
+          "date": "2024-08-20",
+          "type": "EARLY_IGNITION",
+          "rsr": 82.8,
+          "si": 76.7,
+          "comp": 37.8,
+          "fwd30": 0.0221
+        },
+        {
+          "sym": "6920.T",
+          "date": "2024-08-20",
+          "type": "EARLY_IGNITION",
+          "rsr": 55.2,
+          "si": 76.7,
+          "comp": 23.6,
+          "fwd30": -0.1995
+        },
+        {
+          "sym": "8035.T",
+          "date": "2024-08-20",
+          "type": "EARLY_IGNITION",
+          "rsr": 69.0,
+          "si": 76.7,
+          "comp": 35.0,
+          "fwd30": -0.0845
+        },
+        {
+          "sym": "5706.T",
+          "date": "2024-09-19",
+          "type": "UNCLASSIFIED",
+          "rsr": 62.1,
+          "si": 56.7,
+          "comp": 37.4,
+          "fwd30": 0.0348
+        },
+        {
+          "sym": "6146.T",
+          "date": "2024-09-19",
+          "type": "UNCLASSIFIED",
+          "rsr": 69.0,
+          "si": 56.7,
+          "comp": 33.0,
+          "fwd30": 0.2661
+        },
+        {
+          "sym": "6857.T",
+          "date": "2024-09-19",
+          "type": "UNCLASSIFIED",
+          "rsr": 82.8,
+          "si": 56.7,
+          "comp": 25.6,
+          "fwd30": 0.3899
+        },
+        {
+          "sym": "6920.T",
+          "date": "2024-09-19",
+          "type": "UNCLASSIFIED",
+          "rsr": 31.0,
+          "si": 56.7,
+          "comp": 17.8,
+          "fwd30": -0.1367
+        },
+        {
+          "sym": "8035.T",
+          "date": "2024-09-19",
+          "type": "UNCLASSIFIED",
+          "rsr": 37.9,
+          "si": 56.7,
+          "comp": 23.8,
+          "fwd30": 0.001
+        },
+        {
+          "sym": "5706.T",
+          "date": "2024-10-22",
+          "type": "EARLY_IGNITION",
+          "rsr": 72.4,
+          "si": 76.7,
+          "comp": 22.6,
+          "fwd30": 0.0015
+        },
+        {
+          "sym": "6146.T",
+          "date": "2024-10-22",
+          "type": "UNCLASSIFIED",
+          "rsr": 75.9,
+          "si": 56.7,
+          "comp": 19.7,
+          "fwd30": 0.1245
+        },
+        {
+          "sym": "6920.T",
+          "date": "2024-10-22",
+          "type": "UNCLASSIFIED",
+          "rsr": 13.8,
+          "si": 56.7,
+          "comp": 18.0,
+          "fwd30": -0.2051
+        },
+        {
+          "sym": "8035.T",
+          "date": "2024-10-22",
+          "type": "UNCLASSIFIED",
+          "rsr": 44.8,
+          "si": 56.7,
+          "comp": 18.6,
+          "fwd30": 0.0533
+        },
+        {
+          "sym": "6146.T",
+          "date": "2024-11-21",
+          "type": "UNCLASSIFIED",
+          "rsr": 72.4,
+          "si": 50.0,
+          "comp": 12.1,
+          "fwd30": null
+        },
+        {
+          "sym": "8035.T",
+          "date": "2024-12-20",
+          "type": "UNCLASSIFIED",
+          "rsr": 20.7,
+          "si": 56.7,
+          "comp": 6.7,
+          "fwd30": null
+        }
+      ]
+    }
+  },
+  "portfolio_metrics": {
+    "Baseline": {
+      "cagr": 23.45,
+      "max_dd": -24.13,
+      "sharpe": 1.079
+    },
+    "A": {
+      "cagr": 23.85,
+      "max_dd": -22.85,
+      "sharpe": 1.14
+    },
+    "B": {
+      "cagr": 25.0,
+      "max_dd": -22.59,
+      "sharpe": 1.212
+    },
+    "C": {
+      "cagr": 24.53,
+      "max_dd": -22.59,
+      "sharpe": 1.18
+    },
+    "D": {
+      "cagr": 23.97,
+      "max_dd": -22.85,
+      "sharpe": 1.149
+    },
+    "E": {
+      "cagr": 27.26,
+      "max_dd": -21.43,
+      "sharpe": 1.31
+    }
+  },
+  "sym_baseline_fwd": {
+    "6702.T": {
+      "mean": 3.56,
+      "median": 5.26,
+      "win_rate": 65.4,
+      "n": 26
+    },
+    "6501.T": {
+      "mean": 4.02,
+      "median": 4.96,
+      "win_rate": 70.8,
+      "n": 24
+    },
+    "6762.T": {
+      "mean": -0.11,
+      "median": -1.26,
+      "win_rate": 42.1,
+      "n": 19
+    },
+    "6594.T": {
+      "mean": 4.81,
+      "median": 4.05,
+      "win_rate": 66.7,
+      "n": 12
+    },
+    "7203.T": {
+      "mean": 0.36,
+      "median": 2.75,
+      "win_rate": 60.0,
+      "n": 10
+    },
+    "9432.T": {
+      "mean": -0.67,
+      "median": 0.44,
+      "win_rate": 53.3,
+      "n": 15
+    },
+    "8306.T": {
+      "mean": 0.88,
+      "median": 0.52,
+      "win_rate": 63.6,
+      "n": 11
+    },
+    "8411.T": {
+      "mean": 1.34,
+      "median": 3.64,
+      "win_rate": 62.5,
+      "n": 8
+    },
+    "8725.T": {
+      "mean": 3.99,
+      "median": 1.72,
+      "win_rate": 60.0,
+      "n": 15
+    },
+    "8058.T": {
+      "mean": 2.91,
+      "median": 0.8,
+      "win_rate": 60.7,
+      "n": 28
+    },
+    "8053.T": {
+      "mean": 3.02,
+      "median": 2.19,
+      "win_rate": 56.2,
+      "n": 16
+    },
+    "8002.T": {
+      "mean": 4.44,
+      "median": 2.91,
+      "win_rate": 68.8,
+      "n": 32
+    },
+    "8001.T": {
+      "mean": 1.66,
+      "median": 3.1,
+      "win_rate": 71.4,
+      "n": 21
+    },
+    "4021.T": {
+      "mean": -2.61,
+      "median": -4.26,
+      "win_rate": 33.3,
+      "n": 12
+    },
+    "2914.T": {
+      "mean": 5.54,
+      "median": 4.84,
+      "win_rate": 83.3,
+      "n": 6
+    },
+    "7011.T": {
+      "mean": 6.26,
+      "median": 4.51,
+      "win_rate": 66.7,
+      "n": 33
+    },
+    "3382.T": {
+      "mean": -5.71,
+      "median": -4.07,
+      "win_rate": 40.0,
+      "n": 5
+    },
+    "5401.T": {
+      "mean": 4.72,
+      "median": 3.92,
+      "win_rate": 72.2,
+      "n": 18
+    },
+    "5411.T": {
+      "mean": 3.35,
+      "median": 4.42,
+      "win_rate": 70.0,
+      "n": 10
+    },
+    "9531.T": {
+      "mean": -1.61,
+      "median": -1.06,
+      "win_rate": 28.6,
+      "n": 7
+    },
+    "9101.T": {
+      "mean": 10.87,
+      "median": 10.73,
+      "win_rate": 75.0,
+      "n": 24
+    },
+    "9104.T": {
+      "mean": 9.55,
+      "median": 4.58,
+      "win_rate": 68.0,
+      "n": 25
+    }
+  },
+  "sector_dist": {
+    "A": {
+      "電機精密": 23,
+      "非鉄金属": 17
+    },
+    "B": {
+      "電機精密": 53,
+      "非鉄金属": 25
+    },
+    "C": {
+      "電機精密": 45,
+      "非鉄金属": 25
+    },
+    "D": {
+      "電機精密": 25,
+      "非鉄金属": 18
+    },
+    "E": {
+      "電機精密": 98,
+      "非鉄金属": 29
+    }
+  },
+  "unc_by_year": {
+    "2020": [
+      -2.7628,
+      6.1387,
+      -34.2971,
+      -4.4436,
+      25.5525,
+      12.9536,
+      12.0117,
+      -24.1672,
+      -4.0803,
+      9.5479,
+      19.0195,
+      -27.5737,
+      0.1788,
+      11.0113,
+      7.0006,
+      18.4276,
+      -6.0758,
+      -6.8347,
+      10.7856,
+      19.5077,
+      24.2689,
+      20.743
+    ],
+    "2021": [
+      -9.3895,
+      2.0789,
+      2.2191,
+      -13.4258,
+      3.868,
+      3.3109,
+      15.5676,
+      -8.0223,
+      -4.9216,
+      2.2175,
+      -7.9106,
+      10.6737,
+      6.3709,
+      5.5848,
+      6.5499,
+      15.8267,
+      -0.8298,
+      6.4152,
+      -6.3874,
+      6.5296,
+      20.0845,
+      6.0055,
+      -11.5132
+    ],
+    "2024": [
+      -13.3827,
+      7.9366,
+      32.9828,
+      -2.7436,
+      -22.7654,
+      -8.8552,
+      13.7939,
+      2.2137,
+      38.995,
+      7.455,
+      35.3167,
+      17.5795,
+      -0.8382,
+      -10.7849,
+      -5.5589,
+      -10.2202
+    ],
+    "2019": [
+      7.9317,
+      -3.4102,
+      25.2145,
+      -16.1677,
+      17.7839,
+      52.8647,
+      28.6883,
+      19.0803,
+      15.0069,
+      -6.0584,
+      16.296,
+      -7.229,
+      9.9049,
+      6.0002,
+      0.8391,
+      11.5603,
+      7.5971
+    ],
+    "2023": [
+      63.2122,
+      14.0495,
+      -4.4157,
+      -13.2493,
+      0.1369,
+      5.9459,
+      12.5867,
+      25.2581,
+      14.7946,
+      15.736
+    ],
+    "2022": [
+      -6.8671,
+      -28.5583
+    ]
+  },
+  "baseline_live_syms": [
+    "6702.T",
+    "6501.T",
+    "6762.T",
+    "6594.T",
+    "7203.T",
+    "7201.T",
+    "9432.T",
+    "8306.T",
+    "8411.T",
+    "8309.T",
+    "7182.T",
+    "8725.T",
+    "8058.T",
+    "8053.T",
+    "8002.T",
+    "8001.T",
+    "4021.T",
+    "2914.T",
+    "7011.T",
+    "3382.T",
+    "5401.T",
+    "5411.T",
+    "9531.T",
+    "9101.T",
+    "9104.T"
+  ],
+  "monthly_eval_count": 70
+}

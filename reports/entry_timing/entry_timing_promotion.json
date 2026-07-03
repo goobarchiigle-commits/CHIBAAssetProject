@@ -1,0 +1,52 @@
+{
+  "current_tier": 0,
+  "current_boost_weight": 0.06,
+  "tier_start_date": "2026-06-03",
+  "last_evaluated": "2026-07-03",
+  "windows": {
+    "30d": {
+      "window_days": 30,
+      "sample_count": 36,
+      "monotonicity_score": null,
+      "top_decile_win_rate": 0.1944,
+      "bottom_decile_win_rate": null,
+      "top_decile_expectancy": -0.047711,
+      "bottom_decile_expectancy": null,
+      "all_expectancy": -0.047711,
+      "expectancy_uplift": null,
+      "win_rate_gap": null,
+      "sufficient": true
+    },
+    "60d": {
+      "window_days": 60,
+      "sample_count": 36,
+      "monotonicity_score": null,
+      "top_decile_win_rate": 0.1944,
+      "bottom_decile_win_rate": null,
+      "top_decile_expectancy": -0.047711,
+      "bottom_decile_expectancy": null,
+      "all_expectancy": -0.047711,
+      "expectancy_uplift": null,
+      "win_rate_gap": null,
+      "sufficient": true
+    },
+    "90d": {
+      "window_days": 90,
+      "sample_count": 36,
+      "monotonicity_score": null,
+      "top_decile_win_rate": 0.1944,
+      "bottom_decile_win_rate": null,
+      "top_decile_expectancy": -0.047711,
+      "bottom_decile_expectancy": null,
+      "all_expectancy": -0.047711,
+      "expectancy_uplift": null,
+      "win_rate_gap": null,
+      "sufficient": true
+    }
+  },
+  "promotion_recommendation": "HOLD",
+  "safety_triggered": false,
+  "safety_reasons": [],
+  "events": [],
+  "schema_version": "v1"
+}

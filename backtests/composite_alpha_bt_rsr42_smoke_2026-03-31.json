@@ -1,0 +1,26 @@
+{
+  "BASELINE": {
+    "scenario": "BASELINE",
+    "dataset_version": "2026-03-28",
+    "cagr": 0.0,
+    "sharpe": 0.0,
+    "max_dd": 0.0,
+    "calmar": Infinity,
+    "n_trades": 0,
+    "n_trades_yr": 0.0,
+    "avg_hold_days": 0,
+    "win_rate": 0.0,
+    "avg_win_pct": 0.0,
+    "avg_lose_pct": 0.0,
+    "r_multiple": Infinity,
+    "avg_exposure": 0.0,
+    "avg_candidates": 0.0,
+    "avg_simultaneous_holdings": 0.0,
+    "annual_returns": {
+      "2025": 0.0,
+      "2026": 0.0
+    },
+    "exit_reason_counts": {},
+    "_trades": []
+  }
+}

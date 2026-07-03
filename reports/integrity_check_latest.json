@@ -1,0 +1,134 @@
+{
+  "run_date": "2026-06-28",
+  "pass": 25,
+  "warn": 0,
+  "fail": 0,
+  "verdict": "PASS",
+  "checks": [
+    {
+      "check": "IC-01 common_dates uses union (not intersection)",
+      "status": "PASS",
+      "detail": "intersection removed 2026-06-28"
+    },
+    {
+      "check": "IC-02 4055.T first date = 2020-08-11",
+      "status": "PASS",
+      "detail": "actual=2020-08-11"
+    },
+    {
+      "check": "IC-03a CAGR years = n_days/252",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "IC-03b CAGR compound formula",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "IC-04a SLIPPAGE matches yaml",
+      "status": "PASS",
+      "detail": "code=0.001 yaml=0.001"
+    },
+    {
+      "check": "IC-04b COMMISSION matches yaml",
+      "status": "PASS",
+      "detail": "code=0.00055 yaml=0.00055"
+    },
+    {
+      "check": "IC-04c COST_ONE_WAY = SLIPPAGE+COMMISSION",
+      "status": "PASS",
+      "detail": "=0.00155"
+    },
+    {
+      "check": "IC-05a RSR uses shift(63) for past periods",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "IC-05b RSR r1 = prices/prices.shift(63)-1",
+      "status": "PASS",
+      "detail": "past-only reference"
+    },
+    {
+      "check": "IC-05c No shift(0) in RSR (would be current without lag)",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "IC-05d high200 (entry bonus) uses shift(1)",
+      "status": "PASS",
+      "detail": "no future price in entry scoring"
+    },
+    {
+      "check": "IC-05e high50_close (trailing stop) uses EOD close (no shift, correct)",
+      "status": "PASS",
+      "detail": "decided at EOD using today close — no lookahead"
+    },
+    {
+      "check": "IC-05f Execution price = next-day open (no intraday lookahead)",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "IC-06 No random in composite_alpha_bt.py",
+      "status": "PASS",
+      "detail": "deterministic"
+    },
+    {
+      "check": "IC-07 equity_curve_full.csv reads consistently",
+      "status": "PASS",
+      "detail": "n=1967 rows"
+    },
+    {
+      "check": "IC-07b Dashboard equity starts by 2018-01-31 (not 2020-08-11)",
+      "status": "PASS",
+      "detail": "actual_start=2018-01-01"
+    },
+    {
+      "check": "IC-08a Study47 E_COMBINED IS CAGR in [10,15]% (not inflated)",
+      "status": "PASS",
+      "detail": "cagr=12.19%  (was 20.51% before fix)"
+    },
+    {
+      "check": "IC-08b Study47 E_COMBINED IS Trades >= 200",
+      "status": "PASS",
+      "detail": "trades=274"
+    },
+    {
+      "check": "IC-08c Old Study47 CAGR was >18% (confirming pre-fix inflation)",
+      "status": "PASS",
+      "detail": "old_cagr=20.51%"
+    },
+    {
+      "check": "IC-09a Survivorship bias disclosed in universe_builder.py",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "IC-09b Selection bias noted in universe.yaml",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "IC-10a Dashboard CAGR(2018-2024) matches Study47 IS ±0.5pp",
+      "status": "PASS",
+      "detail": "dash=12.19%  study47=12.19%  Δ=+0.00pp"
+    },
+    {
+      "check": "IC-10b Dashboard full CAGR < 15% (no period truncation inflation)",
+      "status": "PASS",
+      "detail": "cagr_2018_2025=11.04%"
+    },
+    {
+      "check": "IC-11 .intersection(idx) NOT in run_scenario (permanently removed)",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "IC-11b per-symbol valid mask handles partial date coverage",
+      "status": "PASS",
+      "detail": ""
+    }
+  ]
+}

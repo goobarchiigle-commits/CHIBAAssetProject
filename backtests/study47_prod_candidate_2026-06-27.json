@@ -1,0 +1,117 @@
+{
+  "study": "Study47_ProductionCandidateVerification",
+  "date": "2026-06-27",
+  "cases": [
+    "A_BASELINE",
+    "B_ATR_EXT",
+    "C_VOL_ADJ",
+    "D_EQ_SCALE",
+    "E_COMBINED"
+  ],
+  "results": {
+    "FULL_IS": {
+      "A_BASELINE": {
+        "cagr": 19.37,
+        "sharpe": 0.855,
+        "max_dd": -18.25,
+        "calmar": 1.062,
+        "n_trades": 199,
+        "addon_count": 0,
+        "avg_exp": 34.9,
+        "idle_cash": 100.6
+      },
+      "B_ATR_EXT": {
+        "cagr": 19.56,
+        "sharpe": 0.863,
+        "max_dd": -18.25,
+        "calmar": 1.072,
+        "n_trades": 198,
+        "addon_count": 0,
+        "avg_exp": 34.9,
+        "idle_cash": 100.9
+      },
+      "C_VOL_ADJ": {
+        "cagr": 19.86,
+        "sharpe": 0.855,
+        "max_dd": -20.0,
+        "calmar": 0.993,
+        "n_trades": 205,
+        "addon_count": 0,
+        "avg_exp": 36.8,
+        "idle_cash": 97.3
+      },
+      "D_EQ_SCALE": {
+        "cagr": 20.22,
+        "sharpe": 0.886,
+        "max_dd": -18.07,
+        "calmar": 1.119,
+        "n_trades": 199,
+        "addon_count": 4,
+        "avg_exp": 35.5,
+        "idle_cash": 102.3
+      },
+      "E_COMBINED": {
+        "cagr": 20.51,
+        "sharpe": 0.88,
+        "max_dd": -19.81,
+        "calmar": 1.035,
+        "n_trades": 205,
+        "addon_count": 5,
+        "avg_exp": 37.4,
+        "idle_cash": 98.6
+      }
+    },
+    "TRUE_OOS": {
+      "A_BASELINE": {
+        "cagr": 8.5,
+        "sharpe": 0.953,
+        "max_dd": -8.07,
+        "calmar": 1.054,
+        "n_trades": 44,
+        "addon_count": 0,
+        "avg_exp": 29.4,
+        "idle_cash": 72.2
+      },
+      "B_ATR_EXT": {
+        "cagr": 10.84,
+        "sharpe": 1.14,
+        "max_dd": -8.06,
+        "calmar": 1.345,
+        "n_trades": 44,
+        "addon_count": 0,
+        "avg_exp": 30.8,
+        "idle_cash": 71.2
+      },
+      "C_VOL_ADJ": {
+        "cagr": 6.8,
+        "sharpe": 0.759,
+        "max_dd": -8.62,
+        "calmar": 0.788,
+        "n_trades": 47,
+        "addon_count": 0,
+        "avg_exp": 31.8,
+        "idle_cash": 69.0
+      },
+      "D_EQ_SCALE": {
+        "cagr": 11.22,
+        "sharpe": 1.054,
+        "max_dd": -10.16,
+        "calmar": 1.104,
+        "n_trades": 42,
+        "addon_count": 14,
+        "avg_exp": 34.6,
+        "idle_cash": 67.0
+      },
+      "E_COMBINED": {
+        "cagr": 11.9,
+        "sharpe": 1.056,
+        "max_dd": -10.6,
+        "calmar": 1.123,
+        "n_trades": 45,
+        "addon_count": 16,
+        "avg_exp": 38.5,
+        "idle_cash": 63.0
+      }
+    }
+  }
+}

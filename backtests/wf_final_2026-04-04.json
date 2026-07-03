@@ -1,0 +1,63 @@
+{
+  "date": "2026-04-04",
+  "description": "WF revalidation with recommended settings (atr_mult=2.5, vol/atr_filter=OFF, volume_filter=ON)",
+  "config": {
+    "scenario": "STEP5",
+    "trail_atr_mult": 2.5,
+    "enable_volatility_filter": false,
+    "enable_atr_filter": false,
+    "enable_volume_filter": true,
+    "enable_market_filter": false,
+    "min_hold": 3,
+    "min_rsr": 75,
+    "max_positions": 3,
+    "capital": 3000000
+  },
+  "wf_segments": [
+    {"seg": 1, "is": "2018-2019", "oos": "2020", "is_sharpe": 0.0,   "oos_sharpe": 1.225, "ratio": null,  "win": true},
+    {"seg": 2, "is": "2019-2020", "oos": "2021", "is_sharpe": 1.225, "oos_sharpe": 0.454, "ratio": 0.371, "win": true},
+    {"seg": 3, "is": "2020-2021", "oos": "2022", "is_sharpe": 0.600, "oos_sharpe": 0.375, "ratio": 0.625, "win": true},
+    {"seg": 4, "is": "2021-2022", "oos": "2023", "is_sharpe": 0.596, "oos_sharpe": 1.460, "ratio": 2.450, "win": true},
+    {"seg": 5, "is": "2022-2023", "oos": "2024", "is_sharpe": 0.929, "oos_sharpe": 0.791, "ratio": 0.851, "win": true}
+  ],
+  "wf_summary": {
+    "oos_wins": "5/5",
+    "avg_oos_is_ratio": 1.074,
+    "judgment": "PASS"
+  },
+  "full_is": {
+    "period": "2018-2024",
+    "trades": 221,
+    "sharpe": 0.783,
+    "cagr": 18.12,
+    "max_dd": -18.24,
+    "win_rate": 55.7,
+    "avg_hold_days": 10.1
+  },
+  "true_oos": {
+    "period": "2025",
+    "trades": 43,
+    "sharpe": -0.075,
+    "cagr": -0.98,
+    "max_dd": -9.94,
+    "note": "4月関税ショックに損失集中 (-226,390 JPY). 他11ヶ月は10勝1敗"
+  },
+  "filter_ablation": {
+    "baseline_nofilt":  {"is_sharpe": 0.715, "oos_sharpe": -0.236},
+    "recommended":      {"is_sharpe": 0.783, "oos_sharpe": -0.075},
+    "vol_only_off":     {"is_sharpe": 0.660},
+    "atr_only_off":     {"is_sharpe": 0.394}
+  },
+  "crash_exit_rule": {
+    "result": "entry_blackout_ineffective",
+    "reason": "April losses from pre-held positions, not new entries",
+    "next_action": "engine-level forced_exit (market_ret < -5%) — not yet implemented"
+  },
+  "topix_proxy": {
+    "ticker": "1306.T",
+    "rows": 1966,
+    "market_filter_on_is_sharpe": 0.568,
+    "market_filter_off_is_sharpe": 0.783,
+    "decision": "market_filter=False maintained (30% risk_off days = over-filtering)"
+  }
+}

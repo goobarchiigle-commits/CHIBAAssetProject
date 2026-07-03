@@ -1,0 +1,445 @@
+{
+  "study": "Study52_ProductionCandidateOptimization",
+  "date": "2026-06-28",
+  "cases": [
+    "A_BASELINE",
+    "B_ATR_EXT",
+    "C_EQ_SCALE",
+    "D_ATR_EQ"
+  ],
+  "note": "VOL_ADJ 完全除外。Study50キャッシュ再利用(A/B/C)、D_ATR_EQ新規実行",
+  "period_results": {
+    "FULL_IS": {
+      "A_BASELINE": {
+        "cagr": 12.63,
+        "sharpe": 0.593,
+        "max_dd": -18.18,
+        "calmar": 0.695,
+        "n_trades": 264,
+        "addon_cnt": 14,
+        "avg_exp": 31.7
+      },
+      "B_ATR_EXT": {
+        "cagr": 12.81,
+        "sharpe": 0.6,
+        "max_dd": -18.18,
+        "calmar": 0.705,
+        "n_trades": 263,
+        "addon_cnt": 16,
+        "avg_exp": 31.8
+      },
+      "C_EQ_SCALE": {
+        "cagr": 12.16,
+        "sharpe": 0.578,
+        "max_dd": -18.12,
+        "calmar": 0.671,
+        "n_trades": 264,
+        "addon_cnt": 3,
+        "avg_exp": 31.3
+      },
+      "D_ATR_EQ": {
+        "cagr": 12.37,
+        "sharpe": 0.586,
+        "max_dd": -18.12,
+        "calmar": 0.683,
+        "n_trades": 263,
+        "addon_cnt": 5,
+        "avg_exp": 31.3
+      }
+    },
+    "TRUE_OOS": {
+      "A_BASELINE": {
+        "cagr": 11.64,
+        "sharpe": 1.084,
+        "max_dd": -10.16,
+        "calmar": 1.146,
+        "n_trades": 42,
+        "addon_cnt": 15,
+        "avg_exp": 34.7
+      },
+      "B_ATR_EXT": {
+        "cagr": 13.87,
+        "sharpe": 1.225,
+        "max_dd": -10.15,
+        "calmar": 1.367,
+        "n_trades": 42,
+        "addon_cnt": 17,
+        "avg_exp": 36.3
+      },
+      "C_EQ_SCALE": {
+        "cagr": 11.22,
+        "sharpe": 1.054,
+        "max_dd": -10.16,
+        "calmar": 1.104,
+        "n_trades": 42,
+        "addon_cnt": 14,
+        "avg_exp": 34.6
+      },
+      "D_ATR_EQ": {
+        "cagr": 13.48,
+        "sharpe": 1.199,
+        "max_dd": -10.15,
+        "calmar": 1.329,
+        "n_trades": 42,
+        "addon_cnt": 16,
+        "avg_exp": 36.2
+      }
+    }
+  },
+  "wf_results": {
+    "A_BASELINE": {
+      "wf_count": 4,
+      "avg_oos_cagr": 17.5,
+      "avg_oos_sharpe": 0.833,
+      "avg_oos_dd": -16.81,
+      "avg_oos_calmar": 1.497,
+      "avg_oos_exp": 46.9,
+      "seg3_2022_cagr": -5.11,
+      "fold_std_cagr": 19.14
+    },
+    "B_ATR_EXT": {
+      "wf_count": 4,
+      "avg_oos_cagr": 18.02,
+      "avg_oos_sharpe": 0.858,
+      "avg_oos_dd": -16.7,
+      "avg_oos_calmar": 1.616,
+      "avg_oos_exp": 47.1,
+      "seg3_2022_cagr": -5.11,
+      "fold_std_cagr": 19.86
+    },
+    "C_EQ_SCALE": {
+      "wf_count": 5,
+      "avg_oos_cagr": 17.91,
+      "avg_oos_sharpe": 0.853,
+      "avg_oos_dd": -17.03,
+      "avg_oos_calmar": 1.502,
+      "avg_oos_exp": 46.9,
+      "seg3_2022_cagr": -2.65,
+      "fold_std_cagr": 18.79
+    },
+    "D_ATR_EQ": {
+      "wf_count": 5,
+      "avg_oos_cagr": 18.37,
+      "avg_oos_sharpe": 0.876,
+      "avg_oos_dd": -16.91,
+      "seg3_2022_cagr": -2.65,
+      "fold_std_cagr": 19.41
+    }
+  },
+  "wf_segments": {
+    "A_BASELINE": [
+      {
+        "seg": 1,
+        "oos_year": "2020",
+        "wf_pass": true,
+        "cagr": 6.12,
+        "sharpe": 0.345,
+        "max_dd": -18.14,
+        "calmar": 0.337,
+        "n_trades": 29,
+        "addon_cnt": 2,
+        "avg_exp": 43.3
+      },
+      {
+        "seg": 2,
+        "oos_year": "2021",
+        "wf_pass": true,
+        "cagr": 6.04,
+        "sharpe": 0.345,
+        "max_dd": -20.61,
+        "calmar": 0.293,
+        "n_trades": 54,
+        "addon_cnt": 1,
+        "avg_exp": 48.0
+      },
+      {
+        "seg": 3,
+        "oos_year": "2022",
+        "wf_pass": false,
+        "cagr": -5.11,
+        "sharpe": -0.029,
+        "max_dd": -20.93,
+        "calmar": -0.244,
+        "n_trades": 43,
+        "addon_cnt": 1,
+        "avg_exp": 49.9
+      },
+      {
+        "seg": 4,
+        "oos_year": "2023",
+        "wf_pass": true,
+        "cagr": 43.82,
+        "sharpe": 1.731,
+        "max_dd": -9.42,
+        "calmar": 4.65,
+        "n_trades": 50,
+        "addon_cnt": 5,
+        "avg_exp": 48.6
+      },
+      {
+        "seg": 5,
+        "oos_year": "2024",
+        "wf_pass": true,
+        "cagr": 36.64,
+        "sharpe": 1.772,
+        "max_dd": -14.96,
+        "calmar": 2.448,
+        "n_trades": 34,
+        "addon_cnt": 6,
+        "avg_exp": 44.5
+      }
+    ],
+    "B_ATR_EXT": [
+      {
+        "seg": 1,
+        "oos_year": "2020",
+        "wf_pass": true,
+        "cagr": 6.12,
+        "sharpe": 0.345,
+        "max_dd": -18.14,
+        "calmar": 0.337,
+        "n_trades": 29,
+        "addon_cnt": 2,
+        "avg_exp": 43.3
+      },
+      {
+        "seg": 2,
+        "oos_year": "2021",
+        "wf_pass": true,
+        "cagr": 6.04,
+        "sharpe": 0.345,
+        "max_dd": -20.61,
+        "calmar": 0.293,
+        "n_trades": 54,
+        "addon_cnt": 1,
+        "avg_exp": 48.0
+      },
+      {
+        "seg": 3,
+        "oos_year": "2022",
+        "wf_pass": false,
+        "cagr": -5.11,
+        "sharpe": -0.029,
+        "max_dd": -20.93,
+        "calmar": -0.244,
+        "n_trades": 43,
+        "addon_cnt": 1,
+        "avg_exp": 49.9
+      },
+      {
+        "seg": 4,
+        "oos_year": "2023",
+        "wf_pass": true,
+        "cagr": 46.39,
+        "sharpe": 1.857,
+        "max_dd": -8.85,
+        "calmar": 5.244,
+        "n_trades": 49,
+        "addon_cnt": 7,
+        "avg_exp": 49.8
+      },
+      {
+        "seg": 5,
+        "oos_year": "2024",
+        "wf_pass": true,
+        "cagr": 36.64,
+        "sharpe": 1.772,
+        "max_dd": -14.96,
+        "calmar": 2.448,
+        "n_trades": 34,
+        "addon_cnt": 6,
+        "avg_exp": 44.5
+      }
+    ],
+    "C_EQ_SCALE": [
+      {
+        "seg": 1,
+        "oos_year": "2020",
+        "wf_pass": true,
+        "cagr": 5.66,
+        "sharpe": 0.332,
+        "max_dd": -19.0,
+        "calmar": 0.298,
+        "n_trades": 29,
+        "addon_cnt": 2,
+        "avg_exp": 43.9
+      },
+      {
+        "seg": 2,
+        "oos_year": "2021",
+        "wf_pass": true,
+        "cagr": 5.38,
+        "sharpe": 0.33,
+        "max_dd": -20.71,
+        "calmar": 0.26,
+        "n_trades": 53,
+        "addon_cnt": 1,
+        "avg_exp": 47.7
+      },
+      {
+        "seg": 3,
+        "oos_year": "2022",
+        "wf_pass": true,
+        "cagr": -2.65,
+        "sharpe": 0.057,
+        "max_dd": -20.93,
+        "calmar": -0.126,
+        "n_trades": 43,
+        "addon_cnt": 1,
+        "avg_exp": 50.3
+      },
+      {
+        "seg": 4,
+        "oos_year": "2023",
+        "wf_pass": true,
+        "cagr": 42.59,
+        "sharpe": 1.699,
+        "max_dd": -9.42,
+        "calmar": 4.52,
+        "n_trades": 50,
+        "addon_cnt": 3,
+        "avg_exp": 48.2
+      },
+      {
+        "seg": 5,
+        "oos_year": "2024",
+        "wf_pass": true,
+        "cagr": 38.58,
+        "sharpe": 1.846,
+        "max_dd": -15.07,
+        "calmar": 2.56,
+        "n_trades": 34,
+        "addon_cnt": 6,
+        "avg_exp": 44.4
+      }
+    ],
+    "D_ATR_EQ": [
+      {
+        "seg": 1,
+        "oos_year": "2020",
+        "wf_pass": true,
+        "cagr": 5.66,
+        "sharpe": 0.332,
+        "max_dd": -19.0,
+        "calmar": 0.298,
+        "n_trades": 29,
+        "addon_cnt": 2,
+        "avg_exp": 43.9
+      },
+      {
+        "seg": 2,
+        "oos_year": "2021",
+        "wf_pass": true,
+        "cagr": 5.38,
+        "sharpe": 0.33,
+        "max_dd": -20.71,
+        "calmar": 0.26,
+        "n_trades": 53,
+        "addon_cnt": 1,
+        "avg_exp": 47.7
+      },
+      {
+        "seg": 3,
+        "oos_year": "2022",
+        "wf_pass": true,
+        "cagr": -2.65,
+        "sharpe": 0.057,
+        "max_dd": -20.93,
+        "calmar": -0.126,
+        "n_trades": 43,
+        "addon_cnt": 1,
+        "avg_exp": 50.3
+      },
+      {
+        "seg": 4,
+        "oos_year": "2023",
+        "wf_pass": true,
+        "cagr": 44.9,
+        "sharpe": 1.817,
+        "max_dd": -8.85,
+        "calmar": 5.075,
+        "n_trades": 49,
+        "addon_cnt": 5,
+        "avg_exp": 49.3
+      },
+      {
+        "seg": 5,
+        "oos_year": "2024",
+        "wf_pass": true,
+        "cagr": 38.58,
+        "sharpe": 1.846,
+        "max_dd": -15.07,
+        "calmar": 2.56,
+        "n_trades": 34,
+        "addon_cnt": 6,
+        "avg_exp": 44.4
+      }
+    ]
+  },
+  "judgments": {
+    "B_ATR_EXT": {
+      "verdict": "REJECT",
+      "role": [
+        "Return Enhancer"
+      ],
+      "d_cagr_is": 0.18,
+      "d_dd_is": 0.0,
+      "wf_cnt": 4,
+      "d_cagr_wf": 0.52,
+      "d_cagr_oos": 2.23,
+      "d_seg3": 0.0
+    },
+    "C_EQ_SCALE": {
+      "verdict": "ADOPT",
+      "role": [
+        "Robustness Enhancer"
+      ],
+      "d_cagr_is": -0.47,
+      "d_dd_is": 0.06,
+      "wf_cnt": 5,
+      "d_cagr_wf": 0.41,
+      "d_cagr_oos": -0.42,
+      "d_seg3": 2.46
+    },
+    "D_ATR_EQ": {
+      "verdict": "ADOPT",
+      "role": [
+        "Return Enhancer",
+        "Robustness Enhancer"
+      ],
+      "d_cagr_is": -0.26,
+      "d_dd_is": 0.06,
+      "wf_cnt": 5,
+      "d_cagr_wf": 0.87,
+      "d_cagr_oos": 1.84,
+      "d_seg3": 2.46
+    }
+  },
+  "final_case": "D_ATR_EQ",
+  "final_is": {
+    "cagr": 12.37,
+    "sharpe": 0.586,
+    "max_dd": -18.12,
+    "calmar": 0.683,
+    "n_trades": 263,
+    "addon_cnt": 5,
+    "avg_exp": 31.3
+  },
+  "final_oos": {
+    "cagr": 13.48,
+    "sharpe": 1.199,
+    "max_dd": -10.15,
+    "calmar": 1.329,
+    "n_trades": 42,
+    "addon_cnt": 16,
+    "avg_exp": 36.2
+  },
+  "final_wf": {
+    "wf_count": 5,
+    "avg_oos_cagr": 18.37,
+    "avg_oos_sharpe": 0.876,
+    "avg_oos_dd": -16.91,
+    "seg3_2022_cagr": -2.65,
+    "fold_std_cagr": 19.41
+  }
+}

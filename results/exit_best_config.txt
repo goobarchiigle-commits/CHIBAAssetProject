@@ -1,0 +1,14 @@
+Exit Sensitivity Best Config
+best_test_type=ATR trail
+best_parameter=atr_mult
+best_value=2.5
+best_sharpe=1.548
+best_delta_vs_current=+0.542
+best_delta_vs_baseline=+0.542
+current_sharpe=1.006
+baseline_sharpe=1.006
+elapsed_total_sec=5.12
+scenario_count=14
+best_sharpe=1.548
+baseline_sharpe=1.006
+rss=131.0 MB

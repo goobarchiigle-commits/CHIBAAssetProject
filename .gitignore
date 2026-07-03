@@ -1,42 +1,33 @@
-# === 機密情報（CLAUDE.md ルール3：絶対にコミット禁止）===
-.env
-*.env
-.env.local
-.env.*.local
-# テンプレートは共有可（.env.example は除外しない）
-
-# === Python ===
+# Python
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
+*.so
 .Python
 *.egg-info/
 dist/
 build/
-.eggs/
 
-# === 仮想環境 ===
-venv/
-.venv/
-env/
-ENV/
+# 環境変数・シークレット
+.env
+*.env
+src/.env
 
-# === データファイル（CLAUDE.md: data/ 以下はすべてコミット禁止）===
-data/
-
-# === 実運用ランタイム（order_lock.json など。再起動後に再生成）===
+# ランタイム・ログ
 runtime/
+*.jsonl
+*.log
 
-# === ライブ運用ログ（ローカルのみ保管）===
-logs/
+# データ・バックテスト結果（大容量）
+data/
+*.pkl
+*.parquet
+*.csv
 
-# === Jupyter ===
-.ipynb_checkpoints/
-*.ipynb
-
-# === IDE / OS ===
+# IDE
 .vscode/
 .idea/
-*.DS_Store
+*.swp
+
+# OS
+.DS_Store
 Thumbs.db

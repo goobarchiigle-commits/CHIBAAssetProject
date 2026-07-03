@@ -1,0 +1,80 @@
+{
+  "date": "2026-04-06",
+  "description": "Step1-3統合: build_sym_active_df共通化 + loss_penalty + 集中上限",
+  "strategy": "dyn_rsr42_bear_rs0 + loss_penalty(0.10) + sector_cap(25%) + symbol_cap(8%,1lot_guard)",
+
+  "step1_common_module": {
+    "description": "build_sym_active_df を src/strategy/universe.py に共通化",
+    "files_changed": [
+      "src/strategy/universe.py (NEW)",
+      "src/backtest/wf_dynamic_universe.py (refactored to import)",
+      "src/backtest/composite_alpha_bt.py (uses build_dyn_rsr42_active by default)",
+      "src/kabusapi/signal_bridge.py (uses get_today_active_syms for BUY filter)"
+    ],
+    "verification": {
+      "period": "2025-01-01 to 2025-12-31",
+      "sharpe_oos": 0.805,
+      "reference_sharpe": 0.805,
+      "status": "PASS"
+    }
+  },
+
+  "step2_loss_penalty": {
+    "description": "90日リターンプロキシによる loss_penalty (coef=0.10) をスコアリングに追加",
+    "parameters": {
+      "LOSS_PENALTY_COEF": 0.10,
+      "LOSS_PERIOD": 90
+    },
+    "verification": {
+      "period": "2025-01-01 to 2025-12-31",
+      "sharpe_before": 0.805,
+      "sharpe_after": 0.805,
+      "delta": 0.0,
+      "status": "PASS - no degradation"
+    }
+  },
+
+  "step3_concentration_caps": {
+    "description": "セクター・銘柄集中上限を run_scenario() に追加",
+    "parameters": {
+      "MAX_SECTOR_WEIGHT": 0.25,
+      "MAX_SYMBOL_WEIGHT": 0.08,
+      "enable_condition": "sym_active_df is not None"
+    },
+    "verification_2022": {
+      "period": "2022-01-01 to 2022-12-31",
+      "baseline_no_dyn_no_cap": {
+        "cagr": 0.021, "maxdd": -0.191, "sharpe": 0.219, "trades": 40
+      },
+      "dyn_plus_caps": {
+        "cagr": -0.019, "maxdd": -0.130, "sharpe": -0.020, "trades": 47
+      },
+      "maxdd_improvement": 0.061
+    },
+    "verification_2025": {
+      "period": "2025-01-01 to 2025-12-31",
+      "baseline_no_dyn_no_cap": {
+        "cagr": 0.042, "maxdd": -0.101, "sharpe": 0.453, "trades": 49
+      },
+      "dyn_plus_caps": {
+        "cagr": 0.123, "maxdd": -0.037, "sharpe": 1.612, "trades": 45
+      },
+      "sharpe_improvement": 1.159
+    },
+    "status": "PASS"
+  },
+
+  "final_config": {
+    "strategy_module": "src.strategy.universe.build_dyn_rsr42_active",
+    "loss_penalty_coef": 0.10,
+    "loss_penalty_period": 90,
+    "max_sector_weight": 0.25,
+    "max_symbol_weight": 0.08,
+    "max_symbol_weight_guard": "only applied if 1 lot purchasable within cap",
+    "bull_active_n": 30,
+    "bear_active_n": 20,
+    "bear_scoring": "rs_topix(0.50) + rsr(0.30) + log_vol(0.20) - loss_penalty(0.10), rs>0 filter",
+    "bull_scoring": "mom_63(0.40) + rsr(0.35) + log_vol(0.25) - loss_penalty(0.10)",
+    "regime_detection": "TOPIX < MA200 AND 40/60 days below rolling MA200"
+  }
+}

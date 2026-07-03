@@ -1,0 +1,275 @@
+{
+  "date": "2026-04-05",
+  "description": "Phase3 Step1: 動的ユニバース WF検証",
+  "score_weights": {
+    "bull_mom": 0.4,
+    "bull_rsr": 0.35,
+    "bull_vol": 0.25,
+    "bear_rs": 0.5,
+    "bear_rsr": 0.3,
+    "bear_vol": 0.2
+  },
+  "shock_mode": "composite",
+  "results": [
+    {
+      "config_name": "baseline_rsr42_fixed",
+      "active_n": null,
+      "segments": [
+        {
+          "seg": 1,
+          "oos": "2020",
+          "is_sharpe": 0.0,
+          "oos_sharpe": 0.646,
+          "oos_max_dd": -15.71,
+          "ratio": null,
+          "win": true
+        },
+        {
+          "seg": 2,
+          "oos": "2021",
+          "is_sharpe": 0.646,
+          "oos_sharpe": 0.55,
+          "oos_max_dd": -18.43,
+          "ratio": 0.851,
+          "win": true
+        },
+        {
+          "seg": 3,
+          "oos": "2022",
+          "is_sharpe": 0.772,
+          "oos_sharpe": 0.219,
+          "oos_max_dd": -19.13,
+          "ratio": 0.284,
+          "win": true
+        },
+        {
+          "seg": 4,
+          "oos": "2023",
+          "is_sharpe": 0.662,
+          "oos_sharpe": 1.066,
+          "oos_max_dd": -14.44,
+          "ratio": 1.61,
+          "win": true
+        },
+        {
+          "seg": 5,
+          "oos": "2024",
+          "is_sharpe": 0.685,
+          "oos_sharpe": 0.595,
+          "oos_max_dd": -19.47,
+          "ratio": 0.869,
+          "win": true
+        }
+      ],
+      "wf_summary": {
+        "pass_count": "5/5",
+        "median_oos_sharpe": 0.595,
+        "worst_oos_dd": -19.47,
+        "avg_oos_is_ratio": 0.903
+      },
+      "full_is": {
+        "sharpe": 0.775,
+        "max_dd": -15.71
+      },
+      "true_oos_2025": {
+        "sharpe": 0.453,
+        "max_dd": -10.11
+      }
+    },
+    {
+      "config_name": "dyn_bear_full_rs0",
+      "active_n": 30,
+      "segments": [
+        {
+          "seg": 1,
+          "oos": "2020",
+          "is_sharpe": 0.0,
+          "oos_sharpe": 0.344,
+          "oos_max_dd": -11.41,
+          "ratio": null,
+          "win": true
+        },
+        {
+          "seg": 2,
+          "oos": "2021",
+          "is_sharpe": 0.344,
+          "oos_sharpe": 0.065,
+          "oos_max_dd": -20.6,
+          "ratio": 0.189,
+          "win": true
+        },
+        {
+          "seg": 3,
+          "oos": "2022",
+          "is_sharpe": 0.14,
+          "oos_sharpe": -0.071,
+          "oos_max_dd": -17.3,
+          "ratio": -0.507,
+          "win": false
+        },
+        {
+          "seg": 4,
+          "oos": "2023",
+          "is_sharpe": 0.268,
+          "oos_sharpe": 1.016,
+          "oos_max_dd": -9.05,
+          "ratio": 3.791,
+          "win": true
+        },
+        {
+          "seg": 5,
+          "oos": "2024",
+          "is_sharpe": 0.289,
+          "oos_sharpe": 0.301,
+          "oos_max_dd": -21.2,
+          "ratio": 1.042,
+          "win": true
+        }
+      ],
+      "wf_summary": {
+        "pass_count": "4/5",
+        "median_oos_sharpe": 0.301,
+        "worst_oos_dd": -21.2,
+        "avg_oos_is_ratio": 1.129
+      },
+      "full_is": {
+        "sharpe": 0.47,
+        "max_dd": -21.31
+      },
+      "true_oos_2025": {
+        "sharpe": 1.174,
+        "max_dd": -12.6
+      }
+    },
+    {
+      "config_name": "dyn_bear_rsr42_rs0",
+      "active_n": 30,
+      "segments": [
+        {
+          "seg": 1,
+          "oos": "2020",
+          "is_sharpe": 0.0,
+          "oos_sharpe": 0.344,
+          "oos_max_dd": -11.41,
+          "ratio": null,
+          "win": true
+        },
+        {
+          "seg": 2,
+          "oos": "2021",
+          "is_sharpe": 0.344,
+          "oos_sharpe": 0.065,
+          "oos_max_dd": -20.6,
+          "ratio": 0.189,
+          "win": true
+        },
+        {
+          "seg": 3,
+          "oos": "2022",
+          "is_sharpe": 0.14,
+          "oos_sharpe": -0.006,
+          "oos_max_dd": -17.07,
+          "ratio": -0.043,
+          "win": false
+        },
+        {
+          "seg": 4,
+          "oos": "2023",
+          "is_sharpe": 0.294,
+          "oos_sharpe": 1.016,
+          "oos_max_dd": -9.05,
+          "ratio": 3.456,
+          "win": true
+        },
+        {
+          "seg": 5,
+          "oos": "2024",
+          "is_sharpe": 0.418,
+          "oos_sharpe": 0.301,
+          "oos_max_dd": -21.2,
+          "ratio": 0.72,
+          "win": true
+        }
+      ],
+      "wf_summary": {
+        "pass_count": "4/5",
+        "median_oos_sharpe": 0.301,
+        "worst_oos_dd": -21.2,
+        "avg_oos_is_ratio": 1.081
+      },
+      "full_is": {
+        "sharpe": 0.48,
+        "max_dd": -21.31
+      },
+      "true_oos_2025": {
+        "sharpe": 1.174,
+        "max_dd": -12.6
+      }
+    },
+    {
+      "config_name": "dyn_bear_bull_score_n20",
+      "active_n": 30,
+      "segments": [
+        {
+          "seg": 1,
+          "oos": "2020",
+          "is_sharpe": 0.0,
+          "oos_sharpe": 0.344,
+          "oos_max_dd": -11.41,
+          "ratio": null,
+          "win": true
+        },
+        {
+          "seg": 2,
+          "oos": "2021",
+          "is_sharpe": 0.344,
+          "oos_sharpe": 0.065,
+          "oos_max_dd": -20.6,
+          "ratio": 0.189,
+          "win": true
+        },
+        {
+          "seg": 3,
+          "oos": "2022",
+          "is_sharpe": 0.14,
+          "oos_sharpe": -0.071,
+          "oos_max_dd": -17.3,
+          "ratio": -0.507,
+          "win": false
+        },
+        {
+          "seg": 4,
+          "oos": "2023",
+          "is_sharpe": 0.268,
+          "oos_sharpe": 1.016,
+          "oos_max_dd": -9.05,
+          "ratio": 3.791,
+          "win": true
+        },
+        {
+          "seg": 5,
+          "oos": "2024",
+          "is_sharpe": 0.289,
+          "oos_sharpe": 0.301,
+          "oos_max_dd": -21.2,
+          "ratio": 1.042,
+          "win": true
+        }
+      ],
+      "wf_summary": {
+        "pass_count": "4/5",
+        "median_oos_sharpe": 0.301,
+        "worst_oos_dd": -21.2,
+        "avg_oos_is_ratio": 1.129
+      },
+      "full_is": {
+        "sharpe": 0.47,
+        "max_dd": -21.31
+      },
+      "true_oos_2025": {
+        "sharpe": 1.174,
+        "max_dd": -12.6
+      }
+    }
+  ]
+}

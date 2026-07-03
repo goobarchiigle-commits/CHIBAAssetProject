@@ -1,0 +1,146 @@
+{
+  "S1": {
+    "IS": {
+      "cagr_pct": -0.61,
+      "sharpe": 0.0,
+      "sortino": 0.0,
+      "max_dd_pct": -18.54,
+      "calmar": -0.033,
+      "profit_factor": 1.04,
+      "avg_exposure_pct": 7.3,
+      "avg_hold_days": 7.6,
+      "trades_per_year": 11.7
+    },
+    "OOS": {
+      "cagr_pct": 0.0,
+      "sharpe": 0.0,
+      "sortino": 0.0,
+      "max_dd_pct": 0.0,
+      "calmar": null,
+      "profit_factor": null,
+      "avg_exposure_pct": 0.0,
+      "avg_hold_days": 0.0,
+      "trades_per_year": 0.0
+    }
+  },
+  "S2": {
+    "IS": {
+      "cagr_pct": 18.37,
+      "sharpe": 0.821,
+      "sortino": 1.071,
+      "max_dd_pct": -18.14,
+      "calmar": 1.012,
+      "profit_factor": 2.499,
+      "avg_exposure_pct": 35.6,
+      "avg_hold_days": 14.2,
+      "trades_per_year": 40.5
+    },
+    "OOS": {
+      "cagr_pct": 14.8,
+      "sharpe": 1.278,
+      "sortino": 1.864,
+      "max_dd_pct": -7.31,
+      "calmar": 2.025,
+      "profit_factor": 2.484,
+      "avg_exposure_pct": 33.7,
+      "avg_hold_days": 10.3,
+      "trades_per_year": 39.6
+    }
+  },
+  "S3": {
+    "IS": {
+      "cagr_pct": 18.21,
+      "sharpe": 0.777,
+      "sortino": 0.958,
+      "max_dd_pct": -21.59,
+      "calmar": 0.843,
+      "profit_factor": 2.18,
+      "avg_exposure_pct": 42.0,
+      "avg_hold_days": 13.0,
+      "trades_per_year": 50.5
+    },
+    "OOS": {
+      "cagr_pct": 13.99,
+      "sharpe": 1.085,
+      "sortino": 1.414,
+      "max_dd_pct": -10.38,
+      "calmar": 1.348,
+      "profit_factor": 2.151,
+      "avg_exposure_pct": 37.6,
+      "avg_hold_days": 9.9,
+      "trades_per_year": 45.5
+    }
+  },
+  "S4": {
+    "IS": {
+      "cagr_pct": 11.01,
+      "sharpe": 0.693,
+      "sortino": 0.841,
+      "max_dd_pct": -16.27,
+      "calmar": 0.677,
+      "profit_factor": 1.951,
+      "avg_exposure_pct": 24.8,
+      "avg_hold_days": 12.5,
+      "trades_per_year": 44.9
+    },
+    "OOS": {
+      "cagr_pct": 11.62,
+      "sharpe": 1.073,
+      "sortino": 1.433,
+      "max_dd_pct": -9.29,
+      "calmar": 1.252,
+      "profit_factor": 2.139,
+      "avg_exposure_pct": 28.6,
+      "avg_hold_days": 8.0,
+      "trades_per_year": 43.0
+    }
+  },
+  "S5": {
+    "IS": {
+      "cagr_pct": 19.37,
+      "sharpe": 0.855,
+      "sortino": 1.09,
+      "max_dd_pct": -18.25,
+      "calmar": 1.062,
+      "profit_factor": 2.426,
+      "avg_exposure_pct": 34.9,
+      "avg_hold_days": 12.0,
+      "trades_per_year": 46.6
+    },
+    "OOS": {
+      "cagr_pct": 14.35,
+      "sharpe": 1.303,
+      "sortino": 1.612,
+      "max_dd_pct": -8.07,
+      "calmar": 1.779,
+      "profit_factor": 2.365,
+      "avg_exposure_pct": 30.5,
+      "avg_hold_days": 8.2,
+      "trades_per_year": 44.7
+    }
+  },
+  "S4_CDOS_OVERRIDE_VARIANT": {
+    "IS": {
+      "cagr_pct": 9.97,
+      "sharpe": 0.571,
+      "sortino": 0.712,
+      "max_dd_pct": -18.15,
+      "calmar": 0.549,
+      "profit_factor": 1.703,
+      "avg_exposure_pct": 35.6,
+      "avg_hold_days": 12.1,
+      "trades_per_year": 65.3
+    },
+    "OOS": {
+      "cagr_pct": 13.36,
+      "sharpe": 1.091,
+      "sortino": 1.386,
+      "max_dd_pct": -10.13,
+      "calmar": 1.319,
+      "profit_factor": 2.142,
+      "avg_exposure_pct": 32.6,
+      "avg_hold_days": 7.7,
+      "trades_per_year": 50.6
+    }
+  }
+}

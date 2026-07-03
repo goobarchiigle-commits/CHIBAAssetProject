@@ -1,0 +1,87 @@
+{
+  "run_date": "2026-03-18",
+  "period": "2018-01-01 ~ 2024-12-31",
+  "capital": 2000000,
+  "scenarios": [
+    {
+      "label": "現行CB（-15%全決済・比較用）",
+      "cagr_pct": 13.65,
+      "max_dd_pct": -5.67,
+      "calmar": 2.408,
+      "sharpe": 1.853,
+      "win_rate_pct": 67.5,
+      "n_trades": 268,
+      "entry_stop_count": 0,
+      "partial_close_count": 0,
+      "dd_recovery_days": [],
+      "bankrupt_2x": false,
+      "entry_stop_events": []
+    },
+    {
+      "label": "新entry_stop（-10%停止/部分クローズ）",
+      "cagr_pct": 13.65,
+      "max_dd_pct": -5.67,
+      "calmar": 2.408,
+      "sharpe": 1.853,
+      "win_rate_pct": 67.5,
+      "n_trades": 268,
+      "entry_stop_count": 0,
+      "partial_close_count": 0,
+      "dd_recovery_days": [],
+      "bankrupt_2x": false,
+      "entry_stop_events": []
+    },
+    {
+      "label": "新entry_stop（-8%早期停止）",
+      "cagr_pct": 13.65,
+      "max_dd_pct": -5.67,
+      "calmar": 2.408,
+      "sharpe": 1.853,
+      "win_rate_pct": 67.5,
+      "n_trades": 268,
+      "entry_stop_count": 0,
+      "partial_close_count": 0,
+      "dd_recovery_days": [],
+      "bankrupt_2x": false,
+      "entry_stop_events": []
+    },
+    {
+      "label": "新entry_stop x2レバレッジ（破綻検証）",
+      "cagr_pct": 14.31,
+      "max_dd_pct": -6.63,
+      "calmar": 2.16,
+      "sharpe": 1.841,
+      "win_rate_pct": 65.4,
+      "n_trades": 269,
+      "entry_stop_count": 0,
+      "partial_close_count": 0,
+      "dd_recovery_days": [],
+      "bankrupt_2x": false,
+      "entry_stop_events": []
+    },
+    {
+      "label": "【動作確認】-2%閾値（ロジック検証用）",
+      "cagr_pct": -0.5,
+      "max_dd_pct": -4.23,
+      "calmar": -0.118,
+      "sharpe": -0.399,
+      "win_rate_pct": 0.0,
+      "n_trades": 5,
+      "entry_stop_count": 1,
+      "partial_close_count": 1,
+      "dd_recovery_days": [
+        1513
+      ],
+      "bankrupt_2x": false,
+      "entry_stop_events": [
+        {
+          "activate_date": "2018-10-23",
+          "activate_dd": -2.34,
+          "release_date": "N/A (未解除)",
+          "release_dd": -4.23,
+          "days_in_stop": 1513
+        }
+      ]
+    }
+  ]
+}

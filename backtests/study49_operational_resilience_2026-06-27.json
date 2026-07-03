@@ -1,0 +1,417 @@
+{
+  "study": "Study49_OperationalResilienceAudit",
+  "date": "2026-06-27",
+  "sections": {
+    "S1_Restart": {
+      "pass": 11,
+      "fail": 0,
+      "tests": [
+        {
+          "name": "1.VOL_ADJ.fresh_start",
+          "status": "PASS",
+          "detail": "returned 3",
+          "note": "No TOPIX data → safe default"
+        },
+        {
+          "name": "1.VOL_ADJ.restart_state_write",
+          "status": "PASS",
+          "detail": "state_file_exists=True last_result=3",
+          "note": "State file written → survives restart"
+        },
+        {
+          "name": "1.VOL_ADJ.partial_write_recovery",
+          "status": "PASS",
+          "detail": "partial_state → returned 3 (no crash)",
+          "note": "Overwrites corrupt state file → safe"
+        },
+        {
+          "name": "1.EQ_SCALE.fresh_start_state_written",
+          "status": "PASS",
+          "detail": "state_keys=[]",
+          "note": "State persisted to disk on first run"
+        },
+        {
+          "name": "1.EQ_SCALE.restart_no_duplicate",
+          "status": "PASS",
+          "detail": "addon not triggered (insufficient gain or cash)",
+          "note": "Lifecycle guard not needed if addon not placed"
+        },
+        {
+          "name": "1.EQ_SCALE.new_entry_clears_stale_state",
+          "status": "PASS",
+          "detail": "entry_date_in_state=",
+          "note": "Re-opened position: stale addon_done cleared"
+        },
+        {
+          "name": "1.EQ_SCALE.partial_write_recovery",
+          "status": "PASS",
+          "detail": "partial state → returned list of len 0 (no crash)",
+          "note": "FAIL_OPEN: corrupt state → empty list, no exception"
+        },
+        {
+          "name": "1.ATR_EXT.defer_state_written",
+          "status": "PASS",
+          "detail": "n_deferred=1 state_sym_present=True",
+          "note": "Deferral state written on first defer"
+        },
+        {
+          "name": "1.ATR_EXT.restart_deferred_continues",
+          "status": "PASS",
+          "detail": "After restart: still_deferred=True orders_passed=0",
+          "note": "Defer state persists across restart → SELL still suppressed"
+        },
+        {
+          "name": "1.ATR_EXT.deferral_expires_correctly",
+          "status": "PASS",
+          "detail": "After expiry: orders_passed=1 n_deferred=0",
+          "note": "Expired deferral → SELL proceeds, state cleared"
+        },
+        {
+          "name": "1.ATR_EXT.partial_write_recovery",
+          "status": "PASS",
+          "detail": "partial state → returned 0 orders, 1 deferred (no crash)",
+          "note": "FAIL_OPEN: corrupt state → original orders returned"
+        }
+      ]
+    },
+    "S2_Corruption": {
+      "pass": 17,
+      "fail": 0,
+      "tests": [
+        {
+          "name": "2.EQ_SCALE.invalid_json",
+          "status": "PASS",
+          "detail": "returned list=True",
+          "note": "FAIL_OPEN → [] on corrupt state"
+        },
+        {
+          "name": "2.ATR_EXT.invalid_json",
+          "status": "PASS",
+          "detail": "returned list=True",
+          "note": "FAIL_OPEN → original orders on corrupt state"
+        },
+        {
+          "name": "2.VOL_ADJ.invalid_json",
+          "status": "PASS",
+          "detail": "returned 3",
+          "note": "FAIL_OPEN → default max_pos on error"
+        },
+        {
+          "name": "2.EQ_SCALE.empty_file",
+          "status": "PASS",
+          "detail": "returned list=True",
+          "note": "FAIL_OPEN → [] on corrupt state"
+        },
+        {
+          "name": "2.ATR_EXT.empty_file",
+          "status": "PASS",
+          "detail": "returned list=True",
+          "note": "FAIL_OPEN → original orders on corrupt state"
+        },
+        {
+          "name": "2.VOL_ADJ.empty_file",
+          "status": "PASS",
+          "detail": "returned 3",
+          "note": "FAIL_OPEN → default max_pos on error"
+        },
+        {
+          "name": "2.EQ_SCALE.partial_write",
+          "status": "PASS",
+          "detail": "returned list=True",
+          "note": "FAIL_OPEN → [] on corrupt state"
+        },
+        {
+          "name": "2.ATR_EXT.partial_write",
+          "status": "PASS",
+          "detail": "returned list=True",
+          "note": "FAIL_OPEN → original orders on corrupt state"
+        },
+        {
+          "name": "2.VOL_ADJ.partial_write",
+          "status": "PASS",
+          "detail": "returned 3",
+          "note": "FAIL_OPEN → default max_pos on error"
+        },
+        {
+          "name": "2.EQ_SCALE.null_value",
+          "status": "PASS",
+          "detail": "returned list=True",
+          "note": "FAIL_OPEN → [] on corrupt state"
+        },
+        {
+          "name": "2.ATR_EXT.null_value",
+          "status": "PASS",
+          "detail": "returned list=True",
+          "note": "FAIL_OPEN → original orders on corrupt state"
+        },
+        {
+          "name": "2.VOL_ADJ.null_value",
+          "status": "PASS",
+          "detail": "returned 3",
+          "note": "FAIL_OPEN → default max_pos on error"
+        },
+        {
+          "name": "2.EQ_SCALE.array_root",
+          "status": "PASS",
+          "detail": "returned list=True",
+          "note": "FAIL_OPEN → [] on corrupt state"
+        },
+        {
+          "name": "2.ATR_EXT.array_root",
+          "status": "PASS",
+          "detail": "returned list=True",
+          "note": "FAIL_OPEN → original orders on corrupt state"
+        },
+        {
+          "name": "2.VOL_ADJ.array_root",
+          "status": "PASS",
+          "detail": "returned 3",
+          "note": "FAIL_OPEN → default max_pos on error"
+        },
+        {
+          "name": "2.EQ_SCALE.missing_file",
+          "status": "PASS",
+          "detail": "missing file → treated as empty state",
+          "note": "Fresh start behavior"
+        },
+        {
+          "name": "2.ATR_EXT.missing_file",
+          "status": "PASS",
+          "detail": "missing file → treated as empty state",
+          "note": "Fresh start behavior"
+        }
+      ]
+    },
+    "S3_Rollback": {
+      "pass": 7,
+      "fail": 0,
+      "tests": [
+        {
+          "name": "3.ROLLBACK.phase1_enable",
+          "status": "PASS",
+          "detail": "after phase1: {'atr_extension': False, 'vol_adj': False, 'eq_scale_addon': True}",
+          "note": "Phase 1: addon=ON, vol=OFF, atr=OFF"
+        },
+        {
+          "name": "3.ROLLBACK.phase2_enable",
+          "status": "PASS",
+          "detail": "after phase2: {'atr_extension': False, 'vol_adj': True, 'eq_scale_addon': True}",
+          "note": "Phase 2: addon=ON, vol=ON, atr=OFF"
+        },
+        {
+          "name": "3.ROLLBACK.phase3_enable",
+          "status": "PASS",
+          "detail": "after phase3: {'atr_extension': True, 'vol_adj': True, 'eq_scale_addon': True}",
+          "note": "Phase 3: all features ON"
+        },
+        {
+          "name": "3.ROLLBACK.rollback_all_off",
+          "status": "PASS",
+          "detail": "after rollback: {'atr_extension': False, 'vol_adj': False, 'eq_scale_addon': False}",
+          "note": "Rollback: all features OFF"
+        },
+        {
+          "name": "3.ROLLBACK.rollback_idempotent",
+          "status": "PASS",
+          "detail": "double rollback: {'atr_extension': False, 'vol_adj': False, 'eq_scale_addon': False}",
+          "note": "Double rollback → same state (idempotent)"
+        },
+        {
+          "name": "3.ROLLBACK.log_written",
+          "status": "PASS",
+          "detail": "log_path=C:\\Users\\owner\\AppData\\Local\\Temp\\tmp4n24478q\\rb\\rollout.jsonl exists=True",
+          "note": "Every phase change logged to JSONL"
+        },
+        {
+          "name": "3.ROLLBACK.no_duplicate_after_rollback",
+          "status": "PASS",
+          "detail": "orders_after_rollback=0",
+          "note": "addon_done=True prevents duplicate even if called after rollback"
+        }
+      ]
+    },
+    "S4_FlagMatrix": {
+      "pass": 7,
+      "fail": 0,
+      "tests": [
+        {
+          "name": "4.FLAG_MATRIX.ATR_ONLY",
+          "status": "PASS",
+          "detail": "expected={'atr_extension': True, 'vol_adj': False, 'eq_scale_addon': False} actual={'atr_extension': True, 'vol_adj': False, 'eq_scale_addon': False}",
+          "note": "strategy.yaml flag correctly set and read back"
+        },
+        {
+          "name": "4.FLAG_MATRIX.VOL_ONLY",
+          "status": "PASS",
+          "detail": "expected={'atr_extension': False, 'vol_adj': True, 'eq_scale_addon': False} actual={'atr_extension': False, 'vol_adj': True, 'eq_scale_addon': False}",
+          "note": "strategy.yaml flag correctly set and read back"
+        },
+        {
+          "name": "4.FLAG_MATRIX.ADDON_ONLY",
+          "status": "PASS",
+          "detail": "expected={'atr_extension': False, 'vol_adj': False, 'eq_scale_addon': True} actual={'atr_extension': False, 'vol_adj': False, 'eq_scale_addon': True}",
+          "note": "strategy.yaml flag correctly set and read back"
+        },
+        {
+          "name": "4.FLAG_MATRIX.ATR+VOL",
+          "status": "PASS",
+          "detail": "expected={'atr_extension': True, 'vol_adj': True, 'eq_scale_addon': False} actual={'atr_extension': True, 'vol_adj': True, 'eq_scale_addon': False}",
+          "note": "strategy.yaml flag correctly set and read back"
+        },
+        {
+          "name": "4.FLAG_MATRIX.ATR+ADDON",
+          "status": "PASS",
+          "detail": "expected={'atr_extension': True, 'vol_adj': False, 'eq_scale_addon': True} actual={'atr_extension': True, 'vol_adj': False, 'eq_scale_addon': True}",
+          "note": "strategy.yaml flag correctly set and read back"
+        },
+        {
+          "name": "4.FLAG_MATRIX.VOL+ADDON",
+          "status": "PASS",
+          "detail": "expected={'atr_extension': False, 'vol_adj': True, 'eq_scale_addon': True} actual={'atr_extension': False, 'vol_adj': True, 'eq_scale_addon': True}",
+          "note": "strategy.yaml flag correctly set and read back"
+        },
+        {
+          "name": "4.FLAG_MATRIX.ALL",
+          "status": "PASS",
+          "detail": "expected={'atr_extension': True, 'vol_adj': True, 'eq_scale_addon': True} actual={'atr_extension': True, 'vol_adj': True, 'eq_scale_addon': True}",
+          "note": "strategy.yaml flag correctly set and read back"
+        }
+      ]
+    },
+    "S5_Reconciliation": {
+      "pass": 6,
+      "fail": 0,
+      "tests": [
+        {
+          "name": "5.RECON.engine_import",
+          "status": "PASS",
+          "detail": "ReconciliationResult, ReconciliationMismatch, append_reconciliation_result importable",
+          "note": "Reconciliation engine present and importable"
+        },
+        {
+          "name": "5.RECON.inflight_registry_path",
+          "status": "PASS",
+          "detail": "path=C:\\ai-trading\\runtime\\inflight_orders.jsonl  class=InflightRegistry",
+          "note": "Inflight registry path + class both present"
+        },
+        {
+          "name": "5.RECON.addon_order_type",
+          "status": "PASS",
+          "detail": "OrderInstruction: symbol=9432.T side=BUY qty=100",
+          "note": "Addon BUY injected as same OrderInstruction as regular BUY"
+        },
+        {
+          "name": "5.RECON.fail_closed_guard",
+          "status": "PASS",
+          "detail": "SEVERITY_BLOCKING/raise found in reconciliation_engine.py",
+          "note": "Blocking mismatches abort execution path"
+        },
+        {
+          "name": "5.RECON.duplicate_order_guard",
+          "status": "PASS",
+          "detail": "guard keywords found: ['duplicate']",
+          "note": "Duplicate orders blocked at signal_bridge level"
+        },
+        {
+          "name": "5.RECON.inflight_tracking",
+          "status": "PASS",
+          "detail": "inflight reference found in run_live_signal.py (source)",
+          "note": "Pending orders tracked → orphan detection possible"
+        }
+      ]
+    },
+    "S6_Monitoring": {
+      "pass": 14,
+      "fail": 0,
+      "tests": [
+        {
+          "name": "6.MONITOR.features",
+          "status": "PASS",
+          "detail": "key=features value={'eq_scale_addon': False, 'vol_adj': False, 'atr_extension': False}",
+          "note": "Required field: feature activation"
+        },
+        {
+          "name": "6.MONITOR.today_executed",
+          "status": "PASS",
+          "detail": "key=addon.today_executed value=0",
+          "note": "Required field: addon count"
+        },
+        {
+          "name": "6.MONITOR.slot_utilization_pct",
+          "status": "PASS",
+          "detail": "key=vol_adj.slot_utilization_pct value=100.0",
+          "note": "Required field: utilization"
+        },
+        {
+          "name": "6.MONITOR.exposure_pct",
+          "status": "PASS",
+          "detail": "key=portfolio.exposure_pct value=55.7",
+          "note": "Required field: exposure"
+        },
+        {
+          "name": "6.MONITOR.violations",
+          "status": "PASS",
+          "detail": "key=violations value=[]",
+          "note": "Required field: violations"
+        },
+        {
+          "name": "6.MONITOR.drawdown_pct",
+          "status": "PASS",
+          "detail": "key=portfolio.drawdown_pct value=-0.14",
+          "note": "Required field: drawdown"
+        },
+        {
+          "name": "6.MONITOR.deferred_count",
+          "status": "PASS",
+          "detail": "key=atr_extension.deferred_count value=0",
+          "note": "Required field: extension count"
+        },
+        {
+          "name": "6.WEEKLY.total",
+          "status": "PASS",
+          "detail": "key=realized_pnl.total field_exists=True value=0.0",
+          "note": "Weekly required: realized pnl"
+        },
+        {
+          "name": "6.WEEKLY.total",
+          "status": "PASS",
+          "detail": "key=unrealized.total field_exists=True value=89100.0",
+          "note": "Weekly required: unrealized pnl"
+        },
+        {
+          "name": "6.WEEKLY.gross_turnover",
+          "status": "PASS",
+          "detail": "key=turnover.gross_turnover field_exists=True value=0.0",
+          "note": "Weekly required: turnover"
+        },
+        {
+          "name": "6.WEEKLY.avg_hold_days",
+          "status": "PASS",
+          "detail": "key=holding_days.avg_hold_days field_exists=True value=None (None is valid: no closed trades this week)",
+          "note": "Weekly required: holding days"
+        },
+        {
+          "name": "6.WEEKLY.executed",
+          "status": "PASS",
+          "detail": "key=addon.executed field_exists=True value=0",
+          "note": "Weekly required: addon executed count"
+        },
+        {
+          "name": "6.WEEKLY.new_deferrals",
+          "status": "PASS",
+          "detail": "key=atr_ext.new_deferrals field_exists=True value=0",
+          "note": "Weekly required: atr extension count"
+        },
+        {
+          "name": "6.WEEKLY.calm_pct",
+          "status": "PASS",
+          "detail": "key=vol_adj.calm_pct field_exists=True value=0.0",
+          "note": "Weekly required: vol_adj calm pct"
+        }
+      ]
+    }
+  },
+  "total_pass": 62,
+  "total_fail": 0,
+  "verdict": "READY"
+}

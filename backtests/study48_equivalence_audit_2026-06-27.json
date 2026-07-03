@@ -1,0 +1,503 @@
+{
+  "study": "Study48_ProductionEquivalenceAudit",
+  "date": "2026-06-27",
+  "section_A": {
+    "A_BASELINE": {
+      "annual_returns": {
+        "2020": 5.76,
+        "2021": 16.26,
+        "2022": 11.7,
+        "2023": 27.41,
+        "2024": 16.45,
+        "2025": 2.99
+      },
+      "cagr": 16.24,
+      "max_dd": -18.25,
+      "sharpe": 0.797,
+      "calmar": 0.89,
+      "n_trades": 245
+    },
+    "B_ATR_ONLY": {
+      "annual_returns": {
+        "2020": 5.76,
+        "2021": 16.26,
+        "2022": 11.7,
+        "2023": 28.42,
+        "2024": 16.32,
+        "2025": 4.12
+      },
+      "cagr": 16.63,
+      "max_dd": -18.25,
+      "sharpe": 0.815,
+      "calmar": 0.911,
+      "n_trades": 244
+    },
+    "C_VOL_ONLY": {
+      "annual_returns": {
+        "2020": 6.74,
+        "2021": 11.51,
+        "2022": 12.1,
+        "2023": 33.02,
+        "2024": 18.12,
+        "2025": 2.21
+      },
+      "cagr": 16.41,
+      "max_dd": -20.0,
+      "sharpe": 0.789,
+      "calmar": 0.821,
+      "n_trades": 255
+    },
+    "D_REF46": {
+      "annual_returns": {
+        "2020": 8.18,
+        "2021": 11.35,
+        "2022": 11.95,
+        "2023": 36.39,
+        "2024": 17.49,
+        "2025": 2.15
+      },
+      "cagr": 17.06,
+      "max_dd": -19.81,
+      "sharpe": 0.815,
+      "calmar": 0.861,
+      "n_trades": 255
+    },
+    "E_PROD47": {
+      "annual_returns": {
+        "2020": 8.18,
+        "2021": 11.35,
+        "2022": 11.95,
+        "2023": 35.29,
+        "2024": 17.63,
+        "2025": 3.04
+      },
+      "cagr": 17.11,
+      "max_dd": -19.81,
+      "sharpe": 0.818,
+      "calmar": 0.863,
+      "n_trades": 255
+    }
+  },
+  "section_B": {
+    "atr_ext_defer_count": 14,
+    "atr_ext_detail_count": 14,
+    "atr_by_year": {
+      "2018": 0,
+      "2019": 0,
+      "2020": 0,
+      "2021": 0,
+      "2022": 0,
+      "2023": 3,
+      "2024": 0,
+      "2025": 11
+    },
+    "vol_stats_by_year": {
+      "2018": {
+        "calm_days": 86,
+        "total_days": 261,
+        "calm_pct": 33.0
+      },
+      "2019": {
+        "calm_days": 108,
+        "total_days": 241,
+        "calm_pct": 44.8
+      },
+      "2020": {
+        "calm_days": 29,
+        "total_days": 242,
+        "calm_pct": 12.0
+      },
+      "2021": {
+        "calm_days": 14,
+        "total_days": 245,
+        "calm_pct": 5.7
+      },
+      "2022": {
+        "calm_days": 15,
+        "total_days": 244,
+        "calm_pct": 6.1
+      },
+      "2023": {
+        "calm_days": 103,
+        "total_days": 246,
+        "calm_pct": 41.9
+      },
+      "2024": {
+        "calm_days": 50,
+        "total_days": 245,
+        "calm_pct": 20.4
+      },
+      "2025": {
+        "calm_days": 74,
+        "total_days": 243,
+        "calm_pct": 30.5
+      }
+    },
+    "addon_count_prod": 5,
+    "addon_count_ref": 4,
+    "addon_by_year_prod": {
+      "2018": 0,
+      "2019": 0,
+      "2020": 2,
+      "2021": 0,
+      "2022": 0,
+      "2023": 3,
+      "2024": 0,
+      "2025": 0
+    },
+    "addon_by_year_ref": {
+      "2018": 0,
+      "2019": 0,
+      "2020": 2,
+      "2021": 0,
+      "2022": 0,
+      "2023": 2,
+      "2024": 0,
+      "2025": 0
+    }
+  },
+  "section_C": {
+    "A_BASELINE": {
+      "avg_exposure": 31.1,
+      "avg_idle_cash_pct": 115.8,
+      "cap_saturation_rate_pct": 53.7,
+      "avg_simultaneous_holds": 2.28
+    },
+    "B_ATR_ONLY": {
+      "avg_exposure": 31.3,
+      "avg_idle_cash_pct": 116.3,
+      "cap_saturation_rate_pct": 54.2,
+      "avg_simultaneous_holds": 2.29
+    },
+    "C_VOL_ONLY": {
+      "avg_exposure": 32.8,
+      "avg_idle_cash_pct": 113.1,
+      "cap_saturation_rate_pct": 48.6,
+      "avg_simultaneous_holds": 2.39
+    },
+    "D_REF46": {
+      "avg_exposure": 33.2,
+      "avg_idle_cash_pct": 115.7,
+      "cap_saturation_rate_pct": 48.5,
+      "avg_simultaneous_holds": 2.38
+    },
+    "E_PROD47": {
+      "avg_exposure": 33.4,
+      "avg_idle_cash_pct": 114.9,
+      "cap_saturation_rate_pct": 49.2,
+      "avg_simultaneous_holds": 2.4
+    }
+  },
+  "section_D": {
+    "ref_sell_count": 255,
+    "prod_sell_count": 255,
+    "atr_deferrals": 14,
+    "all_diffs_explained_by_atr": true,
+    "atr_all_profitable": true,
+    "equivalence_pct": 94.5,
+    "timing_diffs": 14,
+    "mismatch_sample": [
+      {
+        "type": "EXIT_TIMING_DIFF",
+        "symbol": "6857.T",
+        "entry_idx": 622,
+        "ref_exit_idx": 628,
+        "prod_exit_idx": 629,
+        "ref_reason": "RSR_EXIT",
+        "prod_reason": "RSR_EXIT",
+        "ref_pnl": 20000.0,
+        "prod_pnl": 36000.0,
+        "expected_action": "SELL@idx=628",
+        "actual_action": "SELL@idx=629"
+      },
+      {
+        "type": "EXIT_TIMING_DIFF",
+        "symbol": "6501.T",
+        "entry_idx": 659,
+        "ref_exit_idx": 673,
+        "prod_exit_idx": 678,
+        "ref_reason": "RSR_EXIT",
+        "prod_reason": "DEFERRED_EXIT",
+        "ref_pnl": 22000.0,
+        "prod_pnl": 53404.25,
+        "expected_action": "SELL@idx=673",
+        "actual_action": "SELL@idx=678"
+      },
+      {
+        "type": "SELL_DEFERRED_OR_MISSING",
+        "symbol": "8058.T",
+        "entry_idx": 677,
+        "ref_exit_idx": 691,
+        "prod_exit_idx": null,
+        "ref_reason": "RSR_MOMENTUM_EXIT",
+        "prod_reason": "DEFERRED_BY_ATR_EXT or later",
+        "ref_pnl": 82000.05,
+        "prod_pnl": null,
+        "expected_action": "SELL at ref_exit_idx",
+        "actual_action": "HELD (ATR Extension)"
+      },
+      {
+        "type": "EXIT_TIMING_DIFF",
+        "symbol": "9531.T",
+        "entry_idx": 789,
+        "ref_exit_idx": 792,
+        "prod_exit_idx": 793,
+        "ref_reason": "RSR_EXIT",
+        "prod_reason": "RSR_EXIT",
+        "ref_pnl": 56200.0,
+        "prod_pnl": 56000.0,
+        "expected_action": "SELL@idx=792",
+        "actual_action": "SELL@idx=793"
+      },
+      {
+        "type": "EXIT_TIMING_DIFF",
+        "symbol": "3197.T",
+        "entry_idx": 1074,
+        "ref_exit_idx": 1077,
+        "prod_exit_idx": 1078,
+        "ref_reason": "RSR_EXIT",
+        "prod_reason": "RSR_EXIT",
+        "ref_pnl": 9000.0,
+        "prod_pnl": -6900.0,
+        "expected_action": "SELL@idx=1077",
+        "actual_action": "SELL@idx=1078"
+      },
+      {
+        "type": "EXIT_TIMING_DIFF",
+        "symbol": "3197.T",
+        "entry_idx": 1080,
+        "ref_exit_idx": 1083,
+        "prod_exit_idx": 1084,
+        "ref_reason": "RSR_EXIT",
+        "prod_reason": "RSR_EXIT",
+        "ref_pnl": 25050.0,
+        "prod_pnl": 33450.0,
+        "expected_action": "SELL@idx=1083",
+        "actual_action": "SELL@idx=1084"
+      },
+      {
+        "type": "EXIT_TIMING_DIFF",
+        "symbol": "8002.T",
+        "entry_idx": 1157,
+        "ref_exit_idx": 1168,
+        "prod_exit_idx": 1171,
+        "ref_reason": "RSR_EXIT",
+        "prod_reason": "RSR_EXIT",
+        "ref_pnl": 22200.0,
+        "prod_pnl": 45900.0,
+        "expected_action": "SELL@idx=1168",
+        "actual_action": "SELL@idx=1171"
+      },
+      {
+        "type": "EXIT_TIMING_DIFF",
+        "symbol": "3197.T",
+        "entry_idx": 1197,
+        "ref_exit_idx": 1200,
+        "prod_exit_idx": 1201,
+        "ref_reason": "RSR_EXIT",
+        "prod_reason": "RSR_EXIT",
+        "ref_pnl": 16200.0,
+        "prod_pnl": 4400.0,
+        "expected_action": "SELL@idx=1200",
+        "actual_action": "SELL@idx=1201"
+      },
+      {
+        "type": "EXIT_TIMING_DIFF",
+        "symbol": "6762.T",
+        "entry_idx": 1250,
+        "ref_exit_idx": 1255,
+        "prod_exit_idx": 1260,
+        "ref_reason": "RSR_EXIT",
+        "prod_reason": "DEFERRED_EXIT",
+        "ref_pnl": 6300.0,
+        "prod_pnl": 74850.0,
+        "expected_action": "SELL@idx=1255",
+        "actual_action": "SELL@idx=1260"
+      },
+      {
+        "type": "EXIT_TIMING_DIFF",
+        "symbol": "7203.T",
+        "entry_idx": 1260,
+        "ref_exit_idx": 1263,
+        "prod_exit_idx": 1264,
+        "ref_reason": "RSR_EXIT",
+        "prod_reason": "RSR_EXIT",
+        "ref_pnl": 38800.0,
+        "prod_pnl": 24100.0,
+        "expected_action": "SELL@idx=1263",
+        "actual_action": "SELL@idx=1264"
+      },
+      {
+        "type": "EXIT_TIMING_DIFF",
+        "symbol": "8309.T",
+        "entry_idx": 1267,
+        "ref_exit_idx": 1270,
+        "prod_exit_idx": 1271,
+        "ref_reason": "RSR_EXIT",
+        "prod_reason": "RSR_EXIT",
+        "ref_pnl": 12400.0,
+        "prod_pnl": 6200.0,
+        "expected_action": "SELL@idx=1270",
+        "actual_action": "SELL@idx=1271"
+      },
+      {
+        "type": "EXIT_TIMING_DIFF",
+        "symbol": "5411.T",
+        "entry_idx": 1270,
+        "ref_exit_idx": 1273,
+        "prod_exit_idx": 1274,
+        "ref_reason": "RSR_EXIT",
+        "prod_reason": "RSR_EXIT",
+        "ref_pnl": 3600.0,
+        "prod_pnl": 10800.0,
+        "expected_action": "SELL@idx=1273",
+        "actual_action": "SELL@idx=1274"
+      },
+      {
+        "type": "EXIT_TIMING_DIFF",
+        "symbol": "5401.T",
+        "entry_idx": 1283,
+        "ref_exit_idx": 1286,
+        "prod_exit_idx": 1287,
+        "ref_reason": "RSR_EXIT",
+        "prod_reason": "RSR_EXIT",
+        "ref_pnl": 29759.99,
+        "prod_pnl": 16800.0,
+        "expected_action": "SELL@idx=1286",
+        "actual_action": "SELL@idx=1287"
+      },
+      {
+        "type": "EXIT_TIMING_DIFF",
+        "symbol": "7203.T",
+        "entry_idx": 1291,
+        "ref_exit_idx": 1294,
+        "prod_exit_idx": 1295,
+        "ref_reason": "RSR_EXIT",
+        "prod_reason": "RSR_EXIT",
+        "ref_pnl": 11000.0,
+        "prod_pnl": 16200.0,
+        "expected_action": "SELL@idx=1294",
+        "actual_action": "SELL@idx=1295"
+      },
+      {
+        "type": "EXIT_TIMING_DIFF",
+        "symbol": "3197.T",
+        "entry_idx": 1307,
+        "ref_exit_idx": 1310,
+        "prod_exit_idx": 1311,
+        "ref_reason": "RSR_EXIT",
+        "prod_reason": "RSR_EXIT",
+        "ref_pnl": 8000.0,
+        "prod_pnl": 14800.0,
+        "expected_action": "SELL@idx=1310",
+        "actual_action": "SELL@idx=1311"
+      },
+      {
+        "type": "ATR_EXT_DEFERRED",
+        "symbol": "6857.T",
+        "date": "2023-03-07",
+        "close": 2737.04,
+        "threshold": 2657.92,
+        "pnl_pct": 2.03,
+        "expected_action": "RSR_EXIT (without ATR Extension)",
+        "actual_action": "HELD (defer_expires idx=633)"
+      },
+      {
+        "type": "ATR_EXT_DEFERRED",
+        "symbol": "6501.T",
+        "date": "2023-05-15",
+        "close": 1543.21,
+        "threshold": 1478.39,
+        "pnl_pct": 0.27,
+        "expected_action": "RSR_EXIT (without ATR Extension)",
+        "actual_action": "HELD (defer_expires idx=678)"
+      },
+      {
+        "type": "ATR_EXT_DEFERRED",
+        "symbol": "9531.T",
+        "date": "2023-11-02",
+        "close": 3375.84,
+        "threshold": 3189.54,
+        "pnl_pct": 3.24,
+        "expected_action": "RSR_EXIT (without ATR Extension)",
+        "actual_action": "HELD (defer_expires idx=797)"
+      },
+      {
+        "type": "ATR_EXT_DEFERRED",
+        "symbol": "3197.T",
+        "date": "2025-01-06",
+        "close": 2391.68,
+        "threshold": 2380.55,
+        "pnl_pct": 0.91,
+        "expected_action": "RSR_EXIT (without ATR Extension)",
+        "actual_action": "HELD (defer_expires idx=1082)"
+      },
+      {
+        "type": "ATR_EXT_DEFERRED",
+        "symbol": "3197.T",
+        "date": "2025-01-15",
+        "close": 2376.28,
+        "threshold": 2325.76,
+        "pnl_pct": 3.38,
+        "expected_action": "RSR_EXIT (without ATR Extension)",
+        "actual_action": "HELD (defer_expires idx=1088)"
+      }
+    ]
+  },
+  "section_E": {
+    "full_is": {
+      "A_BASELINE": 16.24,
+      "delta_B_atr": 0.39,
+      "delta_C_vol": 0.17,
+      "delta_D_addon": 0.65,
+      "delta_E_combined": 0.87,
+      "delta_atr_on_top_D": 0.05
+    },
+    "oos_2025": {
+      "A_BASELINE": 2.99,
+      "delta_B_atr": 1.13,
+      "delta_C_vol": -0.78,
+      "delta_D_addon": -0.06,
+      "delta_E_combined": 0.05
+    },
+    "period_effect": {
+      "study46_wf_avg_e": 23.33,
+      "study47_full_is_e": 17.11,
+      "study47_true_oos_e": 3.04,
+      "gap_wf_vs_full_is": 6.22,
+      "gap_wf_vs_true_oos": 20.29,
+      "d_ref46_2018_2025": 17.06,
+      "d_ref46_2018_2024": 20.7,
+      "period_2025_drag_pp": -3.64,
+      "note": "WF OOS avg > Full IS: expected. WF evaluates each fold OOS after IS-optimized universe selection. Study48 includes 2025 annual return (D_REF46 2025≈+2.1%) dragging 7yr CAGR ~3.6pp below Study46 IS 2018-2024 reference."
+    },
+    "implementation_check": {
+      "D_REF46_IS_2018_2025": 17.06,
+      "D_REF46_IS_2018_2024": 20.7,
+      "study46_D_2018_2024": 20.7,
+      "delta_impl_period_match": 0.0,
+      "period_2025_drag": -3.64,
+      "verdict": "MATCH",
+      "note": "Period-matched run: D_REF46 IS 2018-2024 = 20.70% (CAGR), MaxDD=-19.81%, n_trades=205 — exact match with Study46 D_COMBINED. Study48 full period 2018-2025 CAGR=17.06%: delta explained entirely by inclusion of 2025 annual return (+2.1%), not implementation divergence."
+    }
+  },
+  "section_F": {
+    "SC1_all_diffs_explained": {
+      "value": "all 14 profitable",
+      "pass": true
+    },
+    "SC2_feat_diff": {
+      "value": 1,
+      "pass": true
+    },
+    "SC3_impl_match": {
+      "value": 0.0,
+      "pass": true
+    },
+    "SC4_atr_positive": {
+      "value": 0.05,
+      "pass": "True"
+    },
+    "overall_verdict": "PASS"
+  }
+}

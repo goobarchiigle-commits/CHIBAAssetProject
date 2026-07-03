@@ -1,0 +1,498 @@
+{
+  "2018-2024": [
+    {
+      "label": "0_APRIL_REPRO",
+      "cagr": 20.14,
+      "sharpe": 0.859,
+      "max_dd": -15.71,
+      "calmar": 1.282,
+      "profit_factor": 2.465,
+      "n_trades": 216,
+      "n_trades_yr": 50.5,
+      "win_rate": 55.1,
+      "avg_hold_days": 12.0,
+      "avg_candidates": 0.69,
+      "avg_simultaneous_holdings": 2.63,
+      "avg_exposure": 35.2,
+      "exit_reason_counts": {
+        "STRATEGY_EXIT": 15,
+        "RSR_MOMENTUM_EXIT": 90,
+        "RSR_EXIT": 106,
+        "TIME_STOP": 4,
+        "TURTLE_EXIT": 1
+      }
+    },
+    {
+      "label": "1_+UNIVERSE_CAPS",
+      "cagr": 18.33,
+      "sharpe": 0.811,
+      "max_dd": -16.67,
+      "calmar": 1.1,
+      "profit_factor": 2.398,
+      "n_trades": 205,
+      "n_trades_yr": 48.0,
+      "win_rate": 57.1,
+      "avg_hold_days": 11.8,
+      "avg_candidates": 0.64,
+      "avg_simultaneous_holdings": 2.45,
+      "avg_exposure": 34.7,
+      "exit_reason_counts": {
+        "STRATEGY_EXIT": 12,
+        "RSR_MOMENTUM_EXIT": 79,
+        "RSR_EXIT": 109,
+        "TIME_STOP": 4,
+        "TURTLE_EXIT": 1
+      }
+    },
+    {
+      "label": "2_+SHOCK_COMPOSITE",
+      "cagr": 18.33,
+      "sharpe": 0.811,
+      "max_dd": -16.67,
+      "calmar": 1.1,
+      "profit_factor": 2.398,
+      "n_trades": 205,
+      "n_trades_yr": 48.0,
+      "win_rate": 57.1,
+      "avg_hold_days": 11.8,
+      "avg_candidates": 0.64,
+      "avg_simultaneous_holdings": 2.45,
+      "avg_exposure": 34.7,
+      "exit_reason_counts": {
+        "STRATEGY_EXIT": 12,
+        "RSR_MOMENTUM_EXIT": 79,
+        "RSR_EXIT": 109,
+        "TIME_STOP": 4,
+        "TURTLE_EXIT": 1
+      }
+    },
+    {
+      "label": "3_+RSR_EXIT_70",
+      "cagr": 19.67,
+      "sharpe": 0.868,
+      "max_dd": -18.25,
+      "calmar": 1.078,
+      "profit_factor": 2.489,
+      "n_trades": 196,
+      "n_trades_yr": 45.9,
+      "win_rate": 56.6,
+      "avg_hold_days": 12.3,
+      "avg_candidates": 0.64,
+      "avg_simultaneous_holdings": 2.43,
+      "avg_exposure": 34.3,
+      "exit_reason_counts": {
+        "STRATEGY_EXIT": 12,
+        "RSR_MOMENTUM_EXIT": 86,
+        "RSR_EXIT": 91,
+        "TIME_STOP": 5,
+        "TURTLE_EXIT": 2
+      }
+    },
+    {
+      "label": "4_+ATR_TRAILING",
+      "cagr": 20.3,
+      "sharpe": 0.89,
+      "max_dd": -18.25,
+      "calmar": 1.112,
+      "profit_factor": 2.534,
+      "n_trades": 199,
+      "n_trades_yr": 46.6,
+      "win_rate": 56.8,
+      "avg_hold_days": 12.2,
+      "avg_candidates": 0.63,
+      "avg_simultaneous_holdings": 2.46,
+      "avg_exposure": 34.6,
+      "exit_reason_counts": {
+        "STRATEGY_EXIT": 14,
+        "RSR_MOMENTUM_EXIT": 84,
+        "RSR_EXIT": 91,
+        "ATR_TRAILING": 4,
+        "TIME_STOP": 5,
+        "TURTLE_EXIT": 1
+      }
+    },
+    {
+      "label": "5_+MULTILAYER_RSR",
+      "cagr": 20.3,
+      "sharpe": 0.89,
+      "max_dd": -18.25,
+      "calmar": 1.112,
+      "profit_factor": 2.534,
+      "n_trades": 199,
+      "n_trades_yr": 46.6,
+      "win_rate": 56.8,
+      "avg_hold_days": 12.2,
+      "avg_candidates": 0.63,
+      "avg_simultaneous_holdings": 2.46,
+      "avg_exposure": 34.6,
+      "exit_reason_counts": {
+        "STRATEGY_EXIT": 14,
+        "RSR_MOMENTUM_EXIT": 84,
+        "RSR_EXIT": 91,
+        "ATR_TRAILING": 4,
+        "TIME_STOP": 5,
+        "TURTLE_EXIT": 1
+      }
+    },
+    {
+      "label": "6_+ATR_RISK_SIZING",
+      "cagr": 11.49,
+      "sharpe": 0.746,
+      "max_dd": -14.49,
+      "calmar": 0.793,
+      "profit_factor": 1.982,
+      "n_trades": 206,
+      "n_trades_yr": 48.2,
+      "win_rate": 54.9,
+      "avg_hold_days": 12.3,
+      "avg_candidates": 0.63,
+      "avg_simultaneous_holdings": 2.56,
+      "avg_exposure": 26.4,
+      "exit_reason_counts": {
+        "STRATEGY_EXIT": 13,
+        "RSR_MOMENTUM_EXIT": 91,
+        "RSR_EXIT": 92,
+        "ATR_TRAILING": 4,
+        "TIME_STOP": 5,
+        "TURTLE_EXIT": 1
+      }
+    },
+    {
+      "label": "7_+MTF_FILTER",
+      "cagr": 11.13,
+      "sharpe": 0.698,
+      "max_dd": -16.27,
+      "calmar": 0.684,
+      "profit_factor": 1.963,
+      "n_trades": 193,
+      "n_trades_yr": 45.2,
+      "win_rate": 54.4,
+      "avg_hold_days": 12.4,
+      "avg_candidates": 0.56,
+      "avg_simultaneous_holdings": 2.42,
+      "avg_exposure": 24.8,
+      "exit_reason_counts": {
+        "STRATEGY_EXIT": 12,
+        "RSR_MOMENTUM_EXIT": 93,
+        "RSR_EXIT": 77,
+        "ATR_TRAILING": 6,
+        "TIME_STOP": 4,
+        "TURTLE_EXIT": 1
+      }
+    }
+  ],
+  "2020-2024": [
+    {
+      "label": "0_APRIL_REPRO",
+      "cagr": 20.14,
+      "sharpe": 0.859,
+      "max_dd": -15.71,
+      "calmar": 1.282,
+      "profit_factor": 2.465,
+      "n_trades": 216,
+      "n_trades_yr": 50.5,
+      "win_rate": 55.1,
+      "avg_hold_days": 12.0,
+      "avg_candidates": 0.69,
+      "avg_simultaneous_holdings": 2.63,
+      "avg_exposure": 35.2,
+      "exit_reason_counts": {
+        "STRATEGY_EXIT": 15,
+        "RSR_MOMENTUM_EXIT": 90,
+        "RSR_EXIT": 106,
+        "TIME_STOP": 4,
+        "TURTLE_EXIT": 1
+      }
+    },
+    {
+      "label": "1_+UNIVERSE_CAPS",
+      "cagr": 18.33,
+      "sharpe": 0.811,
+      "max_dd": -16.67,
+      "calmar": 1.1,
+      "profit_factor": 2.398,
+      "n_trades": 205,
+      "n_trades_yr": 48.0,
+      "win_rate": 57.1,
+      "avg_hold_days": 11.8,
+      "avg_candidates": 0.64,
+      "avg_simultaneous_holdings": 2.45,
+      "avg_exposure": 34.7,
+      "exit_reason_counts": {
+        "STRATEGY_EXIT": 12,
+        "RSR_MOMENTUM_EXIT": 79,
+        "RSR_EXIT": 109,
+        "TIME_STOP": 4,
+        "TURTLE_EXIT": 1
+      }
+    },
+    {
+      "label": "2_+SHOCK_COMPOSITE",
+      "cagr": 18.33,
+      "sharpe": 0.811,
+      "max_dd": -16.67,
+      "calmar": 1.1,
+      "profit_factor": 2.398,
+      "n_trades": 205,
+      "n_trades_yr": 48.0,
+      "win_rate": 57.1,
+      "avg_hold_days": 11.8,
+      "avg_candidates": 0.64,
+      "avg_simultaneous_holdings": 2.45,
+      "avg_exposure": 34.7,
+      "exit_reason_counts": {
+        "STRATEGY_EXIT": 12,
+        "RSR_MOMENTUM_EXIT": 79,
+        "RSR_EXIT": 109,
+        "TIME_STOP": 4,
+        "TURTLE_EXIT": 1
+      }
+    },
+    {
+      "label": "3_+RSR_EXIT_70",
+      "cagr": 19.67,
+      "sharpe": 0.868,
+      "max_dd": -18.25,
+      "calmar": 1.078,
+      "profit_factor": 2.489,
+      "n_trades": 196,
+      "n_trades_yr": 45.9,
+      "win_rate": 56.6,
+      "avg_hold_days": 12.3,
+      "avg_candidates": 0.64,
+      "avg_simultaneous_holdings": 2.43,
+      "avg_exposure": 34.3,
+      "exit_reason_counts": {
+        "STRATEGY_EXIT": 12,
+        "RSR_MOMENTUM_EXIT": 86,
+        "RSR_EXIT": 91,
+        "TIME_STOP": 5,
+        "TURTLE_EXIT": 2
+      }
+    },
+    {
+      "label": "4_+ATR_TRAILING",
+      "cagr": 20.3,
+      "sharpe": 0.89,
+      "max_dd": -18.25,
+      "calmar": 1.112,
+      "profit_factor": 2.534,
+      "n_trades": 199,
+      "n_trades_yr": 46.6,
+      "win_rate": 56.8,
+      "avg_hold_days": 12.2,
+      "avg_candidates": 0.63,
+      "avg_simultaneous_holdings": 2.46,
+      "avg_exposure": 34.6,
+      "exit_reason_counts": {
+        "STRATEGY_EXIT": 14,
+        "RSR_MOMENTUM_EXIT": 84,
+        "RSR_EXIT": 91,
+        "ATR_TRAILING": 4,
+        "TIME_STOP": 5,
+        "TURTLE_EXIT": 1
+      }
+    },
+    {
+      "label": "5_+MULTILAYER_RSR",
+      "cagr": 20.3,
+      "sharpe": 0.89,
+      "max_dd": -18.25,
+      "calmar": 1.112,
+      "profit_factor": 2.534,
+      "n_trades": 199,
+      "n_trades_yr": 46.6,
+      "win_rate": 56.8,
+      "avg_hold_days": 12.2,
+      "avg_candidates": 0.63,
+      "avg_simultaneous_holdings": 2.46,
+      "avg_exposure": 34.6,
+      "exit_reason_counts": {
+        "STRATEGY_EXIT": 14,
+        "RSR_MOMENTUM_EXIT": 84,
+        "RSR_EXIT": 91,
+        "ATR_TRAILING": 4,
+        "TIME_STOP": 5,
+        "TURTLE_EXIT": 1
+      }
+    },
+    {
+      "label": "6_+ATR_RISK_SIZING",
+      "cagr": 11.49,
+      "sharpe": 0.746,
+      "max_dd": -14.49,
+      "calmar": 0.793,
+      "profit_factor": 1.982,
+      "n_trades": 206,
+      "n_trades_yr": 48.2,
+      "win_rate": 54.9,
+      "avg_hold_days": 12.3,
+      "avg_candidates": 0.63,
+      "avg_simultaneous_holdings": 2.56,
+      "avg_exposure": 26.4,
+      "exit_reason_counts": {
+        "STRATEGY_EXIT": 13,
+        "RSR_MOMENTUM_EXIT": 91,
+        "RSR_EXIT": 92,
+        "ATR_TRAILING": 4,
+        "TIME_STOP": 5,
+        "TURTLE_EXIT": 1
+      }
+    },
+    {
+      "label": "7_+MTF_FILTER",
+      "cagr": 11.13,
+      "sharpe": 0.698,
+      "max_dd": -16.27,
+      "calmar": 0.684,
+      "profit_factor": 1.963,
+      "n_trades": 193,
+      "n_trades_yr": 45.2,
+      "win_rate": 54.4,
+      "avg_hold_days": 12.4,
+      "avg_candidates": 0.56,
+      "avg_simultaneous_holdings": 2.42,
+      "avg_exposure": 24.8,
+      "exit_reason_counts": {
+        "STRATEGY_EXIT": 12,
+        "RSR_MOMENTUM_EXIT": 93,
+        "RSR_EXIT": 77,
+        "ATR_TRAILING": 6,
+        "TIME_STOP": 4,
+        "TURTLE_EXIT": 1
+      }
+    }
+  ],
+  "2025": [
+    {
+      "label": "0_APRIL_REPRO",
+      "cagr": 5.57,
+      "sharpe": 0.564,
+      "max_dd": -10.11,
+      "calmar": 0.551,
+      "profit_factor": 1.57,
+      "n_trades": 50,
+      "n_trades_yr": 51.9,
+      "win_rate": 58.0,
+      "avg_hold_days": 6.8,
+      "avg_candidates": 0.39,
+      "avg_simultaneous_holdings": 1.65,
+      "avg_exposure": 29.3,
+      "exit_reason_counts": {
+        "RSR_EXIT": 29,
+        "STRATEGY_EXIT": 6,
+        "RSR_MOMENTUM_EXIT": 15
+      }
+    },
+    {
+      "label": "3_+RSR_EXIT_70",
+      "cagr": 11.0,
+      "sharpe": 1.059,
+      "max_dd": -9.4,
+      "calmar": 1.17,
+      "profit_factor": 2.278,
+      "n_trades": 44,
+      "n_trades_yr": 45.6,
+      "win_rate": 63.6,
+      "avg_hold_days": 7.8,
+      "avg_candidates": 0.35,
+      "avg_simultaneous_holdings": 1.75,
+      "avg_exposure": 31.3,
+      "exit_reason_counts": {
+        "RSR_EXIT": 19,
+        "STRATEGY_EXIT": 7,
+        "RSR_MOMENTUM_EXIT": 18
+      }
+    },
+    {
+      "label": "7_+MTF_FILTER",
+      "cagr": 5.25,
+      "sharpe": 0.576,
+      "max_dd": -9.29,
+      "calmar": 0.566,
+      "profit_factor": 1.626,
+      "n_trades": 42,
+      "n_trades_yr": 43.6,
+      "win_rate": 59.5,
+      "avg_hold_days": 7.6,
+      "avg_candidates": 0.31,
+      "avg_simultaneous_holdings": 1.54,
+      "avg_exposure": 28.5,
+      "exit_reason_counts": {
+        "RSR_EXIT": 17,
+        "STRATEGY_EXIT": 5,
+        "ATR_TRAILING": 3,
+        "RSR_MOMENTUM_EXIT": 17
+      }
+    }
+  ],
+  "2018-2026": [
+    {
+      "label": "0_APRIL_REPRO",
+      "cagr": 16.12,
+      "sharpe": 0.781,
+      "max_dd": -15.71,
+      "calmar": 1.026,
+      "profit_factor": 2.277,
+      "n_trades": 280,
+      "n_trades_yr": 51.3,
+      "win_rate": 55.4,
+      "avg_hold_days": 11.0,
+      "avg_candidates": 0.64,
+      "avg_simultaneous_holdings": 2.46,
+      "avg_exposure": 31.0,
+      "exit_reason_counts": {
+        "STRATEGY_EXIT": 22,
+        "RSR_MOMENTUM_EXIT": 111,
+        "RSR_EXIT": 142,
+        "TIME_STOP": 4,
+        "TURTLE_EXIT": 1
+      }
+    },
+    {
+      "label": "3_+RSR_EXIT_70",
+      "cagr": 16.89,
+      "sharpe": 0.836,
+      "max_dd": -18.25,
+      "calmar": 0.925,
+      "profit_factor": 2.524,
+      "n_trades": 251,
+      "n_trades_yr": 46.0,
+      "win_rate": 58.6,
+      "avg_hold_days": 11.5,
+      "avg_candidates": 0.59,
+      "avg_simultaneous_holdings": 2.3,
+      "avg_exposure": 30.3,
+      "exit_reason_counts": {
+        "STRATEGY_EXIT": 20,
+        "RSR_MOMENTUM_EXIT": 109,
+        "RSR_EXIT": 115,
+        "TIME_STOP": 5,
+        "TURTLE_EXIT": 2
+      }
+    },
+    {
+      "label": "7_+MTF_FILTER",
+      "cagr": 10.43,
+      "sharpe": 0.713,
+      "max_dd": -16.27,
+      "calmar": 0.641,
+      "profit_factor": 2.02,
+      "n_trades": 246,
+      "n_trades_yr": 45.1,
+      "win_rate": 56.5,
+      "avg_hold_days": 11.5,
+      "avg_candidates": 0.53,
+      "avg_simultaneous_holdings": 2.25,
+      "avg_exposure": 23.6,
+      "exit_reason_counts": {
+        "STRATEGY_EXIT": 17,
+        "RSR_MOMENTUM_EXIT": 113,
+        "RSR_EXIT": 101,
+        "ATR_TRAILING": 10,
+        "TIME_STOP": 4,
+        "TURTLE_EXIT": 1
+      }
+    }
+  ]
+}

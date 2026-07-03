@@ -1,0 +1,181 @@
+{
+  "study": "Study53_OpportunityLossAnalysis",
+  "date": "2026-06-28",
+  "config": "D_ATR_EQ (ATR_Extension + EQ_SCALE, VOL_ADJ除外)",
+  "period": {
+    "is_start": "2018-01-01",
+    "is_end": "2024-12-31"
+  },
+  "capital": 3000000,
+  "daily_stats": {
+    "days_total": 1724,
+    "avg_exposure_pct": 31.3,
+    "avg_cash_ratio_pct": 68.7,
+    "avg_candidates": 0.48,
+    "avg_open_slots": 1.07,
+    "days_no_cand": 1144,
+    "days_no_cand_pct": 66.4,
+    "days_full_cap": 729,
+    "days_full_cap_pct": 42.3,
+    "days_zero_exp": 312,
+    "days_idle_w_cand": 580
+  },
+  "actual_bt": {
+    "cagr": 12.37,
+    "sharpe": 0.586,
+    "max_dd": -18.12,
+    "calmar": 0.683,
+    "n_trades": 263,
+    "avg_exposure": 31.3
+  },
+  "rejection_reasons": {
+    "total_rejected": 569,
+    "MAX_POS": 427,
+    "LOT_REJECT": 10,
+    "SECTOR_CAP": 73,
+    "CLUSTER_CAP": 57,
+    "GROSS_EXPOSURE": 2
+  },
+  "rejection_pct": {
+    "MAX_POS": 75.0,
+    "LOT_REJECT": 1.8,
+    "CAPS": 23.2
+  },
+  "forward_returns": {
+    "max_pos": {
+      "n": 427,
+      "label": "MAX_POS",
+      "fwd5d": {
+        "mean": 0.78,
+        "median": 0.9,
+        "win_rate": 58.1,
+        "top10pct": 6.21,
+        "bottom10pct": -4.69,
+        "n": 427
+      },
+      "fwd10d": {
+        "mean": 1.46,
+        "median": 1.47,
+        "win_rate": 60.4,
+        "top10pct": 9.42,
+        "bottom10pct": -5.91,
+        "n": 427
+      },
+      "fwd20d": {
+        "mean": 3.15,
+        "median": 2.64,
+        "win_rate": 63.9,
+        "top10pct": 13.75,
+        "bottom10pct": -7.59,
+        "n": 427
+      },
+      "fwd60d": {
+        "mean": 7.37,
+        "median": 5.42,
+        "win_rate": 65.8,
+        "top10pct": 31.43,
+        "bottom10pct": -13.75,
+        "n": 427
+      }
+    },
+    "lot_rej": {
+      "n": 10,
+      "label": "LOT_REJECT",
+      "fwd5d": {
+        "mean": 0.89,
+        "median": 0.09,
+        "win_rate": 50.0,
+        "top10pct": 6.4,
+        "bottom10pct": -3.03,
+        "n": 10
+      },
+      "fwd10d": {
+        "mean": 3.45,
+        "median": 0.77,
+        "win_rate": 60.0,
+        "top10pct": 12.55,
+        "bottom10pct": -2.89,
+        "n": 10
+      },
+      "fwd20d": {
+        "mean": 6.77,
+        "median": 7.22,
+        "win_rate": 80.0,
+        "top10pct": 14.04,
+        "bottom10pct": -0.54,
+        "n": 10
+      },
+      "fwd60d": {
+        "mean": 8.26,
+        "median": 9.07,
+        "win_rate": 70.0,
+        "top10pct": 26.63,
+        "bottom10pct": -12.8,
+        "n": 10
+      }
+    },
+    "skip": {
+      "n": 132,
+      "label": "SECTOR/CLUSTER/GROSS",
+      "fwd5d": {
+        "mean": 1.17,
+        "median": 0.91,
+        "win_rate": 59.1,
+        "top10pct": 7.23,
+        "bottom10pct": -5.14,
+        "n": 132
+      },
+      "fwd10d": {
+        "mean": 2.14,
+        "median": 2.05,
+        "win_rate": 63.6,
+        "top10pct": 11.81,
+        "bottom10pct": -7.73,
+        "n": 132
+      },
+      "fwd20d": {
+        "mean": 1.78,
+        "median": 1.44,
+        "win_rate": 56.1,
+        "top10pct": 13.22,
+        "bottom10pct": -9.12,
+        "n": 132
+      },
+      "fwd60d": {
+        "mean": 9.0,
+        "median": 4.35,
+        "win_rate": 66.7,
+        "top10pct": 33.73,
+        "bottom10pct": -9.3,
+        "n": 132
+      }
+    }
+  },
+  "counterfactual_bt": {
+    "max_positions": 10,
+    "cagr": 12.7,
+    "sharpe": 0.546,
+    "max_dd": -23.08,
+    "calmar": 0.55,
+    "n_trades": 373,
+    "avg_exposure": 37.2,
+    "delta_cagr": 0.33,
+    "delta_max_dd": -4.96,
+    "delta_calmar": -0.133,
+    "delta_exp": 5.9
+  },
+  "opportunity_loss": {
+    "actual_profit_jpy": 3664188,
+    "cf_profit_jpy": 3798243,
+    "gap_jpy": 134055,
+    "gap_pct_capital": 4.5
+  },
+  "diagnosis": {
+    "primary": "MAX_POS_DOMINANT: ポジション上限(max=3)が支配的。cap解除でExposure向上余地あり。",
+    "cap_verdict": "→ ポジション上限解除の効果は限定的(+0.33pp)。エントリー不足が真のボトルネック。",
+    "pct_max_pos": 75.0,
+    "pct_lot_rej": 1.8,
+    "pct_caps": 23.2,
+    "exp_gain_from_cap_lift_pp": 5.9
+  }
+}

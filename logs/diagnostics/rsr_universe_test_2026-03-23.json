@@ -1,0 +1,160 @@
+{
+  "date": "2026-03-23",
+  "trade_universe_size": 24,
+  "rsr42_context_size": 42,
+  "rsr300_context_size": 113,
+  "case_A_rsr42": {
+    "context_size": 42,
+    "threshold_75_count": 3,
+    "threshold_70_count": 3,
+    "top10": [
+      {
+        "symbol": "6920.T",
+        "rsr": 95.2
+      },
+      {
+        "symbol": "8002.T",
+        "rsr": 81.0
+      },
+      {
+        "symbol": "8035.T",
+        "rsr": 78.6
+      },
+      {
+        "symbol": "8053.T",
+        "rsr": 64.3
+      },
+      {
+        "symbol": "8001.T",
+        "rsr": 50.0
+      },
+      {
+        "symbol": "8309.T",
+        "rsr": 42.9
+      },
+      {
+        "symbol": "6501.T",
+        "rsr": 35.7
+      },
+      {
+        "symbol": "5411.T",
+        "rsr": 14.3
+      },
+      {
+        "symbol": "6702.T",
+        "rsr": 9.5
+      }
+    ],
+    "max_rsr": 95.2
+  },
+  "case_B_rsr300": {
+    "context_size": 113,
+    "threshold_75_count": 4,
+    "threshold_70_count": 6,
+    "top10": [
+      {
+        "symbol": "6920.T",
+        "rsr": 95.6
+      },
+      {
+        "symbol": "8002.T",
+        "rsr": 89.4
+      },
+      {
+        "symbol": "8035.T",
+        "rsr": 87.6
+      },
+      {
+        "symbol": "5020.T",
+        "rsr": 82.3
+      },
+      {
+        "symbol": "8053.T",
+        "rsr": 72.6
+      },
+      {
+        "symbol": "4502.T",
+        "rsr": 71.7
+      },
+      {
+        "symbol": "4578.T",
+        "rsr": 69.0
+      },
+      {
+        "symbol": "8001.T",
+        "rsr": 62.8
+      },
+      {
+        "symbol": "8309.T",
+        "rsr": 57.5
+      },
+      {
+        "symbol": "8267.T",
+        "rsr": 50.4
+      }
+    ],
+    "max_rsr": 95.6
+  },
+  "all_context_distribution_42": [
+    {
+      "symbol": "5706.T",
+      "rsr": 100.0
+    },
+    {
+      "symbol": "6857.T",
+      "rsr": 97.6
+    },
+    {
+      "symbol": "6920.T",
+      "rsr": 95.2
+    },
+    {
+      "symbol": "7013.T",
+      "rsr": 92.9
+    },
+    {
+      "symbol": "8058.T",
+      "rsr": 90.5
+    },
+    {
+      "symbol": "6146.T",
+      "rsr": 88.1
+    },
+    {
+      "symbol": "8015.T",
+      "rsr": 85.7
+    },
+    {
+      "symbol": "7012.T",
+      "rsr": 83.3
+    },
+    {
+      "symbol": "8002.T",
+      "rsr": 81.0
+    },
+    {
+      "symbol": "8035.T",
+      "rsr": 78.6
+    },
+    {
+      "symbol": "7011.T",
+      "rsr": 76.2
+    },
+    {
+      "symbol": "9104.T",
+      "rsr": 73.8
+    },
+    {
+      "symbol": "7182.T",
+      "rsr": 71.4
+    },
+    {
+      "symbol": "8354.T",
+      "rsr": 69.0
+    },
+    {
+      "symbol": "9531.T",
+      "rsr": 66.7
+    }
+  ]
+}

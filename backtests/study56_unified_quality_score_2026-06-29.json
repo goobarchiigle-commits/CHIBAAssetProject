@@ -1,0 +1,918 @@
+{
+  "study": "Study56_UnifiedQualityScore",
+  "date": "2026-06-29",
+  "config": "D_ATR_EQ",
+  "period": {
+    "is_start": "2018-01-01",
+    "is_end": "2024-12-31"
+  },
+  "n_sell_trades": 263,
+  "n_missed_cands": 427,
+  "phase1_construction": {
+    "n_total_records": 493,
+    "features_analyzed": [
+      "atr_expansion",
+      "ret_from_entry",
+      "vol_retention",
+      "rsr_delta"
+    ],
+    "ic_by_day": {
+      "day3": {
+        "atr_expansion": {
+          "ic": 0.098,
+          "n": 257,
+          "pval": 0.117
+        },
+        "ret_from_entry": {
+          "ic": 0.001,
+          "n": 257,
+          "pval": 0.992
+        },
+        "vol_retention": {
+          "ic": 0.076,
+          "n": 257,
+          "pval": 0.225
+        },
+        "rsr_delta": {
+          "ic": 0.136,
+          "n": 257,
+          "pval": 0.029
+        },
+        "ma20_dev": {
+          "ic": -0.008,
+          "n": 257,
+          "pval": 0.897
+        },
+        "breakout_dist": {
+          "ic": -0.065,
+          "n": 257,
+          "pval": 0.297
+        },
+        "rs_accel_post": {
+          "ic": 0.006,
+          "n": 255,
+          "pval": 0.927
+        }
+      },
+      "day5": {
+        "atr_expansion": {
+          "ic": 0.094,
+          "n": 149,
+          "pval": 0.253
+        },
+        "ret_from_entry": {
+          "ic": 0.17,
+          "n": 149,
+          "pval": 0.038
+        },
+        "vol_retention": {
+          "ic": 0.067,
+          "n": 149,
+          "pval": 0.416
+        },
+        "rsr_delta": {
+          "ic": 0.04,
+          "n": 149,
+          "pval": 0.626
+        },
+        "ma20_dev": {
+          "ic": 0.12,
+          "n": 149,
+          "pval": 0.146
+        },
+        "breakout_dist": {
+          "ic": 0.029,
+          "n": 149,
+          "pval": 0.728
+        },
+        "rs_accel_post": {
+          "ic": -0.066,
+          "n": 147,
+          "pval": 0.424
+        }
+      },
+      "day10": {
+        "atr_expansion": {
+          "ic": 0.154,
+          "n": 87,
+          "pval": 0.155
+        },
+        "ret_from_entry": {
+          "ic": 0.122,
+          "n": 87,
+          "pval": 0.262
+        },
+        "vol_retention": {
+          "ic": -0.146,
+          "n": 87,
+          "pval": 0.176
+        },
+        "rsr_delta": {
+          "ic": 0.039,
+          "n": 87,
+          "pval": 0.719
+        },
+        "ma20_dev": {
+          "ic": 0.065,
+          "n": 87,
+          "pval": 0.553
+        },
+        "breakout_dist": {
+          "ic": -0.021,
+          "n": 87,
+          "pval": 0.844
+        },
+        "rs_accel_post": {
+          "ic": 0.083,
+          "n": 87,
+          "pval": 0.442
+        }
+      }
+    },
+    "ic_stability": {
+      "atr_expansion": {
+        "mean_abs_ic": 0.115,
+        "std_abs_ic": 0.033,
+        "n_days": 3
+      },
+      "ret_from_entry": {
+        "mean_abs_ic": 0.097,
+        "std_abs_ic": 0.087,
+        "n_days": 3
+      },
+      "vol_retention": {
+        "mean_abs_ic": 0.096,
+        "std_abs_ic": 0.043,
+        "n_days": 3
+      },
+      "rsr_delta": {
+        "mean_abs_ic": 0.072,
+        "std_abs_ic": 0.056,
+        "n_days": 3
+      },
+      "ma20_dev": {
+        "mean_abs_ic": 0.064,
+        "std_abs_ic": 0.056,
+        "n_days": 3
+      },
+      "breakout_dist": {
+        "mean_abs_ic": 0.038,
+        "std_abs_ic": 0.024,
+        "n_days": 3
+      },
+      "rs_accel_post": {
+        "mean_abs_ic": 0.052,
+        "std_abs_ic": 0.041,
+        "n_days": 3
+      }
+    },
+    "mutual_correlation": {
+      "atr_expansion": {
+        "atr_expansion": 1.0,
+        "ret_from_entry": 0.446,
+        "vol_retention": 0.115,
+        "rsr_delta": 0.178
+      },
+      "ret_from_entry": {
+        "atr_expansion": 0.446,
+        "ret_from_entry": 1.0,
+        "vol_retention": 0.097,
+        "rsr_delta": 0.357
+      },
+      "vol_retention": {
+        "atr_expansion": 0.115,
+        "ret_from_entry": 0.097,
+        "vol_retention": 1.0,
+        "rsr_delta": 0.068
+      },
+      "rsr_delta": {
+        "atr_expansion": 0.178,
+        "ret_from_entry": 0.357,
+        "vol_retention": 0.068,
+        "rsr_delta": 1.0
+      }
+    },
+    "vif": {
+      "atr_expansion": 1.789,
+      "ret_from_entry": 1.934,
+      "vol_retention": 1.034,
+      "rsr_delta": 1.122
+    },
+    "decile_spread": {
+      "atr_expansion": {
+        "top30_rem_ret": 21.245,
+        "bot30_rem_ret": 12.567,
+        "spread": 8.679
+      },
+      "ret_from_entry": {
+        "top30_rem_ret": 18.765,
+        "bot30_rem_ret": 17.095,
+        "spread": 1.67
+      },
+      "vol_retention": {
+        "top30_rem_ret": 17.353,
+        "bot30_rem_ret": 17.349,
+        "spread": 0.003
+      },
+      "rsr_delta": {
+        "top30_rem_ret": 18.17,
+        "bot30_rem_ret": 14.945,
+        "spread": 3.225
+      }
+    },
+    "quality_score_v1": {
+      "formula": "IC-weighted Z-score combination → percentile rank 0-100",
+      "features": [
+        "atr_expansion",
+        "ret_from_entry",
+        "vol_retention",
+        "rsr_delta"
+      ],
+      "weights": {
+        "atr_expansion": 0.3018,
+        "ret_from_entry": 0.2572,
+        "vol_retention": 0.252,
+        "rsr_delta": 0.189
+      },
+      "weight_basis": "Study55 avg IC vs remaining return"
+    },
+    "feature_ranking": [
+      {
+        "rank": 1,
+        "feature": "atr_expansion",
+        "mean_abs_ic": 0.115,
+        "std_abs_ic": 0.033,
+        "vif": 1.789
+      },
+      {
+        "rank": 2,
+        "feature": "ret_from_entry",
+        "mean_abs_ic": 0.097,
+        "std_abs_ic": 0.087,
+        "vif": 1.934
+      },
+      {
+        "rank": 3,
+        "feature": "vol_retention",
+        "mean_abs_ic": 0.096,
+        "std_abs_ic": 0.043,
+        "vif": 1.034
+      },
+      {
+        "rank": 4,
+        "feature": "rsr_delta",
+        "mean_abs_ic": 0.072,
+        "std_abs_ic": 0.056,
+        "vif": 1.122
+      }
+    ]
+  },
+  "phase2_validation": {
+    "quality_score_v1_weights": {
+      "atr_expansion": 0.3018,
+      "ret_from_entry": 0.2572,
+      "vol_retention": 0.252,
+      "rsr_delta": 0.189
+    },
+    "by_day": {
+      "day3": {
+        "n": 257,
+        "overall_mean_rem_ret": 16.507,
+        "ic_score_vs_rem": 0.111,
+        "lift_top10": 1.349,
+        "lift_top20": 1.211,
+        "spread_top30_bot30": 5.439,
+        "monotonicity_pct": 83.3,
+        "decile_analysis": {
+          "Top10%": {
+            "n": 26,
+            "score_mean": 95.1,
+            "rem_ret": {
+              "n": 26,
+              "mean": 22.269,
+              "median": 14.521,
+              "std": 26.758,
+              "win_rate": 92.3,
+              "p10": 1.47,
+              "p25": 6.159,
+              "p75": 34.598,
+              "p90": 45.97
+            },
+            "total_ret_mean": 11.816,
+            "winrate_rem": 92.3,
+            "PF_rem": 1.893,
+            "hold_days_mean": 20.885
+          },
+          "Top20%": {
+            "n": 52,
+            "score_mean": 90.1,
+            "rem_ret": {
+              "n": 52,
+              "mean": 19.988,
+              "median": 14.521,
+              "std": 25.589,
+              "win_rate": 86.5,
+              "p10": -0.855,
+              "p25": 5.121,
+              "p75": 28.066,
+              "p90": 43.464
+            },
+            "total_ret_mean": 8.132,
+            "winrate_rem": 86.5,
+            "PF_rem": 3.022,
+            "hold_days_mean": 18.404
+          },
+          "Top30%": {
+            "n": 77,
+            "score_mean": 85.2,
+            "rem_ret": {
+              "n": 77,
+              "mean": 19.072,
+              "median": 14.749,
+              "std": 24.046,
+              "win_rate": 88.3,
+              "p10": -0.637,
+              "p25": 5.463,
+              "p75": 21.974,
+              "p90": 41.405
+            },
+            "total_ret_mean": 6.886,
+            "winrate_rem": 88.3,
+            "PF_rem": 2.821,
+            "hold_days_mean": 17.13
+          },
+          "Mid40%": {
+            "n": 103,
+            "score_mean": 50.2,
+            "rem_ret": {
+              "n": 103,
+              "mean": 16.739,
+              "median": 12.552,
+              "std": 16.788,
+              "win_rate": 94.2,
+              "p10": 2.972,
+              "p25": 7.425,
+              "p75": 21.347,
+              "p90": 34.179
+            },
+            "total_ret_mean": 0.824,
+            "winrate_rem": 94.2,
+            "PF_rem": 2.776,
+            "hold_days_mean": 10.65
+          },
+          "Bot30%": {
+            "n": 77,
+            "score_mean": 15.2,
+            "rem_ret": {
+              "n": 77,
+              "mean": 13.633,
+              "median": 11.453,
+              "std": 11.914,
+              "win_rate": 97.4,
+              "p10": 2.599,
+              "p25": 5.594,
+              "p75": 18.24,
+              "p90": 25.805
+            },
+            "total_ret_mean": -0.809,
+            "winrate_rem": 97.4,
+            "PF_rem": 3.55,
+            "hold_days_mean": 8.052
+          },
+          "Bot20%": {
+            "n": 52,
+            "score_mean": 10.3,
+            "rem_ret": {
+              "n": 52,
+              "mean": 13.848,
+              "median": 10.378,
+              "std": 12.36,
+              "win_rate": 98.1,
+              "p10": 2.772,
+              "p25": 5.402,
+              "p75": 17.831,
+              "p90": 27.907
+            },
+            "total_ret_mean": -0.593,
+            "winrate_rem": 98.1,
+            "PF_rem": 7.72,
+            "hold_days_mean": 8.5
+          },
+          "Bot10%": {
+            "n": 26,
+            "score_mean": 5.3,
+            "rem_ret": {
+              "n": 26,
+              "mean": 12.056,
+              "median": 9.923,
+              "std": 8.766,
+              "win_rate": 100.0,
+              "p10": 4.291,
+              "p25": 5.596,
+              "p75": 15.642,
+              "p90": 19.249
+            },
+            "total_ret_mean": -1.645,
+            "winrate_rem": 100.0,
+            "PF_rem": null,
+            "hold_days_mean": 8.462
+          }
+        }
+      },
+      "day5": {
+        "n": 149,
+        "overall_mean_rem_ret": 17.512,
+        "ic_score_vs_rem": 0.145,
+        "lift_top10": 1.357,
+        "lift_top20": 1.007,
+        "spread_top30_bot30": 9.306,
+        "monotonicity_pct": 66.7,
+        "decile_analysis": {
+          "Top10%": {
+            "n": 15,
+            "score_mean": 95.3,
+            "rem_ret": {
+              "n": 15,
+              "mean": 23.772,
+              "median": 14.328,
+              "std": 22.902,
+              "win_rate": 86.7,
+              "p10": 2.446,
+              "p25": 10.57,
+              "p75": 31.943,
+              "p90": 51.151
+            },
+            "total_ret_mean": 19.629,
+            "winrate_rem": 86.7,
+            "PF_rem": 9.021,
+            "hold_days_mean": 35.8
+          },
+          "Top20%": {
+            "n": 30,
+            "score_mean": 90.3,
+            "rem_ret": {
+              "n": 30,
+              "mean": 17.635,
+              "median": 12.705,
+              "std": 20.832,
+              "win_rate": 80.0,
+              "p10": -3.493,
+              "p25": 2.265,
+              "p75": 28.078,
+              "p90": 45.402
+            },
+            "total_ret_mean": 10.256,
+            "winrate_rem": 80.0,
+            "PF_rem": 4.036,
+            "hold_days_mean": 26.033
+          },
+          "Top30%": {
+            "n": 45,
+            "score_mean": 85.2,
+            "rem_ret": {
+              "n": 45,
+              "mean": 20.622,
+              "median": 13.731,
+              "std": 23.945,
+              "win_rate": 86.7,
+              "p10": -0.782,
+              "p25": 5.337,
+              "p75": 28.682,
+              "p90": 45.956
+            },
+            "total_ret_mean": 8.524,
+            "winrate_rem": 86.7,
+            "PF_rem": 4.241,
+            "hold_days_mean": 23.467
+          },
+          "Mid40%": {
+            "n": 59,
+            "score_mean": 50.3,
+            "rem_ret": {
+              "n": 59,
+              "mean": 19.865,
+              "median": 14.571,
+              "std": 25.12,
+              "win_rate": 93.2,
+              "p10": 3.196,
+              "p25": 6.718,
+              "p75": 23.85,
+              "p90": 38.689
+            },
+            "total_ret_mean": 4.612,
+            "winrate_rem": 93.2,
+            "PF_rem": 2.287,
+            "hold_days_mean": 18.542
+          },
+          "Bot30%": {
+            "n": 45,
+            "score_mean": 15.4,
+            "rem_ret": {
+              "n": 45,
+              "mean": 11.316,
+              "median": 10.525,
+              "std": 9.223,
+              "win_rate": 93.3,
+              "p10": 1.536,
+              "p25": 5.647,
+              "p75": 17.185,
+              "p90": 21.153
+            },
+            "total_ret_mean": -1.595,
+            "winrate_rem": 93.3,
+            "PF_rem": 3.572,
+            "hold_days_mean": 12.022
+          },
+          "Bot20%": {
+            "n": 30,
+            "score_mean": 10.4,
+            "rem_ret": {
+              "n": 30,
+              "mean": 11.198,
+              "median": 9.801,
+              "std": 8.682,
+              "win_rate": 96.7,
+              "p10": 3.033,
+              "p25": 5.715,
+              "p75": 16.725,
+              "p90": 19.197
+            },
+            "total_ret_mean": -1.386,
+            "winrate_rem": 96.7,
+            "PF_rem": 3.251,
+            "hold_days_mean": 11.267
+          },
+          "Bot10%": {
+            "n": 15,
+            "score_mean": 5.4,
+            "rem_ret": {
+              "n": 15,
+              "mean": 11.286,
+              "median": 10.745,
+              "std": 7.654,
+              "win_rate": 100.0,
+              "p10": 3.281,
+              "p25": 6.06,
+              "p75": 16.966,
+              "p90": 19.677
+            },
+            "total_ret_mean": -0.598,
+            "winrate_rem": 100.0,
+            "PF_rem": null,
+            "hold_days_mean": 12.467
+          }
+        }
+      },
+      "day10": {
+        "n": 87,
+        "overall_mean_rem_ret": 18.487,
+        "ic_score_vs_rem": 0.026,
+        "lift_top10": 0.732,
+        "lift_top20": 1.319,
+        "spread_top30_bot30": 0.057,
+        "monotonicity_pct": 66.7,
+        "decile_analysis": {
+          "Top10%": {
+            "n": 9,
+            "score_mean": 95.4,
+            "rem_ret": {
+              "n": 9,
+              "mean": 13.532,
+              "median": 8.687,
+              "std": 14.399,
+              "win_rate": 88.9,
+              "p10": 3.704,
+              "p25": 6.454,
+              "p75": 13.046,
+              "p90": 30.858
+            },
+            "total_ret_mean": 22.901,
+            "winrate_rem": 88.9,
+            "PF_rem": 2.976,
+            "hold_days_mean": 39.444
+          },
+          "Top20%": {
+            "n": 18,
+            "score_mean": 90.2,
+            "rem_ret": {
+              "n": 18,
+              "mean": 24.389,
+              "median": 10.774,
+              "std": 30.781,
+              "win_rate": 94.4,
+              "p10": 5.828,
+              "p25": 6.894,
+              "p75": 25.699,
+              "p90": 67.6
+            },
+            "total_ret_mean": 22.165,
+            "winrate_rem": 94.4,
+            "PF_rem": 4.896,
+            "hold_days_mean": 34.556
+          },
+          "Top30%": {
+            "n": 26,
+            "score_mean": 85.6,
+            "rem_ret": {
+              "n": 26,
+              "mean": 17.683,
+              "median": 8.465,
+              "std": 27.962,
+              "win_rate": 80.8,
+              "p10": -3.572,
+              "p25": 5.624,
+              "p75": 18.499,
+              "p90": 51.289
+            },
+            "total_ret_mean": 14.956,
+            "winrate_rem": 80.8,
+            "PF_rem": 4.314,
+            "hold_days_mean": 30.5
+          },
+          "Mid40%": {
+            "n": 35,
+            "score_mean": 50.6,
+            "rem_ret": {
+              "n": 35,
+              "mean": 19.724,
+              "median": 13.487,
+              "std": 23.306,
+              "win_rate": 94.3,
+              "p10": 1.078,
+              "p25": 7.057,
+              "p75": 21.105,
+              "p90": 55.587
+            },
+            "total_ret_mean": 6.086,
+            "winrate_rem": 94.3,
+            "PF_rem": 4.481,
+            "hold_days_mean": 27.057
+          },
+          "Bot30%": {
+            "n": 26,
+            "score_mean": 15.5,
+            "rem_ret": {
+              "n": 26,
+              "mean": 17.626,
+              "median": 9.683,
+              "std": 25.416,
+              "win_rate": 80.8,
+              "p10": -1.552,
+              "p25": 4.561,
+              "p75": 18.984,
+              "p90": 35.674
+            },
+            "total_ret_mean": 2.451,
+            "winrate_rem": 80.8,
+            "PF_rem": 8.301,
+            "hold_days_mean": 20.115
+          },
+          "Bot20%": {
+            "n": 18,
+            "score_mean": 10.9,
+            "rem_ret": {
+              "n": 18,
+              "mean": 11.623,
+              "median": 9.344,
+              "std": 11.165,
+              "win_rate": 83.3,
+              "p10": -0.971,
+              "p25": 4.615,
+              "p75": 18.698,
+              "p90": 21.19
+            },
+            "total_ret_mean": 0.97,
+            "winrate_rem": 83.3,
+            "PF_rem": 4.445,
+            "hold_days_mean": 17.333
+          },
+          "Bot10%": {
+            "n": 9,
+            "score_mean": 5.7,
+            "rem_ret": {
+              "n": 9,
+              "mean": 8.47,
+              "median": 7.448,
+              "std": 9.234,
+              "win_rate": 77.8,
+              "p10": -1.678,
+              "p25": 3.996,
+              "p75": 16.238,
+              "p90": 19.509
+            },
+            "total_ret_mean": -1.186,
+            "winrate_rem": 77.8,
+            "PF_rem": 3.231,
+            "hold_days_mean": 14.778
+          }
+        }
+      }
+    },
+    "cross_day_summary": {
+      "mean_ic_across_days": 0.094,
+      "mean_spread_across_days": 4.934
+    },
+    "validation_verdict": "PASS",
+    "verdict_basis": "IC≥0.05 AND spread>0 across Day3/5/10"
+  },
+  "phase3_maxpos": {
+    "n_events": 423,
+    "oracle_swap_rate": 74.2,
+    "rsr_score_selection": {
+      "accuracy_pct": 37.589,
+      "precision_pct": 64.535,
+      "recall_pct": 35.35,
+      "tp": 111,
+      "fp": 61,
+      "fn": 203,
+      "tn": 48,
+      "ic_rsr_vs_delta": 0.055
+    },
+    "rsr_quintile_analysis": [
+      {
+        "quintile": 1,
+        "n": 84,
+        "cand_rsr_mean": 35.9,
+        "delta_mean": 11.191,
+        "oracle_swap_rate": 78.6
+      },
+      {
+        "quintile": 2,
+        "n": 84,
+        "cand_rsr_mean": 73.5,
+        "delta_mean": 7.959,
+        "oracle_swap_rate": 72.6
+      },
+      {
+        "quintile": 3,
+        "n": 84,
+        "cand_rsr_mean": 81.3,
+        "delta_mean": 12.047,
+        "oracle_swap_rate": 73.8
+      },
+      {
+        "quintile": 4,
+        "n": 84,
+        "cand_rsr_mean": 87.4,
+        "delta_mean": 11.405,
+        "oracle_swap_rate": 72.6
+      },
+      {
+        "quintile": 5,
+        "n": 84,
+        "cand_rsr_mean": 94.4,
+        "delta_mean": 15.371,
+        "oracle_swap_rate": 75.0
+      }
+    ],
+    "selection_edge_verdict": "LOW",
+    "verdict_basis": "IC(RSR vs delta_fwd60) + swap accuracy vs oracle",
+    "delta_fwd60_summary": {
+      "n": 423,
+      "mean": 11.595,
+      "median": 10.104,
+      "std": 17.806,
+      "win_rate": 74.2,
+      "p10": -7.733,
+      "p25": -0.283,
+      "p75": 21.837,
+      "p90": 34.335
+    }
+  },
+  "phase4_exit_readiness": {
+    "by_day": {
+      "day3": {
+        "n": 257,
+        "n_winners": 66,
+        "n_losers": 66,
+        "winner_score_mean": 66.342,
+        "loser_score_mean": 37.437,
+        "score_spread_w_l": 28.906,
+        "cohens_d": 1.001,
+        "ic_score_vs_rem": 0.111
+      },
+      "day5": {
+        "n": 149,
+        "n_winners": 56,
+        "n_losers": 39,
+        "winner_score_mean": 61.493,
+        "loser_score_mean": 42.196,
+        "score_spread_w_l": 19.297,
+        "cohens_d": 0.684,
+        "ic_score_vs_rem": 0.145
+      },
+      "day10": {
+        "n": 87,
+        "n_winners": 44,
+        "n_losers": 19,
+        "winner_score_mean": 62.304,
+        "loser_score_mean": 41.137,
+        "score_spread_w_l": 21.167,
+        "cohens_d": 0.806,
+        "ic_score_vs_rem": 0.026
+      }
+    },
+    "trajectory_summary": {
+      "day3": {
+        "winner_mean_score": 66.342,
+        "loser_mean_score": null
+      },
+      "day5": {
+        "winner_mean_score": 61.493,
+        "loser_mean_score": null
+      },
+      "day10": {
+        "winner_mean_score": 62.304,
+        "loser_mean_score": null
+      }
+    },
+    "cross_day": {
+      "mean_ic": 0.094,
+      "mean_cohens_d": 0.83
+    },
+    "exit_readiness_value": "HIGH",
+    "verdict_basis": "IC≥0.08 AND Cohen's d≥0.4 → HIGH"
+  },
+  "final_deliverables": {
+    "1_quality_score_definition": {
+      "formula": "IC-weighted Z-score → percentile rank 0-100",
+      "weights": {
+        "atr_expansion": 0.3018,
+        "ret_from_entry": 0.2572,
+        "vol_retention": 0.252,
+        "rsr_delta": 0.189
+      }
+    },
+    "2_feature_importance": [
+      {
+        "rank": 1,
+        "feature": "atr_expansion",
+        "mean_abs_ic": 0.115,
+        "vif": 1.789
+      },
+      {
+        "rank": 2,
+        "feature": "ret_from_entry",
+        "mean_abs_ic": 0.097,
+        "vif": 1.934
+      },
+      {
+        "rank": 3,
+        "feature": "vol_retention",
+        "mean_abs_ic": 0.096,
+        "vif": 1.034
+      },
+      {
+        "rank": 4,
+        "feature": "rsr_delta",
+        "mean_abs_ic": 0.072,
+        "vif": 1.122
+      }
+    ],
+    "3_decile_analysis": {
+      "validation_verdict": "PASS",
+      "mean_ic_cross_day": 0.094,
+      "mean_spread_cross_day": 4.934,
+      "note": "詳細は phase2_validation.by_day 参照"
+    },
+    "4_maxpos_selection_edge": {
+      "verdict": "LOW",
+      "accuracy_pct": 37.589
+    },
+    "5_quality_exit_value": {
+      "verdict": "HIGH",
+      "mean_ic": 0.094,
+      "mean_cohens_d": 0.83
+    },
+    "6_priority_vs_cluster": {
+      "note": "Cluster Allocation (Study55確認済)との比較",
+      "final_priority_list": [
+        {
+          "priority": "A",
+          "research": "Quality Exit WF",
+          "value": "HIGH",
+          "basis": "IC=0.094 / Cohen's_d=0.83"
+        },
+        {
+          "priority": "B",
+          "research": "MAX_POS Selection Score",
+          "value": "LOW",
+          "basis": "accuracy=37.589%"
+        },
+        {
+          "priority": "C",
+          "research": "Cluster Allocation WF",
+          "value": "HIGH",
+          "basis": "Study55確認済 alpha_gap=+1.98pp DISTRIBUTED"
+        },
+        {
+          "priority": "D",
+          "research": "Early Entry",
+          "value": "LOW",
+          "basis": "Study54確認済 Group A -2.96pp (DEFER維持)"
+        }
+      ]
+    },
+    "next_recommended_research": "Quality Exit WF"
+  }
+}

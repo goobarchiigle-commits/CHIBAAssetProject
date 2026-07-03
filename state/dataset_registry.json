@@ -1,0 +1,20 @@
+{
+  "_meta": {
+    "schema_version": "1.0",
+    "description": "Dataset fingerprint registry. Updated by tools/fingerprint_dataset.py.",
+    "fields": [
+      "name",
+      "path",
+      "sha256",
+      "row_count",
+      "column_count",
+      "schema_hash",
+      "columns",
+      "nan_profile",
+      "datetime_range",
+      "file_size_bytes",
+      "created_at"
+    ]
+  },
+  "datasets": {}
+}

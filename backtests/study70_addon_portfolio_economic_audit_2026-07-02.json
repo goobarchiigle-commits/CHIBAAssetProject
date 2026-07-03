@@ -1,0 +1,332 @@
+{
+  "study": "Study70",
+  "title": "Add-on Portfolio Economic Audit",
+  "date": "2026-07-02",
+  "params": {
+    "capital": 3000000,
+    "max_pos": 3,
+    "s65_realistic_pp": 3.16,
+    "s64_oracle_bw_pp": 6.78
+  },
+  "phase0_integrity": {
+    "n_total": 291,
+    "n_match_291": true,
+    "n_bw": 30,
+    "n_bw_match_30": true,
+    "n_rsr": 248,
+    "n_rsr_match_248": true,
+    "n_bw_rsr": 23,
+    "lookahead": 0
+  },
+  "phase1_scenarios_summary": {
+    "NO_ADDON": {
+      "config": {
+        "addon_max_per_pos": 0,
+        "addon_size_frac": 0.0
+      },
+      "is_metrics": {
+        "cagr": 12.81,
+        "calmar": 0.705,
+        "max_dd": -18.18,
+        "sharpe": 0.6,
+        "n_trades": 263
+      },
+      "oos_metrics": {
+        "cagr": 13.87,
+        "calmar": 1.367,
+        "max_dd": -10.15,
+        "sharpe": 1.225,
+        "n_trades": 42
+      }
+    },
+    "UNIT_025": {
+      "config": {
+        "addon_max_per_pos": 1,
+        "addon_size_frac": 0.25
+      },
+      "is_metrics": {
+        "cagr": 12.37,
+        "calmar": 0.683,
+        "max_dd": -18.12,
+        "sharpe": 0.586,
+        "n_trades": 263
+      },
+      "oos_metrics": {
+        "cagr": 13.48,
+        "calmar": 1.329,
+        "max_dd": -10.15,
+        "sharpe": 1.199,
+        "n_trades": 42
+      }
+    },
+    "UNIT_050": {
+      "config": {
+        "addon_max_per_pos": 1,
+        "addon_size_frac": 0.5
+      },
+      "is_metrics": {
+        "cagr": 11.83,
+        "calmar": 0.65,
+        "max_dd": -18.21,
+        "sharpe": 0.567,
+        "n_trades": 263
+      },
+      "oos_metrics": {
+        "cagr": 13.64,
+        "calmar": 1.346,
+        "max_dd": -10.13,
+        "sharpe": 1.23,
+        "n_trades": 42
+      }
+    },
+    "UNIT_100": {
+      "config": {
+        "addon_max_per_pos": 1,
+        "addon_size_frac": 1.0
+      },
+      "is_metrics": {
+        "cagr": 11.83,
+        "calmar": 0.65,
+        "max_dd": -18.21,
+        "sharpe": 0.567,
+        "n_trades": 263
+      },
+      "oos_metrics": {
+        "cagr": 10.84,
+        "calmar": 1.345,
+        "max_dd": -8.06,
+        "sharpe": 1.14,
+        "n_trades": 44
+      }
+    }
+  },
+  "phase2_addon_attribution": {
+    "note_addon_identification": "reason中のADON keyword。0件の場合はBT側がadon reasonを使わない可能性あり。その場合はPhase1 ΔCAGR比較を主評価とする。",
+    "all_addon_trades": {
+      "label": "ALL_ADDON",
+      "n": 0,
+      "total_pnl": 0,
+      "pnl_mean": null,
+      "pnl_positive_pct": null
+    },
+    "bw_addon_trades": {
+      "label": "BW_ADDON",
+      "n": 0,
+      "total_pnl": 0,
+      "pnl_mean": null,
+      "pnl_positive_pct": null
+    },
+    "nonbw_addon_trades": {
+      "label": "NONBW_ADDON",
+      "n": 0,
+      "total_pnl": 0,
+      "pnl_mean": null,
+      "pnl_positive_pct": null
+    },
+    "n_addon_raw": 0,
+    "n_base_raw": 305,
+    "addon_pnl_total": 0,
+    "base_pnl_total": 4658034.5268
+  },
+  "phase3_opportunity_cost": {
+    "no_addon_base_n": 305,
+    "addon_base_n": 305,
+    "displaced_entries_n": 0,
+    "displaced_keys_n": 0,
+    "displaced_pnl_total": 0,
+    "displaced_pnl_stats": {
+      "label": "displaced_entry_pnl",
+      "n": 0
+    },
+    "displaced_fwd40_stats": {
+      "label": "displaced_fwd40d_%",
+      "n": 0
+    },
+    "avg_position_size_jpy": 1000000.0,
+    "opportunity_cost_jpy": 0.0,
+    "redeploy_delay_stats": {
+      "label": "redeploy_delay_days",
+      "n": 0
+    },
+    "note": "displaced = trades appearing in NO_ADDON but absent in UNIT_025. Opportunity cost = n_displaced × avg_pos × avg_fwd40d."
+  },
+  "phase4_portfolio_nev": {
+    "addon_gain_jpy": 0.0,
+    "opportunity_cost_jpy": 0.0,
+    "portfolio_nev_jpy": 0.0,
+    "nev_positive": false,
+    "is_comparison": {
+      "delta_cagr_pp": -0.44,
+      "delta_calmar": -0.022,
+      "delta_max_dd_pp": 0.06
+    },
+    "oos_comparison": {
+      "delta_cagr_pp": -0.39,
+      "delta_calmar": -0.038,
+      "delta_max_dd_pp": 0.0
+    },
+    "reference_comparison": {
+      "s65_realistic_pp": 3.16,
+      "s64_oracle_bw_pp": 6.78,
+      "dcagr_vs_s65": -3.6,
+      "dcagr_vs_s64": -7.22
+    }
+  },
+  "phase5_unit_comparison": {
+    "no_addon_is_cagr": 12.81,
+    "no_addon_oos_cagr": 13.87,
+    "unit_comparison": [
+      {
+        "label": "UNIT_025",
+        "addon_size_frac": 0.25,
+        "is_cagr": 12.37,
+        "is_dcagr": -0.44,
+        "is_dcalmar": -0.022,
+        "is_ddd": 0.06,
+        "oos_cagr": 13.48,
+        "oos_dcagr": -0.39,
+        "oos_dcalmar": -0.038,
+        "oos_ddd": 0.0,
+        "is_n_trades": 263,
+        "oos_n_trades": 42
+      },
+      {
+        "label": "UNIT_050",
+        "addon_size_frac": 0.5,
+        "is_cagr": 11.83,
+        "is_dcagr": -0.98,
+        "is_dcalmar": -0.055,
+        "is_ddd": -0.03,
+        "oos_cagr": 13.64,
+        "oos_dcagr": -0.23,
+        "oos_dcalmar": -0.021,
+        "oos_ddd": 0.02,
+        "is_n_trades": 263,
+        "oos_n_trades": 42
+      },
+      {
+        "label": "UNIT_100",
+        "addon_size_frac": 1.0,
+        "is_cagr": 11.83,
+        "is_dcagr": -0.98,
+        "is_dcalmar": -0.055,
+        "is_ddd": -0.03,
+        "oos_cagr": 10.84,
+        "oos_dcagr": -3.03,
+        "oos_dcalmar": -0.022,
+        "oos_ddd": 2.09,
+        "is_n_trades": 263,
+        "oos_n_trades": 44
+      }
+    ],
+    "optimal_unit": "UNIT_025"
+  },
+  "phase6_regime_analysis": {
+    "regime_by_year": {
+      "2018": {
+        "topix_ret_pct": -15.8079,
+        "regime": "Bear"
+      },
+      "2019": {
+        "topix_ret_pct": 19.8511,
+        "regime": "Bull"
+      },
+      "2020": {
+        "topix_ret_pct": 8.8268,
+        "regime": "Sideways"
+      },
+      "2021": {
+        "topix_ret_pct": 13.331,
+        "regime": "Bull"
+      },
+      "2022": {
+        "topix_ret_pct": -4.6788,
+        "regime": "Sideways"
+      },
+      "2023": {
+        "topix_ret_pct": 29.7602,
+        "regime": "Bull"
+      },
+      "2024": {
+        "topix_ret_pct": 19.6762,
+        "regime": "Bull"
+      },
+      "2025": {
+        "topix_ret_pct": 26.8419,
+        "regime": "Bull"
+      }
+    },
+    "addon_by_regime": {},
+    "year_delta_pnl": {
+      "2018": {
+        "no_addon_pnl": 44416.6992,
+        "addon_pnl": 44416.6992,
+        "delta_pnl": 0.0,
+        "regime": "Bear"
+      },
+      "2019": {
+        "no_addon_pnl": 71822.2519,
+        "addon_pnl": 71822.2519,
+        "delta_pnl": 0.0,
+        "regime": "Bull"
+      },
+      "2020": {
+        "no_addon_pnl": 551750.341,
+        "addon_pnl": 564915.2214,
+        "delta_pnl": 13164.8804,
+        "regime": "Sideways"
+      },
+      "2021": {
+        "no_addon_pnl": 929085.9589,
+        "addon_pnl": 930069.9707,
+        "delta_pnl": 984.0118,
+        "regime": "Bull"
+      },
+      "2022": {
+        "no_addon_pnl": 149161.9827,
+        "addon_pnl": 134699.8917,
+        "delta_pnl": -14462.0911,
+        "regime": "Sideways"
+      },
+      "2023": {
+        "no_addon_pnl": 1507779.895,
+        "addon_pnl": 1490627.6917,
+        "delta_pnl": -17152.2034,
+        "regime": "Bull"
+      },
+      "2024": {
+        "no_addon_pnl": 1112115.5823,
+        "addon_pnl": 947537.0605,
+        "delta_pnl": -164578.5217,
+        "regime": "Bull"
+      },
+      "2025": {
+        "no_addon_pnl": 485295.7397,
+        "addon_pnl": 473945.7397,
+        "delta_pnl": -11350.0,
+        "regime": "Bull"
+      }
+    }
+  },
+  "phase7_verdict": {
+    "①_is_dcagr_pp": -0.44,
+    "②_oos_dcagr_pp": -0.39,
+    "③_portfolio_nev_jpy": 0.0,
+    "④_is_dcalmar": -0.022,
+    "⑤_conditions": {
+      "is_meaningful_1pp": false,
+      "oos_positive": false,
+      "nev_positive": false,
+      "calmar_improve": false,
+      "n_pass": 0
+    },
+    "⑥_optimal_unit": "UNIT_025",
+    "⑦_s65_validation": {
+      "s65_realistic_pp": 3.16,
+      "portfolio_dcagr_pp": -0.44,
+      "s65_confirmed": false
+    },
+    "final_verdict": "REJECT",
+    "reason": "経済価値不十分 → Add-on拡大は不推奨"
+  }
+}

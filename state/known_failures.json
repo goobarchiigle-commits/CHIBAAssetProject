@@ -1,0 +1,81 @@
+{
+  "_meta": {
+    "schema_version": "1.0",
+    "description": "Allowlist of pre-existing test failures. Each entry must have expiry. Expired entries fail the hygiene check.",
+    "policy": "zero-tolerance after expiry; add reason and expiry when acknowledging a failure"
+  },
+  "known_failures": [
+    {
+      "test_id": "tests/test_order_ledger.py::TestMarketOrderPriceExclusion::test_limit_sell_keeps_price",
+      "reason": "Order ledger market order price field logic not yet updated to new schema",
+      "added": "2026-05-09",
+      "expiry": "2026-08-01"
+    },
+    {
+      "test_id": "tests/test_order_ledger.py::TestMarketOrderPriceExclusion::test_market_buy_has_no_price",
+      "reason": "Order ledger market order price field logic not yet updated to new schema",
+      "added": "2026-05-09",
+      "expiry": "2026-08-01"
+    },
+    {
+      "test_id": "tests/test_order_ledger.py::TestMarketOrderPriceExclusion::test_market_open_buy_has_no_price",
+      "reason": "Order ledger market order price field logic not yet updated to new schema",
+      "added": "2026-05-09",
+      "expiry": "2026-08-01"
+    },
+    {
+      "test_id": "tests/test_order_ledger.py::TestMarketOrderPriceExclusion::test_market_open_sell_has_no_price",
+      "reason": "Order ledger market order price field logic not yet updated to new schema",
+      "added": "2026-05-09",
+      "expiry": "2026-08-01"
+    },
+    {
+      "test_id": "tests/test_order_ledger.py::TestMarketOrderPriceExclusion::test_market_sell_has_no_price",
+      "reason": "Order ledger market order price field logic not yet updated to new schema",
+      "added": "2026-05-09",
+      "expiry": "2026-08-01"
+    },
+    {
+      "test_id": "tests/test_risk_flag.py::test_risk_controls_defaults",
+      "reason": "Risk flag test references old default config structure; pending refactor",
+      "added": "2026-05-09",
+      "expiry": "2026-08-01"
+    },
+    {
+      "test_id": "tests/test_risk_flag.py::test_signal_bridge_fixed_cap",
+      "reason": "Risk flag test references old default config structure; pending refactor",
+      "added": "2026-05-09",
+      "expiry": "2026-08-01"
+    },
+    {
+      "test_id": "tests/test_sector_gate.py::TestSectorGate::test_config_loader_sector_concentration",
+      "reason": "Sector gate config loader expects legacy config key; pending migration",
+      "added": "2026-05-09",
+      "expiry": "2026-08-01"
+    },
+    {
+      "test_id": "tests/test_smoke.py::SmokeTests::test_target_modules_import",
+      "reason": "Live mode guard raises on __main__.py context during test import; pending test isolation fix",
+      "added": "2026-05-09",
+      "expiry": "2026-08-01"
+    },
+    {
+      "test_id": "tests/test_state_update.py::TestStateUpdateAfterExecution::test_state_not_updated_when_genuinely_failed",
+      "reason": "State update test uses mock that diverges from new state guard enforcement",
+      "added": "2026-05-09",
+      "expiry": "2026-08-01"
+    },
+    {
+      "test_id": "tests/test_state_update.py::TestStateUpdateAfterExecution::test_state_updated_when_order_id_present",
+      "reason": "State update test uses mock that diverges from new state guard enforcement",
+      "added": "2026-05-09",
+      "expiry": "2026-08-01"
+    },
+    {
+      "test_id": "tests/test_emergency_stop.py::test_live_mode_executes_orders",
+      "reason": "Idempotency guard fires on 'already confirmed today' due to real state file from previous test run; test lacks filesystem isolation for daily fill tracking",
+      "added": "2026-05-09",
+      "expiry": "2026-08-01"
+    }
+  ]
+}

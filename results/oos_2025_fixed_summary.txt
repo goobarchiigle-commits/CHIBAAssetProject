@@ -1,0 +1,29 @@
+OOS 2025 Fixed Engine Summary (post precompute_signals bug fix)
+==============================================================
+fix_applied=precompute_signals_full_dataset
+atr_mult=2.5
+enable_filters=false
+
+Step A: OOS 2025 Baseline (no filters)
+n_trades=57
+sharpe=-0.236
+cagr=-2.81
+max_dd=-10.99
+win_rate=56.1
+avg_hold_days=5.1
+exit_TRAIL=19
+exit_RSR=23
+exit_STRATEGY=15
+SUCCESS=true (n_trades >= 35)
+
+Step B: Filter Ablation
+baseline           n_trades=57  sharpe=-0.236  delta=0
+all_filters_on     n_trades=36  sharpe=-0.955  delta_trades=-21  delta_sharpe=-0.719
+A1_vol_off         n_trades=39  sharpe=-0.599  delta_trades=-18  delta_sharpe=-0.363
+A2_regime_off      n_trades=36  sharpe=-0.955  delta_trades=-21  delta_sharpe=-0.719
+A3_atr_off         n_trades=37  sharpe=-0.951  delta_trades=-20  delta_sharpe=-0.715
+A4_volume_ma_off   n_trades=40  sharpe=-0.855  delta_trades=-17  delta_sharpe=-0.619
+
+over_filtering_hypothesis=CONFIRMED
+worst_filter=volatility_filter (A1: -18 trades, -0.363 sharpe)
+note=A2_regime_off identical to all_filters_on → TOPIX missing → regime filter already disabled

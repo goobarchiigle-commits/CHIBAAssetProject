@@ -1,0 +1,367 @@
+{
+  "date": "2026-04-05",
+  "description": "Phase3 Step2: 銘柄サスペンション WF検証",
+  "shock_mode": "composite",
+  "results": [
+    {
+      "config_name": "baseline",
+      "sus_config": {
+        "name": "baseline",
+        "enable": false,
+        "pnl_thr": 0,
+        "win_thr": 1.0,
+        "lookback": 90,
+        "period": 60
+      },
+      "segments": [
+        {
+          "seg": 1,
+          "oos": "2020",
+          "is_sharpe": 0.0,
+          "oos_sharpe": 0.646,
+          "oos_max_dd": -15.71,
+          "ratio": null,
+          "win": true
+        },
+        {
+          "seg": 2,
+          "oos": "2021",
+          "is_sharpe": 0.646,
+          "oos_sharpe": 0.55,
+          "oos_max_dd": -18.43,
+          "ratio": 0.851,
+          "win": true
+        },
+        {
+          "seg": 3,
+          "oos": "2022",
+          "is_sharpe": 0.772,
+          "oos_sharpe": 0.219,
+          "oos_max_dd": -19.13,
+          "ratio": 0.284,
+          "win": true
+        },
+        {
+          "seg": 4,
+          "oos": "2023",
+          "is_sharpe": 0.662,
+          "oos_sharpe": 1.066,
+          "oos_max_dd": -14.44,
+          "ratio": 1.61,
+          "win": true
+        },
+        {
+          "seg": 5,
+          "oos": "2024",
+          "is_sharpe": 0.685,
+          "oos_sharpe": 0.595,
+          "oos_max_dd": -19.47,
+          "ratio": 0.869,
+          "win": true
+        }
+      ],
+      "wf_summary": {
+        "pass_count": "5/5",
+        "median_oos_sharpe": 0.595,
+        "worst_oos_dd": -19.47,
+        "avg_oos_is_ratio": 0.903
+      },
+      "full_is": {
+        "sharpe": 0.775,
+        "max_dd": -15.71
+      },
+      "true_oos_2025": {
+        "sharpe": 0.453,
+        "max_dd": -10.11
+      }
+    },
+    {
+      "config_name": "sus_90d_100k",
+      "sus_config": {
+        "name": "sus_90d_100k",
+        "enable": true,
+        "pnl_thr": -100000,
+        "win_thr": 0.4,
+        "lookback": 90,
+        "period": 60
+      },
+      "segments": [
+        {
+          "seg": 1,
+          "oos": "2020",
+          "is_sharpe": 0.0,
+          "oos_sharpe": 0.646,
+          "oos_max_dd": -15.71,
+          "ratio": null,
+          "win": true
+        },
+        {
+          "seg": 2,
+          "oos": "2021",
+          "is_sharpe": 0.646,
+          "oos_sharpe": 0.66,
+          "oos_max_dd": -18.43,
+          "ratio": 1.022,
+          "win": true
+        },
+        {
+          "seg": 3,
+          "oos": "2022",
+          "is_sharpe": 0.846,
+          "oos_sharpe": 0.219,
+          "oos_max_dd": -19.13,
+          "ratio": 0.259,
+          "win": true
+        },
+        {
+          "seg": 4,
+          "oos": "2023",
+          "is_sharpe": 0.681,
+          "oos_sharpe": 0.995,
+          "oos_max_dd": -14.44,
+          "ratio": 1.461,
+          "win": true
+        },
+        {
+          "seg": 5,
+          "oos": "2024",
+          "is_sharpe": 0.685,
+          "oos_sharpe": 0.595,
+          "oos_max_dd": -19.47,
+          "ratio": 0.869,
+          "win": true
+        }
+      ],
+      "wf_summary": {
+        "pass_count": "5/5",
+        "median_oos_sharpe": 0.646,
+        "worst_oos_dd": -19.47,
+        "avg_oos_is_ratio": 0.903
+      },
+      "full_is": {
+        "sharpe": 0.786,
+        "max_dd": -15.71
+      },
+      "true_oos_2025": {
+        "sharpe": 0.453,
+        "max_dd": -10.11
+      }
+    },
+    {
+      "config_name": "sus_90d_60k",
+      "sus_config": {
+        "name": "sus_90d_60k",
+        "enable": true,
+        "pnl_thr": -60000,
+        "win_thr": 0.4,
+        "lookback": 90,
+        "period": 60
+      },
+      "segments": [
+        {
+          "seg": 1,
+          "oos": "2020",
+          "is_sharpe": 0.0,
+          "oos_sharpe": 0.646,
+          "oos_max_dd": -15.71,
+          "ratio": null,
+          "win": true
+        },
+        {
+          "seg": 2,
+          "oos": "2021",
+          "is_sharpe": 0.646,
+          "oos_sharpe": 0.522,
+          "oos_max_dd": -18.43,
+          "ratio": 0.808,
+          "win": true
+        },
+        {
+          "seg": 3,
+          "oos": "2022",
+          "is_sharpe": 0.755,
+          "oos_sharpe": 0.219,
+          "oos_max_dd": -19.13,
+          "ratio": 0.29,
+          "win": true
+        },
+        {
+          "seg": 4,
+          "oos": "2023",
+          "is_sharpe": 0.68,
+          "oos_sharpe": 0.995,
+          "oos_max_dd": -14.44,
+          "ratio": 1.463,
+          "win": true
+        },
+        {
+          "seg": 5,
+          "oos": "2024",
+          "is_sharpe": 0.685,
+          "oos_sharpe": 0.595,
+          "oos_max_dd": -19.47,
+          "ratio": 0.869,
+          "win": true
+        }
+      ],
+      "wf_summary": {
+        "pass_count": "5/5",
+        "median_oos_sharpe": 0.595,
+        "worst_oos_dd": -19.47,
+        "avg_oos_is_ratio": 0.857
+      },
+      "full_is": {
+        "sharpe": 0.779,
+        "max_dd": -15.71
+      },
+      "true_oos_2025": {
+        "sharpe": 0.453,
+        "max_dd": -10.11
+      }
+    },
+    {
+      "config_name": "sus_60d_60k",
+      "sus_config": {
+        "name": "sus_60d_60k",
+        "enable": true,
+        "pnl_thr": -60000,
+        "win_thr": 0.4,
+        "lookback": 60,
+        "period": 45
+      },
+      "segments": [
+        {
+          "seg": 1,
+          "oos": "2020",
+          "is_sharpe": 0.0,
+          "oos_sharpe": 0.646,
+          "oos_max_dd": -15.71,
+          "ratio": null,
+          "win": true
+        },
+        {
+          "seg": 2,
+          "oos": "2021",
+          "is_sharpe": 0.646,
+          "oos_sharpe": 0.687,
+          "oos_max_dd": -18.43,
+          "ratio": 1.063,
+          "win": true
+        },
+        {
+          "seg": 3,
+          "oos": "2022",
+          "is_sharpe": 0.866,
+          "oos_sharpe": 0.219,
+          "oos_max_dd": -19.13,
+          "ratio": 0.253,
+          "win": true
+        },
+        {
+          "seg": 4,
+          "oos": "2023",
+          "is_sharpe": 0.653,
+          "oos_sharpe": 0.995,
+          "oos_max_dd": -14.44,
+          "ratio": 1.524,
+          "win": true
+        },
+        {
+          "seg": 5,
+          "oos": "2024",
+          "is_sharpe": 0.685,
+          "oos_sharpe": 0.595,
+          "oos_max_dd": -19.47,
+          "ratio": 0.869,
+          "win": true
+        }
+      ],
+      "wf_summary": {
+        "pass_count": "5/5",
+        "median_oos_sharpe": 0.646,
+        "worst_oos_dd": -19.47,
+        "avg_oos_is_ratio": 0.927
+      },
+      "full_is": {
+        "sharpe": 0.774,
+        "max_dd": -15.71
+      },
+      "true_oos_2025": {
+        "sharpe": 0.453,
+        "max_dd": -10.11
+      }
+    },
+    {
+      "config_name": "sus_90d_100k_30d",
+      "sus_config": {
+        "name": "sus_90d_100k_30d",
+        "enable": true,
+        "pnl_thr": -100000,
+        "win_thr": 0.4,
+        "lookback": 90,
+        "period": 30
+      },
+      "segments": [
+        {
+          "seg": 1,
+          "oos": "2020",
+          "is_sharpe": 0.0,
+          "oos_sharpe": 0.646,
+          "oos_max_dd": -15.71,
+          "ratio": null,
+          "win": true
+        },
+        {
+          "seg": 2,
+          "oos": "2021",
+          "is_sharpe": 0.646,
+          "oos_sharpe": 0.55,
+          "oos_max_dd": -18.43,
+          "ratio": 0.851,
+          "win": true
+        },
+        {
+          "seg": 3,
+          "oos": "2022",
+          "is_sharpe": 0.772,
+          "oos_sharpe": 0.219,
+          "oos_max_dd": -19.13,
+          "ratio": 0.284,
+          "win": true
+        },
+        {
+          "seg": 4,
+          "oos": "2023",
+          "is_sharpe": 0.662,
+          "oos_sharpe": 0.995,
+          "oos_max_dd": -14.44,
+          "ratio": 1.503,
+          "win": true
+        },
+        {
+          "seg": 5,
+          "oos": "2024",
+          "is_sharpe": 0.685,
+          "oos_sharpe": 0.595,
+          "oos_max_dd": -19.47,
+          "ratio": 0.869,
+          "win": true
+        }
+      ],
+      "wf_summary": {
+        "pass_count": "5/5",
+        "median_oos_sharpe": 0.595,
+        "worst_oos_dd": -19.47,
+        "avg_oos_is_ratio": 0.877
+      },
+      "full_is": {
+        "sharpe": 0.775,
+        "max_dd": -15.71
+      },
+      "true_oos_2025": {
+        "sharpe": 0.453,
+        "max_dd": -10.11
+      }
+    }
+  ]
+}

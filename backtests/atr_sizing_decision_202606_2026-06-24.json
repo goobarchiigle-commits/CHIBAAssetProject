@@ -1,0 +1,155 @@
+{
+  "period": [
+    "2018-01-01",
+    "2026-06-23"
+  ],
+  "step2_summary": {
+    "A_EQUAL": {
+      "cagr": 19.75,
+      "sharpe": 0.798,
+      "max_dd": -19.37,
+      "calmar": 1.02,
+      "profit_factor": 2.42,
+      "avg_exposure": 35.2,
+      "n_trades": 220
+    },
+    "B_CURRENT_ATR": {
+      "cagr": 10.43,
+      "sharpe": 0.713,
+      "max_dd": -16.27,
+      "calmar": 0.641,
+      "profit_factor": 2.02,
+      "avg_exposure": 23.6,
+      "n_trades": 246
+    },
+    "C_ATR_SQRT": {
+      "cagr": 9.82,
+      "sharpe": 0.713,
+      "max_dd": -15.33,
+      "calmar": 0.641,
+      "profit_factor": 1.998,
+      "avg_exposure": 22.5,
+      "n_trades": 243
+    },
+    "D_ATR_025": {
+      "cagr": 9.43,
+      "sharpe": 0.719,
+      "max_dd": -15.12,
+      "calmar": 0.624,
+      "profit_factor": 2.002,
+      "avg_exposure": 21.2,
+      "n_trades": 243
+    },
+    "E_NO_ATR": {
+      "cagr": 15.23,
+      "sharpe": 0.753,
+      "max_dd": -18.06,
+      "calmar": 0.844,
+      "profit_factor": 2.339,
+      "avg_exposure": 29.4,
+      "n_trades": 242
+    }
+  },
+  "step1_atr_quartile": [
+    {
+      "quartile": "Q1(低ATR%)",
+      "n": 55,
+      "atr_pct_range": [
+        1.94,
+        4.16
+      ],
+      "win_rate": 65.5,
+      "avg_return_pct": 4.41,
+      "median_return_pct": 1.19,
+      "pf": 3.766,
+      "total_pnl_yen": 2155385.0,
+      "cagr_contrib_total_pct": 71.85,
+      "cagr_contrib_annualized_pct_linear": 8.48
+    },
+    {
+      "quartile": "Q2",
+      "n": 55,
+      "atr_pct_range": [
+        4.21,
+        8.19
+      ],
+      "win_rate": 49.1,
+      "avg_return_pct": 1.74,
+      "median_return_pct": 0.0,
+      "pf": 1.47,
+      "total_pnl_yen": 649845.0,
+      "cagr_contrib_total_pct": 21.66,
+      "cagr_contrib_annualized_pct_linear": 2.56
+    },
+    {
+      "quartile": "Q3",
+      "n": 55,
+      "atr_pct_range": [
+        8.2,
+        14.09
+      ],
+      "win_rate": 56.4,
+      "avg_return_pct": 1.71,
+      "median_return_pct": 1.12,
+      "pf": 1.933,
+      "total_pnl_yen": 754143.0,
+      "cagr_contrib_total_pct": 25.14,
+      "cagr_contrib_annualized_pct_linear": 2.97
+    },
+    {
+      "quartile": "Q4(高ATR%)",
+      "n": 55,
+      "atr_pct_range": [
+        14.2,
+        35.52
+      ],
+      "win_rate": 58.2,
+      "avg_return_pct": 3.86,
+      "median_return_pct": 0.83,
+      "pf": 3.129,
+      "total_pnl_yen": 1970903.0,
+      "cagr_contrib_total_pct": 65.7,
+      "cagr_contrib_annualized_pct_linear": 7.75
+    }
+  ],
+  "step3_top20_contribution": {
+    "A_EQUAL": {
+      "n_winners_total": 126,
+      "gross_profit_all_yen": 9425910.0,
+      "top20_profit_yen": 5480334.0,
+      "top20_contribution_pct_of_gross_profit": 58.1,
+      "top20_avg_position_size_yen": 902339.0
+    },
+    "B_CURRENT_ATR": {
+      "n_winners_total": 139,
+      "gross_profit_all_yen": 4781603.0,
+      "top20_profit_yen": 2629001.0,
+      "top20_contribution_pct_of_gross_profit": 55.0,
+      "top20_avg_position_size_yen": 512915.0
+    },
+    "C_ATR_SQRT": {
+      "n_winners_total": 140,
+      "gross_profit_all_yen": 4478442.0,
+      "top20_profit_yen": 2423931.0,
+      "top20_contribution_pct_of_gross_profit": 54.1,
+      "top20_avg_position_size_yen": 476946.0
+    },
+    "D_ATR_025": {
+      "n_winners_total": 140,
+      "gross_profit_all_yen": 4225906.0,
+      "top20_profit_yen": 2379831.0,
+      "top20_contribution_pct_of_gross_profit": 56.3,
+      "top20_avg_position_size_yen": 466931.0
+    },
+    "E_NO_ATR": {
+      "n_winners_total": 139,
+      "gross_profit_all_yen": 6788665.0,
+      "top20_profit_yen": 3643652.0,
+      "top20_contribution_pct_of_gross_profit": 53.7,
+      "top20_avg_position_size_yen": 621225.0
+    }
+  },
+  "decision": "REMOVE",
+  "reason": "A_EQUALがBに対しCAGR/Sharpe/PFの全指標で優位(A_EQUAL: CAGR+19.8%/Sharpe0.798/PF2.420 vs B: CAGR+10.4%/Sharpe0.713/PF2.020)",
+  "confidence": "HIGH"
+}

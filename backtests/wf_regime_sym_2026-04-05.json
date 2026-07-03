@@ -1,0 +1,91 @@
+{
+  "date": "2026-04-05",
+  "description": "Step3 sym_regime: up=0.75 down=0.4 mom=20d",
+  "config": {
+    "shock_exit_mode": "composite",
+    "regime_mode": "regime_sym",
+    "scale_up": 0.75,
+    "scale_down": 0.4,
+    "mom_period": 20,
+    "min_hold": 3
+  },
+  "wf_segments": [
+    {
+      "seg": 1,
+      "is": "2018-2019",
+      "oos": "2020-2020",
+      "is_sharpe": 0.0,
+      "oos_sharpe": 0.646,
+      "oos_max_dd": -15.71,
+      "ratio": null,
+      "win": true
+    },
+    {
+      "seg": 2,
+      "is": "2019-2020",
+      "oos": "2021-2021",
+      "is_sharpe": 0.646,
+      "oos_sharpe": 0.55,
+      "oos_max_dd": -18.43,
+      "ratio": 0.851,
+      "win": true
+    },
+    {
+      "seg": 3,
+      "is": "2020-2021",
+      "oos": "2022-2022",
+      "is_sharpe": 0.772,
+      "oos_sharpe": 0.136,
+      "oos_max_dd": -19.06,
+      "ratio": 0.176,
+      "win": true
+    },
+    {
+      "seg": 4,
+      "is": "2021-2022",
+      "oos": "2023-2023",
+      "is_sharpe": 0.68,
+      "oos_sharpe": 1.066,
+      "oos_max_dd": -14.44,
+      "ratio": 1.568,
+      "win": true
+    },
+    {
+      "seg": 5,
+      "is": "2022-2023",
+      "oos": "2024-2024",
+      "is_sharpe": 0.658,
+      "oos_sharpe": 0.474,
+      "oos_max_dd": -19.47,
+      "ratio": 0.72,
+      "win": true
+    }
+  ],
+  "wf_summary": {
+    "oos_wins": "5/5",
+    "median_oos_sharpe": 0.55,
+    "worst_oos_dd": -19.47,
+    "avg_oos_is_ratio": 0.829,
+    "judgment": "FAIL"
+  },
+  "true_oos": {
+    "period": "2025",
+    "sharpe": 0.453,
+    "max_dd": -10.11,
+    "cagr": 4.21,
+    "monthly": {
+      "2025-01": 2.5,
+      "2025-02": -0.74,
+      "2025-03": 1.66,
+      "2025-04": -2.21,
+      "2025-05": 1.36,
+      "2025-06": 0.26,
+      "2025-07": 1.91,
+      "2025-08": 0.14,
+      "2025-09": 3.29,
+      "2025-10": 3.75,
+      "2025-11": -2.31,
+      "2025-12": 0.18
+    }
+  }
+}

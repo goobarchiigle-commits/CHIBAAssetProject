@@ -1,0 +1,29 @@
+Filter Degradation Analysis
+Source CSV: C:\ai-trading\results\filter_sensitivity_oos.csv
+Output CSV: C:\ai-trading\results\filter_degradation_analysis.csv
+
+Baseline Sharpe (recomputed, filters OFF): 0.564
+Reference Sharpe 0.564 source: mom_period_sensitivity_2026-03-31.json
+Best filtered Sharpe: 0.237
+Sharpe delta vs recomputed baseline: -0.327
+Sharpe delta vs reference 0.564: -0.327
+Trade count / Sharpe correlation: 0.376
+
+Filter strength summary:
+                 sharpe  trade_count  avg_hold_days  expectancy
+filter_strength                                                
+medium           -0.074       37.143          5.414       0.374
+strong           -0.174       35.500          4.983       0.333
+weak              0.088       40.000          5.900       0.489
+
+Conclusion hypothesis:
+- over_filtering
+Reason:
+- Best filtered case expectancy 0.653% vs baseline 1.090%.
+- Best filtered trade_count 41 vs baseline 50.
+- Best filtered avg_hold_days 6.10 vs baseline 6.80.
+- Sharpe degrades as threshold strength increases, while drawdown improvement is limited.
+
+Next hypothesis to test:
+- over_filtering
+  Entry filters are removing too many valid breakouts without materially improving downside control.

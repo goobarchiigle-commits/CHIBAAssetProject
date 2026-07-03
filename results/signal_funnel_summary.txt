@@ -1,0 +1,23 @@
+signal funnel summary
+requested_business_days: 60
+available_business_days: 8
+date_range: 2026-03-23 to 2026-04-10
+
+counts
+universe_count: avg=34.88, min=28, max=42
+filter_pass_count: avg=7.62, min=5, max=11
+buy_signal_count: avg=0.62, min=0, max=2
+executed_count: avg=0.00, min=0, max=0
+
+rates
+filter_pass_rate: avg=21.20%, min=15.62%, max=27.50%
+signal_rate: avg=8.41%, min=0.00%, max=40.00%
+execution_rate: avg=0.00%, min=0.00%, max=0.00%
+
+bottleneck_stage: execution_rate
+bottleneck_avg_rate: 0.00%
+pre_execution_bottleneck_stage: signal_rate
+pre_execution_bottleneck_avg_rate: 8.41%
+
+note: fewer than 60 business days were available in metrics.jsonl,
+so the report uses all available observed business days only.

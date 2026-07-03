@@ -1,0 +1,34 @@
+{
+  "run_date": "2026-06-28",
+  "config": "D_ATR_EQ (S5 + ATR Extension + EQ_SCALE, VOL_ADJ除外)",
+  "universe": "RSR42 (42銘柄, union fix, 4055.T参加は2020-08-11以降)",
+  "period_actual": "2018-01-01 ~ 2025-12-30",
+  "IS_2018_2024": {
+    "cagr": 12.37,
+    "max_dd": -18.12,
+    "sharpe": 0.586,
+    "calmar": 0.683,
+    "trades": 263
+  },
+  "OOS_2025": {
+    "cagr": 13.48,
+    "max_dd": -10.15,
+    "sharpe": 1.199,
+    "calmar": 1.329,
+    "trades": 42
+  },
+  "FULL_2018_2025": {
+    "cagr": 11.35,
+    "max_dd": -18.12,
+    "sharpe": 0.57,
+    "calmar": 0.626,
+    "trades": 309
+  },
+  "win_rate": 54.0,
+  "avg_exp": 29.2,
+  "WF_5fold": {
+    "pass": "5/5",
+    "avg_cagr": 18.37,
+    "seg3_2022": -2.65
+  }
+}

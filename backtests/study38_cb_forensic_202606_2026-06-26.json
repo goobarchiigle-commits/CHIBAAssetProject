@@ -1,0 +1,103 @@
+{
+  "study": "Study38_CB_Forensic",
+  "date": "2026-06-26",
+  "recorded": {
+    "cagr": 22.4,
+    "sharpe": 1.582,
+    "max_dd": -12.32,
+    "n_trades": 219
+  },
+  "total_residual": {
+    "cagr": 2.26,
+    "sharpe": 0.723,
+    "max_dd": 3.39
+  },
+  "case_A_cb_on": {
+    "cagr": 20.14,
+    "sharpe": 0.859,
+    "max_dd": -15.71,
+    "calmar": 1.282,
+    "n_trades": 216,
+    "avg_hold_days": 12.0,
+    "avg_exposure": 35.2,
+    "win_rate": 55.1,
+    "avg_win_pct": 8.64,
+    "avg_lose_pct": -4.47,
+    "exit_reason_counts": {
+      "STRATEGY_EXIT": 15,
+      "RSR_MOMENTUM_EXIT": 90,
+      "RSR_EXIT": 106,
+      "TIME_STOP": 4,
+      "TURTLE_EXIT": 1
+    },
+    "cb_trigger_count": 3,
+    "cb_active_days": 49,
+    "cb_scaled_entries": 5,
+    "capital_suppressed": 2437500
+  },
+  "case_B_cb_off": {
+    "cagr": 20.14,
+    "sharpe": 0.859,
+    "max_dd": -15.71,
+    "calmar": 1.282,
+    "n_trades": 216,
+    "avg_hold_days": 12.0,
+    "avg_exposure": 35.2,
+    "win_rate": 55.1,
+    "avg_win_pct": 8.64,
+    "avg_lose_pct": -4.47,
+    "exit_reason_counts": {
+      "STRATEGY_EXIT": 15,
+      "RSR_MOMENTUM_EXIT": 90,
+      "RSR_EXIT": 106,
+      "TIME_STOP": 4,
+      "TURTLE_EXIT": 1
+    },
+    "cb_trigger_count": 0,
+    "cb_active_days": 0,
+    "cb_scaled_entries": 0,
+    "capital_suppressed": 0
+  },
+  "annual_returns": {
+    "original": {
+      "2020": 15.2,
+      "2021": 36.81,
+      "2022": 10.81,
+      "2023": 19.63,
+      "2024": 12.77
+    },
+    "A_cb_on": {
+      "2020": 7.43,
+      "2021": 28.75,
+      "2022": 13.96,
+      "2023": 17.65,
+      "2024": 16.35
+    },
+    "B_cb_off": {
+      "2020": 7.43,
+      "2021": 28.75,
+      "2022": 13.96,
+      "2023": 17.65,
+      "2024": 16.35
+    }
+  },
+  "cb_effect": {
+    "delta_cagr": 0.0,
+    "delta_sharpe": 0.0,
+    "delta_max_dd": 0.0
+  },
+  "explanation_rate_pct": {
+    "cagr": 0.0,
+    "sharpe": 0.0,
+    "max_dd": 0.0
+  },
+  "verdict": {
+    "A_cb_primary": false,
+    "B_sharpe_cause": "再現不能領域（data vintage / code構造変化）が支配的（CB説明率=0.0%のみ）",
+    "C_remaining_gap": {
+      "cagr": 2.26,
+      "sharpe": 0.723
+    },
+    "D_archaeology_value": "LOW（Sharpe残差 > 0.3 が残存するが原理的に再現不能領域）"
+  }
+}

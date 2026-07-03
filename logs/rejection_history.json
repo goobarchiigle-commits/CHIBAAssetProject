@@ -1,0 +1,14 @@
+{
+  "low_sharpe": {
+    "ratio": 0.125025
+  },
+  "high_variance": {
+    "ratio": 0.0
+  },
+  "low_trades": {
+    "ratio": 0.0
+  },
+  "insufficient_oos_periods": {
+    "ratio": 0.0
+  }
+}

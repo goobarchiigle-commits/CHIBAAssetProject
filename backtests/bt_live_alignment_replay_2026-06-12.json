@@ -1,0 +1,254 @@
+{
+  "A_baseline": {
+    "IS": {
+      "cagr": 19.6,
+      "pf": 2.356,
+      "max_dd": -17.5,
+      "win_rate": 56.9,
+      "exposure": 32.4,
+      "n_trades": 197
+    },
+    "OOS": {
+      "cagr": 3.46,
+      "pf": 1.658,
+      "max_dd": -3.2,
+      "win_rate": 59.6,
+      "exposure": 12.9,
+      "n_trades": 47
+    },
+    "oos_is_ratio": 0.177,
+    "yearly": {
+      "2020": {
+        "ret": 5.76,
+        "max_dd": -9.02
+      },
+      "2021": {
+        "ret": 13.56,
+        "max_dd": -17.5
+      },
+      "2022": {
+        "ret": 22.26,
+        "max_dd": -10.27
+      },
+      "2023": {
+        "ret": 27.12,
+        "max_dd": -7.5
+      },
+      "2024": {
+        "ret": 16.09,
+        "max_dd": -9.77
+      },
+      "2025": {
+        "ret": 3.39,
+        "max_dd": -3.2
+      }
+    },
+    "n_kept": 244,
+    "scale": 1.0
+  },
+  "B_max_new_1": {
+    "IS": {
+      "cagr": 17.95,
+      "pf": 2.312,
+      "max_dd": -15.31,
+      "win_rate": 55.1,
+      "exposure": 30.8,
+      "n_trades": 176
+    },
+    "OOS": {
+      "cagr": 2.85,
+      "pf": 1.541,
+      "max_dd": -3.35,
+      "win_rate": 58.5,
+      "exposure": 12.8,
+      "n_trades": 41
+    },
+    "oos_is_ratio": 0.159,
+    "yearly": {
+      "2020": {
+        "ret": 3.28,
+        "max_dd": -9.43
+      },
+      "2021": {
+        "ret": 15.19,
+        "max_dd": -15.31
+      },
+      "2022": {
+        "ret": 14.57,
+        "max_dd": -9.41
+      },
+      "2023": {
+        "ret": 27.98,
+        "max_dd": -7.8
+      },
+      "2024": {
+        "ret": 16.97,
+        "max_dd": -10.38
+      },
+      "2025": {
+        "ret": 2.8,
+        "max_dd": -3.35
+      }
+    },
+    "n_kept": 217,
+    "scale": 1.0
+  },
+  "C_sector_names_1": {
+    "IS": {
+      "cagr": 17.57,
+      "pf": 2.331,
+      "max_dd": -16.96,
+      "win_rate": 56.5,
+      "exposure": 29.6,
+      "n_trades": 170
+    },
+    "OOS": {
+      "cagr": 3.85,
+      "pf": 1.731,
+      "max_dd": -3.45,
+      "win_rate": 61.9,
+      "exposure": 12.8,
+      "n_trades": 42
+    },
+    "oos_is_ratio": 0.219,
+    "yearly": {
+      "2020": {
+        "ret": 1.77,
+        "max_dd": -9.64
+      },
+      "2021": {
+        "ret": 12.51,
+        "max_dd": -16.96
+      },
+      "2022": {
+        "ret": 14.56,
+        "max_dd": -10.75
+      },
+      "2023": {
+        "ret": 28.37,
+        "max_dd": -7.72
+      },
+      "2024": {
+        "ret": 19.48,
+        "max_dd": -9.15
+      },
+      "2025": {
+        "ret": 3.77,
+        "max_dd": -3.45
+      }
+    },
+    "n_kept": 212,
+    "scale": 1.0
+  },
+  "D_cash_buffer_10": {
+    "IS": {
+      "cagr": 18.08,
+      "pf": 2.356,
+      "max_dd": -16.23,
+      "win_rate": 56.9,
+      "exposure": 30.0,
+      "n_trades": 197
+    },
+    "OOS": {
+      "cagr": 3.3,
+      "pf": 1.658,
+      "max_dd": -3.05,
+      "win_rate": 59.6,
+      "exposure": 12.3,
+      "n_trades": 47
+    },
+    "oos_is_ratio": 0.183,
+    "yearly": {
+      "2020": {
+        "ret": 5.18,
+        "max_dd": -8.14
+      },
+      "2021": {
+        "ret": 12.27,
+        "max_dd": -16.23
+      },
+      "2022": {
+        "ret": 20.41,
+        "max_dd": -9.5
+      },
+      "2023": {
+        "ret": 25.23,
+        "max_dd": -7.01
+      },
+      "2024": {
+        "ret": 15.19,
+        "max_dd": -9.3
+      },
+      "2025": {
+        "ret": 3.23,
+        "max_dd": -3.05
+      }
+    },
+    "n_kept": 244,
+    "scale": 0.9
+  },
+  "E_all": {
+    "IS": {
+      "cagr": 15.41,
+      "pf": 2.366,
+      "max_dd": -15.25,
+      "win_rate": 55.8,
+      "exposure": 25.6,
+      "n_trades": 156
+    },
+    "OOS": {
+      "cagr": 2.94,
+      "pf": 1.608,
+      "max_dd": -3.31,
+      "win_rate": 61.1,
+      "exposure": 11.6,
+      "n_trades": 36
+    },
+    "oos_is_ratio": 0.191,
+    "yearly": {
+      "2020": {
+        "ret": -0.64,
+        "max_dd": -8.89
+      },
+      "2021": {
+        "ret": 15.8,
+        "max_dd": -15.25
+      },
+      "2022": {
+        "ret": 7.31,
+        "max_dd": -9.29
+      },
+      "2023": {
+        "ret": 25.91,
+        "max_dd": -7.14
+      },
+      "2024": {
+        "ret": 19.48,
+        "max_dd": -8.93
+      },
+      "2025": {
+        "ret": 2.88,
+        "max_dd": -3.31
+      }
+    },
+    "n_kept": 192,
+    "scale": 0.9
+  },
+  "_meta": {
+    "date": "2026-06-12",
+    "engine": "capital_allocation_abc.run_period pattern=A",
+    "engine_full_metrics": {
+      "cagr": 16.85,
+      "sharpe": 0.789,
+      "max_dd": -18.06,
+      "calmar": 0.933,
+      "n_trades": 241
+    },
+    "rsr_exit_in_cfg": 70.0,
+    "approximation": [
+      "B/C/E: 除去のみ・代替エントリー生成不能 → 劣化の上限推定",
+      "D: 線形スケール・lot丸め無視 → 劣化の下限推定",
+      "OPEN_END合成クローズ含む"
+    ]
+  }
+}

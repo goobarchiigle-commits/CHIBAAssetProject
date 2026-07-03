@@ -1,0 +1,18 @@
+[
+  {
+    "run_at": "2026-05-25T08:44:25+0900",
+    "orders": [
+      {
+        "symbol": "8015.T",
+        "sector": "商社",
+        "side": "SELL",
+        "qty": 100.0,
+        "order_type": "MARKET_OPEN",
+        "estimated_price": 6763.0,
+        "estimated_amount": 676300.0,
+        "reason": "SELL[フジコ法]: RSR=88.7 mom=-1.6"
+      }
+    ],
+    "send_results": []
+  }
+]

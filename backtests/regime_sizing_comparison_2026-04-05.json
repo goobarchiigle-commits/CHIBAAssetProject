@@ -1,0 +1,245 @@
+{
+  "no_regime": {
+    "scenario": "no_regime",
+    "params": {
+      "up_stable": 1.0,
+      "up_hiVol": 1.0,
+      "down": 1.0
+    },
+    "IS": {
+      "scenario": "BASELINE",
+      "dataset_version": "2026-03-28",
+      "cagr": 17.58,
+      "sharpe": 0.775,
+      "max_dd": -15.71,
+      "calmar": 1.119,
+      "n_trades": 215,
+      "n_trades_yr": 50.3,
+      "avg_hold_days": 12.0,
+      "win_rate": 54.0,
+      "avg_win_pct": 8.44,
+      "avg_lose_pct": -4.74,
+      "r_multiple": 1.78,
+      "avg_exposure": 35.2,
+      "avg_candidates": 0.69,
+      "avg_simultaneous_holdings": 2.61,
+      "annual_returns": {
+        "2020": 7.43,
+        "2021": 28.75,
+        "2022": 13.96,
+        "2023": 17.65,
+        "2024": 6.13
+      },
+      "exit_reason_counts": {
+        "STRATEGY_EXIT": 102,
+        "RSR_EXIT": 106,
+        "TIME_STOP": 4,
+        "MARKET_SHOCK_EXIT": 3
+      },
+      "signal_calls": 45234
+    },
+    "OOS": {
+      "scenario": "BASELINE",
+      "dataset_version": "2026-03-28",
+      "cagr": 4.21,
+      "sharpe": 0.453,
+      "max_dd": -10.11,
+      "calmar": 0.417,
+      "n_trades": 49,
+      "n_trades_yr": 50.8,
+      "avg_hold_days": 6.7,
+      "win_rate": 57.1,
+      "avg_win_pct": 4.25,
+      "avg_lose_pct": -3.46,
+      "r_multiple": 1.23,
+      "avg_exposure": 28.7,
+      "avg_candidates": 0.38,
+      "avg_simultaneous_holdings": 1.61,
+      "annual_returns": {
+        "2025": 4.06
+      },
+      "exit_reason_counts": {
+        "RSR_EXIT": 28,
+        "STRATEGY_EXIT": 20,
+        "MARKET_SHOCK_EXIT": 1
+      },
+      "signal_calls": 10206
+    },
+    "monthly_oos": {
+      "2025-01": 2.5,
+      "2025-02": -0.74,
+      "2025-03": 1.66,
+      "2025-04": -2.21,
+      "2025-05": 1.36,
+      "2025-06": 0.26,
+      "2025-07": 1.91,
+      "2025-08": 0.14,
+      "2025-09": 3.29,
+      "2025-10": 3.75,
+      "2025-11": -2.31,
+      "2025-12": 0.18
+    }
+  },
+  "regime_2": {
+    "scenario": "regime_2",
+    "params": {
+      "up_stable": 1.0,
+      "up_hiVol": 1.0,
+      "down": 0.25
+    },
+    "IS": {
+      "scenario": "BASELINE",
+      "dataset_version": "2026-03-28",
+      "cagr": 17.45,
+      "sharpe": 0.771,
+      "max_dd": -15.71,
+      "calmar": 1.111,
+      "n_trades": 215,
+      "n_trades_yr": 50.3,
+      "avg_hold_days": 12.0,
+      "win_rate": 54.0,
+      "avg_win_pct": 8.44,
+      "avg_lose_pct": -4.74,
+      "r_multiple": 1.78,
+      "avg_exposure": 35.1,
+      "avg_candidates": 0.69,
+      "avg_simultaneous_holdings": 2.61,
+      "annual_returns": {
+        "2020": 7.43,
+        "2021": 28.75,
+        "2022": 13.28,
+        "2023": 17.75,
+        "2024": 6.16
+      },
+      "exit_reason_counts": {
+        "STRATEGY_EXIT": 102,
+        "RSR_EXIT": 106,
+        "TIME_STOP": 4,
+        "MARKET_SHOCK_EXIT": 3
+      },
+      "signal_calls": 45234
+    },
+    "OOS": {
+      "scenario": "BASELINE",
+      "dataset_version": "2026-03-28",
+      "cagr": 5.02,
+      "sharpe": 0.616,
+      "max_dd": -6.5,
+      "calmar": 0.773,
+      "n_trades": 49,
+      "n_trades_yr": 50.8,
+      "avg_hold_days": 6.7,
+      "win_rate": 57.1,
+      "avg_win_pct": 4.25,
+      "avg_lose_pct": -3.46,
+      "r_multiple": 1.23,
+      "avg_exposure": 28.0,
+      "avg_candidates": 0.38,
+      "avg_simultaneous_holdings": 1.61,
+      "annual_returns": {
+        "2025": 4.84
+      },
+      "exit_reason_counts": {
+        "RSR_EXIT": 28,
+        "STRATEGY_EXIT": 20,
+        "MARKET_SHOCK_EXIT": 1
+      },
+      "signal_calls": 10206
+    },
+    "monthly_oos": {
+      "2025-01": 2.5,
+      "2025-02": -0.74,
+      "2025-03": 1.66,
+      "2025-04": -1.44,
+      "2025-05": 1.35,
+      "2025-06": 0.25,
+      "2025-07": 1.9,
+      "2025-08": 0.14,
+      "2025-09": 3.26,
+      "2025-10": 3.72,
+      "2025-11": -2.3,
+      "2025-12": 0.18
+    }
+  },
+  "regime_4": {
+    "scenario": "regime_4",
+    "params": {
+      "up_stable": 1.0,
+      "up_hiVol": 0.5,
+      "down": 0.25
+    },
+    "IS": {
+      "scenario": "BASELINE",
+      "dataset_version": "2026-03-28",
+      "cagr": 17.35,
+      "sharpe": 0.766,
+      "max_dd": -15.74,
+      "calmar": 1.102,
+      "n_trades": 215,
+      "n_trades_yr": 50.3,
+      "avg_hold_days": 12.0,
+      "win_rate": 54.0,
+      "avg_win_pct": 8.44,
+      "avg_lose_pct": -4.74,
+      "r_multiple": 1.78,
+      "avg_exposure": 35.1,
+      "avg_candidates": 0.69,
+      "avg_simultaneous_holdings": 2.61,
+      "annual_returns": {
+        "2020": 7.21,
+        "2021": 27.5,
+        "2022": 14.06,
+        "2023": 17.84,
+        "2024": 6.18
+      },
+      "exit_reason_counts": {
+        "STRATEGY_EXIT": 102,
+        "RSR_EXIT": 106,
+        "TIME_STOP": 4,
+        "MARKET_SHOCK_EXIT": 3
+      },
+      "signal_calls": 45234
+    },
+    "OOS": {
+      "scenario": "BASELINE",
+      "dataset_version": "2026-03-28",
+      "cagr": 5.02,
+      "sharpe": 0.616,
+      "max_dd": -6.5,
+      "calmar": 0.773,
+      "n_trades": 49,
+      "n_trades_yr": 50.8,
+      "avg_hold_days": 6.7,
+      "win_rate": 57.1,
+      "avg_win_pct": 4.25,
+      "avg_lose_pct": -3.46,
+      "r_multiple": 1.23,
+      "avg_exposure": 28.0,
+      "avg_candidates": 0.38,
+      "avg_simultaneous_holdings": 1.61,
+      "annual_returns": {
+        "2025": 4.84
+      },
+      "exit_reason_counts": {
+        "RSR_EXIT": 28,
+        "STRATEGY_EXIT": 20,
+        "MARKET_SHOCK_EXIT": 1
+      },
+      "signal_calls": 10206
+    },
+    "monthly_oos": {
+      "2025-01": 2.5,
+      "2025-02": -0.74,
+      "2025-03": 1.66,
+      "2025-04": -1.44,
+      "2025-05": 1.35,
+      "2025-06": 0.25,
+      "2025-07": 1.9,
+      "2025-08": 0.14,
+      "2025-09": 3.26,
+      "2025-10": 3.72,
+      "2025-11": -2.3,
+      "2025-12": 0.18
+    }
+  }
+}

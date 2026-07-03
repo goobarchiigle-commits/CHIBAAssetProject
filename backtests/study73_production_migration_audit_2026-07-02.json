@@ -1,0 +1,700 @@
+{
+  "study": "Study73_ProductionMigrationAudit",
+  "date": "2026-07-02",
+  "configs": {
+    "CURRENT": {
+      "label": "D_ATR_EQ(RSR70)",
+      "desc": "現行Production",
+      "params": {
+        "exit_policy": "A",
+        "addon_policy": "D",
+        "rsr_exit": 70.0
+      }
+    },
+    "CAND_A": {
+      "label": "B_ATR_EXT(RSR70)",
+      "desc": "EQ Scale除去",
+      "params": {
+        "exit_policy": "A",
+        "addon_policy": "NONE",
+        "rsr_exit": 70.0
+      }
+    },
+    "CAND_B": {
+      "label": "D_ATR_EQ(RSR75)",
+      "desc": "RSR Exit 70→75",
+      "params": {
+        "exit_policy": "A",
+        "addon_policy": "D",
+        "rsr_exit": 75.0
+      }
+    }
+  },
+  "phase0_integrity": {
+    "study52_current_is": 12.37,
+    "study52_current_oos": 13.48,
+    "study52_canda_is": 12.81,
+    "study52_canda_oos": 13.87,
+    "study72_f1_verdict": "INVALID",
+    "study72_f3_verdict": "REMOVE候補"
+  },
+  "phase1_cand_a": {
+    "is_current": {
+      "cagr": 12.37,
+      "sharpe": 0.586,
+      "max_dd": -18.12,
+      "calmar": 0.683,
+      "n_trades": 263,
+      "addon_cnt": 0,
+      "avg_exp": 31.3
+    },
+    "is_cand_a": {
+      "cagr": 11.83,
+      "sharpe": 0.567,
+      "max_dd": -18.21,
+      "calmar": 0.65,
+      "n_trades": 263,
+      "addon_cnt": 0,
+      "avg_exp": 31.2
+    },
+    "oos_current": {
+      "cagr": 13.48,
+      "sharpe": 1.199,
+      "max_dd": -10.15,
+      "calmar": 1.329,
+      "n_trades": 42,
+      "addon_cnt": 0,
+      "avg_exp": 36.2
+    },
+    "oos_cand_a": {
+      "cagr": 10.84,
+      "sharpe": 1.14,
+      "max_dd": -8.06,
+      "calmar": 1.345,
+      "n_trades": 44,
+      "addon_cnt": 0,
+      "avg_exp": 30.8
+    },
+    "wf_current": {
+      "wf_count": 4,
+      "avg_cagr": 18.37,
+      "fold_std": 19.41,
+      "segments": [
+        {
+          "cagr": 5.66,
+          "sharpe": 0.332,
+          "max_dd": -19.0,
+          "calmar": 0.298,
+          "n_trades": 29,
+          "addon_cnt": 0,
+          "avg_exp": 43.9,
+          "year": "2020",
+          "wf_pass": true
+        },
+        {
+          "cagr": 5.38,
+          "sharpe": 0.33,
+          "max_dd": -20.71,
+          "calmar": 0.26,
+          "n_trades": 53,
+          "addon_cnt": 0,
+          "avg_exp": 47.7,
+          "year": "2021",
+          "wf_pass": true
+        },
+        {
+          "cagr": -2.65,
+          "sharpe": 0.057,
+          "max_dd": -20.93,
+          "calmar": -0.126,
+          "n_trades": 43,
+          "addon_cnt": 0,
+          "avg_exp": 50.3,
+          "year": "2022",
+          "wf_pass": false
+        },
+        {
+          "cagr": 44.9,
+          "sharpe": 1.817,
+          "max_dd": -8.85,
+          "calmar": 5.075,
+          "n_trades": 49,
+          "addon_cnt": 0,
+          "avg_exp": 49.3,
+          "year": "2023",
+          "wf_pass": true
+        },
+        {
+          "cagr": 38.58,
+          "sharpe": 1.846,
+          "max_dd": -15.07,
+          "calmar": 2.56,
+          "n_trades": 34,
+          "addon_cnt": 0,
+          "avg_exp": 44.4,
+          "year": "2024",
+          "wf_pass": true
+        }
+      ]
+    },
+    "wf_cand_a": {
+      "wf_count": 4,
+      "avg_cagr": 15.39,
+      "fold_std": 16.83,
+      "segments": [
+        {
+          "cagr": 6.33,
+          "sharpe": 0.351,
+          "max_dd": -17.63,
+          "calmar": 0.359,
+          "n_trades": 30,
+          "addon_cnt": 0,
+          "avg_exp": 42.5,
+          "year": "2020",
+          "wf_pass": true
+        },
+        {
+          "cagr": 6.08,
+          "sharpe": 0.346,
+          "max_dd": -20.6,
+          "calmar": 0.295,
+          "n_trades": 54,
+          "addon_cnt": 0,
+          "avg_exp": 47.9,
+          "year": "2021",
+          "wf_pass": true
+        },
+        {
+          "cagr": -5.6,
+          "sharpe": -0.046,
+          "max_dd": -20.93,
+          "calmar": -0.268,
+          "n_trades": 43,
+          "addon_cnt": 0,
+          "avg_exp": 49.8,
+          "year": "2022",
+          "wf_pass": false
+        },
+        {
+          "cagr": 39.07,
+          "sharpe": 1.744,
+          "max_dd": -8.6,
+          "calmar": 4.546,
+          "n_trades": 49,
+          "addon_cnt": 0,
+          "avg_exp": 45.6,
+          "year": "2023",
+          "wf_pass": true
+        },
+        {
+          "cagr": 31.08,
+          "sharpe": 1.623,
+          "max_dd": -14.72,
+          "calmar": 2.112,
+          "n_trades": 34,
+          "addon_cnt": 0,
+          "avg_exp": 41.8,
+          "year": "2024",
+          "wf_pass": true
+        }
+      ]
+    },
+    "delta": {
+      "is_cagr": -0.54,
+      "oos_cagr": -2.64,
+      "wf_avg": -2.9800000000000004,
+      "wf_pass": 0,
+      "2022_cagr": -2.9499999999999997
+    },
+    "nev_is_yr": -16200.0,
+    "nev_oos_yr": -79200.0,
+    "verdict": "KEEP"
+  },
+  "phase2_cand_b": {
+    "is_current": {
+      "cagr": 12.37,
+      "sharpe": 0.586,
+      "max_dd": -18.12,
+      "calmar": 0.683,
+      "n_trades": 263,
+      "addon_cnt": 0,
+      "avg_exp": 31.3
+    },
+    "is_cand_b": {
+      "cagr": 11.36,
+      "sharpe": 0.548,
+      "max_dd": -17.95,
+      "calmar": 0.633,
+      "n_trades": 272,
+      "addon_cnt": 0,
+      "avg_exp": 31.3
+    },
+    "oos_current": {
+      "cagr": 13.48,
+      "sharpe": 1.199,
+      "max_dd": -10.15,
+      "calmar": 1.329,
+      "n_trades": 42,
+      "addon_cnt": 0,
+      "avg_exp": 36.2
+    },
+    "oos_cand_b": {
+      "cagr": 10.79,
+      "sharpe": 1.009,
+      "max_dd": -10.81,
+      "calmar": 0.998,
+      "n_trades": 43,
+      "addon_cnt": 0,
+      "avg_exp": 33.5
+    },
+    "wf_current": {
+      "wf_count": 4,
+      "avg_cagr": 18.37,
+      "fold_std": 19.41,
+      "segments": [
+        {
+          "cagr": 5.66,
+          "sharpe": 0.332,
+          "max_dd": -19.0,
+          "calmar": 0.298,
+          "n_trades": 29,
+          "addon_cnt": 0,
+          "avg_exp": 43.9,
+          "year": "2020",
+          "wf_pass": true
+        },
+        {
+          "cagr": 5.38,
+          "sharpe": 0.33,
+          "max_dd": -20.71,
+          "calmar": 0.26,
+          "n_trades": 53,
+          "addon_cnt": 0,
+          "avg_exp": 47.7,
+          "year": "2021",
+          "wf_pass": true
+        },
+        {
+          "cagr": -2.65,
+          "sharpe": 0.057,
+          "max_dd": -20.93,
+          "calmar": -0.126,
+          "n_trades": 43,
+          "addon_cnt": 0,
+          "avg_exp": 50.3,
+          "year": "2022",
+          "wf_pass": false
+        },
+        {
+          "cagr": 44.9,
+          "sharpe": 1.817,
+          "max_dd": -8.85,
+          "calmar": 5.075,
+          "n_trades": 49,
+          "addon_cnt": 0,
+          "avg_exp": 49.3,
+          "year": "2023",
+          "wf_pass": true
+        },
+        {
+          "cagr": 38.58,
+          "sharpe": 1.846,
+          "max_dd": -15.07,
+          "calmar": 2.56,
+          "n_trades": 34,
+          "addon_cnt": 0,
+          "avg_exp": 44.4,
+          "year": "2024",
+          "wf_pass": true
+        }
+      ]
+    },
+    "wf_cand_b": {
+      "wf_count": 5,
+      "avg_cagr": 16.38,
+      "fold_std": 14.78,
+      "segments": [
+        {
+          "cagr": 5.93,
+          "sharpe": 0.341,
+          "max_dd": -18.21,
+          "calmar": 0.326,
+          "n_trades": 31,
+          "addon_cnt": 0,
+          "avg_exp": 43.3,
+          "year": "2020",
+          "wf_pass": true
+        },
+        {
+          "cagr": 5.28,
+          "sharpe": 0.326,
+          "max_dd": -19.05,
+          "calmar": 0.277,
+          "n_trades": 56,
+          "addon_cnt": 0,
+          "avg_exp": 48.1,
+          "year": "2021",
+          "wf_pass": true
+        },
+        {
+          "cagr": 2.37,
+          "sharpe": 0.226,
+          "max_dd": -19.13,
+          "calmar": 0.124,
+          "n_trades": 45,
+          "addon_cnt": 0,
+          "avg_exp": 47.4,
+          "year": "2022",
+          "wf_pass": true
+        },
+        {
+          "cagr": 38.1,
+          "sharpe": 1.493,
+          "max_dd": -10.66,
+          "calmar": 3.574,
+          "n_trades": 53,
+          "addon_cnt": 0,
+          "avg_exp": 47.4,
+          "year": "2023",
+          "wf_pass": true
+        },
+        {
+          "cagr": 30.22,
+          "sharpe": 1.42,
+          "max_dd": -15.55,
+          "calmar": 1.943,
+          "n_trades": 36,
+          "addon_cnt": 0,
+          "avg_exp": 50.1,
+          "year": "2024",
+          "wf_pass": true
+        }
+      ]
+    },
+    "delta": {
+      "is_cagr": -1.01,
+      "oos_cagr": -2.69,
+      "wf_avg": -1.990000000000002,
+      "wf_pass": 1,
+      "2022_cagr": 5.02
+    },
+    "nev_is_yr": -30300.0,
+    "nev_oos_yr": -80700.0,
+    "verdict": "CONDITIONAL"
+  },
+  "phase3_robustness": {
+    "bootstrap": {
+      "CURRENT": {
+        "median": 11.88,
+        "ci_5": 1.95,
+        "ci_95": 23.98,
+        "std": 6.84,
+        "p_positive": 0.988,
+        "n_years": 7
+      },
+      "CAND_A": {
+        "median": 9.95,
+        "ci_5": 1.75,
+        "ci_95": 20.77,
+        "std": 5.93,
+        "p_positive": 0.982,
+        "n_years": 7
+      },
+      "CAND_B": {
+        "median": 10.82,
+        "ci_5": 2.85,
+        "ci_95": 20.66,
+        "std": 5.52,
+        "p_positive": 1.0,
+        "n_years": 7
+      }
+    },
+    "annual_by_config": {
+      "CURRENT": {
+        "2018": {
+          "cagr": 0.0,
+          "error": "'4055.T'"
+        },
+        "2019": {
+          "cagr": 0.0,
+          "error": "'4055.T'"
+        },
+        "2020": {
+          "cagr": 5.66,
+          "sharpe": 0.332,
+          "max_dd": -19.0,
+          "calmar": 0.298,
+          "n_trades": 29,
+          "addon_cnt": 0,
+          "avg_exp": 43.9,
+          "year": "2020",
+          "wf_pass": true
+        },
+        "2021": {
+          "cagr": 5.38,
+          "sharpe": 0.33,
+          "max_dd": -20.71,
+          "calmar": 0.26,
+          "n_trades": 53,
+          "addon_cnt": 0,
+          "avg_exp": 47.7,
+          "year": "2021",
+          "wf_pass": true
+        },
+        "2022": {
+          "cagr": -2.65,
+          "sharpe": 0.057,
+          "max_dd": -20.93,
+          "calmar": -0.126,
+          "n_trades": 43,
+          "addon_cnt": 0,
+          "avg_exp": 50.3,
+          "year": "2022",
+          "wf_pass": false
+        },
+        "2023": {
+          "cagr": 44.9,
+          "sharpe": 1.817,
+          "max_dd": -8.85,
+          "calmar": 5.075,
+          "n_trades": 49,
+          "addon_cnt": 0,
+          "avg_exp": 49.3,
+          "year": "2023",
+          "wf_pass": true
+        },
+        "2024": {
+          "cagr": 38.58,
+          "sharpe": 1.846,
+          "max_dd": -15.07,
+          "calmar": 2.56,
+          "n_trades": 34,
+          "addon_cnt": 0,
+          "avg_exp": 44.4,
+          "year": "2024",
+          "wf_pass": true
+        },
+        "2025": {
+          "cagr": 13.48,
+          "sharpe": 1.199,
+          "max_dd": -10.15,
+          "calmar": 1.329,
+          "n_trades": 42,
+          "addon_cnt": 0,
+          "avg_exp": 36.2
+        }
+      },
+      "CAND_A": {
+        "2018": {
+          "cagr": 0.0,
+          "error": "'4055.T'"
+        },
+        "2019": {
+          "cagr": 0.0,
+          "error": "'4055.T'"
+        },
+        "2020": {
+          "cagr": 6.33,
+          "sharpe": 0.351,
+          "max_dd": -17.63,
+          "calmar": 0.359,
+          "n_trades": 30,
+          "addon_cnt": 0,
+          "avg_exp": 42.5,
+          "year": "2020",
+          "wf_pass": true
+        },
+        "2021": {
+          "cagr": 6.08,
+          "sharpe": 0.346,
+          "max_dd": -20.6,
+          "calmar": 0.295,
+          "n_trades": 54,
+          "addon_cnt": 0,
+          "avg_exp": 47.9,
+          "year": "2021",
+          "wf_pass": true
+        },
+        "2022": {
+          "cagr": -5.6,
+          "sharpe": -0.046,
+          "max_dd": -20.93,
+          "calmar": -0.268,
+          "n_trades": 43,
+          "addon_cnt": 0,
+          "avg_exp": 49.8,
+          "year": "2022",
+          "wf_pass": false
+        },
+        "2023": {
+          "cagr": 39.07,
+          "sharpe": 1.744,
+          "max_dd": -8.6,
+          "calmar": 4.546,
+          "n_trades": 49,
+          "addon_cnt": 0,
+          "avg_exp": 45.6,
+          "year": "2023",
+          "wf_pass": true
+        },
+        "2024": {
+          "cagr": 31.08,
+          "sharpe": 1.623,
+          "max_dd": -14.72,
+          "calmar": 2.112,
+          "n_trades": 34,
+          "addon_cnt": 0,
+          "avg_exp": 41.8,
+          "year": "2024",
+          "wf_pass": true
+        },
+        "2025": {
+          "cagr": 10.84,
+          "sharpe": 1.14,
+          "max_dd": -8.06,
+          "calmar": 1.345,
+          "n_trades": 44,
+          "addon_cnt": 0,
+          "avg_exp": 30.8
+        }
+      },
+      "CAND_B": {
+        "2018": {
+          "cagr": 0.0,
+          "error": "'4055.T'"
+        },
+        "2019": {
+          "cagr": 0.0,
+          "error": "'4055.T'"
+        },
+        "2020": {
+          "cagr": 5.93,
+          "sharpe": 0.341,
+          "max_dd": -18.21,
+          "calmar": 0.326,
+          "n_trades": 31,
+          "addon_cnt": 0,
+          "avg_exp": 43.3,
+          "year": "2020",
+          "wf_pass": true
+        },
+        "2021": {
+          "cagr": 5.28,
+          "sharpe": 0.326,
+          "max_dd": -19.05,
+          "calmar": 0.277,
+          "n_trades": 56,
+          "addon_cnt": 0,
+          "avg_exp": 48.1,
+          "year": "2021",
+          "wf_pass": true
+        },
+        "2022": {
+          "cagr": 2.37,
+          "sharpe": 0.226,
+          "max_dd": -19.13,
+          "calmar": 0.124,
+          "n_trades": 45,
+          "addon_cnt": 0,
+          "avg_exp": 47.4,
+          "year": "2022",
+          "wf_pass": true
+        },
+        "2023": {
+          "cagr": 38.1,
+          "sharpe": 1.493,
+          "max_dd": -10.66,
+          "calmar": 3.574,
+          "n_trades": 53,
+          "addon_cnt": 0,
+          "avg_exp": 47.4,
+          "year": "2023",
+          "wf_pass": true
+        },
+        "2024": {
+          "cagr": 30.22,
+          "sharpe": 1.42,
+          "max_dd": -15.55,
+          "calmar": 1.943,
+          "n_trades": 36,
+          "addon_cnt": 0,
+          "avg_exp": 50.1,
+          "year": "2024",
+          "wf_pass": true
+        },
+        "2025": {
+          "cagr": 10.79,
+          "sharpe": 1.009,
+          "max_dd": -10.81,
+          "calmar": 0.998,
+          "n_trades": 43,
+          "addon_cnt": 0,
+          "avg_exp": 33.5
+        }
+      }
+    }
+  },
+  "phase4_safety": {
+    "CURRENT": {
+      "label": "D_ATR_EQ(RSR70)",
+      "n_trades_is": 263,
+      "trade_rate_yr": 37.6,
+      "addon_cnt": 0,
+      "addon_rate_pct": 0.0,
+      "avg_hold_approx": 2.1,
+      "avg_positions": 0.94,
+      "cash_util_pct": 31.3,
+      "worst_year_cagr": -2.65,
+      "fold_std": 19.41,
+      "oos_calmar": 1.329,
+      "is_max_dd": -18.12,
+      "oos_max_dd": -10.15
+    },
+    "CAND_A": {
+      "label": "B_ATR_EXT(RSR70)",
+      "n_trades_is": 263,
+      "trade_rate_yr": 37.6,
+      "addon_cnt": 0,
+      "addon_rate_pct": 0.0,
+      "avg_hold_approx": 2.1,
+      "avg_positions": 0.94,
+      "cash_util_pct": 31.2,
+      "worst_year_cagr": -5.6,
+      "fold_std": 16.83,
+      "oos_calmar": 1.345,
+      "is_max_dd": -18.21,
+      "oos_max_dd": -8.06
+    },
+    "CAND_B": {
+      "label": "D_ATR_EQ(RSR75)",
+      "n_trades_is": 272,
+      "trade_rate_yr": 38.9,
+      "addon_cnt": 0,
+      "addon_rate_pct": 0.0,
+      "avg_hold_approx": 2.0,
+      "avg_positions": 0.94,
+      "cash_util_pct": 31.3,
+      "worst_year_cagr": 2.37,
+      "fold_std": 14.78,
+      "oos_calmar": 0.998,
+      "is_max_dd": -17.95,
+      "oos_max_dd": -10.81
+    }
+  },
+  "phase5_decision": {
+    "cand_a_verdict": "KEEP",
+    "cand_b_verdict": "CONDITIONAL",
+    "priority": [
+      "CAND_B",
+      "CAND_A"
+    ],
+    "recommended_config": "CAND_B_then_CAND_A",
+    "change_files": [
+      "src/configs/strategy.yaml (rsr_exit: 75.0 for CAND_B)",
+      "src/configs/strategy.yaml (eq_scale_addon.enabled: false for CAND_A)",
+      "run_live_signal.py (確認必須)",
+      "signal_bridge.py (確認必須)",
+      "src/live/live_equivalent.py (確認必須)"
+    ]
+  }
+}

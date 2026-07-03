@@ -1,0 +1,266 @@
+{
+  "date": "2026-04-05",
+  "description": "動的ユニバース RSR42内動的選択版",
+  "results": [
+    {
+      "config_name": "baseline_rsr42_fixed",
+      "active_n": null,
+      "segments": [
+        {
+          "seg": 1,
+          "oos": "2020",
+          "is_sharpe": 0.0,
+          "oos_sharpe": 0.646,
+          "oos_max_dd": -15.71,
+          "ratio": null,
+          "win": true
+        },
+        {
+          "seg": 2,
+          "oos": "2021",
+          "is_sharpe": 0.646,
+          "oos_sharpe": 0.55,
+          "oos_max_dd": -18.43,
+          "ratio": 0.851,
+          "win": true
+        },
+        {
+          "seg": 3,
+          "oos": "2022",
+          "is_sharpe": 0.772,
+          "oos_sharpe": 0.219,
+          "oos_max_dd": -19.13,
+          "ratio": 0.284,
+          "win": true
+        },
+        {
+          "seg": 4,
+          "oos": "2023",
+          "is_sharpe": 0.662,
+          "oos_sharpe": 1.066,
+          "oos_max_dd": -14.44,
+          "ratio": 1.61,
+          "win": true
+        },
+        {
+          "seg": 5,
+          "oos": "2024",
+          "is_sharpe": 0.685,
+          "oos_sharpe": 0.595,
+          "oos_max_dd": -19.47,
+          "ratio": 0.869,
+          "win": true
+        }
+      ],
+      "wf_summary": {
+        "pass_count": "5/5",
+        "median_oos_sharpe": 0.595,
+        "worst_oos_dd": -19.47,
+        "avg_oos_is_ratio": 0.903
+      },
+      "full_is": {
+        "sharpe": 0.775,
+        "max_dd": -15.71
+      },
+      "true_oos_2025": {
+        "sharpe": 0.453,
+        "max_dd": -10.11
+      }
+    },
+    {
+      "config_name": "dyn_rsr42_bear_rs0",
+      "active_n": 30,
+      "segments": [
+        {
+          "seg": 1,
+          "oos": "2020",
+          "is_sharpe": 0.0,
+          "oos_sharpe": 0.702,
+          "oos_max_dd": -16.19,
+          "ratio": null,
+          "win": true
+        },
+        {
+          "seg": 2,
+          "oos": "2021",
+          "is_sharpe": 0.702,
+          "oos_sharpe": 0.54,
+          "oos_max_dd": -18.43,
+          "ratio": 0.769,
+          "win": true
+        },
+        {
+          "seg": 3,
+          "oos": "2022",
+          "is_sharpe": 0.805,
+          "oos_sharpe": 0.258,
+          "oos_max_dd": -19.13,
+          "ratio": 0.32,
+          "win": true
+        },
+        {
+          "seg": 4,
+          "oos": "2023",
+          "is_sharpe": 0.671,
+          "oos_sharpe": 1.228,
+          "oos_max_dd": -10.47,
+          "ratio": 1.83,
+          "win": true
+        },
+        {
+          "seg": 5,
+          "oos": "2024",
+          "is_sharpe": 0.738,
+          "oos_sharpe": 0.579,
+          "oos_max_dd": -19.54,
+          "ratio": 0.785,
+          "win": true
+        }
+      ],
+      "wf_summary": {
+        "pass_count": "5/5",
+        "median_oos_sharpe": 0.579,
+        "worst_oos_dd": -19.54,
+        "avg_oos_is_ratio": 0.926
+      },
+      "full_is": {
+        "sharpe": 0.812,
+        "max_dd": -16.19
+      },
+      "true_oos_2025": {
+        "sharpe": 0.805,
+        "max_dd": -10.11
+      }
+    },
+    {
+      "config_name": "dyn_rsr42_bear_score20",
+      "active_n": 30,
+      "segments": [
+        {
+          "seg": 1,
+          "oos": "2020",
+          "is_sharpe": 0.0,
+          "oos_sharpe": 0.702,
+          "oos_max_dd": -16.19,
+          "ratio": null,
+          "win": true
+        },
+        {
+          "seg": 2,
+          "oos": "2021",
+          "is_sharpe": 0.702,
+          "oos_sharpe": 0.54,
+          "oos_max_dd": -18.43,
+          "ratio": 0.769,
+          "win": true
+        },
+        {
+          "seg": 3,
+          "oos": "2022",
+          "is_sharpe": 0.805,
+          "oos_sharpe": 0.241,
+          "oos_max_dd": -19.13,
+          "ratio": 0.299,
+          "win": true
+        },
+        {
+          "seg": 4,
+          "oos": "2023",
+          "is_sharpe": 0.665,
+          "oos_sharpe": 1.228,
+          "oos_max_dd": -10.47,
+          "ratio": 1.847,
+          "win": true
+        },
+        {
+          "seg": 5,
+          "oos": "2024",
+          "is_sharpe": 0.727,
+          "oos_sharpe": 0.579,
+          "oos_max_dd": -19.54,
+          "ratio": 0.796,
+          "win": true
+        }
+      ],
+      "wf_summary": {
+        "pass_count": "5/5",
+        "median_oos_sharpe": 0.579,
+        "worst_oos_dd": -19.54,
+        "avg_oos_is_ratio": 0.928
+      },
+      "full_is": {
+        "sharpe": 0.809,
+        "max_dd": -16.19
+      },
+      "true_oos_2025": {
+        "sharpe": 0.805,
+        "max_dd": -10.11
+      }
+    },
+    {
+      "config_name": "dyn_rsr42_bear_rs0_n25",
+      "active_n": 30,
+      "segments": [
+        {
+          "seg": 1,
+          "oos": "2020",
+          "is_sharpe": 0.0,
+          "oos_sharpe": 0.702,
+          "oos_max_dd": -16.19,
+          "ratio": null,
+          "win": true
+        },
+        {
+          "seg": 2,
+          "oos": "2021",
+          "is_sharpe": 0.702,
+          "oos_sharpe": 0.54,
+          "oos_max_dd": -18.43,
+          "ratio": 0.769,
+          "win": true
+        },
+        {
+          "seg": 3,
+          "oos": "2022",
+          "is_sharpe": 0.805,
+          "oos_sharpe": 0.258,
+          "oos_max_dd": -19.13,
+          "ratio": 0.32,
+          "win": true
+        },
+        {
+          "seg": 4,
+          "oos": "2023",
+          "is_sharpe": 0.671,
+          "oos_sharpe": 1.228,
+          "oos_max_dd": -10.47,
+          "ratio": 1.83,
+          "win": true
+        },
+        {
+          "seg": 5,
+          "oos": "2024",
+          "is_sharpe": 0.738,
+          "oos_sharpe": 0.579,
+          "oos_max_dd": -19.54,
+          "ratio": 0.785,
+          "win": true
+        }
+      ],
+      "wf_summary": {
+        "pass_count": "5/5",
+        "median_oos_sharpe": 0.579,
+        "worst_oos_dd": -19.54,
+        "avg_oos_is_ratio": 0.926
+      },
+      "full_is": {
+        "sharpe": 0.812,
+        "max_dd": -16.19
+      },
+      "true_oos_2025": {
+        "sharpe": 0.805,
+        "max_dd": -10.11
+      }
+    }
+  ]
+}

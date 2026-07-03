@@ -1,0 +1,14 @@
+Filter Ablation Summary
+best_scenario=baseline
+best_sharpe=1.006
+best_expectancy=1.471
+baseline_sharpe=1.006
+baseline_trade_count=4
+best_delta_sharpe_vs_baseline=+0.000
+best_delta_trade_count_vs_baseline=+0
+pairwise_extension_ready=6 scenarios
+elapsed_total_sec=2.29
+scenario_count=6
+best_sharpe=1.006
+baseline_sharpe=1.006
+rss=129.5 MB

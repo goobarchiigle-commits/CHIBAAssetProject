@@ -1,0 +1,1065 @@
+{
+  "study": "Study40_Exit_Continuation_WF",
+  "date": "2026-06-26",
+  "capital": 3000000,
+  "min_hold": 3,
+  "baseline_summary": {
+    "wf_pass_count": 4,
+    "avg_oos_cagr": 16.96,
+    "seg3_2022_oos_cagr": -5.6,
+    "worst_oos_dd": -20.93,
+    "tail_capture_oos_pct": 86.0,
+    "full_is_2018_2024": {
+      "cagr": 19.37,
+      "sharpe": 0.855,
+      "max_dd": -18.25,
+      "calmar": 1.062,
+      "n_trades": 199
+    },
+    "true_oos_2025": {
+      "cagr": 8.5,
+      "sharpe": 0.953,
+      "max_dd": -8.07,
+      "calmar": 1.054,
+      "n_trades": 44
+    }
+  },
+  "policy_results": {
+    "BASELINE": {
+      "policy_params": {},
+      "interaction_risk_with_addon": "NONE",
+      "wf_segments": [
+        {
+          "seg": 1,
+          "oos_year": "2020",
+          "is_sharpe": 0.0,
+          "oos_sharpe": 0.611,
+          "oos_cagr": 15.66,
+          "oos_max_dd": -11.41,
+          "oos_calmar": 1.373,
+          "oos_is_ratio": null,
+          "wf_pass": true,
+          "exit_reasons": {
+            "STRATEGY_EXIT": 1,
+            "RSR_MOMENTUM_EXIT": 6,
+            "RSR_EXIT": 4
+          },
+          "n_trades_oos": 11
+        },
+        {
+          "seg": 2,
+          "oos_year": "2021",
+          "is_sharpe": 0.611,
+          "oos_sharpe": 0.346,
+          "oos_cagr": 6.08,
+          "oos_max_dd": -20.6,
+          "oos_calmar": 0.295,
+          "oos_is_ratio": 0.566,
+          "wf_pass": true,
+          "exit_reasons": {
+            "RSR_MOMENTUM_EXIT": 25,
+            "RSR_EXIT": 24,
+            "STRATEGY_EXIT": 4,
+            "ATR_TRAILING": 1
+          },
+          "n_trades_oos": 54
+        },
+        {
+          "seg": 3,
+          "oos_year": "2022",
+          "is_sharpe": 0.596,
+          "oos_sharpe": -0.046,
+          "oos_cagr": -5.6,
+          "oos_max_dd": -20.93,
+          "oos_calmar": -0.268,
+          "oos_is_ratio": -0.077,
+          "wf_pass": false,
+          "exit_reasons": {
+            "RSR_MOMENTUM_EXIT": 16,
+            "RSR_EXIT": 22,
+            "STRATEGY_EXIT": 3,
+            "TIME_STOP": 1,
+            "TURTLE_EXIT": 1
+          },
+          "n_trades_oos": 43
+        },
+        {
+          "seg": 4,
+          "oos_year": "2023",
+          "is_sharpe": 0.504,
+          "oos_sharpe": 1.638,
+          "oos_cagr": 37.59,
+          "oos_max_dd": -9.17,
+          "oos_calmar": 4.098,
+          "oos_is_ratio": 3.25,
+          "wf_pass": true,
+          "exit_reasons": {
+            "RSR_EXIT": 28,
+            "RSR_MOMENTUM_EXIT": 18,
+            "STRATEGY_EXIT": 1,
+            "ATR_TRAILING": 2,
+            "TIME_STOP": 1
+          },
+          "n_trades_oos": 50
+        },
+        {
+          "seg": 5,
+          "oos_year": "2024",
+          "is_sharpe": 0.724,
+          "oos_sharpe": 1.623,
+          "oos_cagr": 31.08,
+          "oos_max_dd": -14.72,
+          "oos_calmar": 2.112,
+          "oos_is_ratio": 2.242,
+          "wf_pass": true,
+          "exit_reasons": {
+            "RSR_EXIT": 13,
+            "RSR_MOMENTUM_EXIT": 13,
+            "TIME_STOP": 2,
+            "STRATEGY_EXIT": 2,
+            "ATR_TRAILING": 2,
+            "MARKET_SHOCK_EXIT": 2
+          },
+          "n_trades_oos": 34
+        }
+      ],
+      "true_oos_2025": {
+        "cagr": 8.5,
+        "sharpe": 0.953,
+        "max_dd": -8.07,
+        "calmar": 1.054,
+        "n_trades": 44
+      },
+      "full_is_2018_2024": {
+        "cagr": 19.37,
+        "sharpe": 0.855,
+        "max_dd": -18.25,
+        "calmar": 1.062,
+        "n_trades": 199
+      },
+      "tail_capture_oos_pct": 86.0,
+      "tail_capture_n_winning": 107
+    },
+    "A_ATR_EXT": {
+      "policy_params": {
+        "exit_policy": "A",
+        "exit_policy_atr_mult": "1.0",
+        "exit_policy_defer_days": "5"
+      },
+      "interaction_risk_with_addon": "LOW",
+      "wf_segments": [
+        {
+          "seg": 1,
+          "oos_year": "2020",
+          "is_sharpe": 0.0,
+          "oos_sharpe": 0.611,
+          "oos_cagr": 15.66,
+          "oos_max_dd": -11.41,
+          "oos_calmar": 1.373,
+          "oos_is_ratio": null,
+          "wf_pass": true,
+          "exit_reasons": {
+            "STRATEGY_EXIT": 1,
+            "RSR_MOMENTUM_EXIT": 6,
+            "RSR_EXIT": 4
+          },
+          "n_trades_oos": 11
+        },
+        {
+          "seg": 2,
+          "oos_year": "2021",
+          "is_sharpe": 0.611,
+          "oos_sharpe": 0.346,
+          "oos_cagr": 6.08,
+          "oos_max_dd": -20.6,
+          "oos_calmar": 0.295,
+          "oos_is_ratio": 0.566,
+          "wf_pass": true,
+          "exit_reasons": {
+            "RSR_MOMENTUM_EXIT": 25,
+            "RSR_EXIT": 24,
+            "STRATEGY_EXIT": 4,
+            "ATR_TRAILING": 1
+          },
+          "n_trades_oos": 54
+        },
+        {
+          "seg": 3,
+          "oos_year": "2022",
+          "is_sharpe": 0.596,
+          "oos_sharpe": -0.046,
+          "oos_cagr": -5.6,
+          "oos_max_dd": -20.93,
+          "oos_calmar": -0.268,
+          "oos_is_ratio": -0.077,
+          "wf_pass": false,
+          "exit_reasons": {
+            "RSR_MOMENTUM_EXIT": 16,
+            "RSR_EXIT": 22,
+            "STRATEGY_EXIT": 3,
+            "TIME_STOP": 1,
+            "TURTLE_EXIT": 1
+          },
+          "n_trades_oos": 43
+        },
+        {
+          "seg": 4,
+          "oos_year": "2023",
+          "is_sharpe": 0.504,
+          "oos_sharpe": 1.744,
+          "oos_cagr": 39.07,
+          "oos_max_dd": -8.6,
+          "oos_calmar": 4.546,
+          "oos_is_ratio": 3.46,
+          "wf_pass": true,
+          "exit_reasons": {
+            "RSR_EXIT": 28,
+            "RSR_MOMENTUM_EXIT": 16,
+            "STRATEGY_EXIT": 1,
+            "DEFERRED_EXIT": 1,
+            "ATR_TRAILING": 2,
+            "TIME_STOP": 1
+          },
+          "n_trades_oos": 49
+        },
+        {
+          "seg": 5,
+          "oos_year": "2024",
+          "is_sharpe": 0.751,
+          "oos_sharpe": 1.623,
+          "oos_cagr": 31.08,
+          "oos_max_dd": -14.72,
+          "oos_calmar": 2.112,
+          "oos_is_ratio": 2.161,
+          "wf_pass": true,
+          "exit_reasons": {
+            "RSR_EXIT": 13,
+            "RSR_MOMENTUM_EXIT": 13,
+            "TIME_STOP": 2,
+            "STRATEGY_EXIT": 2,
+            "ATR_TRAILING": 2,
+            "MARKET_SHOCK_EXIT": 2
+          },
+          "n_trades_oos": 34
+        }
+      ],
+      "true_oos_2025": {
+        "cagr": 10.84,
+        "sharpe": 1.14,
+        "max_dd": -8.06,
+        "calmar": 1.345,
+        "n_trades": 44
+      },
+      "full_is_2018_2024": {
+        "cagr": 19.56,
+        "sharpe": 0.863,
+        "max_dd": -18.25,
+        "calmar": 1.072,
+        "n_trades": 198
+      },
+      "tail_capture_oos_pct": 86.2,
+      "tail_capture_n_winning": 106
+    },
+    "B_RSR_PERS": {
+      "policy_params": {
+        "exit_policy": "B",
+        "exit_policy_rsr_floor": "65.0",
+        "exit_policy_defer_days": "5"
+      },
+      "interaction_risk_with_addon": "MEDIUM",
+      "wf_segments": [
+        {
+          "seg": 1,
+          "oos_year": "2020",
+          "is_sharpe": 0.0,
+          "oos_sharpe": 0.629,
+          "oos_cagr": 16.67,
+          "oos_max_dd": -11.47,
+          "oos_calmar": 1.454,
+          "oos_is_ratio": null,
+          "wf_pass": true,
+          "exit_reasons": {
+            "STRATEGY_EXIT": 1,
+            "RSR_MOMENTUM_EXIT": 6,
+            "RSR_EXIT": 4
+          },
+          "n_trades_oos": 11
+        },
+        {
+          "seg": 2,
+          "oos_year": "2021",
+          "is_sharpe": 0.629,
+          "oos_sharpe": 0.551,
+          "oos_cagr": 14.69,
+          "oos_max_dd": -17.81,
+          "oos_calmar": 0.825,
+          "oos_is_ratio": 0.876,
+          "wf_pass": true,
+          "exit_reasons": {
+            "RSR_MOMENTUM_EXIT": 25,
+            "RSR_EXIT": 23,
+            "STRATEGY_EXIT": 5
+          },
+          "n_trades_oos": 53
+        },
+        {
+          "seg": 3,
+          "oos_year": "2022",
+          "is_sharpe": 0.718,
+          "oos_sharpe": -0.058,
+          "oos_cagr": -5.92,
+          "oos_max_dd": -21.01,
+          "oos_calmar": -0.282,
+          "oos_is_ratio": -0.081,
+          "wf_pass": false,
+          "exit_reasons": {
+            "RSR_MOMENTUM_EXIT": 14,
+            "ATR_TRAILING": 1,
+            "RSR_EXIT": 20,
+            "STRATEGY_EXIT": 4,
+            "TIME_STOP": 1,
+            "DEFERRED_EXIT": 1,
+            "TURTLE_EXIT": 1
+          },
+          "n_trades_oos": 42
+        },
+        {
+          "seg": 4,
+          "oos_year": "2023",
+          "is_sharpe": 0.583,
+          "oos_sharpe": 1.834,
+          "oos_cagr": 41.74,
+          "oos_max_dd": -9.84,
+          "oos_calmar": 4.242,
+          "oos_is_ratio": 3.146,
+          "wf_pass": true,
+          "exit_reasons": {
+            "RSR_EXIT": 22,
+            "RSR_MOMENTUM_EXIT": 19,
+            "STRATEGY_EXIT": 2,
+            "DEFERRED_EXIT": 1,
+            "ATR_TRAILING": 2,
+            "TIME_STOP": 1
+          },
+          "n_trades_oos": 47
+        },
+        {
+          "seg": 5,
+          "oos_year": "2024",
+          "is_sharpe": 0.743,
+          "oos_sharpe": 1.277,
+          "oos_cagr": 24.84,
+          "oos_max_dd": -18.43,
+          "oos_calmar": 1.348,
+          "oos_is_ratio": 1.719,
+          "wf_pass": true,
+          "exit_reasons": {
+            "RSR_EXIT": 11,
+            "RSR_MOMENTUM_EXIT": 13,
+            "TIME_STOP": 2,
+            "STRATEGY_EXIT": 2,
+            "ATR_TRAILING": 3,
+            "MARKET_SHOCK_EXIT": 3
+          },
+          "n_trades_oos": 34
+        }
+      ],
+      "true_oos_2025": {
+        "cagr": 11.05,
+        "sharpe": 1.165,
+        "max_dd": -8.08,
+        "calmar": 1.368,
+        "n_trades": 44
+      },
+      "full_is_2018_2024": {
+        "cagr": 19.3,
+        "sharpe": 0.875,
+        "max_dd": -17.59,
+        "calmar": 1.097,
+        "n_trades": 191
+      },
+      "tail_capture_oos_pct": 87.3,
+      "tail_capture_n_winning": 106
+    },
+    "C_DONCHIAN": {
+      "policy_params": {
+        "exit_policy": "C",
+        "exit_policy_profit_thr": "0.05",
+        "exit_policy_defer_days": "5"
+      },
+      "interaction_risk_with_addon": "LOW",
+      "wf_segments": [
+        {
+          "seg": 1,
+          "oos_year": "2020",
+          "is_sharpe": 0.0,
+          "oos_sharpe": 0.611,
+          "oos_cagr": 15.66,
+          "oos_max_dd": -11.41,
+          "oos_calmar": 1.373,
+          "oos_is_ratio": null,
+          "wf_pass": true,
+          "exit_reasons": {
+            "STRATEGY_EXIT": 1,
+            "RSR_MOMENTUM_EXIT": 6,
+            "RSR_EXIT": 4
+          },
+          "n_trades_oos": 11
+        },
+        {
+          "seg": 2,
+          "oos_year": "2021",
+          "is_sharpe": 0.611,
+          "oos_sharpe": 0.346,
+          "oos_cagr": 6.08,
+          "oos_max_dd": -20.6,
+          "oos_calmar": 0.295,
+          "oos_is_ratio": 0.566,
+          "wf_pass": true,
+          "exit_reasons": {
+            "RSR_MOMENTUM_EXIT": 25,
+            "RSR_EXIT": 24,
+            "STRATEGY_EXIT": 4,
+            "ATR_TRAILING": 1
+          },
+          "n_trades_oos": 54
+        },
+        {
+          "seg": 3,
+          "oos_year": "2022",
+          "is_sharpe": 0.596,
+          "oos_sharpe": -0.046,
+          "oos_cagr": -5.6,
+          "oos_max_dd": -20.93,
+          "oos_calmar": -0.268,
+          "oos_is_ratio": -0.077,
+          "wf_pass": false,
+          "exit_reasons": {
+            "RSR_MOMENTUM_EXIT": 16,
+            "RSR_EXIT": 22,
+            "STRATEGY_EXIT": 3,
+            "TIME_STOP": 1,
+            "TURTLE_EXIT": 1
+          },
+          "n_trades_oos": 43
+        },
+        {
+          "seg": 4,
+          "oos_year": "2023",
+          "is_sharpe": 0.504,
+          "oos_sharpe": 1.744,
+          "oos_cagr": 39.07,
+          "oos_max_dd": -8.6,
+          "oos_calmar": 4.546,
+          "oos_is_ratio": 3.46,
+          "wf_pass": true,
+          "exit_reasons": {
+            "RSR_EXIT": 28,
+            "RSR_MOMENTUM_EXIT": 16,
+            "STRATEGY_EXIT": 1,
+            "DEFERRED_EXIT": 1,
+            "ATR_TRAILING": 2,
+            "TIME_STOP": 1
+          },
+          "n_trades_oos": 49
+        },
+        {
+          "seg": 5,
+          "oos_year": "2024",
+          "is_sharpe": 0.751,
+          "oos_sharpe": 1.623,
+          "oos_cagr": 31.08,
+          "oos_max_dd": -14.72,
+          "oos_calmar": 2.112,
+          "oos_is_ratio": 2.161,
+          "wf_pass": true,
+          "exit_reasons": {
+            "RSR_EXIT": 13,
+            "RSR_MOMENTUM_EXIT": 13,
+            "TIME_STOP": 2,
+            "STRATEGY_EXIT": 2,
+            "ATR_TRAILING": 2,
+            "MARKET_SHOCK_EXIT": 2
+          },
+          "n_trades_oos": 34
+        }
+      ],
+      "true_oos_2025": {
+        "cagr": 10.84,
+        "sharpe": 1.14,
+        "max_dd": -8.06,
+        "calmar": 1.345,
+        "n_trades": 44
+      },
+      "full_is_2018_2024": {
+        "cagr": 19.56,
+        "sharpe": 0.863,
+        "max_dd": -18.25,
+        "calmar": 1.072,
+        "n_trades": 198
+      },
+      "tail_capture_oos_pct": 86.2,
+      "tail_capture_n_winning": 106
+    },
+    "D_PARTIAL": {
+      "policy_params": {
+        "exit_policy": "D",
+        "exit_policy_partial_frac": "0.5"
+      },
+      "interaction_risk_with_addon": "HIGH",
+      "wf_segments": [
+        {
+          "seg": 1,
+          "oos_year": "2020",
+          "is_sharpe": 0.0,
+          "oos_sharpe": 0.609,
+          "oos_cagr": 14.36,
+          "oos_max_dd": -11.69,
+          "oos_calmar": 1.228,
+          "oos_is_ratio": null,
+          "wf_pass": true,
+          "exit_reasons": {
+            "STRATEGY_EXIT": 2,
+            "RSR_MOMENTUM_EXIT_D_PARTIAL": 5,
+            "RSR_MOMENTUM_EXIT": 6,
+            "RSR_EXIT": 4,
+            "RSR_EXIT_D_PARTIAL": 3
+          },
+          "n_trades_oos": 20
+        },
+        {
+          "seg": 2,
+          "oos_year": "2021",
+          "is_sharpe": 0.609,
+          "oos_sharpe": -0.123,
+          "oos_cagr": -8.71,
+          "oos_max_dd": -21.89,
+          "oos_calmar": -0.398,
+          "oos_is_ratio": -0.202,
+          "wf_pass": false,
+          "exit_reasons": {
+            "RSR_MOMENTUM_EXIT_D_PARTIAL": 21,
+            "RSR_MOMENTUM_EXIT": 17,
+            "RSR_EXIT_D_PARTIAL": 18,
+            "RSR_EXIT": 22,
+            "STRATEGY_EXIT_D_PARTIAL": 2,
+            "RUNNER_TRAIL_EXIT": 3,
+            "TURTLE_EXIT": 1
+          },
+          "n_trades_oos": 84
+        },
+        {
+          "seg": 3,
+          "oos_year": "2022",
+          "is_sharpe": 0.345,
+          "oos_sharpe": -0.167,
+          "oos_cagr": -8.26,
+          "oos_max_dd": -22.71,
+          "oos_calmar": -0.364,
+          "oos_is_ratio": -0.484,
+          "wf_pass": false,
+          "exit_reasons": {
+            "RSR_MOMENTUM_EXIT_D_PARTIAL": 12,
+            "RSR_MOMENTUM_EXIT": 10,
+            "RSR_EXIT_D_PARTIAL": 20,
+            "ATR_TRAILING": 1,
+            "RSR_EXIT": 21,
+            "STRATEGY_EXIT_D_PARTIAL": 3,
+            "STRATEGY_EXIT": 2,
+            "RUNNER_TRAIL_EXIT": 3,
+            "TIME_STOP_D_PARTIAL": 1,
+            "TURTLE_EXIT_D_PARTIAL": 1
+          },
+          "n_trades_oos": 74
+        },
+        {
+          "seg": 4,
+          "oos_year": "2023",
+          "is_sharpe": 0.098,
+          "oos_sharpe": 1.978,
+          "oos_cagr": 39.58,
+          "oos_max_dd": -6.02,
+          "oos_calmar": 6.577,
+          "oos_is_ratio": 20.184,
+          "wf_pass": true,
+          "exit_reasons": {
+            "RSR_EXIT_D_PARTIAL": 20,
+            "RSR_EXIT": 18,
+            "RSR_MOMENTUM_EXIT_D_PARTIAL": 10,
+            "RSR_MOMENTUM_EXIT": 13,
+            "RUNNER_TRAIL_EXIT": 3,
+            "STRATEGY_EXIT_D_PARTIAL": 2,
+            "ATR_TRAILING": 2,
+            "TIME_STOP_D_PARTIAL": 1,
+            "TIME_STOP": 1
+          },
+          "n_trades_oos": 70
+        },
+        {
+          "seg": 5,
+          "oos_year": "2024",
+          "is_sharpe": 0.574,
+          "oos_sharpe": 1.433,
+          "oos_cagr": 25.24,
+          "oos_max_dd": -13.02,
+          "oos_calmar": 1.939,
+          "oos_is_ratio": 2.497,
+          "wf_pass": true,
+          "exit_reasons": {
+            "RSR_EXIT": 14,
+            "RSR_MOMENTUM_EXIT": 8,
+            "RSR_MOMENTUM_EXIT_D_PARTIAL": 5,
+            "RSR_EXIT_D_PARTIAL": 9,
+            "TIME_STOP_D_PARTIAL": 2,
+            "TIME_STOP": 2,
+            "RUNNER_TRAIL_EXIT": 3,
+            "STRATEGY_EXIT_D_PARTIAL": 3,
+            "STRATEGY_EXIT": 1,
+            "ATR_TRAILING": 2,
+            "MARKET_SHOCK_EXIT": 2
+          },
+          "n_trades_oos": 51
+        }
+      ],
+      "true_oos_2025": {
+        "cagr": 11.62,
+        "sharpe": 1.148,
+        "max_dd": -9.48,
+        "calmar": 1.225,
+        "n_trades": 56
+      },
+      "full_is_2018_2024": {
+        "cagr": 15.38,
+        "sharpe": 0.8,
+        "max_dd": -20.07,
+        "calmar": 0.766,
+        "n_trades": 301
+      },
+      "tail_capture_oos_pct": 85.0,
+      "tail_capture_n_winning": 159
+    },
+    "E_TIME": {
+      "policy_params": {
+        "exit_policy": "E",
+        "exit_policy_profit_thr": "0.05",
+        "exit_policy_time_extend": "15"
+      },
+      "interaction_risk_with_addon": "LOW",
+      "wf_segments": [
+        {
+          "seg": 1,
+          "oos_year": "2020",
+          "is_sharpe": 0.0,
+          "oos_sharpe": 0.611,
+          "oos_cagr": 15.66,
+          "oos_max_dd": -11.41,
+          "oos_calmar": 1.373,
+          "oos_is_ratio": null,
+          "wf_pass": true,
+          "exit_reasons": {
+            "STRATEGY_EXIT": 1,
+            "RSR_MOMENTUM_EXIT": 6,
+            "RSR_EXIT": 4
+          },
+          "n_trades_oos": 11
+        },
+        {
+          "seg": 2,
+          "oos_year": "2021",
+          "is_sharpe": 0.611,
+          "oos_sharpe": 0.346,
+          "oos_cagr": 6.08,
+          "oos_max_dd": -20.6,
+          "oos_calmar": 0.295,
+          "oos_is_ratio": 0.566,
+          "wf_pass": true,
+          "exit_reasons": {
+            "RSR_MOMENTUM_EXIT": 25,
+            "RSR_EXIT": 24,
+            "STRATEGY_EXIT": 4,
+            "ATR_TRAILING": 1
+          },
+          "n_trades_oos": 54
+        },
+        {
+          "seg": 3,
+          "oos_year": "2022",
+          "is_sharpe": 0.596,
+          "oos_sharpe": -0.235,
+          "oos_cagr": -10.97,
+          "oos_max_dd": -20.93,
+          "oos_calmar": -0.524,
+          "oos_is_ratio": -0.394,
+          "wf_pass": false,
+          "exit_reasons": {
+            "RSR_MOMENTUM_EXIT": 16,
+            "RSR_EXIT": 22,
+            "STRATEGY_EXIT": 3,
+            "TURTLE_EXIT": 1
+          },
+          "n_trades_oos": 42
+        },
+        {
+          "seg": 4,
+          "oos_year": "2023",
+          "is_sharpe": 0.431,
+          "oos_sharpe": 1.547,
+          "oos_cagr": 35.24,
+          "oos_max_dd": -9.17,
+          "oos_calmar": 3.842,
+          "oos_is_ratio": 3.589,
+          "wf_pass": true,
+          "exit_reasons": {
+            "RSR_EXIT": 27,
+            "RSR_MOMENTUM_EXIT": 19,
+            "STRATEGY_EXIT": 1,
+            "ATR_TRAILING": 2
+          },
+          "n_trades_oos": 49
+        },
+        {
+          "seg": 5,
+          "oos_year": "2024",
+          "is_sharpe": 0.598,
+          "oos_sharpe": 1.316,
+          "oos_cagr": 25.44,
+          "oos_max_dd": -15.09,
+          "oos_calmar": 1.686,
+          "oos_is_ratio": 2.201,
+          "wf_pass": true,
+          "exit_reasons": {
+            "RSR_EXIT": 12,
+            "RSR_MOMENTUM_EXIT": 12,
+            "ATR_TRAILING": 4,
+            "MARKET_SHOCK_EXIT": 2,
+            "STRATEGY_EXIT": 1
+          },
+          "n_trades_oos": 31
+        }
+      ],
+      "true_oos_2025": {
+        "cagr": 8.5,
+        "sharpe": 0.953,
+        "max_dd": -8.07,
+        "calmar": 1.054,
+        "n_trades": 44
+      },
+      "full_is_2018_2024": {
+        "cagr": 17.6,
+        "sharpe": 0.786,
+        "max_dd": -18.25,
+        "calmar": 0.965,
+        "n_trades": 194
+      },
+      "tail_capture_oos_pct": 85.9,
+      "tail_capture_n_winning": 105
+    },
+    "F_HYBRID": {
+      "policy_params": {
+        "exit_policy": "F",
+        "exit_policy_rsr_floor": "65.0",
+        "exit_policy_atr_mult": "1.0",
+        "exit_policy_defer_days": "5"
+      },
+      "interaction_risk_with_addon": "MEDIUM",
+      "wf_segments": [
+        {
+          "seg": 1,
+          "oos_year": "2020",
+          "is_sharpe": 0.0,
+          "oos_sharpe": 0.611,
+          "oos_cagr": 15.66,
+          "oos_max_dd": -11.41,
+          "oos_calmar": 1.373,
+          "oos_is_ratio": null,
+          "wf_pass": true,
+          "exit_reasons": {
+            "STRATEGY_EXIT": 1,
+            "RSR_MOMENTUM_EXIT": 6,
+            "RSR_EXIT": 4
+          },
+          "n_trades_oos": 11
+        },
+        {
+          "seg": 2,
+          "oos_year": "2021",
+          "is_sharpe": 0.611,
+          "oos_sharpe": 0.346,
+          "oos_cagr": 6.08,
+          "oos_max_dd": -20.6,
+          "oos_calmar": 0.295,
+          "oos_is_ratio": 0.566,
+          "wf_pass": true,
+          "exit_reasons": {
+            "RSR_MOMENTUM_EXIT": 25,
+            "RSR_EXIT": 24,
+            "STRATEGY_EXIT": 4,
+            "ATR_TRAILING": 1
+          },
+          "n_trades_oos": 54
+        },
+        {
+          "seg": 3,
+          "oos_year": "2022",
+          "is_sharpe": 0.596,
+          "oos_sharpe": -0.046,
+          "oos_cagr": -5.6,
+          "oos_max_dd": -20.93,
+          "oos_calmar": -0.268,
+          "oos_is_ratio": -0.077,
+          "wf_pass": false,
+          "exit_reasons": {
+            "RSR_MOMENTUM_EXIT": 16,
+            "RSR_EXIT": 22,
+            "STRATEGY_EXIT": 3,
+            "TIME_STOP": 1,
+            "TURTLE_EXIT": 1
+          },
+          "n_trades_oos": 43
+        },
+        {
+          "seg": 4,
+          "oos_year": "2023",
+          "is_sharpe": 0.504,
+          "oos_sharpe": 1.739,
+          "oos_cagr": 39.08,
+          "oos_max_dd": -8.6,
+          "oos_calmar": 4.547,
+          "oos_is_ratio": 3.45,
+          "wf_pass": true,
+          "exit_reasons": {
+            "RSR_EXIT": 28,
+            "RSR_MOMENTUM_EXIT": 16,
+            "STRATEGY_EXIT": 1,
+            "DEFERRED_EXIT": 1,
+            "ATR_TRAILING": 2,
+            "TIME_STOP": 1
+          },
+          "n_trades_oos": 49
+        },
+        {
+          "seg": 5,
+          "oos_year": "2024",
+          "is_sharpe": 0.751,
+          "oos_sharpe": 1.623,
+          "oos_cagr": 31.08,
+          "oos_max_dd": -14.72,
+          "oos_calmar": 2.112,
+          "oos_is_ratio": 2.161,
+          "wf_pass": true,
+          "exit_reasons": {
+            "RSR_EXIT": 13,
+            "RSR_MOMENTUM_EXIT": 13,
+            "TIME_STOP": 2,
+            "STRATEGY_EXIT": 2,
+            "ATR_TRAILING": 2,
+            "MARKET_SHOCK_EXIT": 2
+          },
+          "n_trades_oos": 34
+        }
+      ],
+      "true_oos_2025": {
+        "cagr": 11.06,
+        "sharpe": 1.165,
+        "max_dd": -8.08,
+        "calmar": 1.368,
+        "n_trades": 44
+      },
+      "full_is_2018_2024": {
+        "cagr": 19.56,
+        "sharpe": 0.863,
+        "max_dd": -18.25,
+        "calmar": 1.072,
+        "n_trades": 198
+      },
+      "tail_capture_oos_pct": 86.2,
+      "tail_capture_n_winning": 106
+    }
+  },
+  "gate_results": {
+    "A_ATR_EXT": {
+      "wf_pass_count": 4,
+      "avg_oos_cagr": 17.26,
+      "delta_cagr_vs_baseline": 0.3,
+      "seg3_2022_oos_cagr": -5.6,
+      "delta_seg3_vs_baseline": 0.0,
+      "worst_oos_dd": -20.93,
+      "tail_capture_pct": 86.2,
+      "delta_tail_capture_pp": 0.2,
+      "avg_oos_calmar": 1.612,
+      "G1_wf_pass": true,
+      "G2_cagr_pos": true,
+      "G3_2022_nondeg": true,
+      "G4_dd_nonworse": true,
+      "G5_tailcap_70": true,
+      "gates_passed": 5,
+      "overall": "PASS",
+      "interaction_risk_with_addon": "LOW"
+    },
+    "B_RSR_PERS": {
+      "wf_pass_count": 4,
+      "avg_oos_cagr": 18.4,
+      "delta_cagr_vs_baseline": 1.44,
+      "seg3_2022_oos_cagr": -5.92,
+      "delta_seg3_vs_baseline": -0.32,
+      "worst_oos_dd": -21.01,
+      "tail_capture_pct": 87.3,
+      "delta_tail_capture_pp": 1.3,
+      "avg_oos_calmar": 1.517,
+      "G1_wf_pass": true,
+      "G2_cagr_pos": true,
+      "G3_2022_nondeg": false,
+      "G4_dd_nonworse": false,
+      "G5_tailcap_70": true,
+      "gates_passed": 3,
+      "overall": "FAIL",
+      "interaction_risk_with_addon": "MEDIUM"
+    },
+    "C_DONCHIAN": {
+      "wf_pass_count": 4,
+      "avg_oos_cagr": 17.26,
+      "delta_cagr_vs_baseline": 0.3,
+      "seg3_2022_oos_cagr": -5.6,
+      "delta_seg3_vs_baseline": 0.0,
+      "worst_oos_dd": -20.93,
+      "tail_capture_pct": 86.2,
+      "delta_tail_capture_pp": 0.2,
+      "avg_oos_calmar": 1.612,
+      "G1_wf_pass": true,
+      "G2_cagr_pos": true,
+      "G3_2022_nondeg": true,
+      "G4_dd_nonworse": true,
+      "G5_tailcap_70": true,
+      "gates_passed": 5,
+      "overall": "PASS",
+      "interaction_risk_with_addon": "LOW"
+    },
+    "D_PARTIAL": {
+      "wf_pass_count": 3,
+      "avg_oos_cagr": 12.44,
+      "delta_cagr_vs_baseline": -4.52,
+      "seg3_2022_oos_cagr": -8.26,
+      "delta_seg3_vs_baseline": -2.66,
+      "worst_oos_dd": -22.71,
+      "tail_capture_pct": 85.0,
+      "delta_tail_capture_pp": -1.0,
+      "avg_oos_calmar": 1.796,
+      "G1_wf_pass": false,
+      "G2_cagr_pos": false,
+      "G3_2022_nondeg": false,
+      "G4_dd_nonworse": false,
+      "G5_tailcap_70": true,
+      "gates_passed": 1,
+      "overall": "FAIL",
+      "interaction_risk_with_addon": "HIGH"
+    },
+    "E_TIME": {
+      "wf_pass_count": 4,
+      "avg_oos_cagr": 14.29,
+      "delta_cagr_vs_baseline": -2.67,
+      "seg3_2022_oos_cagr": -10.97,
+      "delta_seg3_vs_baseline": -5.37,
+      "worst_oos_dd": -20.93,
+      "tail_capture_pct": 85.9,
+      "delta_tail_capture_pp": -0.1,
+      "avg_oos_calmar": 1.334,
+      "G1_wf_pass": true,
+      "G2_cagr_pos": false,
+      "G3_2022_nondeg": false,
+      "G4_dd_nonworse": true,
+      "G5_tailcap_70": true,
+      "gates_passed": 3,
+      "overall": "FAIL",
+      "interaction_risk_with_addon": "LOW"
+    },
+    "F_HYBRID": {
+      "wf_pass_count": 4,
+      "avg_oos_cagr": 17.26,
+      "delta_cagr_vs_baseline": 0.3,
+      "seg3_2022_oos_cagr": -5.6,
+      "delta_seg3_vs_baseline": 0.0,
+      "worst_oos_dd": -20.93,
+      "tail_capture_pct": 86.2,
+      "delta_tail_capture_pp": 0.2,
+      "avg_oos_calmar": 1.612,
+      "G1_wf_pass": true,
+      "G2_cagr_pos": true,
+      "G3_2022_nondeg": true,
+      "G4_dd_nonworse": true,
+      "G5_tailcap_70": true,
+      "gates_passed": 5,
+      "overall": "PASS",
+      "interaction_risk_with_addon": "MEDIUM"
+    }
+  },
+  "ranking": [
+    {
+      "policy": "A_ATR_EXT",
+      "overall": "PASS",
+      "gates_passed": 5,
+      "avg_oos_cagr": 17.26,
+      "delta_cagr": 0.3,
+      "avg_oos_calmar": 1.612,
+      "tail_capture_pct": 86.2,
+      "delta_tc_pp": 0.2,
+      "interaction_risk": "LOW"
+    },
+    {
+      "policy": "C_DONCHIAN",
+      "overall": "PASS",
+      "gates_passed": 5,
+      "avg_oos_cagr": 17.26,
+      "delta_cagr": 0.3,
+      "avg_oos_calmar": 1.612,
+      "tail_capture_pct": 86.2,
+      "delta_tc_pp": 0.2,
+      "interaction_risk": "LOW"
+    },
+    {
+      "policy": "F_HYBRID",
+      "overall": "PASS",
+      "gates_passed": 5,
+      "avg_oos_cagr": 17.26,
+      "delta_cagr": 0.3,
+      "avg_oos_calmar": 1.612,
+      "tail_capture_pct": 86.2,
+      "delta_tc_pp": 0.2,
+      "interaction_risk": "MEDIUM"
+    },
+    {
+      "policy": "B_RSR_PERS",
+      "overall": "FAIL",
+      "gates_passed": 3,
+      "avg_oos_cagr": 18.4,
+      "delta_cagr": 1.44,
+      "avg_oos_calmar": 1.517,
+      "tail_capture_pct": 87.3,
+      "delta_tc_pp": 1.3,
+      "interaction_risk": "MEDIUM"
+    },
+    {
+      "policy": "E_TIME",
+      "overall": "FAIL",
+      "gates_passed": 3,
+      "avg_oos_cagr": 14.29,
+      "delta_cagr": -2.67,
+      "avg_oos_calmar": 1.334,
+      "tail_capture_pct": 85.9,
+      "delta_tc_pp": -0.1,
+      "interaction_risk": "LOW"
+    },
+    {
+      "policy": "D_PARTIAL",
+      "overall": "FAIL",
+      "gates_passed": 1,
+      "avg_oos_cagr": 12.44,
+      "delta_cagr": -4.52,
+      "avg_oos_calmar": 1.796,
+      "tail_capture_pct": 85.0,
+      "delta_tc_pp": -1.0,
+      "interaction_risk": "HIGH"
+    }
+  ],
+  "decision": "PROMOTE_TO_CANDIDATE",
+  "decision_detail": "Best: A_ATR_EXT  ΔCAGR=+0.30pp  TC=86.2%"
+}

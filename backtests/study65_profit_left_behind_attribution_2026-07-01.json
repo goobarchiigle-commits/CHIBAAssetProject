@@ -1,0 +1,1201 @@
+{
+  "study": "Study65",
+  "title": "Profit Left Behind Attribution",
+  "date": "2026-07-01",
+  "params": {
+    "capital": 3000000,
+    "fwd_days": 60,
+    "post_exit_days": [
+      5,
+      10,
+      20,
+      40,
+      60
+    ],
+    "pre_exit_days": [
+      5,
+      3,
+      1
+    ],
+    "addon_check_days": [
+      10,
+      20
+    ],
+    "s64_plb_yen": 3273657.78,
+    "s64_plb_pct_of_pnl": 72.54,
+    "failure_theory_dcagr": 1.63
+  },
+  "phase0_integrity": {
+    "n_valid": 291,
+    "study63_n_match": true,
+    "study63_expected": 291,
+    "bigwinner_n": 30,
+    "total_plb_yen": 12782307.8004,
+    "total_pnl_yen": 4513117.0708,
+    "lookahead": 0,
+    "survivorship": 0
+  },
+  "phase1_plb_exit": {
+    "total_plb_yen": 12782307.8004,
+    "total_pnl_yen": 4513117.0708,
+    "all_trades": {
+      "ATR_TRAILING": {
+        "n": 7,
+        "plb_yen_sum": 949495.9838,
+        "pnl_sum_yen": 392686.2549,
+        "plb_pct_of_total_plb": 7.4282,
+        "plb_pct_of_total_pnl": 21.0386,
+        "avg_plb_per_trade_yen": 135642.2834,
+        "plb_median_yen": 131900.0854,
+        "bw_n": 1,
+        "bw_plb_yen": 199647.6562,
+        "plb_rank": 3
+      },
+      "DEFERRED_EXIT": {
+        "n": 2,
+        "plb_yen_sum": 174117.8589,
+        "pnl_sum_yen": 133636.3525,
+        "plb_pct_of_total_plb": 1.3622,
+        "plb_pct_of_total_pnl": 3.858,
+        "avg_plb_per_trade_yen": 87058.9294,
+        "plb_median_yen": 87058.9294,
+        "bw_n": 0,
+        "bw_plb_yen": 0.0,
+        "plb_rank": 6
+      },
+      "MARKET_SHOCK_EXIT": {
+        "n": 3,
+        "plb_yen_sum": 416186.1817,
+        "pnl_sum_yen": -335900.0,
+        "plb_pct_of_total_plb": 3.256,
+        "plb_pct_of_total_pnl": 9.2217,
+        "avg_plb_per_trade_yen": 138728.7272,
+        "plb_median_yen": 147500.0,
+        "bw_n": 0,
+        "bw_plb_yen": 0.0,
+        "plb_rank": 5
+      },
+      "RSR_EXIT": {
+        "n": 129,
+        "plb_yen_sum": 4591812.1215,
+        "pnl_sum_yen": -440872.0932,
+        "plb_pct_of_total_plb": 35.9232,
+        "plb_pct_of_total_pnl": 101.7437,
+        "avg_plb_per_trade_yen": 35595.4428,
+        "plb_median_yen": 0.0,
+        "bw_n": 10,
+        "bw_plb_yen": 1889523.7001,
+        "plb_rank": 2
+      },
+      "RSR_MOMENTUM_EXIT": {
+        "n": 119,
+        "plb_yen_sum": 5991422.9006,
+        "pnl_sum_yen": 2717167.6552,
+        "plb_pct_of_total_plb": 46.8728,
+        "plb_pct_of_total_pnl": 132.7558,
+        "avg_plb_per_trade_yen": 50348.0916,
+        "plb_median_yen": 10333.8135,
+        "bw_n": 13,
+        "bw_plb_yen": 1785368.0116,
+        "plb_rank": 1
+      },
+      "STRATEGY_EXIT": {
+        "n": 24,
+        "plb_yen_sum": 482170.4346,
+        "pnl_sum_yen": 466141.8213,
+        "plb_pct_of_total_plb": 3.7722,
+        "plb_pct_of_total_pnl": 10.6838,
+        "avg_plb_per_trade_yen": 20090.4348,
+        "plb_median_yen": 0.0,
+        "bw_n": 1,
+        "bw_plb_yen": 180216.6992,
+        "plb_rank": 4
+      },
+      "TIME_STOP": {
+        "n": 5,
+        "plb_yen_sum": 124762.5,
+        "pnl_sum_yen": 1670857.0801,
+        "plb_pct_of_total_plb": 0.9761,
+        "plb_pct_of_total_pnl": 2.7644,
+        "avg_plb_per_trade_yen": 24952.5,
+        "plb_median_yen": 0.0,
+        "bw_n": 5,
+        "bw_plb_yen": 124762.5,
+        "plb_rank": 7
+      },
+      "TURTLE_EXIT": {
+        "n": 2,
+        "plb_yen_sum": 52339.8193,
+        "pnl_sum_yen": -90600.0,
+        "plb_pct_of_total_plb": 0.4095,
+        "plb_pct_of_total_pnl": 1.1597,
+        "avg_plb_per_trade_yen": 26169.9097,
+        "plb_median_yen": 26169.9097,
+        "bw_n": 0,
+        "bw_plb_yen": 0.0,
+        "plb_rank": 8
+      }
+    },
+    "bigwinner_only": {
+      "ATR_TRAILING": {
+        "n": 1,
+        "plb_yen_sum": 199647.6562,
+        "plb_pct_of_bw_plb": 4.7768,
+        "avg_plb_yen": 199647.6562
+      },
+      "RSR_EXIT": {
+        "n": 10,
+        "plb_yen_sum": 1889523.7001,
+        "plb_pct_of_bw_plb": 45.2091,
+        "avg_plb_yen": 188952.37
+      },
+      "RSR_MOMENTUM_EXIT": {
+        "n": 13,
+        "plb_yen_sum": 1785368.0116,
+        "plb_pct_of_bw_plb": 42.7171,
+        "avg_plb_yen": 137336.0009
+      },
+      "STRATEGY_EXIT": {
+        "n": 1,
+        "plb_yen_sum": 180216.6992,
+        "plb_pct_of_bw_plb": 4.3119,
+        "avg_plb_yen": 180216.6992
+      },
+      "TIME_STOP": {
+        "n": 5,
+        "plb_yen_sum": 124762.5,
+        "plb_pct_of_bw_plb": 2.9851,
+        "avg_plb_yen": 24952.5
+      }
+    },
+    "top_plb_reason": "RSR_MOMENTUM_EXIT",
+    "top_plb_pct": 46.8728
+  },
+  "phase2_taxonomy": {
+    "n_bw": 30,
+    "pre_peak_exit": {
+      "label": "Pre-Peak Exit (ピーク前にExit)",
+      "n": 24,
+      "pct_of_bw": 80.0,
+      "avg_pnl_jpy": 40400.6208,
+      "avg_plb_jpy": 160629.5171,
+      "total_plb_jpy": 3855108.4109,
+      "avg_actual_ret": 28.0209,
+      "avg_max_possible_ret": 50.5047,
+      "avg_hold_days": 13.375,
+      "avg_peak_day": 56.4167,
+      "avg_days_from_peak": -43.0417,
+      "exit_reasons": {
+        "RSR_MOMENTUM_EXIT": 13,
+        "RSR_EXIT": 10,
+        "STRATEGY_EXIT": 1
+      }
+    },
+    "post_peak_exit": {
+      "label": "Post-Peak Exit (ピーク後にExit)",
+      "n": 6,
+      "pct_of_bw": 20.0,
+      "avg_pnl_jpy": 354336.0514,
+      "avg_plb_jpy": 54068.3594,
+      "total_plb_jpy": 324410.1562,
+      "avg_actual_ret": 57.1529,
+      "avg_max_possible_ret": 58.6854,
+      "avg_hold_days": 60.3333,
+      "avg_peak_day": 54.3333,
+      "avg_days_from_peak": 6.0,
+      "exit_reasons": {
+        "TIME_STOP": 5,
+        "ATR_TRAILING": 1
+      }
+    },
+    "pre_peak_pct": 80.0,
+    "post_peak_pct": 20.0,
+    "pre_peak_plb_share": 92.2381,
+    "interpretation": "Peak前ExitはExit後に最高値到達 → hold延長で改善余地大。Peak後Exitは下落途中でExit → より早いExitが有効な可能性。"
+  },
+  "phase3_trigger": {
+    "timeline": {
+      "day_minus_5": {
+        "ret_from_entry": {
+          "bw": {
+            "n": 30,
+            "mean": 13.5524,
+            "median": 2.4508,
+            "std": 21.7043
+          },
+          "all": {
+            "n": 305,
+            "mean": 3.1371,
+            "median": 0.6252,
+            "std": 9.6454
+          },
+          "diff_bw_minus_all": 10.4153,
+          "mwu_p": 0.073
+        },
+        "rsr_delta": {
+          "bw": {
+            "n": 30,
+            "mean": 4.5683,
+            "median": 2.381,
+            "std": 10.1849
+          },
+          "all": {
+            "n": 299,
+            "mean": 1.4064,
+            "median": 0.0,
+            "std": 7.5928
+          },
+          "diff_bw_minus_all": 3.1619,
+          "mwu_p": 0.1422
+        },
+        "atr_expansion": {
+          "bw": {
+            "n": 30,
+            "mean": 1.1669,
+            "median": 1.0234,
+            "std": 0.2898
+          },
+          "all": {
+            "n": 305,
+            "mean": 1.0429,
+            "median": 1.0071,
+            "std": 0.147
+          },
+          "diff_bw_minus_all": 0.124,
+          "mwu_p": 0.0051
+        },
+        "vol_retention": {
+          "bw": {
+            "n": 30,
+            "mean": 0.9664,
+            "median": 0.8623,
+            "std": 0.3583
+          },
+          "all": {
+            "n": 305,
+            "mean": 1.017,
+            "median": 0.9277,
+            "std": 0.4278
+          },
+          "diff_bw_minus_all": -0.0506,
+          "mwu_p": 0.463
+        },
+        "high_persistence": {
+          "bw": {
+            "n": 30,
+            "mean": 0.6333,
+            "median": 1.0,
+            "std": 0.4819
+          },
+          "all": {
+            "n": 305,
+            "mean": 0.6262,
+            "median": 1.0,
+            "std": 0.4838
+          },
+          "diff_bw_minus_all": 0.0071,
+          "mwu_p": 0.9398
+        },
+        "ma5_slope": {
+          "bw": {
+            "n": 30,
+            "mean": 0.8342,
+            "median": 0.4603,
+            "std": 4.4562
+          },
+          "all": {
+            "n": 305,
+            "mean": 0.7109,
+            "median": 0.6415,
+            "std": 3.8568
+          },
+          "diff_bw_minus_all": 0.1233,
+          "mwu_p": 0.9921
+        },
+        "rs_accel_post": {
+          "bw": {
+            "n": 30,
+            "mean": -0.171,
+            "median": -0.1134,
+            "std": 0.7549
+          },
+          "all": {
+            "n": 297,
+            "mean": -0.0871,
+            "median": 0.0,
+            "std": 0.5458
+          },
+          "diff_bw_minus_all": -0.0839,
+          "mwu_p": 0.8572
+        }
+      },
+      "day_minus_3": {
+        "ret_from_entry": {
+          "bw": {
+            "n": 30,
+            "mean": 14.4018,
+            "median": 1.3257,
+            "std": 21.0368
+          },
+          "all": {
+            "n": 305,
+            "mean": 3.2288,
+            "median": 0.0,
+            "std": 9.5608
+          },
+          "diff_bw_minus_all": 11.173,
+          "mwu_p": 0.01
+        },
+        "rsr_delta": {
+          "bw": {
+            "n": 30,
+            "mean": 3.5947,
+            "median": 0.0,
+            "std": 9.3682
+          },
+          "all": {
+            "n": 299,
+            "mean": 0.3545,
+            "median": 0.0,
+            "std": 5.7168
+          },
+          "diff_bw_minus_all": 3.2402,
+          "mwu_p": 0.0335
+        },
+        "atr_expansion": {
+          "bw": {
+            "n": 30,
+            "mean": 1.1719,
+            "median": 1.017,
+            "std": 0.2916
+          },
+          "all": {
+            "n": 305,
+            "mean": 1.0422,
+            "median": 1.0,
+            "std": 0.1536
+          },
+          "diff_bw_minus_all": 0.1297,
+          "mwu_p": 0.0071
+        },
+        "vol_retention": {
+          "bw": {
+            "n": 30,
+            "mean": 1.0555,
+            "median": 0.8874,
+            "std": 0.4927
+          },
+          "all": {
+            "n": 305,
+            "mean": 1.032,
+            "median": 0.9252,
+            "std": 0.4774
+          },
+          "diff_bw_minus_all": 0.0235,
+          "mwu_p": 0.9025
+        },
+        "high_persistence": {
+          "bw": {
+            "n": 30,
+            "mean": 0.9,
+            "median": 1.0,
+            "std": 0.3
+          },
+          "all": {
+            "n": 305,
+            "mean": 0.7607,
+            "median": 1.0,
+            "std": 0.4267
+          },
+          "diff_bw_minus_all": 0.1393,
+          "mwu_p": 0.0828
+        },
+        "ma5_slope": {
+          "bw": {
+            "n": 30,
+            "mean": 0.5027,
+            "median": 0.6585,
+            "std": 4.2319
+          },
+          "all": {
+            "n": 305,
+            "mean": 0.4957,
+            "median": -0.2008,
+            "std": 3.9651
+          },
+          "diff_bw_minus_all": 0.007,
+          "mwu_p": 0.9504
+        },
+        "rs_accel_post": {
+          "bw": {
+            "n": 30,
+            "mean": -0.2976,
+            "median": -0.1134,
+            "std": 0.6301
+          },
+          "all": {
+            "n": 297,
+            "mean": -0.1824,
+            "median": 0.0,
+            "std": 0.4956
+          },
+          "diff_bw_minus_all": -0.1152,
+          "mwu_p": 0.2458
+        }
+      },
+      "day_minus_1": {
+        "ret_from_entry": {
+          "bw": {
+            "n": 30,
+            "mean": 14.1834,
+            "median": 3.1806,
+            "std": 20.8387
+          },
+          "all": {
+            "n": 305,
+            "mean": 2.6543,
+            "median": 0.4862,
+            "std": 9.6778
+          },
+          "diff_bw_minus_all": 11.5291,
+          "mwu_p": 0.0039
+        },
+        "rsr_delta": {
+          "bw": {
+            "n": 30,
+            "mean": 3.1998,
+            "median": 0.0,
+            "std": 9.8493
+          },
+          "all": {
+            "n": 299,
+            "mean": -0.7343,
+            "median": 0.0,
+            "std": 7.535
+          },
+          "diff_bw_minus_all": 3.9341,
+          "mwu_p": 0.0546
+        },
+        "atr_expansion": {
+          "bw": {
+            "n": 30,
+            "mean": 1.1654,
+            "median": 1.0158,
+            "std": 0.2819
+          },
+          "all": {
+            "n": 305,
+            "mean": 1.0356,
+            "median": 1.0018,
+            "std": 0.1528
+          },
+          "diff_bw_minus_all": 0.1298,
+          "mwu_p": 0.0089
+        },
+        "vol_retention": {
+          "bw": {
+            "n": 30,
+            "mean": 0.8277,
+            "median": 0.8015,
+            "std": 0.2102
+          },
+          "all": {
+            "n": 305,
+            "mean": 1.0229,
+            "median": 0.894,
+            "std": 0.6081
+          },
+          "diff_bw_minus_all": -0.1952,
+          "mwu_p": 0.0583
+        },
+        "high_persistence": {
+          "bw": {
+            "n": 30,
+            "mean": 0.7333,
+            "median": 1.0,
+            "std": 0.4422
+          },
+          "all": {
+            "n": 305,
+            "mean": 0.5836,
+            "median": 1.0,
+            "std": 0.493
+          },
+          "diff_bw_minus_all": 0.1497,
+          "mwu_p": 0.1114
+        },
+        "ma5_slope": {
+          "bw": {
+            "n": 30,
+            "mean": 0.885,
+            "median": -0.0487,
+            "std": 3.8776
+          },
+          "all": {
+            "n": 305,
+            "mean": 0.0669,
+            "median": -0.699,
+            "std": 4.0432
+          },
+          "diff_bw_minus_all": 0.8181,
+          "mwu_p": 0.2647
+        },
+        "rs_accel_post": {
+          "bw": {
+            "n": 30,
+            "mean": -0.3844,
+            "median": -0.2323,
+            "std": 0.5973
+          },
+          "all": {
+            "n": 297,
+            "mean": -0.3092,
+            "median": -0.2268,
+            "std": 0.5821
+          },
+          "diff_bw_minus_all": -0.0752,
+          "mwu_p": 0.6304
+        }
+      },
+      "exit_day": {
+        "ret_from_entry": {
+          "bw": {
+            "n": 30,
+            "mean": 14.0596,
+            "median": 1.578,
+            "std": 21.4952
+          },
+          "all": {
+            "n": 305,
+            "mean": 2.1366,
+            "median": 0.0252,
+            "std": 10.1274
+          },
+          "diff_bw_minus_all": 11.923,
+          "mwu_p": 0.0064
+        },
+        "rsr_delta": {
+          "bw": {
+            "n": 30,
+            "mean": 1.3763,
+            "median": 0.0,
+            "std": 13.1712
+          },
+          "all": {
+            "n": 299,
+            "mean": -3.2577,
+            "median": -2.381,
+            "std": 9.1181
+          },
+          "diff_bw_minus_all": 4.634,
+          "mwu_p": 0.0094
+        },
+        "atr_expansion": {
+          "bw": {
+            "n": 30,
+            "mean": 1.1656,
+            "median": 1.0252,
+            "std": 0.2798
+          },
+          "all": {
+            "n": 305,
+            "mean": 1.0334,
+            "median": 0.9983,
+            "std": 0.1579
+          },
+          "diff_bw_minus_all": 0.1322,
+          "mwu_p": 0.0031
+        },
+        "vol_retention": {
+          "bw": {
+            "n": 30,
+            "mean": 1.0437,
+            "median": 0.8962,
+            "std": 0.4824
+          },
+          "all": {
+            "n": 305,
+            "mean": 1.0178,
+            "median": 0.9035,
+            "std": 0.451
+          },
+          "diff_bw_minus_all": 0.0259,
+          "mwu_p": 0.9292
+        },
+        "high_persistence": {
+          "bw": {
+            "n": 30,
+            "mean": 0.7,
+            "median": 1.0,
+            "std": 0.4583
+          },
+          "all": {
+            "n": 305,
+            "mean": 0.5115,
+            "median": 1.0,
+            "std": 0.4999
+          },
+          "diff_bw_minus_all": 0.1885,
+          "mwu_p": 0.0489
+        },
+        "ma5_slope": {
+          "bw": {
+            "n": 30,
+            "mean": 0.9933,
+            "median": 0.4489,
+            "std": 4.2864
+          },
+          "all": {
+            "n": 305,
+            "mean": -0.1958,
+            "median": -0.3376,
+            "std": 4.0082
+          },
+          "diff_bw_minus_all": 1.1891,
+          "mwu_p": 0.1691
+        },
+        "rs_accel_post": {
+          "bw": {
+            "n": 30,
+            "mean": -0.5669,
+            "median": -0.3401,
+            "std": 0.8515
+          },
+          "all": {
+            "n": 297,
+            "mean": -0.5021,
+            "median": -0.3484,
+            "std": 0.6937
+          },
+          "diff_bw_minus_all": -0.0648,
+          "mwu_p": 0.9345
+        }
+      }
+    },
+    "trigger_ranking": [
+      {
+        "rank": 1,
+        "feature": "ret_from_entry",
+        "bw_mean_minus_all_mean": 11.5291,
+        "mwu_p": 0.0039,
+        "bw_mean": 14.1834,
+        "all_mean": 2.6543
+      },
+      {
+        "rank": 2,
+        "feature": "rsr_delta",
+        "bw_mean_minus_all_mean": 3.9341,
+        "mwu_p": 0.0546,
+        "bw_mean": 3.1998,
+        "all_mean": -0.7343
+      },
+      {
+        "rank": 3,
+        "feature": "ma5_slope",
+        "bw_mean_minus_all_mean": 0.8181,
+        "mwu_p": 0.2647,
+        "bw_mean": 0.885,
+        "all_mean": 0.0669
+      },
+      {
+        "rank": 4,
+        "feature": "vol_retention",
+        "bw_mean_minus_all_mean": -0.1952,
+        "mwu_p": 0.0583,
+        "bw_mean": 0.8277,
+        "all_mean": 1.0229
+      },
+      {
+        "rank": 5,
+        "feature": "high_persistence",
+        "bw_mean_minus_all_mean": 0.1497,
+        "mwu_p": 0.1114,
+        "bw_mean": 0.7333,
+        "all_mean": 0.5836
+      },
+      {
+        "rank": 6,
+        "feature": "atr_expansion",
+        "bw_mean_minus_all_mean": 0.1298,
+        "mwu_p": 0.0089,
+        "bw_mean": 1.1654,
+        "all_mean": 1.0356
+      },
+      {
+        "rank": 7,
+        "feature": "rs_accel_post",
+        "bw_mean_minus_all_mean": -0.0752,
+        "mwu_p": 0.6304,
+        "bw_mean": -0.3844,
+        "all_mean": -0.3092
+      }
+    ],
+    "bw_exit_reason_distribution": {
+      "RSR_MOMENTUM_EXIT": 13,
+      "RSR_EXIT": 10,
+      "TIME_STOP": 5,
+      "ATR_TRAILING": 1,
+      "STRATEGY_EXIT": 1
+    },
+    "key_features": [
+      "ret_from_entry",
+      "rsr_delta",
+      "atr_expansion",
+      "vol_retention",
+      "high_persistence",
+      "ma5_slope",
+      "rs_accel_post"
+    ],
+    "n_bw_analyzed": 30,
+    "interpretation": "Exit Day-1でBWとAll全体で差が大きい特徴量がExit Triggerの候補"
+  },
+  "phase4_counterfactual": {
+    "bigwinner": {
+      "label": "BigWinner (Top10%)",
+      "n": 30,
+      "fwd_5d": {
+        "n": 30,
+        "mean": 2.578,
+        "median": 1.5516,
+        "p20": -2.8795,
+        "p80": 6.7904,
+        "win_rate": 63.3333
+      },
+      "fwd_10d": {
+        "n": 30,
+        "mean": 3.4671,
+        "median": 2.2389,
+        "p20": -2.5407,
+        "p80": 8.8703,
+        "win_rate": 63.3333
+      },
+      "fwd_20d": {
+        "n": 30,
+        "mean": 8.8126,
+        "median": 7.7844,
+        "p20": -2.3796,
+        "p80": 16.7692,
+        "win_rate": 70.0
+      },
+      "fwd_40d": {
+        "n": 30,
+        "mean": 27.6951,
+        "median": 23.5219,
+        "p20": 3.7897,
+        "p80": 38.9914,
+        "win_rate": 86.6667
+      },
+      "fwd_60d": {
+        "n": 30,
+        "mean": 36.9122,
+        "median": 37.3389,
+        "p20": 23.2185,
+        "p80": 49.9839,
+        "win_rate": 93.3333
+      }
+    },
+    "all_trades": {
+      "label": "All trades",
+      "n": 291,
+      "fwd_5d": {
+        "n": 291,
+        "mean": 0.4947,
+        "median": 0.6098,
+        "p20": -2.6219,
+        "p80": 3.4366,
+        "win_rate": 55.3265
+      },
+      "fwd_10d": {
+        "n": 291,
+        "mean": 0.7131,
+        "median": 1.1918,
+        "p20": -3.4547,
+        "p80": 5.0917,
+        "win_rate": 57.732
+      },
+      "fwd_20d": {
+        "n": 291,
+        "mean": 2.2056,
+        "median": 2.5412,
+        "p20": -5.137,
+        "p80": 8.5809,
+        "win_rate": 61.8557
+      },
+      "fwd_40d": {
+        "n": 291,
+        "mean": 5.3594,
+        "median": 3.9956,
+        "p20": -5.8824,
+        "p80": 15.2274,
+        "win_rate": 65.2921
+      },
+      "fwd_60d": {
+        "n": 289,
+        "mean": 8.1556,
+        "median": 5.6653,
+        "p20": -5.165,
+        "p80": 20.5695,
+        "win_rate": 68.1661
+      }
+    },
+    "bw_pre_peak": {
+      "label": "BW Pre-Peak Exit",
+      "n": 24,
+      "fwd_5d": {
+        "n": 24,
+        "mean": 3.3571,
+        "median": 2.9638,
+        "p20": -2.784,
+        "p80": 9.5521,
+        "win_rate": 70.8333
+      },
+      "fwd_10d": {
+        "n": 24,
+        "mean": 4.5591,
+        "median": 4.0311,
+        "p20": -2.7089,
+        "p80": 11.7048,
+        "win_rate": 66.6667
+      },
+      "fwd_20d": {
+        "n": 24,
+        "mean": 11.4694,
+        "median": 9.1367,
+        "p20": 2.8323,
+        "p80": 17.5302,
+        "win_rate": 83.3333
+      },
+      "fwd_40d": {
+        "n": 24,
+        "mean": 34.2335,
+        "median": 27.0526,
+        "p20": 15.1463,
+        "p80": 43.3209,
+        "win_rate": 95.8333
+      },
+      "fwd_60d": {
+        "n": 24,
+        "mean": 42.2712,
+        "median": 38.7892,
+        "p20": 27.8682,
+        "p80": 53.6727,
+        "win_rate": 100.0
+      }
+    },
+    "bw_post_peak": {
+      "label": "BW Post-Peak Exit",
+      "n": 6,
+      "fwd_5d": {
+        "n": 6,
+        "mean": -0.5384,
+        "median": -0.9448,
+        "p20": -2.78,
+        "p80": 5.0025,
+        "win_rate": 33.3333
+      },
+      "fwd_10d": {
+        "n": 6,
+        "mean": -0.9012,
+        "median": 0.1231,
+        "p20": -2.1446,
+        "p80": 2.5331,
+        "win_rate": 50.0
+      },
+      "fwd_20d": {
+        "n": 6,
+        "mean": -1.8144,
+        "median": -3.9341,
+        "p20": -6.9314,
+        "p80": -2.1339,
+        "win_rate": 16.6667
+      },
+      "fwd_40d": {
+        "n": 6,
+        "mean": 1.5417,
+        "median": -0.5807,
+        "p20": -8.539,
+        "p80": 4.1214,
+        "win_rate": 50.0
+      },
+      "fwd_60d": {
+        "n": 6,
+        "mean": 15.476,
+        "median": 14.4912,
+        "p20": -2.92,
+        "p80": 34.2249,
+        "win_rate": 66.6667
+      }
+    },
+    "bw_fwd40_mean": 27.6951,
+    "bw_fwd10_mean": 3.4671,
+    "bw_fwd5_mean": 2.578,
+    "interpretation": "BW Exit後のフォワードリターンが正なら保持延長価値大。負なら早期Exitが正解だった可能性あり。"
+  },
+  "phase5_missed_opp": {
+    "top10": [
+      {
+        "symbol": "5706.T",
+        "entry_date": "2025-06-16",
+        "exit_date": "2025-06-19",
+        "exit_reason": "RSR_EXIT",
+        "hold_days": 3,
+        "peak_day": 55,
+        "exit_before_peak": true,
+        "plb_yen": 591990.0391,
+        "actual_ret_pct": 0.0476,
+        "max_possible_ret_pct": 125.7419,
+        "fwd60d_entry": 116.7964,
+        "pnl_yen": -2600.0
+      },
+      {
+        "symbol": "4055.T",
+        "entry_date": "2023-03-28",
+        "exit_date": "2023-04-17",
+        "exit_reason": "RSR_EXIT",
+        "hold_days": 14,
+        "peak_day": 52,
+        "exit_before_peak": true,
+        "plb_yen": 375953.9795,
+        "actual_ret_pct": -5.6218,
+        "max_possible_ret_pct": 58.0,
+        "fwd60d_entry": 41.75,
+        "pnl_yen": -61200.0
+      },
+      {
+        "symbol": "6857.T",
+        "entry_date": "2023-03-10",
+        "exit_date": "2023-04-14",
+        "exit_reason": "RSR_MOMENTUM_EXIT",
+        "hold_days": 24,
+        "peak_day": 57,
+        "exit_before_peak": true,
+        "plb_yen": 327112.0117,
+        "actual_ret_pct": 3.1899,
+        "max_possible_ret_pct": 61.7409,
+        "fwd60d_entry": 53.0935,
+        "pnl_yen": 8500.0
+      },
+      {
+        "symbol": "7011.T",
+        "entry_date": "2023-11-27",
+        "exit_date": "2023-11-30",
+        "exit_reason": "RSR_EXIT",
+        "hold_days": 3,
+        "peak_day": 60,
+        "exit_before_peak": true,
+        "plb_yen": 277499.4141,
+        "actual_ret_pct": 1.9404,
+        "max_possible_ret_pct": 44.2377,
+        "fwd60d_entry": 44.2377,
+        "pnl_yen": -32000.0
+      },
+      {
+        "symbol": "6857.T",
+        "entry_date": "2023-02-27",
+        "exit_date": "2023-03-08",
+        "exit_reason": "RSR_EXIT",
+        "hold_days": 7,
+        "peak_day": 60,
+        "exit_before_peak": true,
+        "plb_yen": 264561.2305,
+        "actual_ret_pct": 8.569,
+        "max_possible_ret_pct": 58.7405,
+        "fwd60d_entry": 58.7405,
+        "pnl_yen": 36000.0
+      },
+      {
+        "symbol": "6857.T",
+        "entry_date": "2023-12-21",
+        "exit_date": "2023-12-27",
+        "exit_reason": "RSR_MOMENTUM_EXIT",
+        "hold_days": 4,
+        "peak_day": 46,
+        "exit_before_peak": true,
+        "plb_yen": 242915.7715,
+        "actual_ret_pct": 1.149,
+        "max_possible_ret_pct": 51.5401,
+        "fwd60d_entry": 38.2136,
+        "pnl_yen": 3000.0
+      },
+      {
+        "symbol": "6857.T",
+        "entry_date": "2023-11-15",
+        "exit_date": "2023-11-20",
+        "exit_reason": "RSR_MOMENTUM_EXIT",
+        "hold_days": 3,
+        "peak_day": 60,
+        "exit_before_peak": true,
+        "plb_yen": 221055.4688,
+        "actual_ret_pct": 0.3085,
+        "max_possible_ret_pct": 46.8626,
+        "fwd60d_entry": 46.8626,
+        "pnl_yen": 14300.0
+      },
+      {
+        "symbol": "9107.T",
+        "entry_date": "2021-06-16",
+        "exit_date": "2021-07-27",
+        "exit_reason": "RSR_MOMENTUM_EXIT",
+        "hold_days": 27,
+        "peak_day": 60,
+        "exit_before_peak": true,
+        "plb_yen": 213826.7395,
+        "actual_ret_pct": 32.2143,
+        "max_possible_ret_pct": 72.5437,
+        "fwd60d_entry": 72.5437,
+        "pnl_yen": -13999.9878
+      },
+      {
+        "symbol": "6857.T",
+        "entry_date": "2023-05-15",
+        "exit_date": "2023-08-03",
+        "exit_reason": "ATR_TRAILING",
+        "hold_days": 57,
+        "peak_day": 46,
+        "exit_before_peak": false,
+        "plb_yen": 199647.6562,
+        "actual_ret_pct": 58.1966,
+        "max_possible_ret_pct": 80.4366,
+        "fwd60d_entry": 47.0758,
+        "pnl_yen": 455159.2285
+      },
+      {
+        "symbol": "8015.T",
+        "entry_date": "2025-06-20",
+        "exit_date": "2025-07-30",
+        "exit_reason": "RSR_MOMENTUM_EXIT",
+        "hold_days": 27,
+        "peak_day": 59,
+        "exit_before_peak": true,
+        "plb_yen": 186482.7393,
+        "actual_ret_pct": 11.6793,
+        "max_possible_ret_pct": 31.7027,
+        "fwd60d_entry": 30.3367,
+        "pnl_yen": 71354.8828
+      }
+    ],
+    "top10_plb_yen": 2901045.0502,
+    "top10_pct_of_bw_plb": 69.411,
+    "top10_pct_of_all_plb": 22.6958,
+    "bw_total_plb_yen": 4179518.5671,
+    "dominant_exit_reason": "RSR_MOMENTUM_EXIT"
+  },
+  "phase6_addon_feasibility": {
+    "day10": {
+      "n_total": 291,
+      "n_candidates": 95,
+      "candidate_rate_pct": 32.646,
+      "n_bw_candidates": 14,
+      "bw_in_candidates_pct": 14.7368,
+      "bw_capture_rate_pct": 46.6667,
+      "n_nw_candidates": 60,
+      "candidates_fwd60_mean": 10.9754,
+      "candidates_fwd60_median": 9.115,
+      "bw_candidates_fwd60_mean": 46.9632,
+      "exit_reasons": {
+        "RSR_MOMENTUM_EXIT": 71,
+        "RSR_EXIT": 9,
+        "ATR_TRAILING": 6,
+        "TIME_STOP": 5,
+        "DEFERRED_EXIT": 2,
+        "TURTLE_EXIT": 1,
+        "STRATEGY_EXIT": 1
+      },
+      "bw_exit_reasons": {
+        "RSR_MOMENTUM_EXIT": 7,
+        "TIME_STOP": 5,
+        "RSR_EXIT": 1,
+        "ATR_TRAILING": 1
+      }
+    },
+    "day20": {
+      "n_total": 291,
+      "n_candidates": 57,
+      "candidate_rate_pct": 19.5876,
+      "n_bw_candidates": 13,
+      "bw_in_candidates_pct": 22.807,
+      "bw_capture_rate_pct": 43.3333,
+      "n_nw_candidates": 36,
+      "candidates_fwd60_mean": 16.6383,
+      "candidates_fwd60_median": 14.2072,
+      "bw_candidates_fwd60_mean": 47.3642,
+      "exit_reasons": {
+        "RSR_MOMENTUM_EXIT": 45,
+        "TIME_STOP": 5,
+        "ATR_TRAILING": 4,
+        "RSR_EXIT": 1,
+        "TURTLE_EXIT": 1,
+        "STRATEGY_EXIT": 1
+      },
+      "bw_exit_reasons": {
+        "RSR_MOMENTUM_EXIT": 7,
+        "TIME_STOP": 5,
+        "ATR_TRAILING": 1
+      }
+    },
+    "summary": {
+      "bw_still_open_at_day10": 14,
+      "bw_day10_capture_rate": 46.6667,
+      "bw_still_open_at_day20": 13,
+      "bw_day20_capture_rate": 43.3333,
+      "interpretation": "BigWinner30件のうちDay10でまだ保有中=14件(47%)。この割合がAdd-on実現可能率の上界となる。"
+    }
+  },
+  "phase7_frontier": {
+    "baseline_cagr": 12.1598,
+    "baseline_calmar": 1.0302,
+    "themes": [
+      {
+        "theme": "Failure除去 (Bottom20%完全除去)",
+        "dcagr_theory": 1.63,
+        "dcagr_realistic": -0.93,
+        "source": "Study63",
+        "notes": "現実改善は負(FPコスト支配)。研究継続価値低。"
+      },
+      {
+        "theme": "BW限定保持延長 +40d",
+        "dcagr_theory": 6.37,
+        "dcagr_realistic": null,
+        "source": "Study64 Phase3",
+        "notes": "ΔCalmar+0.622 ΔDD+0.59pp。Exit Trigger識別が鍵。"
+      },
+      {
+        "theme": "Add-on Day10×1.0",
+        "dcagr_theory": 6.78,
+        "dcagr_realistic": 3.164,
+        "source": "Study64 Phase5 × Study65 Phase6",
+        "notes": "Day10時BWキャプチャ率=47% → 現実的ΔCAGR=3.164pp"
+      },
+      {
+        "theme": "PLB回収 (Exit改善)",
+        "dcagr_theory": null,
+        "dcagr_realistic": null,
+        "source": "Study64 Phase2 + Study65 Phase1-2",
+        "notes": "BW PLB=¥3,273,658 (全利益72.5%)。Exit Trigger識別が鍵。"
+      }
+    ],
+    "bw_post_exit_fwd40_positive": true,
+    "addon_d10_realistic_dcagr": 3.164,
+    "interpretation": "BW Exit後fwd40dが正 → 保持延長研究に価値あり。Add-onは実現率で割引しても+3pp超の見込み。"
+  },
+  "phase8_verdict": {
+    "1_plb_top_reason": "RSR_MOMENTUM_EXIT",
+    "1_plb_top_reason_pct": 46.8728,
+    "2_pre_peak_exit_pct": 80.0,
+    "2_pre_peak_plb_share_pct": 92.2381,
+    "3_addon_day10_capture_rate": 46.6667,
+    "3_addon_day10_bw_n": 14,
+    "3_addon_day20_capture_rate": 43.3333,
+    "4_retention_value": "HIGH",
+    "4_bw_exit_fwd10_mean": 3.4671,
+    "4_bw_exit_fwd40_mean": 27.6951,
+    "5_addon_value": "LOW",
+    "6_top_exit_trigger_feat": "ret_from_entry",
+    "7_study66_candidate": "BW早期Exit原因特定 (Peak前Exit>60% → exit triggerシグナル研究)",
+    "7_priority_themes": [
+      "BW保持延長 理論6.37pp / Retention value=HIGH",
+      "Add-on Day10 理論6.78pp / Capture=47% / LOW",
+      "Failure研究 理論+1.63pp / 現実-0.93pp → 継続価値LOW"
+    ]
+  }
+}

@@ -1,0 +1,62 @@
+# 採用確定設定 (2026-04-04)
+# WF検証完了・IS最終評価通過
+
+[確定パラメータ]
+scenario          = STEP5
+atr_mult          = 2.5
+enable_volatility_filter = false
+enable_atr_filter        = false
+enable_volume_filter     = true
+enable_market_filter     = false
+min_hold          = 3
+min_rsr           = 75
+max_positions     = 3
+capital           = 3,000,000
+
+[IS (2018-2024) 評価結果]
+trades            = 221
+sharpe            = 0.783
+cagr              = +18.12%
+max_dd            = -18.24%
+win_rate          = 55.7%
+avg_hold_days     = 10.1
+
+[WF結果 (5セグメント rolling 2yr IS + 1yr OOS)]
+seg1: IS 2018-19 → OOS 2020  OOS_sh=1.225  win=True
+seg2: IS 2019-20 → OOS 2021  OOS/IS=0.371  win=True
+seg3: IS 2020-21 → OOS 2022  OOS/IS=0.625  win=True
+seg4: IS 2021-22 → OOS 2023  OOS/IS=2.450  win=True
+seg5: IS 2022-23 → OOS 2024  OOS/IS=0.851  win=True
+oos_wins          = 5/5
+avg_oos_is_ratio  = 1.074
+judgment          = PASS
+
+[True OOS (2025)]
+trades            = 43
+sharpe            = -0.075
+cagr              = -0.98%
+max_dd            = -9.94%
+april_loss_yen    = -226,390  (全損失の95%超)
+non_april_months  = 10勝1敗
+
+[フィルター除去実験結果]
+baseline_no_filters   IS_sh=0.715  OOS_sh=-0.236
+recommended           IS_sh=0.783  OOS_sh=-0.075   ← 採用
+vol_only_off          IS_sh=0.660
+atr_only_off          IS_sh=0.394  ← 最大加害
+
+[市場クラッシュ防御 (Step2)]
+入口ブロック効果     = 0 (Δsharpe=0 全閾値)
+根本原因             = 4月損失はショック前保有ポジションへの直撃
+必要なルール         = エンジン内forced_exit (market_ret < -5% → 全Exit)
+実装状況             = 未実装 (次フェーズ課題)
+
+[TOPIX proxy (Step3)]
+1306.T              = 1966行ロード成功 (2018-01-01 to 2025-12-30)
+market_filter_ON    = IS_sh=0.568 (-0.215 vs OFF) → 不採用維持
+risk_off_days_IS    = 522/1742日 (30%) → 過剰除外のため廃止
+
+[段階導入計画]
+week1: 0.25x  kabuステーション動作確認
+week2: 0.50x  実取引3件以上正常完了
+week3: 1.00x  forced_exit実装後

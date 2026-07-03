@@ -1,0 +1,79 @@
+{
+  "date": "2026-04-05",
+  "description": "研究ブランチ: shock=composite regime=regime_2 bear=0.5",
+  "config": {
+    "shock_exit_mode": "composite",
+    "regime_sizing": "regime_2",
+    "bear_scale": 0.5,
+    "min_hold": 3
+  },
+  "wf_segments": [
+    {
+      "seg": 1,
+      "is_sh": 0.0,
+      "oos_sh": 0.646,
+      "oos_dd": -15.71,
+      "ratio": null,
+      "win": true
+    },
+    {
+      "seg": 2,
+      "is_sh": 0.646,
+      "oos_sh": 0.55,
+      "oos_dd": -18.43,
+      "ratio": 0.851,
+      "win": true
+    },
+    {
+      "seg": 3,
+      "is_sh": 0.772,
+      "oos_sh": -0.01,
+      "oos_dd": -19.06,
+      "ratio": -0.013,
+      "win": false
+    },
+    {
+      "seg": 4,
+      "is_sh": 0.673,
+      "oos_sh": 1.066,
+      "oos_dd": -14.44,
+      "ratio": 1.584,
+      "win": true
+    },
+    {
+      "seg": 5,
+      "is_sh": 0.604,
+      "oos_sh": 0.546,
+      "oos_dd": -19.47,
+      "ratio": 0.904,
+      "win": true
+    }
+  ],
+  "wf_summary": {
+    "oos_wins": "4/5",
+    "median_oos_sharpe": 0.55,
+    "worst_oos_dd": -19.47,
+    "avg_oos_is_ratio": 0.832,
+    "judgment": "FAIL"
+  },
+  "true_oos": {
+    "period": "2025",
+    "sharpe": 0.522,
+    "max_dd": -9.05,
+    "cagr": 4.68,
+    "monthly": {
+      "2025-01": 2.5,
+      "2025-02": -0.74,
+      "2025-03": 1.66,
+      "2025-04": -1.77,
+      "2025-05": 1.35,
+      "2025-06": 0.25,
+      "2025-07": 1.9,
+      "2025-08": 0.14,
+      "2025-09": 3.27,
+      "2025-10": 3.73,
+      "2025-11": -2.3,
+      "2025-12": 0.18
+    }
+  }
+}

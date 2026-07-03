@@ -1,0 +1,68 @@
+# config_snapshot_S2.yaml — 2026-04-15 snapshot
+# engine: composite_alpha_bt.run_scenario (scenario=BASELINE + 明示flags)
+# 出典: strategy_snapshot_manifest.md §1-15 列S2
+snapshot_id: S2
+snapshot_date: "2026-04-15"
+engine: composite_alpha_bt
+confidence: CONFIRMED
+
+universe:
+  type: rsr42_dynamic
+  dynamic_universe_enabled: true   # dyn_rsr42_bear_rs0, 採用2026-04-05
+
+fujiko:
+  min_sepa: 6
+  min_rsr: 75.0
+  turtle_entry: 20
+  turtle_exit: 55          # CONFIRMED 2026-03-31変更
+  use_turtle_entry: true
+  mom_period: 21
+
+portfolio:
+  capital: 3_000_000
+  max_positions: 3         # CONFIRMED — 違反(→4)は2026-04-18開始、このスナップショットの後
+  max_single_weight: 0.25
+  max_dd_limit: 0.15
+
+risk:
+  min_hold_days: 3         # CONFIRMED 2026-03-31
+
+rsr_exit:
+  enable_simple_rsr_exit: false     # CONFIRMED — 絶対閾値メカニズム自体が未導入（追加は06-05）
+  enable_multilayer_rsr: true
+  ml_exit_single_only: true         # CONFIRMED — exit_1(z<1.1)のみ、4条件多層は未導入
+  rsr_exit_threshold: null          # 使用しない（enable_simple_rsr_exit=false）
+
+trailing_stop:
+  mode: none   # REVISED — 文書記載値(fixed_pct 2.5%)は存在をCONFIRMEDだが、機械的再現を試みた結果
+               # 実測トリガー率が04-13レポート実績(219件中trailing起因ほぼ0件)と著しく不整合(再現実測:76%)。
+               # 04-13当時の正確なコード実体は非保存(gitなし)で再現不能と判断、推測実装を回避し無効化。
+               # 詳細: strategy_snapshot_manifest.md §6 を参照。
+  fixed_trail_pct: 0.025
+  enable_atr_trailing_prod: false
+
+mtf:
+  enabled: true            # CONFIRMED 実装2026-03-24
+
+sizing:
+  mode: existing
+  enable_atr_risk_sizing: false   # CONFIRMED 最早証拠06-03、このスナップショットには存在しない
+
+sector_gate:
+  enabled: true            # CONFIRMED 採用2026-04-09
+
+shock_exit:
+  mode: composite          # CONFIRMED 採用2026-04-05
+
+bear_filter:
+  enabled: true            # CONFIRMED 採用2026-04-07
+
+addon:
+  enabled: false           # CONFIRMED 04-13レポートに記載なし
+
+entry_timing:
+  enabled: false           # CONFIRMED 導入05-31、この後
+
+costs:
+  slippage_rate: 0.001
+  commission_rate: 0.00055

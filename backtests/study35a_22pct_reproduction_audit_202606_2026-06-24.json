@@ -1,0 +1,86 @@
+{
+  "recorded": {
+    "cagr": 22.4,
+    "sharpe": 1.582,
+    "max_dd": -12.32
+  },
+  "current_reproduction": {
+    "cagr": 19.53,
+    "sharpe": 0.852,
+    "max_dd": -16.24,
+    "n_trades": 209
+  },
+  "total_gap_vs_recorded": {
+    "cagr": -2.87,
+    "sharpe": -0.73,
+    "max_dd": -3.92,
+    "n_trades": null
+  },
+  "findings": [
+    {
+      "factor": "gross_exposure_enabled(2026-04-07追加)",
+      "measured_delta": {
+        "cagr": 0.0,
+        "sharpe": 0.0,
+        "max_dd": 0.0,
+        "n_trades": 0
+      },
+      "explains_pct_of_gap_cagr": -0.0
+    },
+    {
+      "factor": "rsr_exit_threshold(70.0→75.0、当時値不明のため両方実測)",
+      "measured_delta": {
+        "cagr": 0.61,
+        "sharpe": 0.007,
+        "max_dd": 0.53,
+        "n_trades": 7
+      },
+      "explains_pct_of_gap_cagr": -21.3
+    },
+    {
+      "factor": "REENTRY_COOL(5日→0日、変更日コメントなし)",
+      "measured_delta": {
+        "cagr": 0.0,
+        "sharpe": 0.0,
+        "max_dd": 0.0,
+        "n_trades": 0
+      },
+      "explains_pct_of_gap_cagr": -0.0
+    },
+    {
+      "factor": "CAPITAL参照消失(_bt.CAPITAL→cfg.portfolio.capital)",
+      "measured_delta": {
+        "cagr": 0.0,
+        "sharpe": 0.0,
+        "max_dd": 0.0,
+        "n_trades": 0
+      },
+      "verdict": "数値同一のため非要因（構造変更のみ、結果に影響なし）"
+    }
+  ],
+  "combined_test": {
+    "result": {
+      "cagr": 20.14,
+      "sharpe": 0.859,
+      "max_dd": -15.71,
+      "n_trades": 216
+    },
+    "delta_vs_current": {
+      "cagr": 0.61,
+      "sharpe": 0.007,
+      "max_dd": 0.53,
+      "n_trades": 7
+    },
+    "residual_vs_recorded": {
+      "cagr": -2.26,
+      "sharpe": -0.723,
+      "max_dd": -3.39,
+      "n_trades": null
+    }
+  },
+  "unmeasurable_factors": [
+    "Exit優先順位の変更（2026-03-31時点の優先順位コードが存在しないため代替実装による比較不可）",
+    "sizing/cash allocation式そのものの変更（sizing_mode='existing'の代替実装が存在しないため比較不可）",
+    "min_sepa/min_rsr/mom_period/turtle_entryが2026-03-31当時から不変だったかの確証（変更日コメントなし）"
+  ]
+}

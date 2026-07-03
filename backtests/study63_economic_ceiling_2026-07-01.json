@@ -1,0 +1,635 @@
+{
+  "study": "Study63",
+  "title": "Economic Ceiling & Intervention Feasibility Audit",
+  "date": "2026-07-01",
+  "params": {
+    "success_cagr_pp": 3.0,
+    "success_calmar": 0.2,
+    "n_mc": 500,
+    "detection_day": 10,
+    "s62_precision": 0.3898,
+    "s62_recall": 0.3966,
+    "s62_bal_acc": 0.621
+  },
+  "phase0_integrity": {
+    "n_raw_trades": 305,
+    "n_valid": 291,
+    "study62_n_match": true,
+    "study62_expected": 291,
+    "lookahead": 0,
+    "survivorship_bias": 0,
+    "label_consistency": "Study62ラベル完全再利用"
+  },
+  "phase1_return_attribution": {
+    "n_total": 291,
+    "total_pnl": 4513117.0708,
+    "groups": {
+      "BigWinner": {
+        "n": 30,
+        "pnl_sum": 3095631.2073,
+        "ev_contrib_pct": 68.5919,
+        "avg_fwd60": 46.282,
+        "avg_pnl": 103187.7069,
+        "is_profit": true
+      },
+      "NearMiss": {
+        "n": 116,
+        "pnl_sum": 2162490.5136,
+        "ev_contrib_pct": 47.9157,
+        "avg_fwd60": 15.737,
+        "avg_pnl": 18642.1596,
+        "is_profit": true
+      },
+      "NormalWinner": {
+        "n": 116,
+        "pnl_sum": 2162490.5136,
+        "ev_contrib_pct": 47.9157,
+        "avg_fwd60": 15.737,
+        "avg_pnl": 18642.1596,
+        "is_profit": true
+      },
+      "NormalLoser": {
+        "n": 75,
+        "pnl_sum": -147133.3748,
+        "ev_contrib_pct": -3.2601,
+        "avg_fwd60": 0.9682,
+        "avg_pnl": -1961.7783,
+        "is_profit": false
+      },
+      "EarlyFail": {
+        "n": 37,
+        "pnl_sum": -909219.0796,
+        "ev_contrib_pct": -20.1461,
+        "avg_fwd60": -15.7455,
+        "avg_pnl": -24573.4886,
+        "is_profit": false
+      },
+      "LateFail": {
+        "n": 12,
+        "pnl_sum": -258619.3665,
+        "ev_contrib_pct": -5.7304,
+        "avg_fwd60": -12.2188,
+        "avg_pnl": -21551.6139,
+        "is_profit": false
+      },
+      "FalseHero": {
+        "n": 15,
+        "pnl_sum": 256795.2332,
+        "ev_contrib_pct": 5.69,
+        "avg_fwd60": -1.5514,
+        "avg_pnl": 17119.6822,
+        "is_profit": true
+      }
+    }
+  },
+  "phase2_perfect_removal": {
+    "baseline": {
+      "label": "Baseline",
+      "n": 291,
+      "total_pnl": 4513117.0708,
+      "cagr": 12.1598,
+      "max_dd": -11.8037,
+      "calmar": 1.0302,
+      "pf": 2.1457,
+      "win_rate": 0.5326
+    },
+    "scenarios": {
+      "EarlyFail": {
+        "n_removed": 37,
+        "n_kept": 254,
+        "removed_pnl": -909219.0796,
+        "portfolio": {
+          "label": "Without EarlyFail",
+          "n": 254,
+          "total_pnl": 5422336.1504,
+          "cagr": 13.7729,
+          "max_dd": -7.1771,
+          "calmar": 1.919,
+          "pf": 2.9474,
+          "win_rate": 0.5748
+        },
+        "removed_group": {
+          "label": "Removed EarlyFail",
+          "n": 37,
+          "total_pnl": -909219.0796,
+          "cagr": -4.4131,
+          "max_dd": -30.3073,
+          "calmar": -0.1456,
+          "pf": 0.2126,
+          "win_rate": 0.2432
+        },
+        "delta_vs_baseline": {
+          "d_cagr": 1.6131,
+          "d_calmar": 0.8888,
+          "d_max_dd": 4.6266,
+          "d_pf": 0.8017,
+          "d_win_rate": 0.0422
+        }
+      },
+      "LateFail": {
+        "n_removed": 12,
+        "n_kept": 279,
+        "removed_pnl": -258619.3665,
+        "portfolio": {
+          "label": "Without LateFail",
+          "n": 279,
+          "total_pnl": 4771736.4372,
+          "cagr": 12.6353,
+          "max_dd": -12.1853,
+          "calmar": 1.0369,
+          "pf": 2.3141,
+          "win_rate": 0.5448
+        },
+        "removed_group": {
+          "label": "Removed LateFail",
+          "n": 12,
+          "total_pnl": -258619.3665,
+          "cagr": -1.1206,
+          "max_dd": -8.8583,
+          "calmar": -0.1265,
+          "pf": 0.1607,
+          "win_rate": 0.25
+        },
+        "delta_vs_baseline": {
+          "d_cagr": 0.4755,
+          "d_calmar": 0.0067,
+          "d_max_dd": -0.3816,
+          "d_pf": 0.1684,
+          "d_win_rate": 0.0122
+        }
+      },
+      "FalseHero": {
+        "n_removed": 15,
+        "n_kept": 276,
+        "removed_pnl": 256795.2332,
+        "portfolio": {
+          "label": "Without FalseHero",
+          "n": 276,
+          "total_pnl": 4256321.8376,
+          "cagr": 11.6733,
+          "max_dd": -13.4641,
+          "calmar": 0.867,
+          "pf": 2.1557,
+          "win_rate": 0.5254
+        },
+        "removed_group": {
+          "label": "Removed FalseHero",
+          "n": 15,
+          "total_pnl": 256795.2332,
+          "cagr": 1.0319,
+          "max_dd": -4.342,
+          "calmar": 0.2377,
+          "pf": 2.0018,
+          "win_rate": 0.6667
+        },
+        "delta_vs_baseline": {
+          "d_cagr": -0.4865,
+          "d_calmar": -0.1632,
+          "d_max_dd": -1.6604,
+          "d_pf": 0.01,
+          "d_win_rate": -0.0072
+        }
+      },
+      "Bottom10%": {
+        "n_removed": 29,
+        "n_kept": 262,
+        "removed_pnl": -459650.2197,
+        "portfolio": {
+          "label": "Without Bottom10%",
+          "n": 262,
+          "total_pnl": 4972767.2905,
+          "cagr": 12.9955,
+          "max_dd": -11.2504,
+          "calmar": 1.1551,
+          "pf": 2.5257,
+          "win_rate": 0.5611
+        },
+        "removed_group": {
+          "label": "Removed Bottom10%",
+          "n": 29,
+          "total_pnl": -459650.2197,
+          "cagr": -2.0574,
+          "max_dd": -18.3851,
+          "calmar": -0.1119,
+          "pf": 0.3239,
+          "win_rate": 0.2759
+        },
+        "delta_vs_baseline": {
+          "d_cagr": 0.8357,
+          "d_calmar": 0.1249,
+          "d_max_dd": 0.5533,
+          "d_pf": 0.38,
+          "d_win_rate": 0.0285
+        }
+      },
+      "Bottom20%": {
+        "n_removed": 58,
+        "n_kept": 233,
+        "removed_pnl": -918244.2001,
+        "portfolio": {
+          "label": "Without Bottom20%",
+          "n": 233,
+          "total_pnl": 5431361.2709,
+          "cagr": 13.7882,
+          "max_dd": -5.0565,
+          "calmar": 2.7268,
+          "pf": 3.2015,
+          "win_rate": 0.5794
+        },
+        "removed_group": {
+          "label": "Removed Bottom20%",
+          "n": 58,
+          "total_pnl": -918244.2001,
+          "cagr": -4.4648,
+          "max_dd": -31.03,
+          "calmar": -0.1439,
+          "pf": 0.3762,
+          "win_rate": 0.3448
+        },
+        "delta_vs_baseline": {
+          "d_cagr": 1.6284,
+          "d_calmar": 1.6966,
+          "d_max_dd": 6.7472,
+          "d_pf": 1.0558,
+          "d_win_rate": 0.0468
+        }
+      }
+    }
+  },
+  "phase3_realistic_detection": {
+    "n_mc": 500,
+    "expected_cagr": 11.2281,
+    "expected_calmar": 1.2214,
+    "expected_max_dd": -9.8432,
+    "delta_cagr_mean": -0.9317,
+    "delta_calmar_mean": 0.1912,
+    "delta_max_dd_mean": 1.9605,
+    "delta_cagr_std": 0.9154,
+    "delta_cagr_p25": -1.4956,
+    "delta_cagr_p75": -0.2948,
+    "detection_params": {
+      "recall": 0.3966,
+      "fpr": 0.1546,
+      "specificity": 0.8454,
+      "expected_tp": 23.0028,
+      "expected_fp": 36.0218
+    }
+  },
+  "phase4_intervention_timing": {
+    "day1": {
+      "Bottom20%": {
+        "n_affected": 58,
+        "avg_ret_at_dayN": -0.7291,
+        "avg_ret_at_natural": -14.0053,
+        "ret_improvement_pp": 13.2763,
+        "avg_pnl_improvement": 11326.8531,
+        "portfolio_delta": {
+          "d_cagr": 1.1815,
+          "d_calmar": 1.1546,
+          "d_max_dd": 5.6974,
+          "d_pf": 0.6419,
+          "d_win_rate": 0.0069
+        }
+      },
+      "EarlyFail": {
+        "n_affected": 37,
+        "avg_ret_at_dayN": -1.3781,
+        "avg_ret_at_natural": -15.7455,
+        "ret_improvement_pp": 14.3674,
+        "avg_pnl_improvement": 16024.5658,
+        "portfolio_delta": {
+          "d_cagr": 1.07,
+          "d_calmar": 0.5407,
+          "d_max_dd": 3.3818,
+          "d_pf": 0.4791,
+          "d_win_rate": 0.0
+        }
+      }
+    },
+    "day2": {
+      "Bottom20%": {
+        "n_affected": 58,
+        "avg_ret_at_dayN": -0.812,
+        "avg_ret_at_natural": -14.0053,
+        "ret_improvement_pp": 13.1933,
+        "avg_pnl_improvement": 10959.3029,
+        "portfolio_delta": {
+          "d_cagr": 1.1445,
+          "d_calmar": 0.9418,
+          "d_max_dd": 5.0571,
+          "d_pf": 0.6039,
+          "d_win_rate": -0.0034
+        }
+      },
+      "EarlyFail": {
+        "n_affected": 37,
+        "avg_ret_at_dayN": -1.6113,
+        "avg_ret_at_natural": -15.7455,
+        "ret_improvement_pp": 14.1342,
+        "avg_pnl_improvement": 14718.6201,
+        "portfolio_delta": {
+          "d_cagr": 0.9854,
+          "d_calmar": 0.5901,
+          "d_max_dd": 3.6908,
+          "d_pf": 0.4337,
+          "d_win_rate": -0.0103
+        }
+      }
+    },
+    "day3": {
+      "Bottom20%": {
+        "n_affected": 58,
+        "avg_ret_at_dayN": -0.993,
+        "avg_ret_at_natural": -14.0053,
+        "ret_improvement_pp": 13.0123,
+        "avg_pnl_improvement": 9797.7217,
+        "portfolio_delta": {
+          "d_cagr": 1.0269,
+          "d_calmar": 0.7558,
+          "d_max_dd": 4.4201,
+          "d_pf": 0.5069,
+          "d_win_rate": -0.0068
+        }
+      },
+      "EarlyFail": {
+        "n_affected": 37,
+        "avg_ret_at_dayN": -2.2897,
+        "avg_ret_at_natural": -15.7455,
+        "ret_improvement_pp": 13.4558,
+        "avg_pnl_improvement": 10227.0931,
+        "portfolio_delta": {
+          "d_cagr": 0.6911,
+          "d_calmar": 0.6101,
+          "d_max_dd": 3.9693,
+          "d_pf": 0.3152,
+          "d_win_rate": -0.0206
+        }
+      }
+    },
+    "day4": {
+      "Bottom20%": {
+        "n_affected": 58,
+        "avg_ret_at_dayN": -1.4641,
+        "avg_ret_at_natural": -14.0053,
+        "ret_improvement_pp": 12.5412,
+        "avg_pnl_improvement": 6988.1475,
+        "portfolio_delta": {
+          "d_cagr": 0.7391,
+          "d_calmar": 0.334,
+          "d_max_dd": 2.3487,
+          "d_pf": 0.3755,
+          "d_win_rate": 0.0
+        }
+      },
+      "EarlyFail": {
+        "n_affected": 37,
+        "avg_ret_at_dayN": -3.0915,
+        "avg_ret_at_natural": -15.7455,
+        "ret_improvement_pp": 12.654,
+        "avg_pnl_improvement": 5202.1603,
+        "portfolio_delta": {
+          "d_cagr": 0.3553,
+          "d_calmar": 0.1593,
+          "d_max_dd": 1.2824,
+          "d_pf": 0.1857,
+          "d_win_rate": -0.0171
+        }
+      }
+    },
+    "day5": {
+      "Bottom20%": {
+        "n_affected": 58,
+        "avg_ret_at_dayN": -1.7238,
+        "avg_ret_at_natural": -14.0053,
+        "ret_improvement_pp": 12.2815,
+        "avg_pnl_improvement": 4846.3607,
+        "portfolio_delta": {
+          "d_cagr": 0.5162,
+          "d_calmar": 0.1013,
+          "d_max_dd": 0.6012,
+          "d_pf": 0.2589,
+          "d_win_rate": 0.0
+        }
+      },
+      "EarlyFail": {
+        "n_affected": 37,
+        "avg_ret_at_dayN": -4.0281,
+        "avg_ret_at_natural": -15.7455,
+        "ret_improvement_pp": 11.7174,
+        "avg_pnl_improvement": -996.0322,
+        "portfolio_delta": {
+          "d_cagr": -0.0689,
+          "d_calmar": -0.0917,
+          "d_max_dd": -1.0797,
+          "d_pf": 0.0542,
+          "d_win_rate": -0.0309
+        }
+      }
+    },
+    "day7": {
+      "Bottom20%": {
+        "n_affected": 58,
+        "avg_ret_at_dayN": -1.8958,
+        "avg_ret_at_natural": -14.0053,
+        "ret_improvement_pp": 12.1095,
+        "avg_pnl_improvement": 3683.6629,
+        "portfolio_delta": {
+          "d_cagr": 0.3939,
+          "d_calmar": -0.0245,
+          "d_max_dd": -0.679,
+          "d_pf": 0.2188,
+          "d_win_rate": 0.0069
+        }
+      },
+      "EarlyFail": {
+        "n_affected": 37,
+        "avg_ret_at_dayN": -3.8418,
+        "avg_ret_at_natural": -15.7455,
+        "ret_improvement_pp": 11.9037,
+        "avg_pnl_improvement": 7.3824,
+        "portfolio_delta": {
+          "d_cagr": 0.0005,
+          "d_calmar": -0.0462,
+          "d_max_dd": -0.554,
+          "d_pf": 0.0578,
+          "d_win_rate": -0.0137
+        }
+      }
+    },
+    "day10": {
+      "Bottom20%": {
+        "n_affected": 58,
+        "avg_ret_at_dayN": -2.8455,
+        "avg_ret_at_natural": -14.0053,
+        "ret_improvement_pp": 11.1599,
+        "avg_pnl_improvement": -2245.7298,
+        "portfolio_delta": {
+          "d_cagr": -0.2449,
+          "d_calmar": -0.3451,
+          "d_max_dd": -5.5884,
+          "d_pf": -0.0071,
+          "d_win_rate": -0.0034
+        }
+      },
+      "EarlyFail": {
+        "n_affected": 37,
+        "avg_ret_at_dayN": -5.1611,
+        "avg_ret_at_natural": -15.7455,
+        "ret_improvement_pp": 10.5843,
+        "avg_pnl_improvement": -8298.0776,
+        "portfolio_delta": {
+          "d_cagr": -0.5834,
+          "d_calmar": -0.2689,
+          "d_max_dd": -3.403,
+          "d_pf": -0.12,
+          "d_win_rate": -0.0137
+        }
+      }
+    },
+    "summary": {
+      "optimal_day_Bottom20%": 1,
+      "optimal_dcagr_Bottom20%": 1.1815,
+      "optimal_day_EarlyFail": 1,
+      "optimal_dcagr_EarlyFail": 1.07
+    }
+  },
+  "phase5_info_compression": {
+    "ret": {
+      "n_features": 1,
+      "f1": 0.3932,
+      "delta_cagr_mean": -0.9317,
+      "delta_calmar_mean": 0.1912,
+      "delta_max_dd_mean": 1.9605
+    },
+    "ret+rsr_delta": {
+      "n_features": 2,
+      "f1": 0.339,
+      "delta_cagr_mean": -1.2307,
+      "delta_calmar_mean": 0.1135,
+      "delta_max_dd_mean": 1.6688
+    },
+    "ret+rsr+vol": {
+      "n_features": 3,
+      "f1": 0.339,
+      "delta_cagr_mean": -1.2307,
+      "delta_calmar_mean": 0.1135,
+      "delta_max_dd_mean": 1.6688
+    },
+    "ret+rsr+vol+atr": {
+      "n_features": 4,
+      "f1": 0.3419,
+      "delta_cagr_mean": -1.1922,
+      "delta_calmar_mean": 0.1221,
+      "delta_max_dd_mean": 1.686
+    },
+    "full_18": {
+      "n_features": 18,
+      "f1": 0.3419,
+      "delta_cagr_mean": -1.1922,
+      "delta_calmar_mean": 0.1221,
+      "delta_max_dd_mean": 1.686
+    }
+  },
+  "phase6_economic_frontier": {
+    "frontier": [
+      {
+        "set_name": "ret",
+        "n_features": 1,
+        "f1": 0.3932,
+        "delta_cagr_pp": -0.9317,
+        "delta_calmar": 0.1912
+      },
+      {
+        "set_name": "ret+rsr_delta",
+        "n_features": 2,
+        "f1": 0.339,
+        "delta_cagr_pp": -1.2307,
+        "delta_calmar": 0.1135
+      },
+      {
+        "set_name": "ret+rsr+vol",
+        "n_features": 3,
+        "f1": 0.339,
+        "delta_cagr_pp": -1.2307,
+        "delta_calmar": 0.1135
+      },
+      {
+        "set_name": "ret+rsr+vol+atr",
+        "n_features": 4,
+        "f1": 0.3419,
+        "delta_cagr_pp": -1.1922,
+        "delta_calmar": 0.1221
+      },
+      {
+        "set_name": "full_18",
+        "n_features": 18,
+        "f1": 0.3419,
+        "delta_cagr_pp": -1.1922,
+        "delta_calmar": 0.1221
+      }
+    ],
+    "ret_single_dcagr": -0.9317,
+    "full18_dcagr": -1.1922,
+    "single_beats_full18": true,
+    "interpretation": "ret単独 ≥ Full18: Borda rankの等重み問題によりノイズ特徴量が信号を希薄化"
+  },
+  "phase7_research_portfolio": {
+    "themes": [
+      {
+        "theme": "Bottom20%除去",
+        "theory_cagr_pp": 1.6284,
+        "realistic_cagr_pp": -0.9317,
+        "difficulty": 2,
+        "roi_score": 0.4658,
+        "note": "Day10 ret単独 F1=0.393. 現実改善=MC平均",
+        "rank": 1
+      },
+      {
+        "theme": "FalseHero除去",
+        "theory_cagr_pp": -0.4865,
+        "realistic_cagr_pp": 0.1,
+        "difficulty": 4,
+        "roi_score": 0.025,
+        "note": "n=15 F1≈0.027 実質検出不能",
+        "rank": 2
+      },
+      {
+        "theme": "EarlyFail除去",
+        "theory_cagr_pp": 1.6131,
+        "realistic_cagr_pp": null,
+        "difficulty": 1,
+        "roi_score": null,
+        "note": "Day5以前でfwd5d<0が観測可能 (別研究要)",
+        "rank": 3
+      },
+      {
+        "theme": "BigWinner保持強化",
+        "theory_cagr_pp": null,
+        "realistic_cagr_pp": null,
+        "difficulty": 4,
+        "roi_score": null,
+        "note": "Day1判別不能。別研究フェーズ(Study61 Phase2知見)",
+        "rank": 4
+      }
+    ],
+    "baseline_cagr": 12.1598,
+    "baseline_calmar": 1.0302
+  },
+  "phase8_verdict": {
+    "1_max_improvement_group": "Bottom20%",
+    "2_max_roi_group": "Bottom20%除去",
+    "3_not_worth_targeting": "FalseHero (n=15, F1≈0.027, theory改善小)",
+    "4_min_info_max_value_feature": "ret_from_entry (単独 F1=0.393, Day10)",
+    "5_theory_cagr_ceiling_pp": 1.6284,
+    "6_realistic_cagr_improvement_pp": -0.9317,
+    "7_next_research_theme": "BigWinner研究へ移行",
+    "success_condition": {
+      "cagr_threshold_pp": 3.0,
+      "calmar_threshold": 0.2,
+      "realistic_dcagr": -0.9317,
+      "realistic_dcalmar": 0.1912,
+      "pass": false,
+      "verdict": "MOVE_TO_BIGWINNER"
+    }
+  }
+}

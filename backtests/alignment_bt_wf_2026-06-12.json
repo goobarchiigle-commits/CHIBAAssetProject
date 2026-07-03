@@ -1,0 +1,636 @@
+{
+  "date": "2026-06-12",
+  "engine": "capital_allocation_abc.run_period pattern=A",
+  "wf_segs": [
+    {
+      "seg": 1,
+      "is": [
+        "2018-01-01",
+        "2019-12-31"
+      ],
+      "oos": [
+        "2020-01-01",
+        "2020-12-31"
+      ]
+    },
+    {
+      "seg": 2,
+      "is": [
+        "2019-01-01",
+        "2020-12-31"
+      ],
+      "oos": [
+        "2021-01-01",
+        "2021-12-31"
+      ]
+    },
+    {
+      "seg": 3,
+      "is": [
+        "2020-01-01",
+        "2021-12-31"
+      ],
+      "oos": [
+        "2022-01-01",
+        "2022-12-31"
+      ]
+    },
+    {
+      "seg": 4,
+      "is": [
+        "2021-01-01",
+        "2022-12-31"
+      ],
+      "oos": [
+        "2023-01-01",
+        "2023-12-31"
+      ]
+    },
+    {
+      "seg": 5,
+      "is": [
+        "2022-01-01",
+        "2023-12-31"
+      ],
+      "oos": [
+        "2024-01-01",
+        "2024-12-31"
+      ]
+    }
+  ],
+  "cases": {
+    "base": {
+      "max_new_per_day": null,
+      "max_names_per_sector": null,
+      "cash_buffer": 0.0
+    },
+    "live_proxy": {
+      "max_new_per_day": 1,
+      "max_names_per_sector": 1,
+      "cash_buffer": 0.1
+    },
+    "mx2": {
+      "max_new_per_day": 2,
+      "max_names_per_sector": null,
+      "cash_buffer": 0.0
+    },
+    "sn2": {
+      "max_new_per_day": null,
+      "max_names_per_sector": 2,
+      "cash_buffer": 0.0
+    },
+    "cb5": {
+      "max_new_per_day": null,
+      "max_names_per_sector": null,
+      "cash_buffer": 0.05
+    },
+    "bundle_225": {
+      "max_new_per_day": 2,
+      "max_names_per_sector": 2,
+      "cash_buffer": 0.05
+    }
+  },
+  "results": {
+    "base": {
+      "wf": {
+        "case": "base",
+        "pass_count": 5,
+        "wf_pass": true,
+        "seg3_2022_cagr": 1.69,
+        "seg3_2022_ok": true,
+        "folds": [
+          {
+            "seg": 1,
+            "oos_year": "2020",
+            "is_cagr": 0.0,
+            "oos_cagr": 15.66,
+            "oos_sharpe": 0.611,
+            "oos_dd": -11.41,
+            "ois_ratio": null,
+            "pass": true
+          },
+          {
+            "seg": 2,
+            "oos_year": "2021",
+            "is_cagr": 15.66,
+            "oos_cagr": 13.91,
+            "oos_sharpe": 0.52,
+            "oos_dd": -18.43,
+            "ois_ratio": 0.888,
+            "pass": true
+          },
+          {
+            "seg": 3,
+            "oos_year": "2022",
+            "is_cagr": 14.35,
+            "oos_cagr": 1.69,
+            "oos_sharpe": 0.211,
+            "oos_dd": -20.73,
+            "ois_ratio": 0.118,
+            "pass": true
+          },
+          {
+            "seg": 4,
+            "oos_year": "2023",
+            "is_cagr": 6.21,
+            "oos_cagr": 35.78,
+            "oos_sharpe": 1.573,
+            "oos_dd": -9.17,
+            "ois_ratio": 5.762,
+            "pass": true
+          },
+          {
+            "seg": 5,
+            "oos_year": "2024",
+            "is_cagr": 19.09,
+            "oos_cagr": 11.2,
+            "oos_sharpe": 0.763,
+            "oos_dd": -16.06,
+            "ois_ratio": 0.587,
+            "pass": true
+          }
+        ]
+      },
+      "full_is": {
+        "cagr": 20.02,
+        "sharpe": 0.843,
+        "max_dd": -18.06,
+        "pf": 2.604,
+        "wr": 58.2,
+        "n": 196,
+        "exp": 34.9,
+        "annual": {
+          "2020": 5.76,
+          "2021": 13.56,
+          "2022": 20.15,
+          "2023": 25.48,
+          "2024": 15.51
+        }
+      },
+      "oos_25": {
+        "cagr": 9.65,
+        "sharpe": 0.981,
+        "max_dd": -9.4,
+        "pf": 2.12,
+        "wr": 62.8,
+        "n": 43,
+        "exp": 30.3,
+        "annual": {
+          "2025": 9.29
+        }
+      },
+      "ois": 0.482
+    },
+    "live_proxy": {
+      "wf": {
+        "case": "live_proxy",
+        "pass_count": 4,
+        "wf_pass": true,
+        "seg3_2022_cagr": 4.99,
+        "seg3_2022_ok": true,
+        "folds": [
+          {
+            "seg": 1,
+            "oos_year": "2020",
+            "is_cagr": 0.0,
+            "oos_cagr": 16.08,
+            "oos_sharpe": 0.652,
+            "oos_dd": -10.66,
+            "ois_ratio": null,
+            "pass": true
+          },
+          {
+            "seg": 2,
+            "oos_year": "2021",
+            "is_cagr": 16.08,
+            "oos_cagr": -0.79,
+            "oos_sharpe": 0.173,
+            "oos_dd": -17.7,
+            "ois_ratio": -0.049,
+            "pass": false
+          },
+          {
+            "seg": 3,
+            "oos_year": "2022",
+            "is_cagr": 10.87,
+            "oos_cagr": 4.99,
+            "oos_sharpe": 0.313,
+            "oos_dd": -15.13,
+            "ois_ratio": 0.459,
+            "pass": true
+          },
+          {
+            "seg": 4,
+            "oos_year": "2023",
+            "is_cagr": 8.0,
+            "oos_cagr": 32.97,
+            "oos_sharpe": 1.618,
+            "oos_dd": -9.29,
+            "ois_ratio": 4.121,
+            "pass": true
+          },
+          {
+            "seg": 5,
+            "oos_year": "2024",
+            "is_cagr": 18.32,
+            "oos_cagr": 35.4,
+            "oos_sharpe": 1.741,
+            "oos_dd": -14.38,
+            "ois_ratio": 1.932,
+            "pass": true
+          }
+        ]
+      },
+      "full_is": {
+        "cagr": 18.18,
+        "sharpe": 0.853,
+        "max_dd": -16.47,
+        "pf": 2.453,
+        "wr": 58.4,
+        "n": 178,
+        "exp": 34.5,
+        "annual": {
+          "2020": 5.91,
+          "2021": 8.75,
+          "2022": 14.51,
+          "2023": 26.26,
+          "2024": 20.16
+        }
+      },
+      "oos_25": {
+        "cagr": 6.17,
+        "sharpe": 0.68,
+        "max_dd": -8.68,
+        "pf": 1.714,
+        "wr": 54.1,
+        "n": 37,
+        "exp": 28.8,
+        "annual": {
+          "2025": 5.94
+        }
+      },
+      "ois": 0.339
+    },
+    "mx2": {
+      "wf": {
+        "case": "mx2",
+        "pass_count": 5,
+        "wf_pass": true,
+        "seg3_2022_cagr": 2.92,
+        "seg3_2022_ok": true,
+        "folds": [
+          {
+            "seg": 1,
+            "oos_year": "2020",
+            "is_cagr": 0.0,
+            "oos_cagr": 14.13,
+            "oos_sharpe": 0.578,
+            "oos_dd": -11.46,
+            "ois_ratio": null,
+            "pass": true
+          },
+          {
+            "seg": 2,
+            "oos_year": "2021",
+            "is_cagr": 14.13,
+            "oos_cagr": 13.56,
+            "oos_sharpe": 0.513,
+            "oos_dd": -18.43,
+            "ois_ratio": 0.96,
+            "pass": true
+          },
+          {
+            "seg": 3,
+            "oos_year": "2022",
+            "is_cagr": 17.02,
+            "oos_cagr": 2.92,
+            "oos_sharpe": 0.263,
+            "oos_dd": -18.19,
+            "ois_ratio": 0.172,
+            "pass": true
+          },
+          {
+            "seg": 4,
+            "oos_year": "2023",
+            "is_cagr": 6.05,
+            "oos_cagr": 35.05,
+            "oos_sharpe": 1.569,
+            "oos_dd": -9.17,
+            "ois_ratio": 5.793,
+            "pass": true
+          },
+          {
+            "seg": 5,
+            "oos_year": "2024",
+            "is_cagr": 19.31,
+            "oos_cagr": 11.2,
+            "oos_sharpe": 0.763,
+            "oos_dd": -16.06,
+            "ois_ratio": 0.58,
+            "pass": true
+          }
+        ]
+      },
+      "full_is": {
+        "cagr": 12.88,
+        "sharpe": 0.6,
+        "max_dd": -18.54,
+        "pf": 2.087,
+        "wr": 53.6,
+        "n": 166,
+        "exp": 32.0,
+        "annual": {
+          "2020": 5.22,
+          "2021": 17.78,
+          "2022": -0.86,
+          "2023": 9.17,
+          "2024": 21.14
+        }
+      },
+      "oos_25": {
+        "cagr": 9.65,
+        "sharpe": 0.981,
+        "max_dd": -9.4,
+        "pf": 2.12,
+        "wr": 62.8,
+        "n": 43,
+        "exp": 30.3,
+        "annual": {
+          "2025": 9.29
+        }
+      },
+      "ois": 0.749
+    },
+    "sn2": {
+      "wf": {
+        "case": "sn2",
+        "pass_count": 5,
+        "wf_pass": true,
+        "seg3_2022_cagr": 1.69,
+        "seg3_2022_ok": true,
+        "folds": [
+          {
+            "seg": 1,
+            "oos_year": "2020",
+            "is_cagr": 0.0,
+            "oos_cagr": 15.66,
+            "oos_sharpe": 0.611,
+            "oos_dd": -11.41,
+            "ois_ratio": null,
+            "pass": true
+          },
+          {
+            "seg": 2,
+            "oos_year": "2021",
+            "is_cagr": 15.66,
+            "oos_cagr": 13.91,
+            "oos_sharpe": 0.52,
+            "oos_dd": -18.43,
+            "ois_ratio": 0.888,
+            "pass": true
+          },
+          {
+            "seg": 3,
+            "oos_year": "2022",
+            "is_cagr": 14.35,
+            "oos_cagr": 1.69,
+            "oos_sharpe": 0.211,
+            "oos_dd": -20.73,
+            "ois_ratio": 0.118,
+            "pass": true
+          },
+          {
+            "seg": 4,
+            "oos_year": "2023",
+            "is_cagr": 6.21,
+            "oos_cagr": 35.78,
+            "oos_sharpe": 1.573,
+            "oos_dd": -9.17,
+            "ois_ratio": 5.762,
+            "pass": true
+          },
+          {
+            "seg": 5,
+            "oos_year": "2024",
+            "is_cagr": 19.09,
+            "oos_cagr": 11.2,
+            "oos_sharpe": 0.763,
+            "oos_dd": -16.06,
+            "ois_ratio": 0.587,
+            "pass": true
+          }
+        ]
+      },
+      "full_is": {
+        "cagr": 20.02,
+        "sharpe": 0.843,
+        "max_dd": -18.06,
+        "pf": 2.604,
+        "wr": 58.2,
+        "n": 196,
+        "exp": 34.9,
+        "annual": {
+          "2020": 5.76,
+          "2021": 13.56,
+          "2022": 20.15,
+          "2023": 25.48,
+          "2024": 15.51
+        }
+      },
+      "oos_25": {
+        "cagr": 9.65,
+        "sharpe": 0.981,
+        "max_dd": -9.4,
+        "pf": 2.12,
+        "wr": 62.8,
+        "n": 43,
+        "exp": 30.3,
+        "annual": {
+          "2025": 9.29
+        }
+      },
+      "ois": 0.482
+    },
+    "cb5": {
+      "wf": {
+        "case": "cb5",
+        "pass_count": 5,
+        "wf_pass": true,
+        "seg3_2022_cagr": 1.69,
+        "seg3_2022_ok": true,
+        "folds": [
+          {
+            "seg": 1,
+            "oos_year": "2020",
+            "is_cagr": 0.0,
+            "oos_cagr": 15.66,
+            "oos_sharpe": 0.611,
+            "oos_dd": -11.41,
+            "ois_ratio": null,
+            "pass": true
+          },
+          {
+            "seg": 2,
+            "oos_year": "2021",
+            "is_cagr": 15.66,
+            "oos_cagr": 13.91,
+            "oos_sharpe": 0.52,
+            "oos_dd": -18.43,
+            "ois_ratio": 0.888,
+            "pass": true
+          },
+          {
+            "seg": 3,
+            "oos_year": "2022",
+            "is_cagr": 14.35,
+            "oos_cagr": 1.69,
+            "oos_sharpe": 0.211,
+            "oos_dd": -20.73,
+            "ois_ratio": 0.118,
+            "pass": true
+          },
+          {
+            "seg": 4,
+            "oos_year": "2023",
+            "is_cagr": 6.21,
+            "oos_cagr": 35.78,
+            "oos_sharpe": 1.573,
+            "oos_dd": -9.17,
+            "ois_ratio": 5.762,
+            "pass": true
+          },
+          {
+            "seg": 5,
+            "oos_year": "2024",
+            "is_cagr": 19.09,
+            "oos_cagr": 11.2,
+            "oos_sharpe": 0.763,
+            "oos_dd": -16.06,
+            "ois_ratio": 0.587,
+            "pass": true
+          }
+        ]
+      },
+      "full_is": {
+        "cagr": 20.02,
+        "sharpe": 0.843,
+        "max_dd": -18.06,
+        "pf": 2.604,
+        "wr": 58.2,
+        "n": 196,
+        "exp": 34.9,
+        "annual": {
+          "2020": 5.76,
+          "2021": 13.56,
+          "2022": 20.15,
+          "2023": 25.48,
+          "2024": 15.51
+        }
+      },
+      "oos_25": {
+        "cagr": 9.65,
+        "sharpe": 0.981,
+        "max_dd": -9.4,
+        "pf": 2.12,
+        "wr": 62.8,
+        "n": 43,
+        "exp": 30.3,
+        "annual": {
+          "2025": 9.29
+        }
+      },
+      "ois": 0.482
+    },
+    "bundle_225": {
+      "wf": {
+        "case": "bundle_225",
+        "pass_count": 5,
+        "wf_pass": true,
+        "seg3_2022_cagr": 2.92,
+        "seg3_2022_ok": true,
+        "folds": [
+          {
+            "seg": 1,
+            "oos_year": "2020",
+            "is_cagr": 0.0,
+            "oos_cagr": 14.13,
+            "oos_sharpe": 0.578,
+            "oos_dd": -11.46,
+            "ois_ratio": null,
+            "pass": true
+          },
+          {
+            "seg": 2,
+            "oos_year": "2021",
+            "is_cagr": 14.13,
+            "oos_cagr": 13.56,
+            "oos_sharpe": 0.513,
+            "oos_dd": -18.43,
+            "ois_ratio": 0.96,
+            "pass": true
+          },
+          {
+            "seg": 3,
+            "oos_year": "2022",
+            "is_cagr": 17.02,
+            "oos_cagr": 2.92,
+            "oos_sharpe": 0.263,
+            "oos_dd": -18.19,
+            "ois_ratio": 0.172,
+            "pass": true
+          },
+          {
+            "seg": 4,
+            "oos_year": "2023",
+            "is_cagr": 6.05,
+            "oos_cagr": 35.05,
+            "oos_sharpe": 1.569,
+            "oos_dd": -9.17,
+            "ois_ratio": 5.793,
+            "pass": true
+          },
+          {
+            "seg": 5,
+            "oos_year": "2024",
+            "is_cagr": 19.31,
+            "oos_cagr": 11.2,
+            "oos_sharpe": 0.763,
+            "oos_dd": -16.06,
+            "ois_ratio": 0.58,
+            "pass": true
+          }
+        ]
+      },
+      "full_is": {
+        "cagr": 12.88,
+        "sharpe": 0.6,
+        "max_dd": -18.54,
+        "pf": 2.087,
+        "wr": 53.6,
+        "n": 166,
+        "exp": 32.0,
+        "annual": {
+          "2020": 5.22,
+          "2021": 17.78,
+          "2022": -0.86,
+          "2023": 9.17,
+          "2024": 21.14
+        }
+      },
+      "oos_25": {
+        "cagr": 9.65,
+        "sharpe": 0.981,
+        "max_dd": -9.4,
+        "pf": 2.12,
+        "wr": 62.8,
+        "n": 43,
+        "exp": 30.3,
+        "annual": {
+          "2025": 9.29
+        }
+      },
+      "ois": 0.749
+    }
+  },
+  "total_time_s": 40.0
+}

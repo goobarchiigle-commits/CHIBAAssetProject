@@ -1,0 +1,33 @@
+{
+  "_meta": {
+    "schema_version": "1.0",
+    "description": "Performance baseline for regression detection. Update with: python tools/check_performance_regression.py --record key=value",
+    "last_updated": "2026-05-09"
+  },
+  "measurements": {
+    "test_suite_runtime_s": {
+      "value": 35.0,
+      "threshold_pct": 30,
+      "unit": "seconds",
+      "description": "Full pytest suite runtime"
+    },
+    "governance_gate_runtime_s": {
+      "value": 5.0,
+      "threshold_pct": 50,
+      "unit": "seconds",
+      "description": "governance_gate.py total runtime"
+    },
+    "signal_generation_latency_ms": {
+      "value": null,
+      "threshold_pct": 20,
+      "unit": "milliseconds",
+      "description": "Per-signal generation latency (set after first measurement)"
+    },
+    "import_time_ms": {
+      "value": 500.0,
+      "threshold_pct": 100,
+      "unit": "milliseconds",
+      "description": "Time to import src.governance package"
+    }
+  }
+}

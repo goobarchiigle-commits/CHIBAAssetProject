@@ -1,0 +1,66 @@
+# config_snapshot_S3.yaml — 2026-05-15 snapshot
+# engine: composite_alpha_bt.run_scenario
+# 出典: strategy_snapshot_manifest.md §1-15 列S3
+snapshot_id: S3
+snapshot_date: "2026-05-15"
+engine: composite_alpha_bt
+confidence: MIXED  # max_positions/universe/MTF=CONFIRMED, sizing/trailing/rsr_exit/addon=UNKNOWN(carry-forward from S2)
+
+universe:
+  type: rsr42_dynamic
+  dynamic_universe_enabled: true
+
+fujiko:
+  min_sepa: 6
+  min_rsr: 75.0
+  turtle_entry: 20
+  turtle_exit: 55
+  use_turtle_entry: true
+  mom_period: 21
+
+portfolio:
+  capital: 3_000_000
+  max_positions: 4         # CONFIRMED PARAMS_LOCKED VIOLATION — changed 2026-04-18, restored 2026-05-31 (after this snapshot)
+  max_single_weight: 0.25
+  max_dd_limit: 0.15
+
+risk:
+  min_hold_days: 3
+
+rsr_exit:
+  enable_simple_rsr_exit: false     # UNKNOWN(carry-forward from S2) — absolute threshold added 06-05, after this date
+  enable_multilayer_rsr: true
+  ml_exit_single_only: true         # UNKNOWN(carry-forward from S2)
+  rsr_exit_threshold: null
+
+trailing_stop:
+  mode: none   # REVISED (see config_snapshot_S2.yaml note) — fixed_pct mechanism not faithfully
+               # reproducible; empirical trigger rate contradicts 04-13 documented distribution.
+  fixed_trail_pct: 0.025
+  enable_atr_trailing_prod: false
+
+mtf:
+  enabled: true            # CONFIRMED — still active, removed only 2026-06-24
+
+sizing:
+  mode: existing            # UNKNOWN(carry-forward) — earliest ATR-sizing evidence is risk_pct_sensitivity.py mtime 2026-06-03, after this date
+  enable_atr_risk_sizing: false
+
+sector_gate:
+  enabled: true
+
+shock_exit:
+  mode: composite
+
+bear_filter:
+  enabled: true
+
+addon:
+  enabled: false            # UNKNOWN(carry-forward) — no addition-date evidence found; first confirmed presence is the 2026-05-31 audit (16 days after this snapshot)
+
+entry_timing:
+  enabled: false            # CONFIRMED — introduced 2026-05-31, after this snapshot
+
+costs:
+  slippage_rate: 0.001
+  commission_rate: 0.00055

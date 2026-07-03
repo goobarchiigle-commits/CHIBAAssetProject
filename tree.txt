@@ -1,0 +1,2331 @@
+フォルダー パスの一覧:  ボリューム Windows
+ボリューム シリアル番号は FA48-A724 です
+C:.
+│  .env
+│  .gitignore
+│  CLAUDE.md
+│  confirm_exit_1pt.py
+│  pytest_local.py
+│  README.md
+│  rsr_research.py
+│  tree.txt
+│  
+├─.claude
+│      settings.local.json
+│      
+├─.codex_tmp
+│  │  emergency_stop_duplicate_buy.json
+│  │  emergency_stop_duplicate_sell.json
+│  │  
+│  ├─tmp3vxnq0ck
+│  ├─tmpagpjr8iv
+│  ├─tmpjhvs2zhl
+│  ├─tmpl2s4soqd
+│  ├─tmptzmws1s2
+│  ├─tmpvprh6v77
+│  ├─tmpvtr7exgb
+│  └─tmpx_astb4a
+├─.pytest_cache
+│  │  .gitignore
+│  │  CACHEDIR.TAG
+│  │  README.md
+│  │  
+│  └─v
+│      └─cache
+│              lastfailed
+│              nodeids
+│              
+├─backtests
+│  │  alpha_decay.csv
+│  │  atr_weight_ab_test.json
+│  │  backtest_summary.json
+│  │  capital_efficiency_2026-03-17.json
+│  │  clenow_comparison.json
+│  │  composite_alpha_bt_2026-03-27.json
+│  │  composite_alpha_bt_rsr42_2026-03-27.json
+│  │  composite_alpha_bt_rsr42_2026-03-28.json
+│  │  composite_alpha_bt_rsr42_2026-03-29.json
+│  │  composite_alpha_bt_rsr42_2026-03-31.json
+│  │  composite_alpha_bt_rsr42_smoke_2026-03-31.json
+│  │  composite_alpha_bt_rsr42_smoke_2026-04-05.json
+│  │  composite_alpha_bt_rsr42_smoke_2026-04-06.json
+│  │  dd_control_2026-03-17.json
+│  │  dd_decomposition_2026-04-05.json
+│  │  dynamic_caps_comparison_2026-04-06.json
+│  │  entry_stop_v5_2026-03-18.json
+│  │  entry_stop_v6_2026-03-19.json
+│  │  exit_param_3way.json
+│  │  exit_sensitivity_2026-03-30.json
+│  │  exit_sensitivity_2026-03-31.json
+│  │  grid_results.csv
+│  │  market_shock_comparison_2026-04-05.json
+│  │  max_pos_sweep_2026-04-07.json
+│  │  min_hold_sensitivity_2026-03-31.json
+│  │  min_rsr_sensitivity_2026-03-30.json
+│  │  mom_period_sensitivity_2026-03-31.json
+│  │  oos_2025_2026-03-19.json
+│  │  regime_sizing_comparison_2026-04-05.json
+│  │  rsr_context_expansion_2026-03-24.json
+│  │  rsr_universe_sweep_2026-03-29.json
+│  │  sector_dd_2022_2025.json
+│  │  step123_integration_2026-04-06.json
+│  │  step7_sensitivity_2026-03-31.json
+│  │  stress_test_2026-03-17.json
+│  │  threshold_sweep.csv
+│  │  topk_rotation_2026-03-20.json
+│  │  trades_log.csv
+│  │  universe_expansion.json
+│  │  wf_abcd_compare_2026-04-07.json
+│  │  wf_abc_compare_2026-04-07.json
+│  │  wf_cap_comparison_2026-04-07.json
+│  │  wf_composite_regime_2026-04-05.json
+│  │  wf_composite_threshold_2026-04-05.json
+│  │  wf_dynamic_universe_2026-04-05.json
+│  │  wf_dyn_rsr42_2026-04-05.json
+│  │  wf_final_2026-04-04.json
+│  │  wf_regime2_bear05_2026-04-05.json
+│  │  wf_regime_sym_2026-04-05.json
+│  │  wf_suspension_2026-04-05.json
+│  │  
+│  └─archive
+│          entry_stop_v2_2026-03-18.json
+│          entry_stop_v3_2026-03-18.json
+│          entry_stop_v4_2026-03-18.json
+│          
+├─cache
+│  │  mtf_state_2026-03-24.json
+│  │  mtf_state_2026-03-25.json
+│  │  mtf_state_2026-03-27.json
+│  │  mtf_state_2026-03-28.json
+│  │  mtf_state_2026-03-31.json
+│  │  mtf_state_2026-04-04.json
+│  │  mtf_state_2026-04-06.json
+│  │  mtf_state_2026-04-07.json
+│  │  mtf_state_2026-04-10.json
+│  │  mtf_state_2026-04-11.json
+│  │  mtf_state_2026-04-13.json
+│  │  mtf_state_2026-04-14.json
+│  │  mtf_state_2026-04-15.json
+│  │  mtf_state_2026-04-16.json
+│  │  mtf_state_2026-04-17.json
+│  │  mtf_state_2026-04-19.json
+│  │  mtf_state_2026-04-20.json
+│  │  
+│  └─ohlcv
+│          1925.T.parquet
+│          1928.T.parquet
+│          2503.T.parquet
+│          2587.T.parquet
+│          2802.T.parquet
+│          2914.T.parquet
+│          3197.T.parquet
+│          3382.T.parquet
+│          3402.T.parquet
+│          3861.T.parquet
+│          4021.T.parquet
+│          4055.T.parquet
+│          4151.T.parquet
+│          4307.T.parquet
+│          4568.T.parquet
+│          5301.T.parquet
+│          5401.T.parquet
+│          5411.T.parquet
+│          5706.T.parquet
+│          6146.T.parquet
+│          6301.T.parquet
+│          6479.T.parquet
+│          6501.T.parquet
+│          6506.T.parquet
+│          6594.T.parquet
+│          6645.T.parquet
+│          6702.T.parquet
+│          6762.T.parquet
+│          6857.T.parquet
+│          6869.T.parquet
+│          6920.T.parquet
+│          6981.T.parquet
+│          7011.T.parquet
+│          7012.T.parquet
+│          7013.T.parquet
+│          7182.T.parquet
+│          7201.T.parquet
+│          7203.T.parquet
+│          8001.T.parquet
+│          8002.T.parquet
+│          8015.T.parquet
+│          8035.T.parquet
+│          8053.T.parquet
+│          8058.T.parquet
+│          8306.T.parquet
+│          8309.T.parquet
+│          8354.T.parquet
+│          8411.T.parquet
+│          8725.T.parquet
+│          8750.T.parquet
+│          8766.T.parquet
+│          8801.T.parquet
+│          8802.T.parquet
+│          9020.T.parquet
+│          9101.T.parquet
+│          9104.T.parquet
+│          9107.T.parquet
+│          9432.T.parquet
+│          9433.T.parquet
+│          9502.T.parquet
+│          9503.T.parquet
+│          9531.T.parquet
+│          
+├─data
+│  │  .gitkeep
+│  │  backtest_ma_band.png
+│  │  cross_validate_1925_T.png
+│  │  dynamic_selection.csv
+│  │  dynamic_selection.png
+│  │  fujiko_backtest.png
+│  │  mean_reversion_comparison.csv
+│  │  mean_reversion_comparison.png
+│  │  monte_carlo_8035.png
+│  │  monte_carlo_topix100.png
+│  │  portfolio_abs_mom.png
+│  │  portfolio_backtest.png
+│  │  portfolio_books.png
+│  │  portfolio_calmar.png
+│  │  portfolio_calmar20.png
+│  │  portfolio_clenow.png
+│  │  portfolio_cross_validate.png
+│  │  portfolio_fip.png
+│  │  portfolio_full.png
+│  │  portfolio_hybrid.png
+│  │  portfolio_tiered.png
+│  │  strategy_comparison.csv
+│  │  strategy_comparison.png
+│  │  topix100_portfolio.png
+│  │  
+│  ├─backtest_dataset
+│  │  └─2026-03-28
+│  │          1306.T.parquet
+│  │          2502.T.parquet
+│  │          2503.T.parquet
+│  │          2802.T.parquet
+│  │          2914.T.parquet
+│  │          3197.T.parquet
+│  │          3382.T.parquet
+│  │          3407.T.parquet
+│  │          4021.T.parquet
+│  │          4055.T.parquet
+│  │          4063.T.parquet
+│  │          4183.T.parquet
+│  │          4307.T.parquet
+│  │          4452.T.parquet
+│  │          4502.T.parquet
+│  │          4519.T.parquet
+│  │          4523.T.parquet
+│  │          4543.T.parquet
+│  │          4568.T.parquet
+│  │          4578.T.parquet
+│  │          4661.T.parquet
+│  │          4704.T.parquet
+│  │          4901.T.parquet
+│  │          4911.T.parquet
+│  │          5020.T.parquet
+│  │          5401.T.parquet
+│  │          5411.T.parquet
+│  │          5706.T.parquet
+│  │          6098.T.parquet
+│  │          6146.T.parquet
+│  │          6301.T.parquet
+│  │          6326.T.parquet
+│  │          6367.T.parquet
+│  │          6479.T.parquet
+│  │          6501.T.parquet
+│  │          6503.T.parquet
+│  │          6506.T.parquet
+│  │          6594.T.parquet
+│  │          6645.T.parquet
+│  │          6702.T.parquet
+│  │          6723.T.parquet
+│  │          6752.T.parquet
+│  │          6758.T.parquet
+│  │          6762.T.parquet
+│  │          6857.T.parquet
+│  │          6861.T.parquet
+│  │          6869.T.parquet
+│  │          6902.T.parquet
+│  │          6920.T.parquet
+│  │          6954.T.parquet
+│  │          6971.T.parquet
+│  │          6981.T.parquet
+│  │          7011.T.parquet
+│  │          7012.T.parquet
+│  │          7013.T.parquet
+│  │          7182.T.parquet
+│  │          7201.T.parquet
+│  │          7203.T.parquet
+│  │          7267.T.parquet
+│  │          7270.T.parquet
+│  │          7741.T.parquet
+│  │          7751.T.parquet
+│  │          7974.T.parquet
+│  │          8001.T.parquet
+│  │          8002.T.parquet
+│  │          8015.T.parquet
+│  │          8031.T.parquet
+│  │          8035.T.parquet
+│  │          8053.T.parquet
+│  │          8058.T.parquet
+│  │          8267.T.parquet
+│  │          8306.T.parquet
+│  │          8309.T.parquet
+│  │          8316.T.parquet
+│  │          8354.T.parquet
+│  │          8411.T.parquet
+│  │          8725.T.parquet
+│  │          8766.T.parquet
+│  │          8801.T.parquet
+│  │          8802.T.parquet
+│  │          8830.T.parquet
+│  │          9020.T.parquet
+│  │          9021.T.parquet
+│  │          9022.T.parquet
+│  │          9101.T.parquet
+│  │          9104.T.parquet
+│  │          9107.T.parquet
+│  │          9432.T.parquet
+│  │          9433.T.parquet
+│  │          9531.T.parquet
+│  │          9983.T.parquet
+│  │          9984.T.parquet
+│  │          _meta.json
+│  │          
+│  └─signals
+│          signal_20260305_145826.json
+│          signal_20260305_150606.json
+│          signal_20260309_083052.json
+│          signal_20260310_083617.json
+│          signal_20260310_084132.json
+│          signal_20260311_083302.json
+│          signal_20260311_111012.json
+│          signal_20260311_111013_executed.json
+│          signal_20260311_181304.json
+│          signal_20260312_173222.json
+│          signal_20260313_083724.json
+│          signal_20260313_084558.json
+│          signal_20260313_132311.json
+│          signal_20260313_132919.json
+│          signal_20260316_082440.json
+│          signal_20260316_082515.json
+│          signal_20260316_082515_executed.json
+│          signal_20260316_083010.json
+│          signal_20260316_100421.json
+│          signal_20260316_100421_executed.json
+│          signal_20260316_100907.json
+│          signal_20260316_100908_executed.json
+│          signal_20260317_083859.json
+│          signal_20260317_083947.json
+│          signal_20260317_103640.json
+│          signal_20260317_103711.json
+│          signal_20260317_104445.json
+│          signal_20260318_131006.json
+│          signal_20260318_143322.json
+│          signal_20260319_141132.json
+│          signal_20260319_142354.json
+│          signal_20260319_145434.json
+│          signal_20260320_082407.json
+│          signal_20260320_082531.json
+│          signal_20260320_082614.json
+│          signal_20260320_082634.json
+│          signal_20260323_103411.json
+│          signal_20260323_122412.json
+│          signal_20260323_125524.json
+│          signal_20260323_131327.json
+│          signal_20260323_132118.json
+│          signal_20260323_132239.json
+│          signal_20260323_132317.json
+│          signal_20260323_141728.json
+│          signal_20260323_142124.json
+│          signal_20260323_150713.json
+│          signal_20260323_161948.json
+│          signal_20260324_084547.json
+│          signal_20260324_124326.json
+│          signal_20260324_124349.json
+│          signal_20260324_125316.json
+│          signal_20260324_125331.json
+│          signal_20260324_125347.json
+│          signal_20260324_140913.json
+│          signal_20260324_142227.json
+│          signal_20260324_143555.json
+│          signal_20260324_144728.json
+│          signal_20260324_144743.json
+│          signal_20260324_153404.json
+│          signal_20260324_154133.json
+│          signal_20260324_154151.json
+│          signal_20260324_154229.json
+│          signal_20260324_154257.json
+│          signal_20260324_161000.json
+│          signal_20260324_164052.json
+│          signal_20260324_165121.json
+│          signal_20260324_174238.json
+│          signal_20260324_200535.json
+│          signal_20260324_201512.json
+│          signal_20260324_201916.json
+│          signal_20260324_202537.json
+│          signal_20260324_210439.json
+│          signal_20260324_210651.json
+│          signal_20260325_082208.json
+│          signal_20260325_083014.json
+│          signal_20260325_091342.json
+│          signal_20260325_091635.json
+│          signal_20260327_063643.json
+│          signal_20260327_065458.json
+│          signal_20260327_065541.json
+│          signal_20260327_070503.json
+│          signal_20260327_073235.json
+│          signal_20260327_073929.json
+│          signal_20260327_073952.json
+│          signal_20260327_114355.json
+│          signal_20260328_081541.json
+│          signal_20260328_082629.json
+│          signal_20260328_082717.json
+│          signal_20260328_082744.json
+│          signal_20260328_082822.json
+│          signal_20260328_082942.json
+│          signal_20260328_083017.json
+│          signal_20260328_083052.json
+│          signal_20260328_083356.json
+│          signal_20260328_153223.json
+│          signal_20260328_154957.json
+│          signal_20260331_172608.json
+│          signal_20260331_175317.json
+│          signal_20260331_180643.json
+│          signal_20260331_181858.json
+│          signal_20260331_183117.json
+│          signal_20260331_183258.json
+│          signal_20260331_185547.json
+│          signal_20260331_185937.json
+│          signal_20260331_200342.json
+│          signal_20260331_203902.json
+│          signal_20260331_204206.json
+│          signal_20260406_110031.json
+│          signal_20260407_195458.json
+│          signal_20260407_202702.json
+│          signal_20260407_213036.json
+│          signal_20260410_072834.json
+│          signal_20260410_075713.json
+│          signal_20260410_075831.json
+│          signal_20260411_111910.json
+│          signal_20260413_124607.json
+│          signal_20260413_124623.json
+│          signal_20260413_124651_executed.json
+│          signal_20260414_075817.json
+│          signal_20260414_094816.json
+│          signal_20260414_094843_executed.json
+│          signal_20260414_132909.json
+│          signal_20260414_132941.json
+│          signal_20260414_133315.json
+│          signal_20260414_133326.json
+│          signal_20260414_133350_executed.json
+│          signal_20260414_142023.json
+│          signal_20260414_142055_executed.json
+│          signal_20260415_101708.json
+│          signal_20260415_101711.json
+│          signal_20260415_101843_executed.json
+│          signal_20260415_104927.json
+│          signal_20260415_104958_executed.json
+│          signal_20260415_114228.json
+│          signal_20260415_125727.json
+│          signal_20260415_125751_executed.json
+│          signal_20260415_150242.json
+│          signal_20260415_150322.json
+│          signal_20260415_150327_executed.json
+│          signal_20260415_150937.json
+│          signal_20260415_151031.json
+│          signal_20260415_151041_executed.json
+│          signal_20260415_154450.json
+│          signal_20260416_092526.json
+│          signal_20260417_091645.json
+│          signal_20260417_091651.json
+│          signal_20260419_171914.json
+│          signal_20260420_095804.json
+│          
+├─docs
+│  └─research
+│          2026-03-15.md
+│          2026-03-16.md
+│          2026-03-17.md
+│          2026-03-18.md
+│          2026-03-19.md
+│          2026-03-20.md
+│          2026-03-21.md
+│          2026-03-22.md
+│          2026-03-23.md
+│          2026-03-24.md
+│          2026-03-27.md
+│          2026-03-29.md
+│          2026-03-30.md
+│          2026-04-05.md
+│          2026-04-06.md
+│          sector_dd_2022_2025.md
+│          strategy_review_2026-04-13.md
+│          strategy_spec_2026-04-13.md
+│          weekly_report_2026-03-27.md
+│          
+├─logs
+│  │  ce_compare_daily.csv
+│  │  ce_debug.log
+│  │  ce_eval_result.txt
+│  │  mom_period_sens.log
+│  │  morning_signal.log
+│  │  phase2_live_metrics.jsonl
+│  │  trades.jsonl
+│  │  
+│  ├─cb_events
+│  │  │  cb_20260320.jsonl
+│  │  │  
+│  │  └─archive
+│  │          cb_20260502.jsonl
+│  │          cb_20260510.jsonl
+│  │          
+│  ├─diagnostics
+│  │      metrics.jsonl
+│  │      rsr_distribution.jsonl
+│  │      rsr_period_test_2026-03-23.json
+│  │      rsr_universe_test_2026-03-23.json
+│  │      
+│  ├─research
+│  │      bear_filter_wf_compare_run.log
+│  │      dryrun_20260317.log
+│  │      exit_sensitivity_2026-03-30.log
+│  │      min_hold_sensitivity_2026-03-31.log
+│  │      min_rsr_sensitivity_2026-03-30.log
+│  │      min_rsr_sensitivity_run.log
+│  │      morning_signal_20260317.log
+│  │      oos_2025_after_rsr_fix.log
+│  │      oos_2025_rsr_sensitivity.log
+│  │      portfolio_v2_rerun.log
+│  │      step7_sensitivity_2026-03-31.log
+│  │      topk_rotation_is.log
+│  │      topk_rotation_v2.log
+│  │      topk_stoploss.log
+│  │      walkforward_revalidation_2026-03-31.log
+│  │      
+│  ├─runtime
+│  └─sim
+│          README.md
+│          
+├─reports
+│      weekly_review_2026-04-04.csv
+│      
+├─results
+│      exit_best_config.txt
+│      exit_sensitivity_grid.csv
+│      filter_ablation_fixed_report.csv
+│      filter_ablation_report.csv
+│      filter_ablation_summary.txt
+│      filter_degradation_analysis.csv
+│      filter_sensitivity_oos.csv
+│      filter_summary_report.txt
+│      final_config_2026-04-04.txt
+│      is_atr_mult_validation.csv
+│      is_filter_ablation.csv
+│      oos_2025_fixed_summary.txt
+│      oos_2025_min_rsr_sensitivity.csv
+│      oos_2025_monthly_pnl.csv
+│      oos_2025_regime_report.csv
+│      oos_2025_regime_summary.txt
+│      oos_2025_single_engine_baseline.csv
+│      research_batch_best_combination.txt
+│      shock_filter_summary.json
+│      signal_funnel_60d.csv
+│      signal_funnel_summary.txt
+│      
+├─runtime
+│      bear_filter_log.jsonl
+│      cap_reject_analysis.json
+│      cb_state.json
+│      ce_state.pkl
+│      execution_ledger.json
+│      execution_ledger_20260413_backup.json
+│      order_lock.json
+│      portfolio_state.json
+│      send_idem_confirmed.json
+│      send_idem_pending.json
+│      shadow_orders.jsonl
+│      smoke_test_log.jsonl
+│      sync_log.jsonl
+│      
+├─scripts
+│  │  analyze_filter_degradation.py
+│  │  batch_filter_test.py
+│  │  profile_run_scenario.py
+│  │  quick_gross_check.py
+│  │  research_batch_utils.py
+│  │  run_ce_pipeline.py
+│  │  run_claude_research_batches.py
+│  │  run_exit_sensitivity_batch.py
+│  │  run_filter_ablation_batch.py
+│  │  run_regime_decomposition_2025.py
+│  │  
+│  └─__pycache__
+│          analyze_filter_degradation.cpython-312.pyc
+│          batch_filter_test.cpython-312-pytest-9.0.2.pyc
+│          batch_filter_test.cpython-312.pyc
+│          profile_run_scenario.cpython-312.pyc
+│          research_batch_utils.cpython-312.pyc
+│          run_claude_research_batches.cpython-312.pyc
+│          run_exit_sensitivity_batch.cpython-312.pyc
+│          run_filter_ablation_batch.cpython-312.pyc
+│          run_regime_decomposition_2025.cpython-312.pyc
+│          
+├─src
+│  │  .env
+│  │  .env.example
+│  │  .gitignore
+│  │  analyze_hold_days.py
+│  │  analyze_maxdd_timing.py
+│  │  build_dataset_snapshot.py
+│  │  config_loader.py
+│  │  evaluate_ce.py
+│  │  generate_strategy_spec.py
+│  │  morning_dryrun.bat
+│  │  morning_live.bat
+│  │  notify.py
+│  │  paths.py
+│  │  requirements.txt
+│  │  research_state.md
+│  │  run_live_signal.py
+│  │  run_morning_signal.bat
+│  │  run_morning_signal.py
+│  │  verify_dataset.py
+│  │  
+│  ├─.claude
+│  │      settings.json
+│  │      
+│  ├─.git
+│  │  │  COMMIT_EDITMSG
+│  │  │  config
+│  │  │  description
+│  │  │  HEAD
+│  │  │  index
+│  │  │  
+│  │  ├─hooks
+│  │  │      applypatch-msg.sample
+│  │  │      commit-msg.sample
+│  │  │      fsmonitor-watchman.sample
+│  │  │      post-update.sample
+│  │  │      pre-applypatch.sample
+│  │  │      pre-commit.sample
+│  │  │      pre-merge-commit.sample
+│  │  │      pre-push.sample
+│  │  │      pre-rebase.sample
+│  │  │      pre-receive.sample
+│  │  │      prepare-commit-msg.sample
+│  │  │      push-to-checkout.sample
+│  │  │      sendemail-validate.sample
+│  │  │      update.sample
+│  │  │      
+│  │  ├─info
+│  │  │      exclude
+│  │  │      
+│  │  ├─logs
+│  │  │  │  HEAD
+│  │  │  │  
+│  │  │  └─refs
+│  │  │      ├─heads
+│  │  │      │      main
+│  │  │      │      
+│  │  │      └─remotes
+│  │  │          └─origin
+│  │  │                  main
+│  │  │                  
+│  │  ├─objects
+│  │  │  ├─00
+│  │  │  │      0fe0811a20702817604154425a131ba9b89263
+│  │  │  │      3f0db3797d3b97dbb864b7041a25a6613b532c
+│  │  │  │      6b7d716b512fa82596ae58c408f09ed861724b
+│  │  │  │      
+│  │  │  ├─01
+│  │  │  │      1d0bb2b7ac264d7b41ce6fde4cf0867b81721a
+│  │  │  │      3f19126322acf1beb99065e0d1bb2566f2605b
+│  │  │  │      
+│  │  │  ├─02
+│  │  │  │      06d9690bff8599325e38e1a6f55925277482f0
+│  │  │  │      50c6dc71f24e6222cf8f93e9f7ef2912b7d27c
+│  │  │  │      a63d25544775b0fdf81a1aa2bbc583a0cec6c5
+│  │  │  │      
+│  │  │  ├─03
+│  │  │  │      2b4efe44738810a145107f97f4d296afff9284
+│  │  │  │      fc2d1032bd8f123f19323c760a34b463c1b1db
+│  │  │  │      
+│  │  │  ├─04
+│  │  │  │      51b2aaa7d77ddad2e4a80b1cf1653815d70ddd
+│  │  │  │      
+│  │  │  ├─05
+│  │  │  │      0bc0007922841cc3fa25391905af22cc4132be
+│  │  │  │      154200d6aae3472fbc04c49dd4bad592b26aef
+│  │  │  │      9302679f38b33f7346dcb3114cf9406e739598
+│  │  │  │      c47901694adf6e877c65bca5d835d5ca3394db
+│  │  │  │      
+│  │  │  ├─06
+│  │  │  │      a8d00d28963e94c0bb76cafc6bff6266919f31
+│  │  │  │      
+│  │  │  ├─07
+│  │  │  │      6f217daa136dfbe16255dc698776ad58e494c4
+│  │  │  │      c2f99a749d075caf77660c9adf47101e449a55
+│  │  │  │      
+│  │  │  ├─08
+│  │  │  │      31baa34076c2a3003e0defb9bc5ac774cedf06
+│  │  │  │      3ad58f810339b21d23cc34635561ce1b011fb5
+│  │  │  │      
+│  │  │  ├─09
+│  │  │  │      267e1a9feb667f3a91fcd97b323643360ceeaa
+│  │  │  │      31c909e075294cb1e91fe8f2fd685b32a68b84
+│  │  │  │      ce2bbfdb08dc48b8bf4a62118877b4098b3714
+│  │  │  │      
+│  │  │  ├─0b
+│  │  │  │      100d8bf73106d4d148abf4805ae5695fd2df57
+│  │  │  │      eac4fbc4361af853d8fc8fb0088b20e6a88ac0
+│  │  │  │      
+│  │  │  ├─0c
+│  │  │  │      11accd106e8d2991fbfacdaea1d1faf64c1f3b
+│  │  │  │      48ad86a85ad8ed95a5e9c023c1a3647ce7e7c9
+│  │  │  │      7cb535af7ef83b05b462ef87c8787445ce21b3
+│  │  │  │      
+│  │  │  ├─0d
+│  │  │  │      6f08953285b0a6f9e0123d0242cb02a2245a35
+│  │  │  │      f9486ff5a81890b0f1d68ab905715f3c320999
+│  │  │  │      
+│  │  │  ├─0e
+│  │  │  │      c5ce537105e6ba549db434fc6a7e82353cee90
+│  │  │  │      
+│  │  │  ├─0f
+│  │  │  │      2f929c67b0fa196305ccae804fc8427c422df5
+│  │  │  │      da46319f2420c5675c4dd200f3f8f459e830e5
+│  │  │  │      
+│  │  │  ├─10
+│  │  │  │      07886e86769e2dc4ec9f96892b93d72c849ff1
+│  │  │  │      9064a5f8bddcd4871faec668f9c1075bec28ff
+│  │  │  │      e705ec67096bee326d1955cf33b1559954673e
+│  │  │  │      
+│  │  │  ├─11
+│  │  │  │      16891e92ff5bdf2570982981d4acbc293bf67e
+│  │  │  │      5788b6a99f284958ff748c007f776b9e834d12
+│  │  │  │      593a32e035a989cf47549036042e6c0d0124ad
+│  │  │  │      
+│  │  │  ├─12
+│  │  │  │      70fc7001db8f703971a132cda9c814d88f16c3
+│  │  │  │      
+│  │  │  ├─14
+│  │  │  │      903e6a13ecf5468b64abf4ca7304171cfd1e70
+│  │  │  │      eb2b9ace9f2143b3adfc7f004518cfdea3dc38
+│  │  │  │      
+│  │  │  ├─15
+│  │  │  │      2db1128485acc56df7b76f646e192f1d2a5c8d
+│  │  │  │      e094602de0dc34cdfbcfa19873090c22a4fe0f
+│  │  │  │      f130ecf284c5b2de06e4f5828daf909e68065c
+│  │  │  │      
+│  │  │  ├─16
+│  │  │  │      72612228efe2e4fbdc7726e00e219800af92d8
+│  │  │  │      9d1892988f6c499b01dccc28844453efa6b1d8
+│  │  │  │      
+│  │  │  ├─17
+│  │  │  │      8b75bbb83fbb2704b627b68d0989ba0752a59f
+│  │  │  │      
+│  │  │  ├─18
+│  │  │  │      301e203550a90a6bf7179de71b0c4bf8bb19d5
+│  │  │  │      4bce5852a07ef2ecd260f6dbd1f3223d222ee4
+│  │  │  │      968c778255f0b0edfeb138da959a6e638fc24a
+│  │  │  │      
+│  │  │  ├─19
+│  │  │  │      7665c669dc40c054cce9728a3f885e9d13b8ca
+│  │  │  │      fcfa3ff1270e4f2a43a05b7484b5143238e0f1
+│  │  │  │      
+│  │  │  ├─1a
+│  │  │  │      009f2a974cd28e6811d40ae1b2223df000ac05
+│  │  │  │      de6cbce030a0bd65f9532df7d27ca823643456
+│  │  │  │      
+│  │  │  ├─1b
+│  │  │  │      5a5420df3319ba060890a9d6c3dda5b15127fc
+│  │  │  │      8704323cdc9a204803774612579f8bb500aefe
+│  │  │  │      
+│  │  │  ├─1c
+│  │  │  │      26e735f9acea927c457a56058f71edde87442c
+│  │  │  │      6c83ee4e6814995584b8fc583bed1821ef4323
+│  │  │  │      
+│  │  │  ├─1d
+│  │  │  │      1370e30e1fc15014097c10f2c9507308978ef3
+│  │  │  │      bd60941eef8061f6d5127aa17c3e1f551e0dea
+│  │  │  │      d1aa651eb07f4801490b3c24a6c78c390b9aea
+│  │  │  │      
+│  │  │  ├─1e
+│  │  │  │      0c1a44d1560855638f466fb771aebc2250a512
+│  │  │  │      a34052d56486e58c25cfa8798b78d79169e05f
+│  │  │  │      d025a914921457490f470c641c9d67e054b60d
+│  │  │  │      
+│  │  │  ├─1f
+│  │  │  │      54949122ed43fa4e732b64ed5d995b2dcf9fe0
+│  │  │  │      80fe6996bef796d0e244a1588914205f071a2c
+│  │  │  │      a0049537a42d7920554b53d06f102003e1db12
+│  │  │  │      
+│  │  │  ├─20
+│  │  │  │      032f2b307b456cf69b397dc3bec9c0e0e9b6fe
+│  │  │  │      471dd830aa23843043fa2644c889891386e707
+│  │  │  │      47de2cf98fabad4392d023a4a2a68122986ef3
+│  │  │  │      717e3ee4d7c3e448a5e7270ff92a7fda4b3323
+│  │  │  │      8090887e99a4f22eaf71f862eb1d32181764f6
+│  │  │  │      c69a61e88060587502ac1f5dc274e4397c0a57
+│  │  │  │      ee351124b222fb1768cfab0bf0360be1346074
+│  │  │  │      
+│  │  │  ├─22
+│  │  │  │      14cd31fdc235bc7fa9e3edc77ce1dfa4ab2553
+│  │  │  │      46381757b461a34c16a434e5239ec4526cd0c0
+│  │  │  │      5355cfb90e37c18dfca4c16c1e93f7101cf3bb
+│  │  │  │      68a54769f18438caee82ab11cb25ae52866e01
+│  │  │  │      acc12f1803e34aa2d9386a5ad5081668d5f97f
+│  │  │  │      
+│  │  │  ├─23
+│  │  │  │      7b9d01a472c866c7109ec02fe8101d5dcfc632
+│  │  │  │      8bcacf33562057ef912a4d6a3cda87cde3ee37
+│  │  │  │      
+│  │  │  ├─24
+│  │  │  │      2415821a329fd4a7a8ac6672198828e44aab97
+│  │  │  │      815b46c18b5d06a8fc9339102031ad5fa8c995
+│  │  │  │      9b3f44f184a602612544b97b113cbe41904a36
+│  │  │  │      
+│  │  │  ├─25
+│  │  │  │      1c2698ad321e034f7e17cc950c38c80c2a13f1
+│  │  │  │      5cc83cfaeea8744deb86e9d4e95724c0960bea
+│  │  │  │      
+│  │  │  ├─26
+│  │  │  │      d62a365fa5086344bc41a49befed3e9d9011c8
+│  │  │  │      
+│  │  │  ├─27
+│  │  │  │      11e369dfe803f17b12e56e26fb42a6be1142c8
+│  │  │  │      12163f970aae9da336eee082c7e181cf206e73
+│  │  │  │      1f1363a485a480abe1134e6c0d3850dc6909b8
+│  │  │  │      44f7b2c0a2fe60ba8a7d56cbf0859f84657716
+│  │  │  │      d0ea279db90ea294a3b2a221a495f78fffa5ff
+│  │  │  │      d2891a277c46d494d4859bfc6cc48c44fef5d6
+│  │  │  │      dc9e1d7e0ae15956cccb922379297af8a96be4
+│  │  │  │      
+│  │  │  ├─28
+│  │  │  │      0e18549d38942405233d4aa0e959e789c729c7
+│  │  │  │      2ca7ee244e4ccaddfbedf2c7f0114825351cf5
+│  │  │  │      b7c476357f7189a13ca0a54cf5efa78b99d116
+│  │  │  │      db09b2dafbd0586dbda17087e0d8172b26c659
+│  │  │  │      
+│  │  │  ├─29
+│  │  │  │      4602b0a540887c19705122c30fdf8c78894af4
+│  │  │  │      
+│  │  │  ├─2a
+│  │  │  │      5dbf80c8beb2cecacfcd9fccebaaf61044e1a0
+│  │  │  │      795650e168af31f2afd13559b5d185915b68e7
+│  │  │  │      c5f2965001a0c4aa7f7f5026c43c956d09c376
+│  │  │  │      
+│  │  │  ├─2b
+│  │  │  │      5c2b7058120328c580d37699598eaee4f25a67
+│  │  │  │      84cedeeb9548d8f6fc7d01886d36e77d3ff8f7
+│  │  │  │      c903d5cc0de74eafb0f3b5138f1895e4b04264
+│  │  │  │      cc683757fc084430526ffdaceb28c39dc674c3
+│  │  │  │      
+│  │  │  ├─2c
+│  │  │  │      6342411f28796fc619a9623a753efdf905f035
+│  │  │  │      c6e34e94be2a0fb5c099a2a81b90ef83389352
+│  │  │  │      
+│  │  │  ├─2d
+│  │  │  │      19c37e8d02a8555bed9fee1924aad2006bef5e
+│  │  │  │      45076e39cb3146a9c688b6d79e818f959f0c9b
+│  │  │  │      4509af2aadfaabed9b79bbe8960353c70b3a43
+│  │  │  │      
+│  │  │  ├─2e
+│  │  │  │      57765fb5d85b8dfaa0e4346f3dbaab1394351e
+│  │  │  │      a65529ef1d297f30a4e0ad13ce10fab56c8211
+│  │  │  │      cd9734bd5ad243f9fae7bd4ccac5af1730cb56
+│  │  │  │      eb7c495682be4f33232a71fc2981e56db6e325
+│  │  │  │      
+│  │  │  ├─2f
+│  │  │  │      55ce4010626544f196681cf0ab22b361660c36
+│  │  │  │      e023e3cd4b7c1fa423a59cf0a30ecd6ff0347e
+│  │  │  │      ef73fcc0817dfa91328c36fb7fad1d8305a0d2
+│  │  │  │      
+│  │  │  ├─30
+│  │  │  │      0b57be7c9b9773171d1b5f1cbf1b9b08c43d23
+│  │  │  │      0f8d60de346c8f7b18e23c35fbf693e727c469
+│  │  │  │      f162455da7ef749982eaee0720cc81631e0585
+│  │  │  │      
+│  │  │  ├─31
+│  │  │  │      5d257a573a9cf91c67578e7813e360f8716f59
+│  │  │  │      aee5a9cfa9c2eabeaf703f1f666539016f0b47
+│  │  │  │      
+│  │  │  ├─32
+│  │  │  │      9e230169c0a75bd1f3a289ac442018b131338b
+│  │  │  │      d66fcc5b4aeb43479e96b24c95e8b2f08fe5ca
+│  │  │  │      e216583628b7b555ad6569bcd3ac6f7641284a
+│  │  │  │      
+│  │  │  ├─33
+│  │  │  │      00812573d4bd545ae6a493fa265f6b47593911
+│  │  │  │      41dbedc36f96a06d0894f5d0666808514dd898
+│  │  │  │      7014d28b61b0abae25cbc36c2cbf9bd7d5a4dd
+│  │  │  │      
+│  │  │  ├─34
+│  │  │  │      220ba1b0b143ecc31d3104c0152567a0b60870
+│  │  │  │      928e50a259d2735d20510f312355b99fa316d1
+│  │  │  │      e22415a954d59f9321071e6c8aa310dfc45826
+│  │  │  │      
+│  │  │  ├─35
+│  │  │  │      2543880c15491bb9822f22076ea0da590ba7ab
+│  │  │  │      49fb87d3a534d776c72399763db2581f36017c
+│  │  │  │      
+│  │  │  ├─36
+│  │  │  │      74343a1cbd4da70c0f7cc3d5e33586e8dc5dae
+│  │  │  │      
+│  │  │  ├─37
+│  │  │  │      3035e488ef7ecf15b93e26208f25666158467e
+│  │  │  │      676ffdb2b68caa858849695f544e22ee8e3afc
+│  │  │  │      9436f223c58cc2875c916a2a864ed46645b6a7
+│  │  │  │      a562f6f067186e85d85bbbcbe9cc3348a16ba8
+│  │  │  │      d206c1ad1424766cc78893fe8da921c60eacff
+│  │  │  │      
+│  │  │  ├─38
+│  │  │  │      25815d0e722a7fd0fce85e30ba9936c0723b45
+│  │  │  │      61941ccec10153f77ffbbc24d12386d9bbac93
+│  │  │  │      6c53f12a1d36a3e156af943be325a0adcf40d2
+│  │  │  │      d773a33f8bbe15ca05790223d681fcbe9a2702
+│  │  │  │      
+│  │  │  ├─39
+│  │  │  │      0d2254f99a8a588014ddbe1c82ef4d8a028e1d
+│  │  │  │      6aa1802c5a5d927de54b06af5de71476c7a6a6
+│  │  │  │      7419de4667734b42f8bfa0570cafc6a4c97584
+│  │  │  │      797bdba87f80152274d2ac3bf69b9f6815a828
+│  │  │  │      
+│  │  │  ├─3a
+│  │  │  │      b14b5181051377af558a0e3a98d745a54ad8ad
+│  │  │  │      b8964317aaf344d706dbafcadb1e54da74b827
+│  │  │  │      
+│  │  │  ├─3b
+│  │  │  │      361be0308d86e980ea520717376eed522867df
+│  │  │  │      
+│  │  │  ├─3d
+│  │  │  │      10fd84550b48bbf89c27f61e47d0067e07617a
+│  │  │  │      
+│  │  │  ├─3e
+│  │  │  │      316fff39da46c412af32e86c7a887f09d8b5c8
+│  │  │  │      76a91bec1a6e8cd6ffa242633d7f4439ac1995
+│  │  │  │      
+│  │  │  ├─3f
+│  │  │  │      8c9c61bf2efd91133cdff64effed06c7526b85
+│  │  │  │      a535cc3dbb3248860f9897caf7a40bbd5f49f5
+│  │  │  │      d435a35e1e6aa24c28cf2bc215ea9f5edefe90
+│  │  │  │      fcfac59d7dbe2cb0c27bc2728f58655975b841
+│  │  │  │      
+│  │  │  ├─41
+│  │  │  │      17ae0aa2761b6819011aa2c2bf00c87e633a74
+│  │  │  │      f4e68f53104e29237e7087e91631cddd367b69
+│  │  │  │      f7efe158d9ccdaefe58a72482bef42fec88341
+│  │  │  │      
+│  │  │  ├─42
+│  │  │  │      15fbde7b0e38c519d421e0f19bea2eeb5e7031
+│  │  │  │      344917487b386e1843eea53501edf0beea6330
+│  │  │  │      461e2ecd1a33f0cfd6178760bc94061f4123d9
+│  │  │  │      
+│  │  │  ├─43
+│  │  │  │      637faa65c50fcb401b07d0ec6388d06007e1ff
+│  │  │  │      cceb0cdf9e63845b3f567e7802af22faa5b58f
+│  │  │  │      
+│  │  │  ├─44
+│  │  │  │      1e57c582718a808d6cdbe3fed4c7cc885abf49
+│  │  │  │      f1d60e3d6aee08c7c5cafe588a7eacffea9aea
+│  │  │  │      
+│  │  │  ├─45
+│  │  │  │      12accd0927da18c8042ca1cee2bc9e365e16db
+│  │  │  │      59e8ee40dc0b5a2e9af3227871cf7b550f5b80
+│  │  │  │      
+│  │  │  ├─46
+│  │  │  │      0e6a90e2172c9b7ec659babfd34aa528286887
+│  │  │  │      23941067872123bd141bb518b9ea8117439cd1
+│  │  │  │      532a7c4002eae2eb67ff4dc6153df53900d7a4
+│  │  │  │      6c98a886156c5b0be8820afd45830936a2e7f6
+│  │  │  │      c5483d262421971c256cdbc5df71f68aa4fc57
+│  │  │  │      
+│  │  │  ├─47
+│  │  │  │      1f7c2537460bc7f9772beb62b0b373f6e58c8f
+│  │  │  │      
+│  │  │  ├─48
+│  │  │  │      07ca80af47a63acda3d808b16f6663a1b3b5f1
+│  │  │  │      89f199a8b9cc8523b817abb4585937b58a4f15
+│  │  │  │      f33c6c9823856c66b002d9baa500ab141aa26d
+│  │  │  │      
+│  │  │  ├─49
+│  │  │  │      36a902952aa8ca9da51e2b1f1332943f83e49d
+│  │  │  │      466f37bf3ab09f58bb81b45940918a21254d1d
+│  │  │  │      c0224ba9f399538cac9c610a2ce60e4d32e1a5
+│  │  │  │      d266c72efb2e5b34f4dcbe4cffb8949b4e2854
+│  │  │  │      
+│  │  │  ├─4a
+│  │  │  │      357ca9beb22aa01fd73c2ce65d6e913c37df8c
+│  │  │  │      a06c291ae2a7b792ae63ae9372b13d23543274
+│  │  │  │      
+│  │  │  ├─4b
+│  │  │  │      2bbd23fec23a270ff1770dd76140ec8bb3c12a
+│  │  │  │      
+│  │  │  ├─4c
+│  │  │  │      21c92895040b0d8184184f737f279824d7aa2e
+│  │  │  │      3225ac9d886166f9bd14cb96ae11cd5887c004
+│  │  │  │      d59cb4bd93c1ce92d077da1f97a0f49bd87db7
+│  │  │  │      f656aa719c89b97fd7254a11384692f1323330
+│  │  │  │      
+│  │  │  ├─4d
+│  │  │  │      3515ad2e958cb9c9879c44fe1634eee4a20a42
+│  │  │  │      563a839d4428fc5ec6391fa810a50c4d8a0248
+│  │  │  │      
+│  │  │  ├─4f
+│  │  │  │      c7eeac7bae65ed44c099f612d1512242ce697e
+│  │  │  │      eac2aad9361d15f0500f94d44c5014d9b2f168
+│  │  │  │      
+│  │  │  ├─50
+│  │  │  │      aadb891b233be7ec1d0d0a47b868ab0929d96e
+│  │  │  │      d77205614e178253411006a8bed061f869247d
+│  │  │  │      
+│  │  │  ├─51
+│  │  │  │      8cd60ab4f514f45e33e75b45764f33021aa5ad
+│  │  │  │      a835450ca6234e11589fbb96ce99cc503aea37
+│  │  │  │      c7036bc65bdcc9127f344455c5a84acec09e31
+│  │  │  │      daa54310a9c7ef113085bd599f43293b58acb7
+│  │  │  │      e6b1b060d0a4648fd80100b2d09a8ed40cd672
+│  │  │  │      
+│  │  │  ├─52
+│  │  │  │      25e4a042f8588c1eef9573edbb1327d1ef4f62
+│  │  │  │      804176f7b9ff2552676baa26f47c2eb340c236
+│  │  │  │      a03eeaafd602c8703e31923e423e1b8955f1ef
+│  │  │  │      a96ef0f3d66f47bb515540d81b9610c8f606e8
+│  │  │  │      
+│  │  │  ├─53
+│  │  │  │      8f565277a8d400e643c293d119f88a930ee83a
+│  │  │  │      
+│  │  │  ├─54
+│  │  │  │      5e9a71eb2d56e21fae195d44a385771221850e
+│  │  │  │      
+│  │  │  ├─55
+│  │  │  │      0d028d52a5ba2a6b13015cfcd47d1e9665f4b6
+│  │  │  │      2fc702f29880d7d812470cab159a725afb904d
+│  │  │  │      82fe2640c96250496a5723aab3ea68cd4871c1
+│  │  │  │      8b7ebd1108e6ff6675332c27c1e034d5a90c52
+│  │  │  │      8ce72fd2772b319d0a2c7562e6d41a055149b6
+│  │  │  │      
+│  │  │  ├─56
+│  │  │  │      755536a7f7c1b039c0e15a82afaaf7e0de5874
+│  │  │  │      cf45676ea28362eb582e7089ea6a046c6fc570
+│  │  │  │      
+│  │  │  ├─57
+│  │  │  │      d5319694c8764f4be870e80ffe7328b69f144f
+│  │  │  │      d939e471d9666889aca673de6b319a4212e393
+│  │  │  │      
+│  │  │  ├─58
+│  │  │  │      70a9e6c76e071cdf91707e92fb70003696091d
+│  │  │  │      76056628c66733c5c5841566ebb91f1c984616
+│  │  │  │      
+│  │  │  ├─59
+│  │  │  │      32fb9c4127a536f63725268b0ceeef5924a111
+│  │  │  │      
+│  │  │  ├─5a
+│  │  │  │      04fba952281bf2c2358ea8465fa2fc2889b618
+│  │  │  │      490fca724d58f7cd083783049e718b08f016db
+│  │  │  │      8e62b1cb9424bac3c3dc59639c9f0a2761d9cf
+│  │  │  │      e4d621dbe3fab7d80735e08933cc8af4797592
+│  │  │  │      f82c1c461f6ee2b18f1369c93c94a91d7e0d29
+│  │  │  │      
+│  │  │  ├─5b
+│  │  │  │      2eb358c517431f8d75f650e83d73ccfb15f0a2
+│  │  │  │      dbf892570d87ac650f2d40401a650d9d807840
+│  │  │  │      
+│  │  │  ├─5c
+│  │  │  │      5a021b72f68979253edb53ef15597d8947753b
+│  │  │  │      d81a5825db72cfaeee17b46db41aadc8962832
+│  │  │  │      e22addfcee1b494cd79d1c1f6cef433a551c12
+│  │  │  │      
+│  │  │  ├─5d
+│  │  │  │      0eaebd775bf152847c1701d8ea30d634a30536
+│  │  │  │      5ea0b129019f0f430d106343ef63820397fac7
+│  │  │  │      6e25a325872cc430ebf3d29e717b12d27305fb
+│  │  │  │      c0c85bc5f0b09095d4ef2c0680357521b7c0c7
+│  │  │  │      
+│  │  │  ├─5e
+│  │  │  │      55aecebacddc116b186696418669b62abe6467
+│  │  │  │      8a30761bde0697a09181e1de8f9207bd2c50a2
+│  │  │  │      
+│  │  │  ├─5f
+│  │  │  │      15205bb5210fe43db62034aefcac412e20bad6
+│  │  │  │      5cc6f2015e272b34aac551bcaa8e099ab0cfeb
+│  │  │  │      fc2355801dcb28c20f344c18fa8ad736dbb797
+│  │  │  │      
+│  │  │  ├─62
+│  │  │  │      3b053898159a44b98f47aa2eb2fe6e9c029f4d
+│  │  │  │      
+│  │  │  ├─63
+│  │  │  │      20cc71c19f7e30dfddb229c00a6658e22947ac
+│  │  │  │      9163f12952f02da5c851b9c9aa557f5d47879e
+│  │  │  │      9a45a72e0ed4e6c0917dc2aa08bc35e3535d67
+│  │  │  │      c9f12c2e7e3d62f0f14a53d286e078522099eb
+│  │  │  │      
+│  │  │  ├─64
+│  │  │  │      8c578d90f30430b07cc1b3c30bea7ce4e4aa13
+│  │  │  │      a4feb96d31cbdee1be0b4ab0219e9c1cd9d6bb
+│  │  │  │      cf83fbda0b606cd0c183a98bd1c4ceacf38d98
+│  │  │  │      
+│  │  │  ├─65
+│  │  │  │      27f410b44aeb3b878676f73060b0dadc44995f
+│  │  │  │      606d86e78bc0bba84ba36f1d3563aa96595e09
+│  │  │  │      d41762c5edaffc829ada32099c60d6ffad0279
+│  │  │  │      e0d21efdf051474918c7daeb7f0c49337fbec8
+│  │  │  │      
+│  │  │  ├─66
+│  │  │  │      dd3a6f6a7ac99ac9d7a55f8637c72032f0104d
+│  │  │  │      
+│  │  │  ├─67
+│  │  │  │      0dbb97033fe21df7bf8c1e72f27a972df09787
+│  │  │  │      ca05644a9a97965ae5a7a8312bd977cf9aa8d5
+│  │  │  │      cdc90e0a92a9cc78769e7577c5bb4065a0db84
+│  │  │  │      
+│  │  │  ├─68
+│  │  │  │      3d3104ad8d6fb7e2915b49cbb69fcebd8ecfda
+│  │  │  │      
+│  │  │  ├─6a
+│  │  │  │      e0821b86f72c22d002fe2b83f65aef0215683e
+│  │  │  │      e1a466b96644d48c61a1c29f0410730c8f0468
+│  │  │  │      
+│  │  │  ├─6b
+│  │  │  │      8f9e83b9cbbb46acdb02cd424b2807f2d19294
+│  │  │  │      
+│  │  │  ├─6c
+│  │  │  │      3dee8126d5dfd2727af040abfe17a749eb2618
+│  │  │  │      c673191d3fa12e01e3f6aaaf2917faed655ea9
+│  │  │  │      
+│  │  │  ├─6e
+│  │  │  │      289bb911bfcfc3ef78649b0ba0b319f02f56db
+│  │  │  │      7cfeb608d1120066af6e84d33ca73b16f9a51c
+│  │  │  │      821000adb4e27c43cf9819900e393403d1d682
+│  │  │  │      da802d3240a8f03a1f00bc3720bebf325b894c
+│  │  │  │      
+│  │  │  ├─6f
+│  │  │  │      02a80a8848f545ed218e2040226dadd5794997
+│  │  │  │      
+│  │  │  ├─70
+│  │  │  │      4bfb3893c35257d8f89a712602d9f4012ec8af
+│  │  │  │      bcc384e135c62b524c640ad704ae796389051a
+│  │  │  │      
+│  │  │  ├─72
+│  │  │  │      46a51e02e86afcac982741f2ce46812205c927
+│  │  │  │      9d72008c1bd8698b79c51d85e54c17857aef84
+│  │  │  │      
+│  │  │  ├─73
+│  │  │  │      e052f8c6e3823b5961212225b395c311955b4f
+│  │  │  │      f66f226902fd35bab2a004e4544e960e15ba04
+│  │  │  │      
+│  │  │  ├─74
+│  │  │  │      26cae09beb064cc533853427acbcc14540f28d
+│  │  │  │      564d20ca3793565ea72b81eae8c16bf421b6a4
+│  │  │  │      7c07f79b46e9d8cde6c00aece9eb509acb4493
+│  │  │  │      8b5c9bc38e60f70b00a4e78085e4d8b605a37e
+│  │  │  │      9369e5557d8c94bd3562a51d4e7c88c4c86059
+│  │  │  │      c42bc77642e602d3ce6f1c3f2d908b23e1f150
+│  │  │  │      
+│  │  │  ├─75
+│  │  │  │      5210a0ca1df41be2a48b6d61a3b85a5546bf1e
+│  │  │  │      a533c39a8a360ed083d7854c9aa35314e8a6c3
+│  │  │  │      b2bd6e15bf81efaf98b119349a05224d80e095
+│  │  │  │      
+│  │  │  ├─76
+│  │  │  │      85f7bdb4d8dc50f5d68c01190b4e333909e41f
+│  │  │  │      
+│  │  │  ├─77
+│  │  │  │      0a5b45c6ae624aeec6ce17db9c564d29923802
+│  │  │  │      1e8b5e2deac1290ac03787a8b296791f4d4797
+│  │  │  │      b49722991df0a72e2208b38ffe6c9eb27907f6
+│  │  │  │      
+│  │  │  ├─78
+│  │  │  │      0871a7e3cb546168dd501f4dc989da26168498
+│  │  │  │      32c4322005dc765ec5723936279789feeb9c6b
+│  │  │  │      53c7ac041d63ccc66a70bf2f3e377ed12f7fac
+│  │  │  │      8b8db6fd01b3fe4d495185f110b6814e42d99e
+│  │  │  │      
+│  │  │  ├─79
+│  │  │  │      07a21bbaa7c5117956d5f39cdcb090ca0ec6fd
+│  │  │  │      
+│  │  │  ├─7a
+│  │  │  │      9454bdf4fc1fdf59b2ce3d142e540c5216777b
+│  │  │  │      ae9d87fc4db45bf27b3bf884c277946a7b1db8
+│  │  │  │      d0f4e3d13d1353ec07733851687115a1e4ada4
+│  │  │  │      f8657356b39828b260d81e36528f944b01bfa6
+│  │  │  │      
+│  │  │  ├─7b
+│  │  │  │      2ec624a740136de9472ec404451dad15263e9f
+│  │  │  │      
+│  │  │  ├─7c
+│  │  │  │      fdbb26ca1de05a77f9fe642efaad75654f7c36
+│  │  │  │      
+│  │  │  ├─7d
+│  │  │  │      0556f9a96e165cbb0c04261e4fa9d6b083b180
+│  │  │  │      0aeb05fce3b7a73bdba588ea37240416df9dea
+│  │  │  │      e013da358bf99d85cda99367cd5dddf792e28a
+│  │  │  │      eb70c23801cb8ddbd747028c8088078bb19d4e
+│  │  │  │      eeaac41c58c3acd2610abb7de8c37675239b1c
+│  │  │  │      
+│  │  │  ├─7e
+│  │  │  │      8c372215bfae85a3208332d6acb956e79ed13d
+│  │  │  │      
+│  │  │  ├─7f
+│  │  │  │      37114f4d03088512f69002f0c1bd29e92929f5
+│  │  │  │      4be765d49461a9a574801a2f1e991249ecdf48
+│  │  │  │      bda0d4df66496dce4fd2213477038a690e71a9
+│  │  │  │      be1865148206cf7b31f4e21e3c66c3e0d0c885
+│  │  │  │      
+│  │  │  ├─80
+│  │  │  │      206a3e13a1ae86c02e417d79b8bd6b3c1b2ff2
+│  │  │  │      4238c97f90283d56d6286cc70269a05b59e482
+│  │  │  │      7ced660d443147ae6635a1d2f011a7e7ed8f93
+│  │  │  │      fa6dfdbd26d55a4f84c241a19e902a4dc2a534
+│  │  │  │      
+│  │  │  ├─81
+│  │  │  │      103248a3abe1b2d46a5f3e3f124fef81b18007
+│  │  │  │      
+│  │  │  ├─82
+│  │  │  │      00517686bdeefeb11b67064306f00d8fb9175e
+│  │  │  │      48f9b9e45c66c3f8aebada8ca5d3355155eedb
+│  │  │  │      
+│  │  │  ├─83
+│  │  │  │      32ef384b2b099861cdaab222f31bf34b3ab996
+│  │  │  │      4ba20a8a79dd3f6601294b190ae2e071fe681e
+│  │  │  │      ccdf8002bf1b834eb3f1c4828cc9bb00f8f444
+│  │  │  │      fb7e9873e925c905937b368df34e0545c770b9
+│  │  │  │      
+│  │  │  ├─84
+│  │  │  │      46a3b962d354bb899148fb5b683d3977a99b30
+│  │  │  │      69272c9646326480b6a118ac03dd8efb927a3b
+│  │  │  │      
+│  │  │  ├─85
+│  │  │  │      e5cf1aa1b2e2ca5556814fcc67f0cf9a288167
+│  │  │  │      
+│  │  │  ├─87
+│  │  │  │      d773e8379704f68a7b096e02506c55b499ff42
+│  │  │  │      
+│  │  │  ├─88
+│  │  │  │      5823f1efc079ac6dbe243b92c13353905ae04d
+│  │  │  │      6c0a51b672d0ed833143141d772d5ff68e7d09
+│  │  │  │      804078f6a6997eef493c03be5fd0c78df99701
+│  │  │  │      aa1584da87ce2829dc638d34fdea3cfbba080e
+│  │  │  │      df7f252bb018aba8b3c96adfe0bfd9053382ae
+│  │  │  │      
+│  │  │  ├─89
+│  │  │  │      2794b628f9d6c298e2a63413046a064b7c1b65
+│  │  │  │      4f6eff4e69e0e6715cd4cb96e67214a40642a0
+│  │  │  │      c8cf7a11f75ed292bf10c2861039025ccd87ba
+│  │  │  │      
+│  │  │  ├─8a
+│  │  │  │      039788ad40b443bea17bee0471053ef579d4fa
+│  │  │  │      4848531fc3357e678f2fa8ad489a9fb73dedca
+│  │  │  │      6cc8b56321e65b584a2a05a3ed4ae795c4cbcd
+│  │  │  │      efefe2bf6e8f33938733eaf0cbaa6c6db611d0
+│  │  │  │      
+│  │  │  ├─8b
+│  │  │  │      df176a6bf97f5fd901697af4c22daf5b0b9e94
+│  │  │  │      e312ddf16c0130ec1ee7db6950388d6be64ab4
+│  │  │  │      
+│  │  │  ├─8c
+│  │  │  │      3aab1113eaf58d778517394c2c872a82b3a67e
+│  │  │  │      ef2b981662eb650eed50caff426cd91ca7cfb0
+│  │  │  │      
+│  │  │  ├─8e
+│  │  │  │      2a3e7eb86d086724ea4e9cd471f61e019d1b29
+│  │  │  │      3ee0e62f39e13d904fec7331132266aec5ce23
+│  │  │  │      3f6c8815b0b84bcdc81af5ce4d5c7a7ea75277
+│  │  │  │      c9c3daabe6243bd96ccb0d5af3b80af32dae11
+│  │  │  │      ca80bc7eb25c4f45b014060e76e24a3c8a25d2
+│  │  │  │      
+│  │  │  ├─8f
+│  │  │  │      0ffc1a335cecd3d95e49718c701bfbfdb01913
+│  │  │  │      22220883a7bc8945ada54e323a88132022bbab
+│  │  │  │      768fe2a9d2bc776b5c0a9f04ac405213afba61
+│  │  │  │      f1f8a31af0269c08c85493c410c952ce691659
+│  │  │  │      
+│  │  │  ├─90
+│  │  │  │      031e5777eda6dec4170072e17d73915428fdff
+│  │  │  │      2a2a152579f7286b71d54d7912da2c58a9b2c6
+│  │  │  │      648ebe2e44fbd1c0225a3530cfb3857638ac18
+│  │  │  │      6e7f6cbd74f8671e5a1062c299b4a3c5574092
+│  │  │  │      
+│  │  │  ├─91
+│  │  │  │      289126e92fe52368b45119e25f45649a63c465
+│  │  │  │      deae52a83495398907d0a3b0aba0daa587599d
+│  │  │  │      
+│  │  │  ├─93
+│  │  │  │      138cad1aa900749380b7da39c70a64972d20e5
+│  │  │  │      78c04d0507b1d6cc3b66bc20a267e392450c8b
+│  │  │  │      8aa51470b5470970ffeb45eebc084f34e4a7f1
+│  │  │  │      
+│  │  │  ├─94
+│  │  │  │      1e4f94d39164d1f08bb26fff1d4247b5ff867b
+│  │  │  │      5a429ee3713bcdfd73ee218facd98472275ae4
+│  │  │  │      
+│  │  │  ├─95
+│  │  │  │      2f0ac5b2659d4928f798df66a7a0f1c75e7ce7
+│  │  │  │      66cbe1fbe97cab45bdafb449b2ce14e5a1af0a
+│  │  │  │      7e468eebd2ee49ea84fa5c20e883b5bd00b02b
+│  │  │  │      a4707ba6a277a3b880b8a0f346e43dba0645f4
+│  │  │  │      
+│  │  │  ├─96
+│  │  │  │      458b243598257c6d185def9cff2182aaccb2ea
+│  │  │  │      5f88fabfb01c9183d6b3ef99666cc866573960
+│  │  │  │      c37569e3a17675c7a776ac5e408e09d32e3dda
+│  │  │  │      
+│  │  │  ├─97
+│  │  │  │      46993b8c4cb58fc991b51574d6e044d98f23ea
+│  │  │  │      6f969681ec732d282588163fd592498d162946
+│  │  │  │      7fc78f14026b596ced7008cb1f3e0ad78f2c06
+│  │  │  │      
+│  │  │  ├─98
+│  │  │  │      f0ce768fa9cedd5831e4464beb6e7c2f4d2283
+│  │  │  │      
+│  │  │  ├─99
+│  │  │  │      2f6d651da6f20ef765b9b2f13783f1ff441c40
+│  │  │  │      43747a72470aaada2c5cb020f7a5a5f263308a
+│  │  │  │      76380e702124e32ea50b00aa1bf370fe157830
+│  │  │  │      b2c2db589ac1e65f7f050bab39dd67c22d1977
+│  │  │  │      
+│  │  │  ├─9a
+│  │  │  │      0f8fed66fc6629b7bc59bce4044fefbcc9b1f7
+│  │  │  │      74548929517bbde9fb2753736607f5202e7c68
+│  │  │  │      d5449891a506ba18bf9b5ff501c6d28fec295c
+│  │  │  │      dbdc79c89bfc81ab900ef82aa5ad5defbbcc06
+│  │  │  │      
+│  │  │  ├─9b
+│  │  │  │      3a09b4bb00291cb7b34c103cb037fa481cb089
+│  │  │  │      78acbb0f9a0181d85fc7dee2bc19f1df49bc71
+│  │  │  │      ad7d9fd41e82f994f76116b7cf5a01966b5278
+│  │  │  │      
+│  │  │  ├─9c
+│  │  │  │      cc97a9a38ff1f945a8e61fdd2f1e7b07c86e70
+│  │  │  │      def51d1884a8f23c1c926e1ff1938ab3081d96
+│  │  │  │      
+│  │  │  ├─9d
+│  │  │  │      a181f251ab11cb2f0dbc6c0788302b221d19d3
+│  │  │  │      bdfd11059510511225e0a69d7324fa6efded39
+│  │  │  │      ecd38756e48b05c562967f19f65b8cd89c2cd6
+│  │  │  │      
+│  │  │  ├─9e
+│  │  │  │      383aceeb5e66e3d0c14caa9c250c8eef9604da
+│  │  │  │      665582a86bec4146249a6bfafbc8a5f55a1277
+│  │  │  │      b0844d822c653a2298a0889af6240b04938d83
+│  │  │  │      ffd5e064807642b3bc3667ef5d929b23f46344
+│  │  │  │      
+│  │  │  ├─9f
+│  │  │  │      5243baa2a0c0adbab64d51b3fa0098323f460b
+│  │  │  │      7a90d6d16d6bb6204c9507f125d84a3eddd00d
+│  │  │  │      
+│  │  │  ├─a0
+│  │  │  │      8f94d8761e8bb67fc6712fdc7ce4d6b3d4456b
+│  │  │  │      fde3fe8521d951fc9e76281c5589fc5b094d60
+│  │  │  │      
+│  │  │  ├─a1
+│  │  │  │      0509cbf4add40496449c484cee43adf6a9bdb9
+│  │  │  │      268dc5b912b79609427a93842ab17b3782e8a1
+│  │  │  │      3667e59a50c9c1fe881c6b432980c82cab89c7
+│  │  │  │      8208f8489758f4fae4f5a7fde409d6b6e8ab67
+│  │  │  │      
+│  │  │  ├─a2
+│  │  │  │      9a06317ec99e16c03a1c99ec7e62bbf56c297d
+│  │  │  │      b619e7e4438e6e93a5abbfc194a37a2c7447a5
+│  │  │  │      c983453a5379b3c406ed97ac70aaa7a9266da7
+│  │  │  │      cf3bb5d1a51f102eb4df47baba38d426c6e1bc
+│  │  │  │      
+│  │  │  ├─a3
+│  │  │  │      304ce8d2871c73d13f100ee377ebdcc51ea9b7
+│  │  │  │      
+│  │  │  ├─a4
+│  │  │  │      6b95e878aacd69ceba3109ba906541a043e549
+│  │  │  │      
+│  │  │  ├─a5
+│  │  │  │      00bed80852b20e8f4b1ef377a0a28c4427453b
+│  │  │  │      2e63932e4ffa2572abfff77cbbd959ca763cc5
+│  │  │  │      
+│  │  │  ├─a6
+│  │  │  │      2427069ec109025dfb24ae0ad64178e89d8a00
+│  │  │  │      fa607905c2e89ed93f5f620d317f1235cc7f84
+│  │  │  │      
+│  │  │  ├─a8
+│  │  │  │      5ccf4e4725c061b9e19871069cb63a7e7643ec
+│  │  │  │      812444d9737416767b9cdf38bc4f3ef919b970
+│  │  │  │      909fc5fc2998aa0070ed89e73280c25fa45994
+│  │  │  │      abea0c72d52a82c92b72e8e3c948e2832ec694
+│  │  │  │      f44412be47b39fb637e5bd64afbc90e4cad31b
+│  │  │  │      
+│  │  │  ├─a9
+│  │  │  │      bfdae552094b80708ba513912e37d6a7bbe100
+│  │  │  │      fffbcca42f9c0a378f26ad631194288efb227c
+│  │  │  │      
+│  │  │  ├─aa
+│  │  │  │      07aff75ecfdc70e2d84d5370604b6add3dd99a
+│  │  │  │      36723c3a99124689ba7562b99cf6fff16d721e
+│  │  │  │      ee356d317dd2baab574b4bef801685da0648a7
+│  │  │  │      
+│  │  │  ├─ab
+│  │  │  │      368f9ea54d4fd8147013d9f2e3ae6d0952e3d1
+│  │  │  │      4e2397f339563bd2bc92baf82a8dd0c1c76108
+│  │  │  │      
+│  │  │  ├─ac
+│  │  │  │      3234850eed1062c56292981600263910dda646
+│  │  │  │      cc1a48756184e0ca0fe89f72e7c0de5610823d
+│  │  │  │      
+│  │  │  ├─ad
+│  │  │  │      661c03c161983e76ed8dc35495d9619da550fe
+│  │  │  │      b7bc8043890f507728a625c85a5a8f3006a65c
+│  │  │  │      
+│  │  │  ├─ae
+│  │  │  │      6c0f163a2806b06f2cf06535c98f66fcd62e46
+│  │  │  │      
+│  │  │  ├─af
+│  │  │  │      4f8c85a683d4701c506abd7be711d41e733bed
+│  │  │  │      8a31e08d53edcf9f1f3ba7ad9b73abba1a387b
+│  │  │  │      a3fec00df9dd263a661b0927df25844b9fa955
+│  │  │  │      
+│  │  │  ├─b0
+│  │  │  │      225ee9acf69e1a35898892dcd818086eea3bd0
+│  │  │  │      7c93583c5660a52ad23054473d8b87b847b48f
+│  │  │  │      b9fb6e8bffa65f7bfac7d2ec2949f41cb3cb76
+│  │  │  │      bd463b68e621d4d7cfdd10d2b1ac42eee663fa
+│  │  │  │      d0e23cf77f11ec65a2992de502e3a15aaf5a0a
+│  │  │  │      
+│  │  │  ├─b1
+│  │  │  │      692ff828025a60cec012a4146eb78c9f57d0a8
+│  │  │  │      
+│  │  │  ├─b2
+│  │  │  │      49bf902ff53414e14cfa3060ec17685f4ce6aa
+│  │  │  │      ee6a9a7880dc9c541f5e5c1193156115f3f5e5
+│  │  │  │      f7e5601ca617782750c3654ab4d9a16f4d56c6
+│  │  │  │      
+│  │  │  ├─b3
+│  │  │  │      10734f42e654f20a4027818c3f692e0b48c4bb
+│  │  │  │      1b415cdee3a2d979f6d95992f4db34392dad40
+│  │  │  │      5f085c62a17e1fd35b0461be2279de61d1585a
+│  │  │  │      8a691c5288d03d2db4786fe229d69e0037fed7
+│  │  │  │      c5c469e1d1593ab0e9af291ecd9afcb596b4d4
+│  │  │  │      
+│  │  │  ├─b4
+│  │  │  │      9c36470e41967e79e9dce134feacccafc9e44b
+│  │  │  │      c965201e6ec55d00d2c1bb57706a6e8d5ee17c
+│  │  │  │      e80a39611c756907c5b49b2672090d2d78ffdb
+│  │  │  │      
+│  │  │  ├─b5
+│  │  │  │      1e0cae9a615986b1fd12386b765e2a2468c56f
+│  │  │  │      78805ff9f3c50524cb3911fd79517a41f92c91
+│  │  │  │      bb3e12e83244ef92e015b903be4d0bbc8dd8b7
+│  │  │  │      e4fa0c7d015147ce4173853a0599a509b76869
+│  │  │  │      f6a26b9a2c5c405a83f31753c0e1c18192a3b1
+│  │  │  │      
+│  │  │  ├─b6
+│  │  │  │      015677fb579e2ab07e793cbba8f07f3fe79ef8
+│  │  │  │      0600967968a2eabcf140ace0bce5de8b50a143
+│  │  │  │      7e1c900e38f8f6fc9cba387273ec4d26c72ce8
+│  │  │  │      9a6432b0ef82f80a342052e5e12a3c8c7f7563
+│  │  │  │      b62b355a2ff366c1ade483435b84e2d89770bc
+│  │  │  │      e09037b354c43d344a2e1965d7861b26e55077
+│  │  │  │      eb6394d64e56dbbf484d3b558b99a57d8e3941
+│  │  │  │      
+│  │  │  ├─b7
+│  │  │  │      3cbfd0f63ddb261e5cfaaa630ecbd059c33f30
+│  │  │  │      f3d260224fea826b30e4b40c96d8ee4d7f5f92
+│  │  │  │      
+│  │  │  ├─b8
+│  │  │  │      05a51b23cbdfc8dd9cd9e47d9b2cd283214d3d
+│  │  │  │      369d714ded41b7367930899c06809e1303982e
+│  │  │  │      7396c052154d2fe2f384294055e71ea15dc89e
+│  │  │  │      d28c21168c1ee24ef8ae6427f6b407359505b4
+│  │  │  │      dfdc200d3b2e444b8b237069fbfc058ca0dc14
+│  │  │  │      
+│  │  │  ├─b9
+│  │  │  │      0af59dd6ab65fa7fa125c5b398b80ee29031ab
+│  │  │  │      1b78b45a94b7696996d104c4c48ff4fa388245
+│  │  │  │      5f8590ef7c67be22a9c42f19112c73c5996b39
+│  │  │  │      7f3b5770c7324ca0a8226afbaebc5a572b5e36
+│  │  │  │      bf7ada100d9407c3814be41cf3ec8d858aec99
+│  │  │  │      eefe52b51b8b172338b85f7b9739cc2ba8b9c1
+│  │  │  │      
+│  │  │  ├─ba
+│  │  │  │      7e3031594dc7a01533798f9ff814cf109ca8a0
+│  │  │  │      e58b71d1bdf9bfa237e6a207994f731f1a3758
+│  │  │  │      
+│  │  │  ├─bb
+│  │  │  │      8c882e5f48980b166ea6ec4e1795fc0fce0abe
+│  │  │  │      94020c7499e9da29f0eaf4b45c4f5c33f83e7a
+│  │  │  │      9eb5abc72e566297d5c9a14e32a26276517463
+│  │  │  │      b46275c310af7d69244aba9e81babfc05b3530
+│  │  │  │      d12c57c3f1878b0d25b93846f7ad9e4385ce7d
+│  │  │  │      d355261cdba4b17cedbc172945828af2e7ca42
+│  │  │  │      
+│  │  │  ├─bc
+│  │  │  │      296ffef45e98d737c490748487c2836ada143d
+│  │  │  │      f02cec44b4147cf0d6777edd4f9b73dc5e0476
+│  │  │  │      
+│  │  │  ├─bd
+│  │  │  │      0bc615707d46629e2be72b23712986989fbd24
+│  │  │  │      4333e0ed9bfed31409138a709fa7e5c43d8976
+│  │  │  │      ddcfe9128777230cea82b40d471f973c889fe0
+│  │  │  │      
+│  │  │  ├─be
+│  │  │  │      0884cda0bb376bef47a9ca506ef0ef7e30018e
+│  │  │  │      6bbd666a17554125deb24ae9c8c45224bf0ce2
+│  │  │  │      9ff03142f0fe7a44471cf4590fe5e80cdf65f1
+│  │  │  │      
+│  │  │  ├─bf
+│  │  │  │      665969b139b664b82e4fcd7913e8a070454a36
+│  │  │  │      b63f8bf47c20b2c26d71fa936a7ca91aa51dcc
+│  │  │  │      db36a2f85a77281a9e4a09b49a482e5bbb0003
+│  │  │  │      
+│  │  │  ├─c0
+│  │  │  │      505b1a2d29f2cc023542f31cd20a07bc05a844
+│  │  │  │      623d56aad2ee4e526e260ec7b903517dcf09bb
+│  │  │  │      93bdb36e77f18e670f2d59b32a1ec2a9385a5b
+│  │  │  │      cd961d08c5982565a2b28fdbee7a47ca12fbaf
+│  │  │  │      
+│  │  │  ├─c1
+│  │  │  │      583d9ad839b6d367d9175af512231fb7cf2ca0
+│  │  │  │      
+│  │  │  ├─c3
+│  │  │  │      7d81970b13c403fdc5a3aa008bcf25aa4b9e81
+│  │  │  │      
+│  │  │  ├─c4
+│  │  │  │      07d7909bf3e1891baa474f497431ad3c4308eb
+│  │  │  │      fa5edc872a3333c8867c3792e3aa7809c0d20c
+│  │  │  │      
+│  │  │  ├─c5
+│  │  │  │      85924dfbab59c6a244fa930c70859ce454af90
+│  │  │  │      
+│  │  │  ├─c6
+│  │  │  │      155f43022d0c4ac5c7cefae36333df647e77f5
+│  │  │  │      3f8907b8cdc7a6cd503ef460ff77fee3ba249b
+│  │  │  │      
+│  │  │  ├─c7
+│  │  │  │      bc97138c0c4972ab229a521243a769b0e77640
+│  │  │  │      da2bf1bc7cb121f743d92b97d8de089229cc56
+│  │  │  │      
+│  │  │  ├─c8
+│  │  │  │      7b572de47771637cb7c3a74735799ab402b35d
+│  │  │  │      be066fc26bd9015e3560b3ea820cad9ef69216
+│  │  │  │      
+│  │  │  ├─c9
+│  │  │  │      3f0957ce7716e168e278ffd7a600e64a43d004
+│  │  │  │      4b7a886b2a69918aa246f28d82ac5179d4d9e1
+│  │  │  │      4c90fe07287059f6fc3469e65f11b6c3e7711f
+│  │  │  │      
+│  │  │  ├─ca
+│  │  │  │      54d07738297acfbea591d1bc1b9f10874d409c
+│  │  │  │      9036c8716a41afb40bee892007742f5359d79b
+│  │  │  │      
+│  │  │  ├─cb
+│  │  │  │      1d7fc718c56679075cf9e0b7e6c9e72eb96993
+│  │  │  │      b5be60f5cad45fa125c019638e371dbaf7aeb3
+│  │  │  │      
+│  │  │  ├─cc
+│  │  │  │      4072fc62bf9617e97b6ef6eef48c7a61522737
+│  │  │  │      4b3cedf930eba8ac28fdb743f7ac79ceb1b32e
+│  │  │  │      
+│  │  │  ├─cd
+│  │  │  │      32c287f394adc1a01e4a890f59b32e49108ceb
+│  │  │  │      e17a443107cd1d1b0355afe3b8eac45d310072
+│  │  │  │      
+│  │  │  ├─ce
+│  │  │  │      8127a4bb2b88991822497cd9434bf04b844353
+│  │  │  │      a5ab1d9ad05ccf9a9186b517a237a98e139718
+│  │  │  │      
+│  │  │  ├─cf
+│  │  │  │      2479244ab7e6153ada3021f7a83f489af96e03
+│  │  │  │      2e9f71a3f626bf102eef0c33070c26931e6286
+│  │  │  │      4ac0706a7db6f476f656da39f5a996a2a445dd
+│  │  │  │      a60613aa58afdbbffc1ee9a09d1ffe07f6045c
+│  │  │  │      ac5ca7f383e15e3c941cf6720add642e941e82
+│  │  │  │      ee3ed935dd61bdf235a034bedf051e55f8f803
+│  │  │  │      
+│  │  │  ├─d0
+│  │  │  │      4bc676bad5b83006ff5fdfc4e66f4a4890a4e2
+│  │  │  │      79cfdca165bafdba69e8c64bd07162de0dda7e
+│  │  │  │      8dcef4ea6a0e1adc0db6f24d55ae724128cc7f
+│  │  │  │      bed80e0ae38f2ca5306640adf1d1c0f505ab5e
+│  │  │  │      
+│  │  │  ├─d2
+│  │  │  │      517375ee6b0cd9bcfb854c21f338fb2b8d2ec1
+│  │  │  │      78c1718a351a3e4fd853f8d2c13da3fb80e807
+│  │  │  │      82c29e17c10644a82f0c5979c8a17c1fca39ab
+│  │  │  │      ec1d45b4825988aa4c50ea48e3b117907d6466
+│  │  │  │      
+│  │  │  ├─d3
+│  │  │  │      53c229e4572be03196945505bd8089fabf7242
+│  │  │  │      5aa1e6af0adf9343fe588dae9ae0cb2890b9e7
+│  │  │  │      f335f3105c013288f5c8d6f33185b1c90ce8ac
+│  │  │  │      f63451981fdef57e7c0646e208235964587a42
+│  │  │  │      f9107524a4c80f024b870fe7ba65b265c87add
+│  │  │  │      fc6e3546c9e84d52c9dcce3058b4cc208de830
+│  │  │  │      
+│  │  │  ├─d4
+│  │  │  │      8b14015d6abf00f6d282076dafd8779a385c47
+│  │  │  │      
+│  │  │  ├─d5
+│  │  │  │      64d0bc3dd917926892c55e3706cc116d5b165e
+│  │  │  │      6d5757fd2a5c95018ae6c1b831c018fb55c769
+│  │  │  │      e236a8424c6a119b57c5c4343eeda301828e2e
+│  │  │  │      
+│  │  │  ├─d6
+│  │  │  │      b25f00c306868df748a803a16f2b9644293f0e
+│  │  │  │      c7fda36d2af22455c8f4a4a212347d1e608561
+│  │  │  │      ce8ddf2d8ed92fbf904b45b5d90f7299d15d5b
+│  │  │  │      e421631076d892cb49a9f3fa0c39d3e0558e3e
+│  │  │  │      
+│  │  │  ├─d7
+│  │  │  │      360590be656e3fead8864243157704960be6dd
+│  │  │  │      4eda1e1009b6fbc1371936e2b2eac0368349b2
+│  │  │  │      db5142e5a9b1b1cdd02b66e3bc24236cb319a7
+│  │  │  │      
+│  │  │  ├─d8
+│  │  │  │      48d58ef274fb99bfc8916a6fa81aecf59b2652
+│  │  │  │      
+│  │  │  ├─da
+│  │  │  │      c94d254c94d510250e6e3fe93cd7979e6e8e7e
+│  │  │  │      
+│  │  │  ├─db
+│  │  │  │      b398c7e38a379d656d5bd4cb27538b11526167
+│  │  │  │      
+│  │  │  ├─dd
+│  │  │  │      334914eec788679f7fe584c4667b99ab8fc32d
+│  │  │  │      343bc45f3787a9d9d2da2aae3b651250bd75d5
+│  │  │  │      4b1d1f6e9fd70ca99849cbb3dedc19611c3bdd
+│  │  │  │      a2c0f78f7ebdbcf4a87416ab193bdd565ec2b6
+│  │  │  │      a8fb8c5a9f23eb522007e0ed62f9c994dd1e6b
+│  │  │  │      
+│  │  │  ├─de
+│  │  │  │      0157c4011d4c21df0733da1b90973c007164f2
+│  │  │  │      4e1d4a9b506924abebf7bfd619eb9921fd913b
+│  │  │  │      cdddf787065fc82fe3eb5cde4af00111b8196b
+│  │  │  │      
+│  │  │  ├─df
+│  │  │  │      2027dfd9d3f2c56edc49cf570253365d1bdbde
+│  │  │  │      2bacf1b52bee809fd60592f71e502eee2902ed
+│  │  │  │      6fda5e444d895752cbbf5f4b2ee53393bc797f
+│  │  │  │      bb20dfd3964ef922ca5fc8f8b1af252ca680bc
+│  │  │  │      dd63f74c93c7a6f3c425d0d009550ee51128d8
+│  │  │  │      
+│  │  │  ├─e0
+│  │  │  │      e9cb5aea7bf68d93baff61eab19a6d5e79a8f8
+│  │  │  │      
+│  │  │  ├─e1
+│  │  │  │      4651170dd22f6f7cd5e521e65a736f93a8586e
+│  │  │  │      8aaf6a1a5f674247c44ce086632e9985343a1e
+│  │  │  │      b18ea6502cbe225ef49cb12c47e459a5bf61fb
+│  │  │  │      
+│  │  │  ├─e2
+│  │  │  │      0f8ce498ba2e15c97b3edde21b63f84d063da8
+│  │  │  │      35fc8f85387cc434a3c61888af03fc8ea80229
+│  │  │  │      c6619fcbf792da1de5e419715b099e4bfd0f8b
+│  │  │  │      
+│  │  │  ├─e3
+│  │  │  │      661b8c5f99d954f892a8113be25db2e08b8d4b
+│  │  │  │      90c0f6a24a7e52ef13ab23d123fcaf07215d95
+│  │  │  │      a782519570d5a9453ca155f42d09dfb74ebf02
+│  │  │  │      
+│  │  │  ├─e4
+│  │  │  │      afaf54e4b5d96a160f0b9d8ff43c28de281ea0
+│  │  │  │      e79983cca067e14a1b344e30ebf168a5d52ce9
+│  │  │  │      
+│  │  │  ├─e6
+│  │  │  │      56cafb125833f21f32ae026ce23a0516dd3a71
+│  │  │  │      9de29bb2d1d6434b8b29ae775ad8c2e48c5391
+│  │  │  │      
+│  │  │  ├─e7
+│  │  │  │      7eae31316c307ca99398f1b4b3131b767a42f3
+│  │  │  │      809b71c79a24f6b57b8f9e802af35cdd305072
+│  │  │  │      949b887053f148bb2e0cffcb9a1b6e8f756b0c
+│  │  │  │      96e3dcafb03f678f5ef47d03bc072398c65281
+│  │  │  │      bcaf92f01b141a6dc8be4848b71ebf831d07f6
+│  │  │  │      
+│  │  │  ├─e8
+│  │  │  │      3525b7bbb95cd0f88b39ea13df15687f65780f
+│  │  │  │      73e95115cc4e694a1e31af44c01c1f58a9ad84
+│  │  │  │      83dcce909a4141e78e5307cb971ed084afdb52
+│  │  │  │      cfccfc3245ec3e49a1cfd11e9585347f138e62
+│  │  │  │      d64a7019110cf50cdcf1ebf15cab31e0aeb607
+│  │  │  │      
+│  │  │  ├─e9
+│  │  │  │      969091193f0326ed5fddbee8c7acd2cb383ed1
+│  │  │  │      c65123d9eef9e0c35131f76fd9778647c39e96
+│  │  │  │      deba15c3e7942dc70fbac1a701ff41b3148674
+│  │  │  │      
+│  │  │  ├─ea
+│  │  │  │      495411ce27fc796c263727543c8ee1af3afe23
+│  │  │  │      9809e96a5ed9899e91ff15c539e203d3017d3f
+│  │  │  │      9b33a37d4ede70328c75618487a596c4154146
+│  │  │  │      
+│  │  │  ├─eb
+│  │  │  │      eab03827226f7218f2293f096226bab7894441
+│  │  │  │      
+│  │  │  ├─ec
+│  │  │  │      0d1b698624c8f801b467d9a855694c770b3757
+│  │  │  │      795cf088400b0a9c9e5d42a5ff8b2e4c3a7417
+│  │  │  │      
+│  │  │  ├─ed
+│  │  │  │      09b35f78b4787c117a5248aff2b220da8574b0
+│  │  │  │      3a9548808ae4de03ee4b6f68ae339ece3cd0d9
+│  │  │  │      76b3566f0c2d12357a2f39c834c48d28c7c049
+│  │  │  │      
+│  │  │  ├─ee
+│  │  │  │      281cd46e36b5bdcb3f18f1ff24c4372a4a6add
+│  │  │  │      5965f421aa5b0f972dee19b57c9a34ff527888
+│  │  │  │      5a28f002b7a118dab118dc0425c44799c679ea
+│  │  │  │      e4edb547c4eb89f8d59acdff9912201054fe76
+│  │  │  │      
+│  │  │  ├─ef
+│  │  │  │      0065eb9c473f4e6d7dc1d9c0fa4834da4973a2
+│  │  │  │      2cee7367821d46265091abb75787f543ee7c93
+│  │  │  │      2e219bf2b0f94bff384496b84620d2ca182ffe
+│  │  │  │      
+│  │  │  ├─f0
+│  │  │  │      112f898c26aae09c1881768935d379d45d9350
+│  │  │  │      
+│  │  │  ├─f1
+│  │  │  │      1ad3e0afe9e2046cb8f0c6fe7431d5244930e1
+│  │  │  │      1eb37b9e3dfff34f3dd40a9b5073f2aa3ff9e7
+│  │  │  │      7ac75249f58d2a94d27a80617be903fa88433e
+│  │  │  │      b4cffda2418892453305276dbb6cd2eb4eea54
+│  │  │  │      c894a945a72e95d0443a4e7788350d9e90c7ec
+│  │  │  │      
+│  │  │  ├─f2
+│  │  │  │      0420f5cd27d3818172305522cc7373f1290a03
+│  │  │  │      4ac50486bfb3377c1dfcf9c53ccff4fa68c156
+│  │  │  │      
+│  │  │  ├─f3
+│  │  │  │      3bcdfe41bc5e0cd821e40cf4bd38b1ba2a0e23
+│  │  │  │      
+│  │  │  ├─f4
+│  │  │  │      1e4addc850d47003f24f5eaa9539eec0c622b4
+│  │  │  │      6fd950fbc4fb0e4b3fa98232411cf5537d9ba8
+│  │  │  │      d0d08f6a03d2aae68cf07a8d03e4ad3b188d15
+│  │  │  │      
+│  │  │  ├─f5
+│  │  │  │      3421c60a9be3acd86b8b1e7195e52450d81e40
+│  │  │  │      aaab971ff427ce3d10aaff35cc5e0339dcb801
+│  │  │  │      
+│  │  │  ├─f6
+│  │  │  │      a6658543a57366a0e5f276e79b2a4fe19ab846
+│  │  │  │      bb12bcc95f24da05f377ec8db2ed3f8639af81
+│  │  │  │      faa1c6eeae0d999604b2c8ecd46f47511a74d1
+│  │  │  │      
+│  │  │  ├─f7
+│  │  │  │      6a9c1f6adc2ee49d1acde89fa022686295d436
+│  │  │  │      ce02eb5028c8d998f4de59f81db0ad36a2f209
+│  │  │  │      
+│  │  │  ├─f8
+│  │  │  │      315009ec437d4bb152959287949bb95e11675e
+│  │  │  │      
+│  │  │  ├─f9
+│  │  │  │      c2f9e4f5e22c2936ac002fcdc24c061e7d3ce8
+│  │  │  │      
+│  │  │  ├─fa
+│  │  │  │      2409b0ae34c5ed9be550d8129bba2c1e9555b3
+│  │  │  │      ae3fe2d49d48c115217134ffc96158cb37c731
+│  │  │  │      
+│  │  │  ├─fc
+│  │  │  │      8f11950164cf8d3e083749c763c990c1ae7a0a
+│  │  │  │      
+│  │  │  ├─fd
+│  │  │  │      5bb77a5b1f6db15854f7e015ec03f4a31fc389
+│  │  │  │      f477207b748f900a3c08b633058291145cdbd9
+│  │  │  │      
+│  │  │  ├─fe
+│  │  │  │      37d04dd794f2ef20a209d156f0c8460129df71
+│  │  │  │      a3a48f1530ec0d4082af8947de601ee5936138
+│  │  │  │      b097fab218f610078560f034585927de3afd7f
+│  │  │  │      be06d694355ccd18c5d36bae312c18b47644ed
+│  │  │  │      f29738e736b41b77db43826b7c670d25dd1853
+│  │  │  │      
+│  │  │  ├─ff
+│  │  │  │      125aee7273b3e04c9f90c1d62a7d909276995e
+│  │  │  │      6401f9f2e68669f63925be1362160434fd8c28
+│  │  │  │      f3090db7a53dbc5292ea0b7930520802f9c56d
+│  │  │  │      
+│  │  │  ├─info
+│  │  │  └─pack
+│  │  └─refs
+│  │      ├─heads
+│  │      │      main
+│  │      │      
+│  │      ├─remotes
+│  │      │  └─origin
+│  │      │          main
+│  │      │          
+│  │      └─tags
+│  │              dyn-universe-adopt-20260405
+│  │              
+│  ├─agents
+│  │  │  01_監督.md
+│  │  │  02_分析.md
+│  │  │  03_批判.md
+│  │  │  04_設計.md
+│  │  │  05_総括.md
+│  │  │  
+│  │  └─outputs
+│  ├─archive
+│  │  │  generate_report_files.py
+│  │  │  register_tasks.cmd
+│  │  │  run_strategy_analysis.py
+│  │  │  run_weekly_agents.py
+│  │  │  simulate.py
+│  │  │  test_order_api.py
+│  │  │  
+│  │  └─__pycache__
+│  │          generate_report_files.cpython-312.pyc
+│  │          run_strategy_analysis.cpython-312.pyc
+│  │          run_weekly_agents.cpython-312.pyc
+│  │          simulate.cpython-312.pyc
+│  │          test_order_api.cpython-312-pytest-9.0.2.pyc
+│  │          test_order_api.cpython-312.pyc
+│  │          
+│  ├─backtest
+│  │  │  composite_alpha_bt.py
+│  │  │  dd_decomposition.py
+│  │  │  debug_alpha_ranking.py
+│  │  │  engine.py
+│  │  │  exit_sensitivity.py
+│  │  │  exit_sweep.py
+│  │  │  fujiko_strategy.py
+│  │  │  live_equivalent.py
+│  │  │  market_shock_comparison.py
+│  │  │  mean_reversion_strategy.py
+│  │  │  min_hold_sensitivity.py
+│  │  │  min_rsr_sensitivity.py
+│  │  │  mom_period_sensitivity.py
+│  │  │  mtf_comparison.py
+│  │  │  oos_2025.py
+│  │  │  portfolio_cross_validate.py
+│  │  │  portfolio_engine.py
+│  │  │  portfolio_temporal_separation.py
+│  │  │  portfolio_v2.py
+│  │  │  regime_sizing_comparison.py
+│  │  │  rolling_universe.py
+│  │  │  rsr.py
+│  │  │  rsr_context_expansion.py
+│  │  │  rsr_slope_analysis.py
+│  │  │  rsr_universe_sweep.py
+│  │  │  step3_final_validation.py
+│  │  │  step7_sensitivity.py
+│  │  │  strategy.py
+│  │  │  topk_live_equivalent.py
+│  │  │  turtle_entry_rolling_oos.py
+│  │  │  universe_builder.py
+│  │  │  universe_parallel_test.py
+│  │  │  walkforward_revalidation.py
+│  │  │  wf_cap_comparison.py
+│  │  │  wf_composite_regime.py
+│  │  │  wf_composite_threshold.py
+│  │  │  wf_dynamic_universe.py
+│  │  │  wf_dyn_rsr42.py
+│  │  │  wf_regime_sym.py
+│  │  │  wf_suspension.py
+│  │  │  __init__.py
+│  │  │  
+│  │  ├─archive
+│  │  │  │  advanced_analysis.py
+│  │  │  │  cb_sector_analysis.py
+│  │  │  │  clenow_momentum.py
+│  │  │  │  cross_validate.py
+│  │  │  │  dynamic_selection.py
+│  │  │  │  exit_param_3way.py
+│  │  │  │  ma_band_strategy.py
+│  │  │  │  mean_reversion_backtest.py
+│  │  │  │  monte_carlo.py
+│  │  │  │  portfolio_abs_mom.py
+│  │  │  │  portfolio_atr_weight.py
+│  │  │  │  portfolio_books.py
+│  │  │  │  portfolio_calmar.py
+│  │  │  │  portfolio_calmar20.py
+│  │  │  │  portfolio_capital_efficiency.py
+│  │  │  │  portfolio_clenow.py
+│  │  │  │  portfolio_dd_control.py
+│  │  │  │  portfolio_entry_stop_v2.py
+│  │  │  │  portfolio_entry_stop_v3.py
+│  │  │  │  portfolio_entry_stop_v4.py
+│  │  │  │  portfolio_entry_stop_v5.py
+│  │  │  │  portfolio_entry_stop_v6.py
+│  │  │  │  portfolio_fip.py
+│  │  │  │  portfolio_full.py
+│  │  │  │  portfolio_hybrid.py
+│  │  │  │  portfolio_stress_test.py
+│  │  │  │  portfolio_tiered.py
+│  │  │  │  reve_lite_strategy.py
+│  │  │  │  robustness_analysis.py
+│  │  │  │  rsr_context_sweep.py
+│  │  │  │  rsr_sensitivity.py
+│  │  │  │  sample_ma.py
+│  │  │  │  sector_filter_universe.py
+│  │  │  │  sepa_sensitivity.py
+│  │  │  │  strategy_comparison.py
+│  │  │  │  topix100_backtest.py
+│  │  │  │  topk_rotation.py
+│  │  │  │  topk_sweep.py
+│  │  │  │  universe_expansion.py
+│  │  │  │  walk_forward_universe.py
+│  │  │  │  
+│  │  │  └─__pycache__
+│  │  │          advanced_analysis.cpython-312.pyc
+│  │  │          cb_sector_analysis.cpython-312.pyc
+│  │  │          clenow_momentum.cpython-312.pyc
+│  │  │          cross_validate.cpython-312.pyc
+│  │  │          dynamic_selection.cpython-312.pyc
+│  │  │          exit_param_3way.cpython-312.pyc
+│  │  │          ma_band_strategy.cpython-312.pyc
+│  │  │          mean_reversion_backtest.cpython-312.pyc
+│  │  │          monte_carlo.cpython-312.pyc
+│  │  │          portfolio_abs_mom.cpython-312.pyc
+│  │  │          portfolio_atr_weight.cpython-312.pyc
+│  │  │          portfolio_books.cpython-312.pyc
+│  │  │          portfolio_calmar.cpython-312.pyc
+│  │  │          portfolio_calmar20.cpython-312.pyc
+│  │  │          portfolio_capital_efficiency.cpython-312.pyc
+│  │  │          portfolio_clenow.cpython-312.pyc
+│  │  │          portfolio_dd_control.cpython-312.pyc
+│  │  │          portfolio_entry_stop_v2.cpython-312.pyc
+│  │  │          portfolio_entry_stop_v3.cpython-312.pyc
+│  │  │          portfolio_entry_stop_v4.cpython-312.pyc
+│  │  │          portfolio_entry_stop_v5.cpython-312.pyc
+│  │  │          portfolio_entry_stop_v6.cpython-312.pyc
+│  │  │          portfolio_fip.cpython-312.pyc
+│  │  │          portfolio_full.cpython-312.pyc
+│  │  │          portfolio_hybrid.cpython-312.pyc
+│  │  │          portfolio_stress_test.cpython-312-pytest-9.0.2.pyc
+│  │  │          portfolio_stress_test.cpython-312.pyc
+│  │  │          portfolio_tiered.cpython-312.pyc
+│  │  │          reve_lite_strategy.cpython-312.pyc
+│  │  │          robustness_analysis.cpython-312.pyc
+│  │  │          rsr_context_sweep.cpython-312.pyc
+│  │  │          rsr_sensitivity.cpython-312.pyc
+│  │  │          sample_ma.cpython-312.pyc
+│  │  │          sector_filter_universe.cpython-312.pyc
+│  │  │          sepa_sensitivity.cpython-312.pyc
+│  │  │          strategy_comparison.cpython-312.pyc
+│  │  │          topix100_backtest.cpython-312.pyc
+│  │  │          topk_rotation.cpython-312.pyc
+│  │  │          topk_sweep.cpython-312.pyc
+│  │  │          universe_expansion.cpython-312.pyc
+│  │  │          walk_forward_universe.cpython-312.pyc
+│  │  │          
+│  │  └─__pycache__
+│  │          advanced_analysis.cpython-312.pyc
+│  │          cb_sector_analysis.cpython-312.pyc
+│  │          clenow_momentum.cpython-312.pyc
+│  │          composite_alpha_bt.cpython-312.pyc
+│  │          cross_validate.cpython-312.pyc
+│  │          debug_alpha_ranking.cpython-312.pyc
+│  │          dynamic_selection.cpython-312.pyc
+│  │          engine.cpython-312.pyc
+│  │          exit_param_3way.cpython-312.pyc
+│  │          exit_sensitivity.cpython-312.pyc
+│  │          exit_sweep.cpython-312.pyc
+│  │          fujiko_strategy.cpython-312.pyc
+│  │          live_equivalent.cpython-312.pyc
+│  │          market_shock_comparison.cpython-312.pyc
+│  │          ma_band_strategy.cpython-312.pyc
+│  │          mean_reversion_backtest.cpython-312.pyc
+│  │          mean_reversion_strategy.cpython-312.pyc
+│  │          min_hold_sensitivity.cpython-312.pyc
+│  │          min_rsr_sensitivity.cpython-312.pyc
+│  │          mom_period_sensitivity.cpython-312.pyc
+│  │          monte_carlo.cpython-312.pyc
+│  │          mtf_comparison.cpython-312.pyc
+│  │          oos_2025.cpython-312.pyc
+│  │          portfolio_abs_mom.cpython-312.pyc
+│  │          portfolio_atr_weight.cpython-312.pyc
+│  │          portfolio_books.cpython-312.pyc
+│  │          portfolio_calmar.cpython-312.pyc
+│  │          portfolio_calmar20.cpython-312.pyc
+│  │          portfolio_capital_efficiency.cpython-312.pyc
+│  │          portfolio_clenow.cpython-312.pyc
+│  │          portfolio_cross_validate.cpython-312.pyc
+│  │          portfolio_dd_control.cpython-312.pyc
+│  │          portfolio_engine.cpython-312.pyc
+│  │          portfolio_entry_stop_v2.cpython-312.pyc
+│  │          portfolio_entry_stop_v3.cpython-312.pyc
+│  │          portfolio_entry_stop_v4.cpython-312.pyc
+│  │          portfolio_entry_stop_v5.cpython-312.pyc
+│  │          portfolio_entry_stop_v6.cpython-312.pyc
+│  │          portfolio_fip.cpython-312.pyc
+│  │          portfolio_full.cpython-312.pyc
+│  │          portfolio_hybrid.cpython-312.pyc
+│  │          portfolio_stress_test.cpython-312.pyc
+│  │          portfolio_temporal_separation.cpython-312.pyc
+│  │          portfolio_tiered.cpython-312.pyc
+│  │          portfolio_v2.cpython-312.pyc
+│  │          regime_sizing_comparison.cpython-312.pyc
+│  │          reve_lite_strategy.cpython-312.pyc
+│  │          robustness_analysis.cpython-312.pyc
+│  │          rolling_universe.cpython-312.pyc
+│  │          rsr.cpython-312.pyc
+│  │          rsr_context_expansion.cpython-312.pyc
+│  │          rsr_sensitivity.cpython-312.pyc
+│  │          rsr_slope_analysis.cpython-312.pyc
+│  │          rsr_universe_sweep.cpython-312.pyc
+│  │          sector_filter_universe.cpython-312.pyc
+│  │          sepa_sensitivity.cpython-312.pyc
+│  │          step3_final_validation.cpython-312.pyc
+│  │          step7_sensitivity.cpython-312.pyc
+│  │          strategy.cpython-312.pyc
+│  │          strategy_comparison.cpython-312.pyc
+│  │          topix100_backtest.cpython-312.pyc
+│  │          topk_live_equivalent.cpython-312.pyc
+│  │          topk_rotation.cpython-312.pyc
+│  │          turtle_entry_rolling_oos.cpython-312.pyc
+│  │          universe_builder.cpython-312.pyc
+│  │          universe_expansion.cpython-312.pyc
+│  │          universe_parallel_test.cpython-312-pytest-9.0.2.pyc
+│  │          universe_parallel_test.cpython-312.pyc
+│  │          walkforward_revalidation.cpython-312.pyc
+│  │          walk_forward_universe.cpython-312.pyc
+│  │          wf_dynamic_universe.cpython-312.pyc
+│  │          __init__.cpython-312.pyc
+│  │          
+│  ├─cache
+│  │  │  mtf_state_2026-03-30.json
+│  │  │  mtf_state_2026-03-31.json
+│  │  │  
+│  │  └─ohlcv
+│  │          1925.T.parquet
+│  │          1928.T.parquet
+│  │          2503.T.parquet
+│  │          2587.T.parquet
+│  │          2802.T.parquet
+│  │          2914.T.parquet
+│  │          3197.T.parquet
+│  │          3382.T.parquet
+│  │          3402.T.parquet
+│  │          3407.T.parquet
+│  │          3861.T.parquet
+│  │          4021.T.parquet
+│  │          4055.T.parquet
+│  │          4151.T.parquet
+│  │          4183.T.parquet
+│  │          4307.T.parquet
+│  │          4502.T.parquet
+│  │          4523.T.parquet
+│  │          4568.T.parquet
+│  │          4661.T.parquet
+│  │          4901.T.parquet
+│  │          4911.T.parquet
+│  │          5020.T.parquet
+│  │          5301.T.parquet
+│  │          5401.T.parquet
+│  │          5411.T.parquet
+│  │          5706.T.parquet
+│  │          6146.T.parquet
+│  │          6301.T.parquet
+│  │          6479.T.parquet
+│  │          6501.T.parquet
+│  │          6506.T.parquet
+│  │          6594.T.parquet
+│  │          6645.T.parquet
+│  │          6702.T.parquet
+│  │          6723.T.parquet
+│  │          6762.T.parquet
+│  │          6857.T.parquet
+│  │          6869.T.parquet
+│  │          6920.T.parquet
+│  │          6971.T.parquet
+│  │          6981.T.parquet
+│  │          7011.T.parquet
+│  │          7012.T.parquet
+│  │          7013.T.parquet
+│  │          7182.T.parquet
+│  │          7201.T.parquet
+│  │          7203.T.parquet
+│  │          8001.T.parquet
+│  │          8002.T.parquet
+│  │          8015.T.parquet
+│  │          8035.T.parquet
+│  │          8053.T.parquet
+│  │          8058.T.parquet
+│  │          8267.T.parquet
+│  │          8306.T.parquet
+│  │          8309.T.parquet
+│  │          8354.T.parquet
+│  │          8411.T.parquet
+│  │          8725.T.parquet
+│  │          8750.T.parquet
+│  │          8766.T.parquet
+│  │          8801.T.parquet
+│  │          8802.T.parquet
+│  │          9020.T.parquet
+│  │          9021.T.parquet
+│  │          9101.T.parquet
+│  │          9104.T.parquet
+│  │          9107.T.parquet
+│  │          9432.T.parquet
+│  │          9433.T.parquet
+│  │          9502.T.parquet
+│  │          9503.T.parquet
+│  │          9531.T.parquet
+│  │          
+│  ├─common
+│  │  │  position_normalizer.py
+│  │  │  __init__.py
+│  │  │  
+│  │  └─__pycache__
+│  │          position_normalizer.cpython-312.pyc
+│  │          __init__.cpython-312.pyc
+│  │          
+│  ├─configs
+│  │  │  rolling_universe.json
+│  │  │  rsr_universe_42.csv
+│  │  │  strategy.yaml
+│  │  │  universe.yaml
+│  │  │  
+│  │  └─universe
+│  │          2026Q1_rsr42_universe.json
+│  │          2026Q1_temporal24.json
+│  │          rsr42_trading.json
+│  │          shadow_universe.json
+│  │          
+│  ├─data
+│  │  └─signals
+│  │          signal_20260330_151125.json
+│  │          signal_20260331_080335.json
+│  │          
+│  ├─diagnostics
+│  │  │  daily_state_logger.py
+│  │  │  exposure_report.py
+│  │  │  exposure_root_cause.py
+│  │  │  live_exposure_report.py
+│  │  │  pnl_vs_holding.py
+│  │  │  rank_stability.py
+│  │  │  rsr_period_test.py
+│  │  │  rsr_universe_test.py
+│  │  │  signal_funnel_60d.py
+│  │  │  turtle_exit_sweep.py
+│  │  │  __init__.py
+│  │  │  
+│  │  └─__pycache__
+│  │          daily_state_logger.cpython-312.pyc
+│  │          exposure_report.cpython-312.pyc
+│  │          exposure_root_cause.cpython-312.pyc
+│  │          live_exposure_report.cpython-312.pyc
+│  │          pnl_vs_holding.cpython-312.pyc
+│  │          rank_stability.cpython-312.pyc
+│  │          rsr_period_test.cpython-312-pytest-9.0.2.pyc
+│  │          rsr_period_test.cpython-312.pyc
+│  │          rsr_universe_test.cpython-312-pytest-9.0.2.pyc
+│  │          rsr_universe_test.cpython-312.pyc
+│  │          signal_funnel_60d.cpython-312.pyc
+│  │          turtle_exit_sweep.cpython-312.pyc
+│  │          __init__.cpython-312.pyc
+│  │          
+│  ├─execution
+│  │  │  execution_metrics.py
+│  │  │  execution_simulator.py
+│  │  │  __init__.py
+│  │  │  
+│  │  └─__pycache__
+│  │          execution_metrics.cpython-312.pyc
+│  │          execution_simulator.cpython-312.pyc
+│  │          __init__.cpython-312.pyc
+│  │          
+│  ├─kabusapi
+│  │  │  client.py
+│  │  │  signal_bridge.py
+│  │  │  __init__.py
+│  │  │  
+│  │  └─__pycache__
+│  │          client.cpython-312.pyc
+│  │          signal_bridge.cpython-312.pyc
+│  │          __init__.cpython-312.pyc
+│  │          
+│  ├─live
+│  │  │  execution_guard.py
+│  │  │  order_ledger.py
+│  │  │  position_sync.py
+│  │  │  __init__.py
+│  │  │  
+│  │  └─__pycache__
+│  │          execution_guard.cpython-312.pyc
+│  │          order_ledger.cpython-312.pyc
+│  │          position_sync.cpython-312.pyc
+│  │          __init__.cpython-312.pyc
+│  │          
+│  ├─logs
+│  │  │  phase2_live_metrics.jsonl
+│  │  │  
+│  │  └─diagnostics
+│  │          metrics.jsonl
+│  │          rsr_distribution.jsonl
+│  │          
+│  ├─market
+│  │  │  jpx_calendar.py
+│  │  │  __init__.py
+│  │  │  
+│  │  └─__pycache__
+│  │          jpx_calendar.cpython-312.pyc
+│  │          __init__.cpython-312.pyc
+│  │          
+│  ├─portfolio
+│  │  │  capital_efficiency.py
+│  │  │  ce_compare_logger.py
+│  │  │  holding_period.py
+│  │  │  volatility_allocator.py
+│  │  │  __init__.py
+│  │  │  
+│  │  └─__pycache__
+│  │          capital_efficiency.cpython-312.pyc
+│  │          ce_compare_logger.cpython-312.pyc
+│  │          holding_period.cpython-312.pyc
+│  │          volatility_allocator.cpython-312.pyc
+│  │          __init__.cpython-312.pyc
+│  │          
+│  ├─research
+│  │  │  weekly_report.py
+│  │  │  
+│  │  └─__pycache__
+│  │          weekly_report.cpython-312.pyc
+│  │          
+│  ├─risk
+│  │  │  circuit_breaker.py
+│  │  │  __init__.py
+│  │  │  
+│  │  └─__pycache__
+│  │          circuit_breaker.cpython-312.pyc
+│  │          __init__.cpython-312.pyc
+│  │          
+│  ├─scripts
+│  │  │  beta_hedge_research.py
+│  │  │  daily_monitor.py
+│  │  │  diagnose_sell.py
+│  │  │  monthly_pnl.py
+│  │  │  risk_regime_report.py
+│  │  │  run_bear_filter_compare.py
+│  │  │  run_bear_filter_wf_compare.py
+│  │  │  run_cap_reject_analysis.py
+│  │  │  run_max_pos_sweep.py
+│  │  │  run_weekly_pdca.py
+│  │  │  run_wf_abcd_compare.py
+│  │  │  run_wf_abc_compare.py
+│  │  │  sector_dd_analysis.py
+│  │  │  setup_scheduler.bat
+│  │  │  shadow_report.py
+│  │  │  sync_positions.py
+│  │  │  test_weekly_review_csv.py
+│  │  │  weekly_review_csv.py
+│  │  │  
+│  │  └─__pycache__
+│  │          daily_monitor.cpython-312.pyc
+│  │          diagnose_sell.cpython-312.pyc
+│  │          monthly_pnl.cpython-312.pyc
+│  │          run_bear_filter_wf_compare.cpython-312.pyc
+│  │          run_cap_reject_analysis.cpython-312.pyc
+│  │          run_weekly_pdca.cpython-312.pyc
+│  │          shadow_report.cpython-312.pyc
+│  │          sync_positions.cpython-312.pyc
+│  │          test_weekly_review_csv.cpython-312-pytest-9.0.2.pyc
+│  │          weekly_review_csv.cpython-312.pyc
+│  │          
+│  ├─strategy
+│  │  │  cluster.py
+│  │  │  filters.py
+│  │  │  universe.py
+│  │  │  __init__.py
+│  │  │  
+│  │  └─__pycache__
+│  │          cluster.cpython-312.pyc
+│  │          filters.cpython-312.pyc
+│  │          universe.cpython-312.pyc
+│  │          __init__.cpython-312.pyc
+│  │          
+│  ├─tools
+│  │  │  pdf_ocr.py
+│  │  │  
+│  │  └─__pycache__
+│  │          pdf_ocr.cpython-312.pyc
+│  │          
+│  ├─tradingview
+│  │      fujiko_indicator.pine
+│  │      
+│  ├─utils
+│  │  │  bear_monitor.py
+│  │  │  memory.py
+│  │  │  morning_smoke_test.py
+│  │  │  
+│  │  └─__pycache__
+│  │          bear_monitor.cpython-312.pyc
+│  │          memory.cpython-312.pyc
+│  │          morning_smoke_test.cpython-312-pytest-9.0.2.pyc
+│  │          morning_smoke_test.cpython-312.pyc
+│  │          
+│  └─__pycache__
+│          analyze_hold_days.cpython-312.pyc
+│          analyze_maxdd_timing.cpython-312.pyc
+│          build_dataset_snapshot.cpython-312.pyc
+│          config_loader.cpython-312.pyc
+│          evaluate_ce.cpython-312.pyc
+│          generate_strategy_spec.cpython-312.pyc
+│          notify.cpython-312.pyc
+│          paths.cpython-312.pyc
+│          run_live_signal.cpython-312.pyc
+│          run_morning_signal.cpython-312.pyc
+│          verify_dataset.cpython-312.pyc
+│          
+└─tests
+    │  test_api_response.py
+    │  test_display_consistency.py
+    │  test_duplicate_prevention.py
+    │  test_dynamic_universe.py
+    │  test_emergency_stop.py
+    │  test_execution_guard.py
+    │  test_import_paths.py
+    │  test_live_sell_guard.py
+    │  test_order_ledger.py
+    │  test_pipeline_audit.py
+    │  test_position_normalizer.py
+    │  test_risk_flag.py
+    │  test_sector_gate.py
+    │  test_send_order_sell_payload.py
+    │  test_smoke.py
+    │  test_state_update.py
+    │  test_sync_stop_persistence.py
+    │  test_token_cache.py
+    │  
+    └─__pycache__
+            test_api_response.cpython-312-pytest-9.0.2.pyc
+            test_api_response.cpython-312.pyc
+            test_display_consistency.cpython-312-pytest-9.0.2.pyc
+            test_display_consistency.cpython-312.pyc
+            test_duplicate_prevention.cpython-312-pytest-9.0.2.pyc
+            test_duplicate_prevention.cpython-312.pyc
+            test_dynamic_universe.cpython-312-pytest-9.0.2.pyc
+            test_dynamic_universe.cpython-312.pyc
+            test_emergency_stop.cpython-312-pytest-9.0.2.pyc
+            test_emergency_stop.cpython-312.pyc
+            test_execution_guard.cpython-312-pytest-9.0.2.pyc
+            test_execution_guard.cpython-312.pyc
+            test_import_paths.cpython-312-pytest-9.0.2.pyc
+            test_import_paths.cpython-312.pyc
+            test_live_sell_guard.cpython-312-pytest-9.0.2.pyc
+            test_live_sell_guard.cpython-312.pyc
+            test_order_ledger.cpython-312-pytest-9.0.2.pyc
+            test_order_ledger.cpython-312.pyc
+            test_pipeline_audit.cpython-312-pytest-9.0.2.pyc
+            test_pipeline_audit.cpython-312.pyc
+            test_position_normalizer.cpython-312-pytest-9.0.2.pyc
+            test_position_normalizer.cpython-312.pyc
+            test_risk_flag.cpython-312-pytest-9.0.2.pyc
+            test_risk_flag.cpython-312.pyc
+            test_sector_gate.cpython-312-pytest-9.0.2.pyc
+            test_sector_gate.cpython-312.pyc
+            test_send_order_sell_payload.cpython-312-pytest-9.0.2.pyc
+            test_send_order_sell_payload.cpython-312.pyc
+            test_smoke.cpython-312-pytest-9.0.2.pyc
+            test_smoke.cpython-312.pyc
+            test_state_update.cpython-312-pytest-9.0.2.pyc
+            test_state_update.cpython-312.pyc
+            test_sync_stop_persistence.cpython-312-pytest-9.0.2.pyc
+            test_sync_stop_persistence.cpython-312.pyc
+            test_token_cache.cpython-312-pytest-9.0.2.pyc
+            test_token_cache.cpython-312.pyc
+            

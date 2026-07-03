@@ -1,0 +1,118 @@
+{
+  "2024_q3q4": {
+    "mx1": {
+      "cagr": 48.48,
+      "pf": 9.955,
+      "wr": 61.5,
+      "max_dd": -6.64,
+      "n_buys": 16,
+      "n_entry_days": 16,
+      "multi_entry_days": 0
+    },
+    "mx2": {
+      "cagr": 48.48,
+      "pf": 9.955,
+      "wr": 61.5,
+      "max_dd": -6.64,
+      "n_buys": 16,
+      "n_entry_days": 16,
+      "multi_entry_days": 0
+    },
+    "base": {
+      "cagr": 48.48,
+      "pf": 9.955,
+      "wr": 61.5,
+      "max_dd": -6.64,
+      "n_buys": 16,
+      "n_entry_days": 16,
+      "multi_entry_days": 0
+    }
+  },
+  "2021_full": {
+    "mx1": {
+      "cagr": 8.85,
+      "pf": 1.346,
+      "wr": 49.0,
+      "max_dd": -22.02,
+      "n_buys": 49,
+      "n_entry_days": 49,
+      "multi_entry_days": 0
+    },
+    "mx2": {
+      "cagr": 13.56,
+      "pf": 1.735,
+      "wr": 50.9,
+      "max_dd": -18.43,
+      "n_buys": 54,
+      "n_entry_days": 48,
+      "multi_entry_days": 6
+    },
+    "base": {
+      "cagr": 13.91,
+      "pf": 1.755,
+      "wr": 50.9,
+      "max_dd": -18.43,
+      "n_buys": 54,
+      "n_entry_days": 48,
+      "multi_entry_days": 5
+    }
+  },
+  "2023_full": {
+    "mx1": {
+      "cagr": 37.04,
+      "pf": 3.457,
+      "wr": 65.2,
+      "max_dd": -7.65,
+      "n_buys": 48,
+      "n_entry_days": 48,
+      "multi_entry_days": 0
+    },
+    "mx2": {
+      "cagr": 35.05,
+      "pf": 3.236,
+      "wr": 66.0,
+      "max_dd": -9.17,
+      "n_buys": 52,
+      "n_entry_days": 45,
+      "multi_entry_days": 7
+    },
+    "base": {
+      "cagr": 35.78,
+      "pf": 3.275,
+      "wr": 66.0,
+      "max_dd": -9.17,
+      "n_buys": 52,
+      "n_entry_days": 44,
+      "multi_entry_days": 7
+    }
+  },
+  "2020_full": {
+    "mx1": {
+      "cagr": 13.13,
+      "pf": 12.317,
+      "wr": 90.0,
+      "max_dd": -11.5,
+      "n_buys": 12,
+      "n_entry_days": 12,
+      "multi_entry_days": 0
+    },
+    "mx2": {
+      "cagr": 14.13,
+      "pf": 12.602,
+      "wr": 90.0,
+      "max_dd": -11.46,
+      "n_buys": 12,
+      "n_entry_days": 11,
+      "multi_entry_days": 1
+    },
+    "base": {
+      "cagr": 15.66,
+      "pf": 13.082,
+      "wr": 90.9,
+      "max_dd": -11.41,
+      "n_buys": 13,
+      "n_entry_days": 11,
+      "multi_entry_days": 1
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "IS_baseline": {
+    "n_trades": 221,
+    "sharpe": 0.783,
+    "cagr": 18.12
+  },
+  "OOS_baseline": {
+    "n_trades": 43,
+    "sharpe": -0.075,
+    "cagr": -0.98
+  }
+}

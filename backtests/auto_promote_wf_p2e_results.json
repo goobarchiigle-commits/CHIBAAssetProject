@@ -1,0 +1,1619 @@
+{
+  "P2-A": {
+    "case": "P2-A",
+    "sector_limit": null,
+    "n_total": 32,
+    "sector_blocked_total": 0,
+    "folds": [
+      {
+        "fold": "Fold1",
+        "test_start": "2021-01-01",
+        "test_end": "2021-12-31",
+        "r": {
+          "n_promotions": 4,
+          "sector_blocked": 0,
+          "n_syms": 3,
+          "fwd30_mean": -6.51,
+          "fwd30_wr": 0.0,
+          "fwd30_pf": null,
+          "fwd60_mean": -1.74,
+          "fwd60_wr": 50.0,
+          "base_cagr": 50.37,
+          "base_dd": -15.58,
+          "base_sharpe": 1.85,
+          "base_calmar": 3.234,
+          "aug_cagr": 47.81,
+          "aug_dd": -15.82,
+          "aug_sharpe": 1.763,
+          "aug_calmar": 3.023,
+          "delta_cagr": -2.56,
+          "delta_dd": -0.24,
+          "delta_sharpe": -0.087,
+          "delta_calmar": -0.211,
+          "sym_stats": {
+            "6146.T": {
+              "n": 2,
+              "fwd30_mean": -9.98,
+              "fwd30_wr": 0.0,
+              "fwd30_pf": null
+            },
+            "6857.T": {
+              "n": 1,
+              "fwd30_mean": -5.08,
+              "fwd30_wr": 0.0,
+              "fwd30_pf": null
+            },
+            "6920.T": {
+              "n": 0,
+              "fwd30_mean": null,
+              "fwd30_wr": null,
+              "fwd30_pf": null
+            },
+            "8035.T": {
+              "n": 1,
+              "fwd30_mean": -0.98,
+              "fwd30_wr": 0.0,
+              "fwd30_pf": null
+            }
+          },
+          "sector_concentration": {
+            "電機精密": 100.0
+          },
+          "max_simultaneous_sector_exposure": 2,
+          "promotions": [
+            {
+              "sym": "8035.T",
+              "date": "2021-04-15",
+              "rsr": 85.7,
+              "si": 72.4,
+              "comp": 11.0,
+              "sector": "電機精密",
+              "fwd30": -0.0098,
+              "fwd60": -0.06
+            },
+            {
+              "sym": "6146.T",
+              "date": "2021-04-15",
+              "rsr": 60.7,
+              "si": 72.4,
+              "comp": 11.8,
+              "sector": "電機精密",
+              "fwd30": -0.1036,
+              "fwd60": -0.1291
+            },
+            {
+              "sym": "6857.T",
+              "date": "2021-06-18",
+              "rsr": 78.6,
+              "si": 72.4,
+              "comp": 17.9,
+              "sector": "電機精密",
+              "fwd30": -0.0508,
+              "fwd60": 0.0913
+            },
+            {
+              "sym": "6146.T",
+              "date": "2021-06-18",
+              "rsr": 53.6,
+              "si": 72.4,
+              "comp": 49.6,
+              "sector": "電機精密",
+              "fwd30": -0.096,
+              "fwd60": 0.0283
+            }
+          ]
+        }
+      },
+      {
+        "fold": "Fold2",
+        "test_start": "2022-01-01",
+        "test_end": "2022-12-31",
+        "r": {
+          "n_promotions": 10,
+          "sector_blocked": 0,
+          "n_syms": 4,
+          "fwd30_mean": 3.61,
+          "fwd30_wr": 70.0,
+          "fwd30_pf": 1.92,
+          "fwd60_mean": 7.19,
+          "fwd60_wr": 90.0,
+          "base_cagr": 9.81,
+          "base_dd": -10.4,
+          "base_sharpe": 0.62,
+          "base_calmar": 0.943,
+          "aug_cagr": 12.97,
+          "aug_dd": -11.17,
+          "aug_sharpe": 0.738,
+          "aug_calmar": 1.161,
+          "delta_cagr": 3.16,
+          "delta_dd": -0.77,
+          "delta_sharpe": 0.118,
+          "delta_calmar": 0.218,
+          "sym_stats": {
+            "6146.T": {
+              "n": 3,
+              "fwd30_mean": 1.9,
+              "fwd30_wr": 66.7,
+              "fwd30_pf": 1.46
+            },
+            "6857.T": {
+              "n": 1,
+              "fwd30_mean": 21.94,
+              "fwd30_wr": 100.0,
+              "fwd30_pf": null
+            },
+            "6920.T": {
+              "n": 3,
+              "fwd30_mean": 2.81,
+              "fwd30_wr": 66.7,
+              "fwd30_pf": 1.75
+            },
+            "8035.T": {
+              "n": 3,
+              "fwd30_mean": 0.02,
+              "fwd30_wr": 66.7,
+              "fwd30_pf": 1.0
+            }
+          },
+          "sector_concentration": {
+            "電機精密": 100.0
+          },
+          "max_simultaneous_sector_exposure": 4,
+          "promotions": [
+            {
+              "sym": "6146.T",
+              "date": "2022-06-01",
+              "rsr": 42.9,
+              "si": 58.6,
+              "comp": 39.8,
+              "sector": "電機精密",
+              "fwd30": -0.1238,
+              "fwd60": 0.007
+            },
+            {
+              "sym": "6920.T",
+              "date": "2022-06-01",
+              "rsr": 17.9,
+              "si": 58.6,
+              "comp": 9.8,
+              "sector": "電機精密",
+              "fwd30": -0.1124,
+              "fwd60": 0.0929
+            },
+            {
+              "sym": "8035.T",
+              "date": "2022-06-30",
+              "rsr": 14.3,
+              "si": 58.6,
+              "comp": 37.9,
+              "sector": "電機精密",
+              "fwd30": 0.0349,
+              "fwd60": -0.1573
+            },
+            {
+              "sym": "6146.T",
+              "date": "2022-08-01",
+              "rsr": 28.6,
+              "si": 55.2,
+              "comp": 26.5,
+              "sector": "電機精密",
+              "fwd30": 0.0738,
+              "fwd60": 0.072
+            },
+            {
+              "sym": "6920.T",
+              "date": "2022-08-01",
+              "rsr": 10.7,
+              "si": 55.2,
+              "comp": 10.8,
+              "sector": "電機精密",
+              "fwd30": 0.0086,
+              "fwd60": 0.0774
+            },
+            {
+              "sym": "8035.T",
+              "date": "2022-08-31",
+              "rsr": 17.9,
+              "si": 69.0,
+              "comp": 6.6,
+              "sector": "電機精密",
+              "fwd30": -0.1564,
+              "fwd60": 0.0491
+            },
+            {
+              "sym": "6146.T",
+              "date": "2022-11-02",
+              "rsr": 60.7,
+              "si": 62.1,
+              "comp": 37.9,
+              "sector": "電機精密",
+              "fwd30": 0.1071,
+              "fwd60": 0.0876
+            },
+            {
+              "sym": "6857.T",
+              "date": "2022-11-02",
+              "rsr": 17.9,
+              "si": 62.1,
+              "comp": 30.1,
+              "sector": "電機精密",
+              "fwd30": 0.2194,
+              "fwd60": 0.2117
+            },
+            {
+              "sym": "6920.T",
+              "date": "2022-11-02",
+              "rsr": 14.3,
+              "si": 62.1,
+              "comp": 50.0,
+              "sector": "電機精密",
+              "fwd30": 0.1881,
+              "fwd60": 0.124
+            },
+            {
+              "sym": "8035.T",
+              "date": "2022-11-02",
+              "rsr": 10.7,
+              "si": 62.1,
+              "comp": 15.5,
+              "sector": "電機精密",
+              "fwd30": 0.122,
+              "fwd60": 0.1549
+            }
+          ]
+        }
+      },
+      {
+        "fold": "Fold3",
+        "test_start": "2023-01-01",
+        "test_end": "2023-12-31",
+        "r": {
+          "n_promotions": 8,
+          "sector_blocked": 0,
+          "n_syms": 4,
+          "fwd30_mean": 9.84,
+          "fwd30_wr": 75.0,
+          "fwd30_pf": 8.83,
+          "fwd60_mean": 16.55,
+          "fwd60_wr": 87.5,
+          "base_cagr": 9.11,
+          "base_dd": -6.73,
+          "base_sharpe": 0.833,
+          "base_calmar": 1.353,
+          "aug_cagr": 16.53,
+          "aug_dd": -5.63,
+          "aug_sharpe": 1.304,
+          "aug_calmar": 2.934,
+          "delta_cagr": 7.42,
+          "delta_dd": 1.1,
+          "delta_sharpe": 0.471,
+          "delta_calmar": 1.581,
+          "sym_stats": {
+            "6146.T": {
+              "n": 2,
+              "fwd30_mean": 9.66,
+              "fwd30_wr": 100.0,
+              "fwd30_pf": null
+            },
+            "6857.T": {
+              "n": 1,
+              "fwd30_mean": 17.4,
+              "fwd30_wr": 100.0,
+              "fwd30_pf": null
+            },
+            "6920.T": {
+              "n": 3,
+              "fwd30_mean": 6.07,
+              "fwd30_wr": 33.3,
+              "fwd30_pf": 2.81
+            },
+            "8035.T": {
+              "n": 2,
+              "fwd30_mean": 11.9,
+              "fwd30_wr": 100.0,
+              "fwd30_pf": null
+            }
+          },
+          "sector_concentration": {
+            "電機精密": 100.0
+          },
+          "max_simultaneous_sector_exposure": 3,
+          "promotions": [
+            {
+              "sym": "6146.T",
+              "date": "2023-02-06",
+              "rsr": 67.9,
+              "si": 55.2,
+              "comp": 18.3,
+              "sector": "電機精密",
+              "fwd30": 0.066,
+              "fwd60": 0.1842
+            },
+            {
+              "sym": "6857.T",
+              "date": "2023-02-06",
+              "rsr": 25.0,
+              "si": 55.2,
+              "comp": 18.5,
+              "sector": "電機精密",
+              "fwd30": 0.174,
+              "fwd60": 0.1121
+            },
+            {
+              "sym": "6920.T",
+              "date": "2023-02-06",
+              "rsr": 10.7,
+              "si": 55.2,
+              "comp": 13.4,
+              "sector": "電機精密",
+              "fwd30": -0.0596,
+              "fwd60": -0.2166
+            },
+            {
+              "sym": "6146.T",
+              "date": "2023-06-09",
+              "rsr": 96.4,
+              "si": 62.1,
+              "comp": 35.2,
+              "sector": "電機精密",
+              "fwd30": 0.1273,
+              "fwd60": 0.3225
+            },
+            {
+              "sym": "6920.T",
+              "date": "2023-06-09",
+              "rsr": 28.6,
+              "si": 62.1,
+              "comp": 20.9,
+              "sector": "電機精密",
+              "fwd30": -0.041,
+              "fwd60": 0.0964
+            },
+            {
+              "sym": "8035.T",
+              "date": "2023-06-09",
+              "rsr": 14.3,
+              "si": 62.1,
+              "comp": 24.6,
+              "sector": "電機精密",
+              "fwd30": 0.0507,
+              "fwd60": 0.1493
+            },
+            {
+              "sym": "8035.T",
+              "date": "2023-10-11",
+              "rsr": 71.4,
+              "si": 55.2,
+              "comp": 5.8,
+              "sector": "電機精密",
+              "fwd30": 0.1873,
+              "fwd60": 0.2525
+            },
+            {
+              "sym": "6920.T",
+              "date": "2023-10-11",
+              "rsr": 60.7,
+              "si": 55.2,
+              "comp": 17.1,
+              "sector": "電機精密",
+              "fwd30": 0.2826,
+              "fwd60": 0.4233
+            }
+          ]
+        }
+      },
+      {
+        "fold": "Fold4",
+        "test_start": "2024-01-01",
+        "test_end": "2024-12-31",
+        "r": {
+          "n_promotions": 10,
+          "sector_blocked": 0,
+          "n_syms": 4,
+          "fwd30_mean": 10.64,
+          "fwd30_wr": 50.0,
+          "fwd30_pf": 4.36,
+          "fwd60_mean": 9.56,
+          "fwd60_wr": 75.0,
+          "base_cagr": 39.69,
+          "base_dd": -14.68,
+          "base_sharpe": 1.871,
+          "base_calmar": 2.705,
+          "aug_cagr": 48.35,
+          "aug_dd": -14.39,
+          "aug_sharpe": 2.206,
+          "aug_calmar": 3.359,
+          "delta_cagr": 8.66,
+          "delta_dd": 0.29,
+          "delta_sharpe": 0.335,
+          "delta_calmar": 0.654,
+          "sym_stats": {
+            "6146.T": {
+              "n": 2,
+              "fwd30_mean": 26.46,
+              "fwd30_wr": 100.0,
+              "fwd30_pf": null
+            },
+            "6857.T": {
+              "n": 3,
+              "fwd30_mean": 20.89,
+              "fwd30_wr": 66.7,
+              "fwd30_pf": 7.95
+            },
+            "6920.T": {
+              "n": 3,
+              "fwd30_mean": -1.3,
+              "fwd30_wr": 33.3,
+              "fwd30_pf": 0.76
+            },
+            "8035.T": {
+              "n": 2,
+              "fwd30_mean": -0.06,
+              "fwd30_wr": 0.0,
+              "fwd30_pf": null
+            }
+          },
+          "sector_concentration": {
+            "電機精密": 100.0
+          },
+          "max_simultaneous_sector_exposure": 4,
+          "promotions": [
+            {
+              "sym": "6857.T",
+              "date": "2024-01-16",
+              "rsr": 96.4,
+              "si": 58.6,
+              "comp": 47.4,
+              "sector": "電機精密",
+              "fwd30": 0.3283,
+              "fwd60": 0.1809
+            },
+            {
+              "sym": "6920.T",
+              "date": "2024-01-16",
+              "rsr": 60.7,
+              "si": 58.6,
+              "comp": 16.3,
+              "sector": "電機精密",
+              "fwd30": 0.1233,
+              "fwd60": 0.2071
+            },
+            {
+              "sym": "6857.T",
+              "date": "2024-04-17",
+              "rsr": 85.7,
+              "si": 58.6,
+              "comp": 17.1,
+              "sector": "電機精密",
+              "fwd30": -0.0901,
+              "fwd60": 0.1321
+            },
+            {
+              "sym": "6920.T",
+              "date": "2024-04-17",
+              "rsr": 71.4,
+              "si": 58.6,
+              "comp": 6.2,
+              "sector": "電機精密",
+              "fwd30": -0.0242,
+              "fwd60": -0.1844
+            },
+            {
+              "sym": "6857.T",
+              "date": "2024-09-19",
+              "rsr": 82.1,
+              "si": 55.2,
+              "comp": 25.6,
+              "sector": "電機精密",
+              "fwd30": 0.3884,
+              "fwd60": 0.5338
+            },
+            {
+              "sym": "6146.T",
+              "date": "2024-09-19",
+              "rsr": 67.9,
+              "si": 55.2,
+              "comp": 33.0,
+              "sector": "電機精密",
+              "fwd30": 0.2646,
+              "fwd60": 0.1801
+            },
+            {
+              "sym": "8035.T",
+              "date": "2024-09-19",
+              "rsr": 39.3,
+              "si": 55.2,
+              "comp": 23.8,
+              "sector": "電機精密",
+              "fwd30": -0.0006,
+              "fwd60": 0.0391
+            },
+            {
+              "sym": "6920.T",
+              "date": "2024-09-19",
+              "rsr": 32.1,
+              "si": 55.2,
+              "comp": 17.8,
+              "sector": "電機精密",
+              "fwd30": -0.1382,
+              "fwd60": -0.324
+            },
+            {
+              "sym": "6146.T",
+              "date": "2024-12-20",
+              "rsr": 64.3,
+              "si": 55.2,
+              "comp": 4.3,
+              "sector": "電機精密",
+              "fwd30": null,
+              "fwd60": null
+            },
+            {
+              "sym": "8035.T",
+              "date": "2024-12-20",
+              "rsr": 21.4,
+              "si": 55.2,
+              "comp": 6.7,
+              "sector": "電機精密",
+              "fwd30": null,
+              "fwd60": null
+            }
+          ]
+        }
+      }
+    ],
+    "agg": {
+      "dc": [
+        -2.56,
+        3.16,
+        7.42,
+        8.66
+      ],
+      "dd": [
+        -0.24,
+        -0.77,
+        1.1,
+        0.29
+      ],
+      "ds": [
+        -0.087,
+        0.118,
+        0.471,
+        0.335
+      ],
+      "dm": [
+        -0.211,
+        0.218,
+        1.581,
+        0.654
+      ],
+      "avg_dc": 4.17,
+      "avg_dd": 0.1,
+      "avg_ds": 0.209,
+      "avg_dm": 0.56,
+      "std_dc": 5.07,
+      "min_dc": -2.56,
+      "max_dc": 8.66,
+      "pos_folds": 3,
+      "pos_folds_ratio": "3/4"
+    }
+  },
+  "E1": {
+    "case": "E1",
+    "sector_limit": 2,
+    "n_total": 29,
+    "sector_blocked_total": 6,
+    "folds": [
+      {
+        "fold": "Fold1",
+        "test_start": "2021-01-01",
+        "test_end": "2021-12-31",
+        "r": {
+          "n_promotions": 4,
+          "sector_blocked": 0,
+          "n_syms": 3,
+          "fwd30_mean": -6.51,
+          "fwd30_wr": 0.0,
+          "fwd30_pf": null,
+          "fwd60_mean": -1.74,
+          "fwd60_wr": 50.0,
+          "base_cagr": 50.37,
+          "base_dd": -15.58,
+          "base_sharpe": 1.85,
+          "base_calmar": 3.234,
+          "aug_cagr": 47.81,
+          "aug_dd": -15.82,
+          "aug_sharpe": 1.763,
+          "aug_calmar": 3.023,
+          "delta_cagr": -2.56,
+          "delta_dd": -0.24,
+          "delta_sharpe": -0.087,
+          "delta_calmar": -0.211,
+          "sym_stats": {
+            "6146.T": {
+              "n": 2,
+              "fwd30_mean": -9.98,
+              "fwd30_wr": 0.0,
+              "fwd30_pf": null
+            },
+            "6857.T": {
+              "n": 1,
+              "fwd30_mean": -5.08,
+              "fwd30_wr": 0.0,
+              "fwd30_pf": null
+            },
+            "6920.T": {
+              "n": 0,
+              "fwd30_mean": null,
+              "fwd30_wr": null,
+              "fwd30_pf": null
+            },
+            "8035.T": {
+              "n": 1,
+              "fwd30_mean": -0.98,
+              "fwd30_wr": 0.0,
+              "fwd30_pf": null
+            }
+          },
+          "sector_concentration": {
+            "電機精密": 100.0
+          },
+          "max_simultaneous_sector_exposure": 2,
+          "promotions": [
+            {
+              "sym": "8035.T",
+              "date": "2021-04-15",
+              "rsr": 85.7,
+              "si": 72.4,
+              "comp": 11.0,
+              "sector": "電機精密",
+              "fwd30": -0.0098,
+              "fwd60": -0.06
+            },
+            {
+              "sym": "6146.T",
+              "date": "2021-04-15",
+              "rsr": 60.7,
+              "si": 72.4,
+              "comp": 11.8,
+              "sector": "電機精密",
+              "fwd30": -0.1036,
+              "fwd60": -0.1291
+            },
+            {
+              "sym": "6857.T",
+              "date": "2021-06-18",
+              "rsr": 78.6,
+              "si": 72.4,
+              "comp": 17.9,
+              "sector": "電機精密",
+              "fwd30": -0.0508,
+              "fwd60": 0.0913
+            },
+            {
+              "sym": "6146.T",
+              "date": "2021-06-18",
+              "rsr": 53.6,
+              "si": 72.4,
+              "comp": 49.6,
+              "sector": "電機精密",
+              "fwd30": -0.096,
+              "fwd60": 0.0283
+            }
+          ]
+        }
+      },
+      {
+        "fold": "Fold2",
+        "test_start": "2022-01-01",
+        "test_end": "2022-12-31",
+        "r": {
+          "n_promotions": 9,
+          "sector_blocked": 2,
+          "n_syms": 4,
+          "fwd30_mean": 0.28,
+          "fwd30_wr": 55.6,
+          "fwd30_pf": 1.06,
+          "fwd60_mean": 2.86,
+          "fwd60_wr": 77.8,
+          "base_cagr": 9.81,
+          "base_dd": -10.4,
+          "base_sharpe": 0.62,
+          "base_calmar": 0.943,
+          "aug_cagr": 10.11,
+          "aug_dd": -11.17,
+          "aug_sharpe": 0.619,
+          "aug_calmar": 0.905,
+          "delta_cagr": 0.3,
+          "delta_dd": -0.77,
+          "delta_sharpe": -0.001,
+          "delta_calmar": -0.038,
+          "sym_stats": {
+            "6146.T": {
+              "n": 3,
+              "fwd30_mean": 1.9,
+              "fwd30_wr": 66.7,
+              "fwd30_pf": 1.46
+            },
+            "6857.T": {
+              "n": 1,
+              "fwd30_mean": 21.94,
+              "fwd30_wr": 100.0,
+              "fwd30_pf": null
+            },
+            "6920.T": {
+              "n": 3,
+              "fwd30_mean": -4.33,
+              "fwd30_wr": 33.3,
+              "fwd30_pf": 0.06
+            },
+            "8035.T": {
+              "n": 2,
+              "fwd30_mean": -6.07,
+              "fwd30_wr": 50.0,
+              "fwd30_pf": 0.22
+            }
+          },
+          "sector_concentration": {
+            "電機精密": 100.0
+          },
+          "max_simultaneous_sector_exposure": 3,
+          "promotions": [
+            {
+              "sym": "6146.T",
+              "date": "2022-06-01",
+              "rsr": 42.9,
+              "si": 58.6,
+              "comp": 39.8,
+              "sector": "電機精密",
+              "fwd30": -0.1238,
+              "fwd60": 0.007
+            },
+            {
+              "sym": "6920.T",
+              "date": "2022-06-01",
+              "rsr": 17.9,
+              "si": 58.6,
+              "comp": 9.8,
+              "sector": "電機精密",
+              "fwd30": -0.1124,
+              "fwd60": 0.0929
+            },
+            {
+              "sym": "8035.T",
+              "date": "2022-06-30",
+              "rsr": 14.3,
+              "si": 58.6,
+              "comp": 37.9,
+              "sector": "電機精密",
+              "fwd30": 0.0349,
+              "fwd60": -0.1573
+            },
+            {
+              "sym": "6146.T",
+              "date": "2022-08-01",
+              "rsr": 28.6,
+              "si": 55.2,
+              "comp": 26.5,
+              "sector": "電機精密",
+              "fwd30": 0.0738,
+              "fwd60": 0.072
+            },
+            {
+              "sym": "6920.T",
+              "date": "2022-08-01",
+              "rsr": 10.7,
+              "si": 55.2,
+              "comp": 10.8,
+              "sector": "電機精密",
+              "fwd30": 0.0086,
+              "fwd60": 0.0774
+            },
+            {
+              "sym": "8035.T",
+              "date": "2022-08-31",
+              "rsr": 17.9,
+              "si": 69.0,
+              "comp": 6.6,
+              "sector": "電機精密",
+              "fwd30": -0.1564,
+              "fwd60": 0.0491
+            },
+            {
+              "sym": "6146.T",
+              "date": "2022-11-02",
+              "rsr": 60.7,
+              "si": 62.1,
+              "comp": 37.9,
+              "sector": "電機精密",
+              "fwd30": 0.1071,
+              "fwd60": 0.0876
+            },
+            {
+              "sym": "6857.T",
+              "date": "2022-11-02",
+              "rsr": 17.9,
+              "si": 62.1,
+              "comp": 30.1,
+              "sector": "電機精密",
+              "fwd30": 0.2194,
+              "fwd60": 0.2117
+            },
+            {
+              "sym": "6920.T",
+              "date": "2022-12-05",
+              "rsr": 10.7,
+              "si": 69.0,
+              "comp": 50.0,
+              "sector": "電機精密",
+              "fwd30": -0.026,
+              "fwd60": -0.1826
+            }
+          ]
+        }
+      },
+      {
+        "fold": "Fold3",
+        "test_start": "2023-01-01",
+        "test_end": "2023-12-31",
+        "r": {
+          "n_promotions": 6,
+          "sector_blocked": 2,
+          "n_syms": 4,
+          "fwd30_mean": 13.27,
+          "fwd30_wr": 83.3,
+          "fwd30_pf": 20.41,
+          "fwd60_mean": 23.18,
+          "fwd60_wr": 100.0,
+          "base_cagr": 9.11,
+          "base_dd": -6.73,
+          "base_sharpe": 0.833,
+          "base_calmar": 1.353,
+          "aug_cagr": 16.58,
+          "aug_dd": -5.63,
+          "aug_sharpe": 1.305,
+          "aug_calmar": 2.942,
+          "delta_cagr": 7.47,
+          "delta_dd": 1.1,
+          "delta_sharpe": 0.472,
+          "delta_calmar": 1.589,
+          "sym_stats": {
+            "6146.T": {
+              "n": 2,
+              "fwd30_mean": 9.66,
+              "fwd30_wr": 100.0,
+              "fwd30_pf": null
+            },
+            "6857.T": {
+              "n": 1,
+              "fwd30_mean": 17.4,
+              "fwd30_wr": 100.0,
+              "fwd30_pf": null
+            },
+            "6920.T": {
+              "n": 2,
+              "fwd30_mean": 12.08,
+              "fwd30_wr": 50.0,
+              "fwd30_pf": 6.89
+            },
+            "8035.T": {
+              "n": 1,
+              "fwd30_mean": 18.73,
+              "fwd30_wr": 100.0,
+              "fwd30_pf": null
+            }
+          },
+          "sector_concentration": {
+            "電機精密": 100.0
+          },
+          "max_simultaneous_sector_exposure": 2,
+          "promotions": [
+            {
+              "sym": "6146.T",
+              "date": "2023-02-06",
+              "rsr": 67.9,
+              "si": 55.2,
+              "comp": 18.3,
+              "sector": "電機精密",
+              "fwd30": 0.066,
+              "fwd60": 0.1842
+            },
+            {
+              "sym": "6857.T",
+              "date": "2023-02-06",
+              "rsr": 25.0,
+              "si": 55.2,
+              "comp": 18.5,
+              "sector": "電機精密",
+              "fwd30": 0.174,
+              "fwd60": 0.1121
+            },
+            {
+              "sym": "6146.T",
+              "date": "2023-06-09",
+              "rsr": 96.4,
+              "si": 62.1,
+              "comp": 35.2,
+              "sector": "電機精密",
+              "fwd30": 0.1273,
+              "fwd60": 0.3225
+            },
+            {
+              "sym": "6920.T",
+              "date": "2023-06-09",
+              "rsr": 28.6,
+              "si": 62.1,
+              "comp": 20.9,
+              "sector": "電機精密",
+              "fwd30": -0.041,
+              "fwd60": 0.0964
+            },
+            {
+              "sym": "8035.T",
+              "date": "2023-10-11",
+              "rsr": 71.4,
+              "si": 55.2,
+              "comp": 5.8,
+              "sector": "電機精密",
+              "fwd30": 0.1873,
+              "fwd60": 0.2525
+            },
+            {
+              "sym": "6920.T",
+              "date": "2023-10-11",
+              "rsr": 60.7,
+              "si": 55.2,
+              "comp": 17.1,
+              "sector": "電機精密",
+              "fwd30": 0.2826,
+              "fwd60": 0.4233
+            }
+          ]
+        }
+      },
+      {
+        "fold": "Fold4",
+        "test_start": "2024-01-01",
+        "test_end": "2024-12-31",
+        "r": {
+          "n_promotions": 10,
+          "sector_blocked": 2,
+          "n_syms": 4,
+          "fwd30_mean": 10.44,
+          "fwd30_wr": 62.5,
+          "fwd30_pf": 3.6,
+          "fwd60_mean": 17.49,
+          "fwd60_wr": 83.3,
+          "base_cagr": 39.69,
+          "base_dd": -14.68,
+          "base_sharpe": 1.871,
+          "base_calmar": 2.705,
+          "aug_cagr": 48.05,
+          "aug_dd": -14.39,
+          "aug_sharpe": 2.17,
+          "aug_calmar": 3.338,
+          "delta_cagr": 8.36,
+          "delta_dd": 0.29,
+          "delta_sharpe": 0.299,
+          "delta_calmar": 0.633,
+          "sym_stats": {
+            "6146.T": {
+              "n": 2,
+              "fwd30_mean": 26.46,
+              "fwd30_wr": 100.0,
+              "fwd30_pf": null
+            },
+            "6857.T": {
+              "n": 3,
+              "fwd30_mean": 20.89,
+              "fwd30_wr": 66.7,
+              "fwd30_pf": 7.95
+            },
+            "6920.T": {
+              "n": 3,
+              "fwd30_mean": -3.58,
+              "fwd30_wr": 33.3,
+              "fwd30_pf": 0.53
+            },
+            "8035.T": {
+              "n": 2,
+              "fwd30_mean": 5.17,
+              "fwd30_wr": 100.0,
+              "fwd30_pf": null
+            }
+          },
+          "sector_concentration": {
+            "電機精密": 100.0
+          },
+          "max_simultaneous_sector_exposure": 4,
+          "promotions": [
+            {
+              "sym": "6857.T",
+              "date": "2024-01-16",
+              "rsr": 96.4,
+              "si": 58.6,
+              "comp": 47.4,
+              "sector": "電機精密",
+              "fwd30": 0.3283,
+              "fwd60": 0.1809
+            },
+            {
+              "sym": "6920.T",
+              "date": "2024-01-16",
+              "rsr": 60.7,
+              "si": 58.6,
+              "comp": 16.3,
+              "sector": "電機精密",
+              "fwd30": 0.1233,
+              "fwd60": 0.2071
+            },
+            {
+              "sym": "6857.T",
+              "date": "2024-04-17",
+              "rsr": 85.7,
+              "si": 58.6,
+              "comp": 17.1,
+              "sector": "電機精密",
+              "fwd30": -0.0901,
+              "fwd60": 0.1321
+            },
+            {
+              "sym": "6920.T",
+              "date": "2024-04-17",
+              "rsr": 71.4,
+              "si": 58.6,
+              "comp": 6.2,
+              "sector": "電機精密",
+              "fwd30": -0.0242,
+              "fwd60": -0.1844
+            },
+            {
+              "sym": "6857.T",
+              "date": "2024-09-19",
+              "rsr": 82.1,
+              "si": 55.2,
+              "comp": 25.6,
+              "sector": "電機精密",
+              "fwd30": 0.3884,
+              "fwd60": 0.5338
+            },
+            {
+              "sym": "6146.T",
+              "date": "2024-09-19",
+              "rsr": 67.9,
+              "si": 55.2,
+              "comp": 33.0,
+              "sector": "電機精密",
+              "fwd30": 0.2646,
+              "fwd60": 0.1801
+            },
+            {
+              "sym": "8035.T",
+              "date": "2024-10-22",
+              "rsr": 46.4,
+              "si": 58.6,
+              "comp": 18.6,
+              "sector": "電機精密",
+              "fwd30": 0.0517,
+              "fwd60": null
+            },
+            {
+              "sym": "6920.T",
+              "date": "2024-10-22",
+              "rsr": 14.3,
+              "si": 58.6,
+              "comp": 18.0,
+              "sector": "電機精密",
+              "fwd30": -0.2067,
+              "fwd60": null
+            },
+            {
+              "sym": "6146.T",
+              "date": "2024-12-20",
+              "rsr": 64.3,
+              "si": 55.2,
+              "comp": 4.3,
+              "sector": "電機精密",
+              "fwd30": null,
+              "fwd60": null
+            },
+            {
+              "sym": "8035.T",
+              "date": "2024-12-20",
+              "rsr": 21.4,
+              "si": 55.2,
+              "comp": 6.7,
+              "sector": "電機精密",
+              "fwd30": null,
+              "fwd60": null
+            }
+          ]
+        }
+      }
+    ],
+    "agg": {
+      "dc": [
+        -2.56,
+        0.3,
+        7.47,
+        8.36
+      ],
+      "dd": [
+        -0.24,
+        -0.77,
+        1.1,
+        0.29
+      ],
+      "ds": [
+        -0.087,
+        -0.001,
+        0.472,
+        0.299
+      ],
+      "dm": [
+        -0.211,
+        -0.038,
+        1.589,
+        0.633
+      ],
+      "avg_dc": 3.39,
+      "avg_dd": 0.1,
+      "avg_ds": 0.171,
+      "avg_dm": 0.493,
+      "std_dc": 5.36,
+      "min_dc": -2.56,
+      "max_dc": 8.36,
+      "pos_folds": 3,
+      "pos_folds_ratio": "3/4"
+    }
+  },
+  "E2": {
+    "case": "E2",
+    "sector_limit": 1,
+    "n_total": 17,
+    "sector_blocked_total": 22,
+    "folds": [
+      {
+        "fold": "Fold1",
+        "test_start": "2021-01-01",
+        "test_end": "2021-12-31",
+        "r": {
+          "n_promotions": 2,
+          "sector_blocked": 2,
+          "n_syms": 2,
+          "fwd30_mean": -3.03,
+          "fwd30_wr": 0.0,
+          "fwd30_pf": null,
+          "fwd60_mean": 1.57,
+          "fwd60_wr": 50.0,
+          "base_cagr": 50.37,
+          "base_dd": -15.58,
+          "base_sharpe": 1.85,
+          "base_calmar": 3.234,
+          "aug_cagr": 49.76,
+          "aug_dd": -15.63,
+          "aug_sharpe": 1.83,
+          "aug_calmar": 3.183,
+          "delta_cagr": -0.61,
+          "delta_dd": -0.05,
+          "delta_sharpe": -0.02,
+          "delta_calmar": -0.051,
+          "sym_stats": {
+            "6146.T": {
+              "n": 0,
+              "fwd30_mean": null,
+              "fwd30_wr": null,
+              "fwd30_pf": null
+            },
+            "6857.T": {
+              "n": 1,
+              "fwd30_mean": -5.08,
+              "fwd30_wr": 0.0,
+              "fwd30_pf": null
+            },
+            "6920.T": {
+              "n": 0,
+              "fwd30_mean": null,
+              "fwd30_wr": null,
+              "fwd30_pf": null
+            },
+            "8035.T": {
+              "n": 1,
+              "fwd30_mean": -0.98,
+              "fwd30_wr": 0.0,
+              "fwd30_pf": null
+            }
+          },
+          "sector_concentration": {
+            "電機精密": 100.0
+          },
+          "max_simultaneous_sector_exposure": 1,
+          "promotions": [
+            {
+              "sym": "8035.T",
+              "date": "2021-04-15",
+              "rsr": 85.7,
+              "si": 72.4,
+              "comp": 11.0,
+              "sector": "電機精密",
+              "fwd30": -0.0098,
+              "fwd60": -0.06
+            },
+            {
+              "sym": "6857.T",
+              "date": "2021-06-18",
+              "rsr": 78.6,
+              "si": 72.4,
+              "comp": 17.9,
+              "sector": "電機精密",
+              "fwd30": -0.0508,
+              "fwd60": 0.0913
+            }
+          ]
+        }
+      },
+      {
+        "fold": "Fold2",
+        "test_start": "2022-01-01",
+        "test_end": "2022-12-31",
+        "r": {
+          "n_promotions": 6,
+          "sector_blocked": 7,
+          "n_syms": 3,
+          "fwd30_mean": -1.02,
+          "fwd30_wr": 66.7,
+          "fwd30_pf": 0.78,
+          "fwd60_mean": 3.86,
+          "fwd60_wr": 83.3,
+          "base_cagr": 9.81,
+          "base_dd": -10.4,
+          "base_sharpe": 0.62,
+          "base_calmar": 0.943,
+          "aug_cagr": 9.1,
+          "aug_dd": -10.4,
+          "aug_sharpe": 0.578,
+          "aug_calmar": 0.875,
+          "delta_cagr": -0.71,
+          "delta_dd": 0.0,
+          "delta_sharpe": -0.042,
+          "delta_calmar": -0.068,
+          "sym_stats": {
+            "6146.T": {
+              "n": 3,
+              "fwd30_mean": 1.9,
+              "fwd30_wr": 66.7,
+              "fwd30_pf": 1.46
+            },
+            "6857.T": {
+              "n": 1,
+              "fwd30_mean": 0.33,
+              "fwd30_wr": 100.0,
+              "fwd30_pf": null
+            },
+            "6920.T": {
+              "n": 0,
+              "fwd30_mean": null,
+              "fwd30_wr": null,
+              "fwd30_pf": null
+            },
+            "8035.T": {
+              "n": 2,
+              "fwd30_mean": -6.07,
+              "fwd30_wr": 50.0,
+              "fwd30_pf": 0.22
+            }
+          },
+          "sector_concentration": {
+            "電機精密": 100.0
+          },
+          "max_simultaneous_sector_exposure": 2,
+          "promotions": [
+            {
+              "sym": "6146.T",
+              "date": "2022-06-01",
+              "rsr": 42.9,
+              "si": 58.6,
+              "comp": 39.8,
+              "sector": "電機精密",
+              "fwd30": -0.1238,
+              "fwd60": 0.007
+            },
+            {
+              "sym": "8035.T",
+              "date": "2022-06-30",
+              "rsr": 14.3,
+              "si": 58.6,
+              "comp": 37.9,
+              "sector": "電機精密",
+              "fwd30": 0.0349,
+              "fwd60": -0.1573
+            },
+            {
+              "sym": "6146.T",
+              "date": "2022-08-01",
+              "rsr": 28.6,
+              "si": 55.2,
+              "comp": 26.5,
+              "sector": "電機精密",
+              "fwd30": 0.0738,
+              "fwd60": 0.072
+            },
+            {
+              "sym": "8035.T",
+              "date": "2022-08-31",
+              "rsr": 17.9,
+              "si": 69.0,
+              "comp": 6.6,
+              "sector": "電機精密",
+              "fwd30": -0.1564,
+              "fwd60": 0.0491
+            },
+            {
+              "sym": "6146.T",
+              "date": "2022-11-02",
+              "rsr": 60.7,
+              "si": 62.1,
+              "comp": 37.9,
+              "sector": "電機精密",
+              "fwd30": 0.1071,
+              "fwd60": 0.0876
+            },
+            {
+              "sym": "6857.T",
+              "date": "2022-12-05",
+              "rsr": 14.3,
+              "si": 69.0,
+              "comp": 50.0,
+              "sector": "電機精密",
+              "fwd30": 0.0033,
+              "fwd60": 0.1731
+            }
+          ]
+        }
+      },
+      {
+        "fold": "Fold3",
+        "test_start": "2023-01-01",
+        "test_end": "2023-12-31",
+        "r": {
+          "n_promotions": 3,
+          "sector_blocked": 5,
+          "n_syms": 2,
+          "fwd30_mean": 12.68,
+          "fwd30_wr": 100.0,
+          "fwd30_pf": null,
+          "fwd60_mean": 25.31,
+          "fwd60_wr": 100.0,
+          "base_cagr": 9.11,
+          "base_dd": -6.73,
+          "base_sharpe": 0.833,
+          "base_calmar": 1.353,
+          "aug_cagr": 12.66,
+          "aug_dd": -5.63,
+          "aug_sharpe": 1.092,
+          "aug_calmar": 2.247,
+          "delta_cagr": 3.55,
+          "delta_dd": 1.1,
+          "delta_sharpe": 0.259,
+          "delta_calmar": 0.894,
+          "sym_stats": {
+            "6146.T": {
+              "n": 2,
+              "fwd30_mean": 9.66,
+              "fwd30_wr": 100.0,
+              "fwd30_pf": null
+            },
+            "6857.T": {
+              "n": 0,
+              "fwd30_mean": null,
+              "fwd30_wr": null,
+              "fwd30_pf": null
+            },
+            "6920.T": {
+              "n": 0,
+              "fwd30_mean": null,
+              "fwd30_wr": null,
+              "fwd30_pf": null
+            },
+            "8035.T": {
+              "n": 1,
+              "fwd30_mean": 18.73,
+              "fwd30_wr": 100.0,
+              "fwd30_pf": null
+            }
+          },
+          "sector_concentration": {
+            "電機精密": 100.0
+          },
+          "max_simultaneous_sector_exposure": 1,
+          "promotions": [
+            {
+              "sym": "6146.T",
+              "date": "2023-02-06",
+              "rsr": 67.9,
+              "si": 55.2,
+              "comp": 18.3,
+              "sector": "電機精密",
+              "fwd30": 0.066,
+              "fwd60": 0.1842
+            },
+            {
+              "sym": "6146.T",
+              "date": "2023-06-09",
+              "rsr": 96.4,
+              "si": 62.1,
+              "comp": 35.2,
+              "sector": "電機精密",
+              "fwd30": 0.1273,
+              "fwd60": 0.3225
+            },
+            {
+              "sym": "8035.T",
+              "date": "2023-10-11",
+              "rsr": 71.4,
+              "si": 55.2,
+              "comp": 5.8,
+              "sector": "電機精密",
+              "fwd30": 0.1873,
+              "fwd60": 0.2525
+            }
+          ]
+        }
+      },
+      {
+        "fold": "Fold4",
+        "test_start": "2024-01-01",
+        "test_end": "2024-12-31",
+        "r": {
+          "n_promotions": 6,
+          "sector_blocked": 8,
+          "n_syms": 3,
+          "fwd30_mean": 15.29,
+          "fwd30_wr": 80.0,
+          "fwd30_pf": 9.48,
+          "fwd60_mean": 21.96,
+          "fwd60_wr": 100.0,
+          "base_cagr": 39.69,
+          "base_dd": -14.68,
+          "base_sharpe": 1.871,
+          "base_calmar": 2.705,
+          "aug_cagr": 47.69,
+          "aug_dd": -14.46,
+          "aug_sharpe": 2.19,
+          "aug_calmar": 3.297,
+          "delta_cagr": 8.0,
+          "delta_dd": 0.22,
+          "delta_sharpe": 0.319,
+          "delta_calmar": 0.592,
+          "sym_stats": {
+            "6146.T": {
+              "n": 2,
+              "fwd30_mean": 12.29,
+              "fwd30_wr": 100.0,
+              "fwd30_pf": null
+            },
+            "6857.T": {
+              "n": 3,
+              "fwd30_mean": 20.89,
+              "fwd30_wr": 66.7,
+              "fwd30_pf": 7.95
+            },
+            "6920.T": {
+              "n": 1,
+              "fwd30_mean": 1.5,
+              "fwd30_wr": 100.0,
+              "fwd30_pf": null
+            },
+            "8035.T": {
+              "n": 0,
+              "fwd30_mean": null,
+              "fwd30_wr": null,
+              "fwd30_pf": null
+            }
+          },
+          "sector_concentration": {
+            "電機精密": 100.0
+          },
+          "max_simultaneous_sector_exposure": 2,
+          "promotions": [
+            {
+              "sym": "6857.T",
+              "date": "2024-01-16",
+              "rsr": 96.4,
+              "si": 58.6,
+              "comp": 47.4,
+              "sector": "電機精密",
+              "fwd30": 0.3283,
+              "fwd60": 0.1809
+            },
+            {
+              "sym": "6920.T",
+              "date": "2024-02-15",
+              "rsr": 78.6,
+              "si": 58.6,
+              "comp": 9.8,
+              "sector": "電機精密",
+              "fwd30": 0.015,
+              "fwd60": 0.0316
+            },
+            {
+              "sym": "6857.T",
+              "date": "2024-04-17",
+              "rsr": 85.7,
+              "si": 58.6,
+              "comp": 17.1,
+              "sector": "電機精密",
+              "fwd30": -0.0901,
+              "fwd60": 0.1321
+            },
+            {
+              "sym": "6857.T",
+              "date": "2024-09-19",
+              "rsr": 82.1,
+              "si": 55.2,
+              "comp": 25.6,
+              "sector": "電機精密",
+              "fwd30": 0.3884,
+              "fwd60": 0.5338
+            },
+            {
+              "sym": "6146.T",
+              "date": "2024-10-22",
+              "rsr": 75.0,
+              "si": 58.6,
+              "comp": 19.7,
+              "sector": "電機精密",
+              "fwd30": 0.1229,
+              "fwd60": null
+            },
+            {
+              "sym": "6146.T",
+              "date": "2024-12-20",
+              "rsr": 64.3,
+              "si": 55.2,
+              "comp": 4.3,
+              "sector": "電機精密",
+              "fwd30": null,
+              "fwd60": null
+            }
+          ]
+        }
+      }
+    ],
+    "agg": {
+      "dc": [
+        -0.61,
+        -0.71,
+        3.55,
+        8.0
+      ],
+      "dd": [
+        -0.05,
+        0.0,
+        1.1,
+        0.22
+      ],
+      "ds": [
+        -0.02,
+        -0.042,
+        0.259,
+        0.319
+      ],
+      "dm": [
+        -0.051,
+        -0.068,
+        0.894,
+        0.592
+      ],
+      "avg_dc": 2.56,
+      "avg_dd": 0.32,
+      "avg_ds": 0.129,
+      "avg_dm": 0.342,
+      "std_dc": 4.14,
+      "min_dc": -0.71,
+      "max_dc": 8.0,
+      "pos_folds": 2,
+      "pos_folds_ratio": "2/4"
+    }
+  }
+}

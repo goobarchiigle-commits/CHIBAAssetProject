@@ -1,0 +1,489 @@
+{
+  "study": "Study43A",
+  "date": "2026-06-26",
+  "period": {
+    "is_start": "2018-01-01",
+    "is_end": "2024-12-31"
+  },
+  "config": {
+    "lot_size": 100,
+    "max_positions": 3,
+    "sizing_mode": "existing",
+    "topix_close": null
+  },
+  "sweep": [
+    {
+      "cagr": 20.14,
+      "sharpe": 0.859,
+      "max_dd": -15.71,
+      "calmar": 1.282,
+      "n_trades": 216,
+      "sortino": 1.116,
+      "profit_factor": 2.465,
+      "win_rate": 55.1,
+      "annual_returns_raw": {
+        "2020": 7.43,
+        "2021": 28.75,
+        "2022": 13.96,
+        "2023": 17.65,
+        "2024": 16.35
+      },
+      "worst_month_pct": -8.61,
+      "worst_month_date": "2021-02",
+      "worst_quarter_pct": -10.01,
+      "peak_date": "2020-12-02",
+      "trough_date": "2020-12-23",
+      "recovery_date": "2021-01-13",
+      "peak_to_trough_days": 21,
+      "recovery_days": 21,
+      "total_underwater_days": 984,
+      "time_underwater_pct": 91.4,
+      "avg_simultaneous_holdings": 2.63,
+      "days_at_max_positions": 779,
+      "cap_saturation_rate_pct": 72.3,
+      "avg_idle_cash_pct": 105.4,
+      "lot_reject_count": 20,
+      "missed_by_cap_count": 476,
+      "missed_fwd20d": {
+        "avg_fwd20d_pct": 2.83,
+        "n": 476,
+        "pct_positive": 61.6
+      },
+      "lot_fwd20d": {
+        "avg_fwd20d_pct": 5.59,
+        "n": 20,
+        "pct_positive": 80.0
+      },
+      "capital": 3000000,
+      "label": "¥3M"
+    },
+    {
+      "cagr": 20.03,
+      "sharpe": 0.837,
+      "max_dd": -16.25,
+      "calmar": 1.233,
+      "n_trades": 216,
+      "sortino": 1.086,
+      "profit_factor": 2.365,
+      "win_rate": 55.6,
+      "annual_returns_raw": {
+        "2020": 5.7,
+        "2021": 28.25,
+        "2022": 13.46,
+        "2023": 18.76,
+        "2024": 17.03
+      },
+      "worst_month_pct": -9.47,
+      "worst_month_date": "2021-02",
+      "worst_quarter_pct": -10.23,
+      "peak_date": "2021-09-17",
+      "trough_date": "2021-12-20",
+      "recovery_date": "2022-08-30",
+      "peak_to_trough_days": 94,
+      "recovery_days": 253,
+      "total_underwater_days": 980,
+      "time_underwater_pct": 91.0,
+      "avg_simultaneous_holdings": 2.66,
+      "days_at_max_positions": 796,
+      "cap_saturation_rate_pct": 73.9,
+      "avg_idle_cash_pct": 99.7,
+      "lot_reject_count": 20,
+      "missed_by_cap_count": 491,
+      "missed_fwd20d": {
+        "avg_fwd20d_pct": 2.95,
+        "n": 491,
+        "pct_positive": 61.9
+      },
+      "lot_fwd20d": {
+        "avg_fwd20d_pct": 6.82,
+        "n": 20,
+        "pct_positive": 85.0
+      },
+      "capital": 5000000,
+      "label": "¥5M"
+    },
+    {
+      "cagr": 21.2,
+      "sharpe": 0.878,
+      "max_dd": -16.02,
+      "calmar": 1.323,
+      "n_trades": 212,
+      "sortino": 1.127,
+      "profit_factor": 2.367,
+      "win_rate": 57.1,
+      "annual_returns_raw": {
+        "2020": 7.31,
+        "2021": 30.17,
+        "2022": 16.08,
+        "2023": 18.87,
+        "2024": 16.72
+      },
+      "worst_month_pct": -10.04,
+      "worst_month_date": "2021-02",
+      "worst_quarter_pct": -10.2,
+      "peak_date": "2021-01-13",
+      "trough_date": "2021-03-02",
+      "recovery_date": "2021-04-08",
+      "peak_to_trough_days": 48,
+      "recovery_days": 37,
+      "total_underwater_days": 972,
+      "time_underwater_pct": 90.3,
+      "avg_simultaneous_holdings": 2.67,
+      "days_at_max_positions": 802,
+      "cap_saturation_rate_pct": 74.5,
+      "avg_idle_cash_pct": 102.8,
+      "lot_reject_count": 16,
+      "missed_by_cap_count": 506,
+      "missed_fwd20d": {
+        "avg_fwd20d_pct": 3.01,
+        "n": 506,
+        "pct_positive": 61.9
+      },
+      "lot_fwd20d": {
+        "avg_fwd20d_pct": 5.2,
+        "n": 16,
+        "pct_positive": 68.8
+      },
+      "capital": 10000000,
+      "label": "¥10M"
+    },
+    {
+      "cagr": 23.26,
+      "sharpe": 0.957,
+      "max_dd": -16.05,
+      "calmar": 1.449,
+      "n_trades": 205,
+      "sortino": 1.225,
+      "profit_factor": 2.584,
+      "win_rate": 58.5,
+      "annual_returns_raw": {
+        "2020": 7.82,
+        "2021": 35.0,
+        "2022": 14.99,
+        "2023": 20.54,
+        "2024": 20.74
+      },
+      "worst_month_pct": -10.01,
+      "worst_month_date": "2021-02",
+      "worst_quarter_pct": -11.73,
+      "peak_date": "2021-01-13",
+      "trough_date": "2021-03-02",
+      "recovery_date": "2021-04-08",
+      "peak_to_trough_days": 48,
+      "recovery_days": 37,
+      "total_underwater_days": 950,
+      "time_underwater_pct": 88.2,
+      "avg_simultaneous_holdings": 2.69,
+      "days_at_max_positions": 821,
+      "cap_saturation_rate_pct": 76.2,
+      "avg_idle_cash_pct": 108.5,
+      "lot_reject_count": 2,
+      "missed_by_cap_count": 518,
+      "missed_fwd20d": {
+        "avg_fwd20d_pct": 2.88,
+        "n": 518,
+        "pct_positive": 61.0
+      },
+      "lot_fwd20d": {
+        "avg_fwd20d_pct": -16.55,
+        "n": 2,
+        "pct_positive": 0.0
+      },
+      "capital": 15000000,
+      "label": "¥15M"
+    },
+    {
+      "cagr": 22.71,
+      "sharpe": 0.931,
+      "max_dd": -16.32,
+      "calmar": 1.392,
+      "n_trades": 205,
+      "sortino": 1.187,
+      "profit_factor": 2.507,
+      "win_rate": 58.0,
+      "annual_returns_raw": {
+        "2020": 7.34,
+        "2021": 32.97,
+        "2022": 16.31,
+        "2023": 20.53,
+        "2024": 19.31
+      },
+      "worst_month_pct": -10.09,
+      "worst_month_date": "2021-02",
+      "worst_quarter_pct": -11.86,
+      "peak_date": "2021-01-13",
+      "trough_date": "2021-03-02",
+      "recovery_date": "2021-04-08",
+      "peak_to_trough_days": 48,
+      "recovery_days": 37,
+      "total_underwater_days": 953,
+      "time_underwater_pct": 88.5,
+      "avg_simultaneous_holdings": 2.7,
+      "days_at_max_positions": 820,
+      "cap_saturation_rate_pct": 76.1,
+      "avg_idle_cash_pct": 106.4,
+      "lot_reject_count": 0,
+      "missed_by_cap_count": 520,
+      "missed_fwd20d": {
+        "avg_fwd20d_pct": 2.88,
+        "n": 520,
+        "pct_positive": 60.8
+      },
+      "lot_fwd20d": {
+        "avg_fwd20d_pct": null,
+        "n": 0,
+        "pct_positive": null
+      },
+      "capital": 20000000,
+      "label": "¥20M"
+    },
+    {
+      "cagr": 23.46,
+      "sharpe": 0.957,
+      "max_dd": -16.19,
+      "calmar": 1.449,
+      "n_trades": 205,
+      "sortino": 1.222,
+      "profit_factor": 2.564,
+      "win_rate": 58.0,
+      "annual_returns_raw": {
+        "2020": 7.82,
+        "2021": 34.44,
+        "2022": 16.13,
+        "2023": 21.36,
+        "2024": 20.08
+      },
+      "worst_month_pct": -10.05,
+      "worst_month_date": "2021-02",
+      "worst_quarter_pct": -11.48,
+      "peak_date": "2021-01-13",
+      "trough_date": "2021-03-02",
+      "recovery_date": "2021-04-08",
+      "peak_to_trough_days": 48,
+      "recovery_days": 37,
+      "total_underwater_days": 949,
+      "time_underwater_pct": 88.1,
+      "avg_simultaneous_holdings": 2.7,
+      "days_at_max_positions": 820,
+      "cap_saturation_rate_pct": 76.1,
+      "avg_idle_cash_pct": 108.0,
+      "lot_reject_count": 0,
+      "missed_by_cap_count": 520,
+      "missed_fwd20d": {
+        "avg_fwd20d_pct": 2.88,
+        "n": 520,
+        "pct_positive": 60.8
+      },
+      "lot_fwd20d": {
+        "avg_fwd20d_pct": null,
+        "n": 0,
+        "pct_positive": null
+      },
+      "capital": 30000000,
+      "label": "¥30M"
+    },
+    {
+      "cagr": 23.8,
+      "sharpe": 0.968,
+      "max_dd": -16.23,
+      "calmar": 1.467,
+      "n_trades": 205,
+      "sortino": 1.239,
+      "profit_factor": 2.582,
+      "win_rate": 58.0,
+      "annual_returns_raw": {
+        "2020": 8.18,
+        "2021": 34.96,
+        "2022": 16.25,
+        "2023": 21.39,
+        "2024": 20.41
+      },
+      "worst_month_pct": -10.05,
+      "worst_month_date": "2021-02",
+      "worst_quarter_pct": -11.12,
+      "peak_date": "2021-01-13",
+      "trough_date": "2021-03-02",
+      "recovery_date": "2021-04-08",
+      "peak_to_trough_days": 48,
+      "recovery_days": 37,
+      "total_underwater_days": 947,
+      "time_underwater_pct": 87.9,
+      "avg_simultaneous_holdings": 2.7,
+      "days_at_max_positions": 820,
+      "cap_saturation_rate_pct": 76.1,
+      "avg_idle_cash_pct": 108.6,
+      "lot_reject_count": 0,
+      "missed_by_cap_count": 520,
+      "missed_fwd20d": {
+        "avg_fwd20d_pct": 2.88,
+        "n": 520,
+        "pct_positive": 60.8
+      },
+      "lot_fwd20d": {
+        "avg_fwd20d_pct": null,
+        "n": 0,
+        "pct_positive": null
+      },
+      "capital": 50000000,
+      "label": "¥50M"
+    },
+    {
+      "cagr": 24.0,
+      "sharpe": 0.972,
+      "max_dd": -16.25,
+      "calmar": 1.477,
+      "n_trades": 205,
+      "sortino": 1.246,
+      "profit_factor": 2.588,
+      "win_rate": 58.0,
+      "annual_returns_raw": {
+        "2020": 8.2,
+        "2021": 35.0,
+        "2022": 16.32,
+        "2023": 21.78,
+        "2024": 20.83
+      },
+      "worst_month_pct": -10.05,
+      "worst_month_date": "2021-02",
+      "worst_quarter_pct": -11.03,
+      "peak_date": "2021-01-13",
+      "trough_date": "2021-03-02",
+      "recovery_date": "2021-04-08",
+      "peak_to_trough_days": 48,
+      "recovery_days": 37,
+      "total_underwater_days": 947,
+      "time_underwater_pct": 87.9,
+      "avg_simultaneous_holdings": 2.7,
+      "days_at_max_positions": 820,
+      "cap_saturation_rate_pct": 76.1,
+      "avg_idle_cash_pct": 108.4,
+      "lot_reject_count": 0,
+      "missed_by_cap_count": 520,
+      "missed_fwd20d": {
+        "avg_fwd20d_pct": 2.88,
+        "n": 520,
+        "pct_positive": 60.8
+      },
+      "lot_fwd20d": {
+        "avg_fwd20d_pct": null,
+        "n": 0,
+        "pct_positive": null
+      },
+      "capital": 100000000,
+      "label": "¥100M"
+    }
+  ],
+  "marginals": [
+    {
+      "label": "¥3M",
+      "delta_cagr": 0.0,
+      "delta_sharpe": 0.0,
+      "delta_calmar": 0.0
+    },
+    {
+      "label": "¥5M",
+      "delta_cagr": -0.11,
+      "delta_sharpe": -0.022,
+      "delta_calmar": -0.049
+    },
+    {
+      "label": "¥10M",
+      "delta_cagr": 1.17,
+      "delta_sharpe": 0.041,
+      "delta_calmar": 0.09
+    },
+    {
+      "label": "¥15M",
+      "delta_cagr": 2.06,
+      "delta_sharpe": 0.079,
+      "delta_calmar": 0.126
+    },
+    {
+      "label": "¥20M",
+      "delta_cagr": -0.55,
+      "delta_sharpe": -0.026,
+      "delta_calmar": -0.057
+    },
+    {
+      "label": "¥30M",
+      "delta_cagr": 0.75,
+      "delta_sharpe": 0.026,
+      "delta_calmar": 0.057
+    },
+    {
+      "label": "¥50M",
+      "delta_cagr": 0.34,
+      "delta_sharpe": 0.011,
+      "delta_calmar": 0.018
+    },
+    {
+      "label": "¥100M",
+      "delta_cagr": 0.2,
+      "delta_sharpe": 0.004,
+      "delta_calmar": 0.01
+    }
+  ],
+  "analysis": {
+    "saturation_point": "¥5M",
+    "max_calmar_capital": "¥100M",
+    "max_calmar_value": 1.477,
+    "best_sharpe_capital": "¥100M",
+    "best_sharpe_value": 0.972,
+    "lot_cliff_capital": "¥20M",
+    "cagr_gain_to_lot_cliff_pp": 2.57,
+    "cagr_gain_beyond_lot_cliff_pp": 0.54,
+    "min_efficient_capital": "¥20M",
+    "optimal_capital": "¥100M",
+    "saturation_capital": "¥5M"
+  },
+  "recommendation": {
+    "range_low": "¥20M",
+    "range_high": "¥100M",
+    "expected_cagr": 24.0,
+    "expected_sharpe": 0.972,
+    "expected_max_dd": -16.25,
+    "expected_calmar": 1.477
+  },
+  "vs_3m_comparison": {
+    "cagr": {
+      "3m": 20.14,
+      "30m": 23.46
+    },
+    "sharpe": {
+      "3m": 0.859,
+      "30m": 0.957
+    },
+    "max_dd": {
+      "3m": -15.71,
+      "30m": -16.19
+    },
+    "calmar": {
+      "3m": 1.282,
+      "30m": 1.449
+    },
+    "worst_month_pct": {
+      "3m": -8.61,
+      "30m": -10.05
+    },
+    "worst_quarter_pct": {
+      "3m": -10.01,
+      "30m": -11.48
+    },
+    "peak_to_trough_days": {
+      "3m": 21,
+      "30m": 48
+    },
+    "recovery_days": {
+      "3m": 21,
+      "30m": 37
+    },
+    "lot_reject_count": {
+      "3m": 20,
+      "30m": 0
+    },
+    "missed_by_cap_count": {
+      "3m": 476,
+      "30m": 520
+    }
+  }
+}
