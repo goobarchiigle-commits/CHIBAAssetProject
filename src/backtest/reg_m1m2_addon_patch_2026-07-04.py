@@ -32,7 +32,7 @@ from src.backtest.snapshot_archaeology_202606 import build_common_dataset
 import src.backtest.composite_alpha_bt as cab
 
 TODAY_STR = date.today().strftime("%Y-%m-%d")
-OUT_FILE  = ROOT / "backtests" / f"reg_m1m2_addon_patch_{TODAY_STR}.json"
+OUT_FILE  = ROOT / "backtests" / f"reg_m1m2_addon_patch_{TODAY_STR}_rollback_verify.json"
 
 CAPITAL   = 3_000_000
 MIN_HOLD  = 3
@@ -74,7 +74,8 @@ def extract_metrics(raw: dict) -> dict:
         "max_dd":    round(safe_float(raw.get("max_dd")), 2),
         "calmar":    round(safe_float(raw.get("calmar")), 3),
         "n_trades":  int(raw.get("n_trades", 0) or 0),
-        "addon_cnt": int(raw.get("addon_cnt", 0) or 0),
+        # 正キーは "addon_count"（Study73のextract_metricsが "addon_cnt" を参照して常に0だったバグの修正 2026-07-04）
+        "addon_cnt": int(raw.get("addon_count", raw.get("addon_cnt", 0)) or 0),
     }
 
 

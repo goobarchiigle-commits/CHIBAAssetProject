@@ -15,7 +15,7 @@
   - **根本原因**: `max_positions=3`均等配分による通常エントリーの目標ウェイトが約33.3%（capital/3）であり、これは`max_single_weight=0.25`（CIRCUIT値）を**エントリー時点で既に超過**している。旧`×1.5`（37.5%上限）はCIRCUIT違反ではなく、addon機能が動作するための必須の実務的ヘッドルームだった。strategy.yamlの`symbol_cap=0.40`が意図的に0.333超に設定されているのも同じ理由（コメント参照）。
   - **結論**: design_philosophy_review「例外を持つ上限は規律の不在」という評価は、現行の均等配分ロジックとの整合性を欠く。M2の単純撤廃は**Study45/52でADOPT済みのEQ Scale addon機能を実質的に無効化**する重大な副作用があり、ロードマップ自身のゲート「|ΔCAGR|>0.5pp または 2022悪化 → 停止」に抵触。
   - **処置**: `src/backtest/composite_alpha_bt.py` は**PATCH前の状態に完全ロールバック済み**（close_mat実行・×1.5維持）。REG結果は `backtests/reg_m1m2_addon_patch_2026-07-04.json` に保存。検証用スクリプトは `src/backtest/reg_m1m2_addon_patch_2026-07-04.py`。
-  - **次のアクション（ユーザー決裁待ち）**: (a) M1/M2を完全放棄し現状維持、(b) max_single_weightの解釈を「新規エントリーのみ」に限定しaddon分は別枠として再設計、(c) M1のみ採用しM2は放棄、のいずれかを検討要。
+  - **次のアクション（ユーザー決裁待ち）**: 推奨案をroadmap§2.2に確定済み（**M1=採用推奨**〔live=MARKET_OPEN実証確認・-2.06ppは過大評価の是正・公式数字再基準化とセット〕 / **M2=コード変更恒久放棄→M2'文書整合に置換**）。決裁チェックリストD1-D3はroadmap§2.2末尾。ロールバック完全性はfresh runで全指標Δ=0.00pp検証済み（`backtests/reg_m1m2_addon_patch_2026-07-04_rollback_verify.json`）。真のaddon件数: IS=5件/OOS=16件（OOS 2025はaddon依存度が高い — OOS解釈全般で注意）。
 
 ### M3: CLAUDE.md 恒久化 — 完了
 `# OVERFIT_GUARD` に `fresh_run_required=true` 追加済み。
@@ -130,6 +130,7 @@ Exit micro / BW検出保護 / 日足OHLCV新ML / 幾何・配分@¥3M / Adaptive
 **Study73新規実行の判定**: KEEP (B_ATR_EXT IS=11.83% < D_ATR_EQ IS=12.37%)
 
 **差異の原因**: Study52のB_ATR_EXT(IS=12.81%)とStudy73のCURRENT(IS=12.37%)は一致するが、Study73のCAN D_A(B_ATR_EXT)は11.83%。Study52のB_ATR_EXTには何らかの追加addon(winner_addon等)が含まれていた可能性。addon_cnt: Study52 B_ATR_EXT=14 vs Study73 CAND_A=0 がその証拠。
+**⚠訂正(2026-07-04)**: 上記のaddon_cnt比較は証拠として無効。Study73のextract_metrics()が誤キー`addon_cnt`（正キー=`addon_count`）を参照しており、Study73側のaddon件数は全構成で常に0と誤報告されていた（CAND_Aはaddon_policy=NONEなので真値も0だが、比較の論拠としては壊れている）。F3=KEEPの結論自体はCAGR比較(12.37% vs 11.83%)に基づくため不変。真のaddon件数(D_ATR_EQ): IS=5件/OOS 2025=16件/WF=2/1/1/5/6件。詳細→roadmap§2.2前提事実3。
 
 **結論**: 現在エンジンでの真のEQ Scale除去比較では、EQ Scaleが有益(+0.54pp IS)。F3=REMOVE候補は誤り。**F3=KEEP（維持）に訂正**。
 

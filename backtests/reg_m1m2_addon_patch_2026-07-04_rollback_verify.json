@@ -1,0 +1,94 @@
+{
+  "reg": "M1_M2_addon_patch",
+  "date": "2026-07-04",
+  "patch": [
+    "M1: addon_px close->open (composite_alpha_bt.py L1666付近)",
+    "M2: max_single_weight x1.5 bypass removed (composite_alpha_bt.py L1685付近)"
+  ],
+  "baseline_pre_patch": {
+    "is_cagr": 12.37,
+    "oos_cagr": 13.48,
+    "wf_avg_cagr": 18.37,
+    "wf_pass": 4,
+    "seg2022_cagr": -2.65
+  },
+  "post_patch": {
+    "is": {
+      "cagr": 12.37,
+      "sharpe": 0.586,
+      "max_dd": -18.12,
+      "calmar": 0.683,
+      "n_trades": 263,
+      "addon_cnt": 5
+    },
+    "oos": {
+      "cagr": 13.48,
+      "sharpe": 1.199,
+      "max_dd": -10.15,
+      "calmar": 1.329,
+      "n_trades": 42,
+      "addon_cnt": 16
+    },
+    "wf_avg_cagr": 18.37,
+    "wf_pass": 4,
+    "wf_segments": [
+      {
+        "cagr": 5.66,
+        "sharpe": 0.332,
+        "max_dd": -19.0,
+        "calmar": 0.298,
+        "n_trades": 29,
+        "addon_cnt": 2,
+        "year": "2020",
+        "wf_pass": true
+      },
+      {
+        "cagr": 5.38,
+        "sharpe": 0.33,
+        "max_dd": -20.71,
+        "calmar": 0.26,
+        "n_trades": 53,
+        "addon_cnt": 1,
+        "year": "2021",
+        "wf_pass": true
+      },
+      {
+        "cagr": -2.65,
+        "sharpe": 0.057,
+        "max_dd": -20.93,
+        "calmar": -0.126,
+        "n_trades": 43,
+        "addon_cnt": 1,
+        "year": "2022",
+        "wf_pass": false
+      },
+      {
+        "cagr": 44.9,
+        "sharpe": 1.817,
+        "max_dd": -8.85,
+        "calmar": 5.075,
+        "n_trades": 49,
+        "addon_cnt": 5,
+        "year": "2023",
+        "wf_pass": true
+      },
+      {
+        "cagr": 38.58,
+        "sharpe": 1.846,
+        "max_dd": -15.07,
+        "calmar": 2.56,
+        "n_trades": 34,
+        "addon_cnt": 6,
+        "year": "2024",
+        "wf_pass": true
+      }
+    ]
+  },
+  "delta": {
+    "is_cagr": 0.0,
+    "oos_cagr": 0.0,
+    "wf_avg": 0.0,
+    "2022_cagr": 0.0
+  },
+  "stop_flag": false
+}

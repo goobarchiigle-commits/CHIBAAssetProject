@@ -118,7 +118,7 @@ ADOPT ⇔ WF 5/5 ∧ 2022非悪化 ∧ ΔCAGR≥+1pp ∧ Bootstrap P(>0)≥95% �
 
 - **問題**: `_max_val = capital * cfg.portfolio.max_single_weight * 1.5`（同ファイル L1685付近、grep `_max_val` で特定）。addon経路のみ37.5%まで許容 = CIRCUIT `max_single_weight=0.25`（変更禁止）と矛盾。
 - **ASK_FIRST**: 要。推奨案 = `* 1.5` を削除し0.25厳格化（「例外を持つ上限は規律の不在」— design_philosophy #7）。
-- **手順**: M1と同一REGサイクルで同時実施（fresh run 1回で両方測る）。addon発火件数の変化（現14件）を報告。
+- **手順**: M1と同一REGサイクルで同時実施（fresh run 1回で両方測る）。addon発火件数の変化を報告。~~（現14件）~~ **→訂正(2026-07-04)**: 14件はStudy52のA_BASELINE構成の値。D_ATR_EQの実測はIS 2018-2024=**5件**/OOS 2025=**16件**（§2.2前提事実3）。
 - **完了条件**: REG差分 + CIRCUIT整合の確認文言。
 
 ## M3: 研究プロトコルの恒久化（CLAUDE.md 1行）
@@ -176,6 +176,8 @@ ADOPT ⇔ WF 5/5 ∧ 2022非悪化 ∧ ΔCAGR≥+1pp ∧ Bootstrap P(>0)≥95% �
 3. **M1のみ採用・M2は放棄**（execution price統一は今後のBT/Live parityのために価値があるが、M1単独でも-2.06pp/2022悪化のゲート抵触があるため、これも「軽微修正」の前提が崩れており単独でもユーザー判断が必要）。
 4. 上記いずれも保留し、Stage2以降（S1 CAND_B等）を先行させる。
 
+**→ 推奨案は§2.2に確定済み（= 選択肢3の変形: M1採用+M2は文書整合M2'に置換）。§2.2は追加実測に基づく実行仕様まで含む — 決裁は§2.2を読んで行うこと。**
+
 ### M5: 想定外の発見（環境認識の誤り）
 
 roadmap執筆時点の前提「`C:/ai-trading`がgit未初期化」は不正確だった。実際には`.git`が`src/`配下に単独で存在し、GitHub origin（CHIBAAssetProject.git, branch=main）と一致・HEAD=origin/mainの状態だったが、最終コミットは2026-04-07で以降3ヶ月分（src/内の再編作業＋reports/backtests/docs/scripts/tools/tests等ルート直下の新規ディレクトリ全て）が未コミットのまま放置されていた。
@@ -191,11 +193,64 @@ roadmap執筆時点の前提「`C:/ai-trading`がgit未初期化」は不正確�
 
 ---
 
+## 2.2 M1/M2 決裁推奨案 + 追加検討4項目の実行仕様（2026-07-04追記・CLD起案）
+
+**目的**: 決裁と実行の間に検討事項を残さない。本節の各仕様は承認後そのまま実行可能なレベルまで具体化済み。
+
+### 前提事実（§2.1以降に追加実測で確定した5点）
+
+1. **live執行の実装確認**: `src/run_live_signal.py` のaddon発注は `order_type="MARKET_OPEN"`（翌日寄付成行・L5670付近）。**BTのclose執行がliveと乖離している側** — M1は「改悪」ではなく「BTの過大評価の是正」。
+2. **ロールバック完全性のfresh run検証**: 復元後エンジンでIS/OOS/WF/2018-2019全再実行 → Study73基準値と**全指標Δ=0.00pp**（IS 12.37/OOS 13.48/WF avg 18.37・4/5/2022 -2.65）。証跡: `backtests/reg_m1m2_addon_patch_2026-07-04_rollback_verify.json`。
+3. **真のaddon件数**（`addon_count`キー修正後の実測）: IS 2018-2024=**5件** / OOS 2025=**16件** / WF fold別=2/1/1/5/6件。M2節の「現14件」はStudy52のA_BASELINE構成の値であり誤引用。
+4. **OOS 2025のaddon依存**: 1年で16件はIS 7年分(5件)の3倍超。M1の執行価格差の影響がOOSに集中した理由（IS -0.15pp vs OOS -2.06pp）はこの分布と整合。**OOS 2025の好成績(13.48%)はaddon経路への依存度が高い** — 今後のOOS解釈全般で注意。
+5. **エントリー経路のweight cap実装**: `composite_alpha_bt.py` L73 `MAX_POS_WEIGHT=0.40`（alpha加重cap）。CIRCUITの`max_single_weight=0.25`はBTエンジン内では**addon経路にのみ**登場（×1.5=0.375）。エントリーには0.25は一切適用されていない。
+
+### M1 推奨: **採用**（Production公式数字の再基準化とセット）
+
+- **判断根拠**: (i) live=MARKET_OPENが実装事実（前提1）。BTをliveに合わせるのが検証機構の真実性（§9原則1: 検証機構の保全>どんな改善）。(ii) -2.06ppは損失ではなくバイアス除去 — 数字が下がるからREJECTするのは「都合の良い測定の選択」であり本プロジェクトが最も禁じる行為。(iii) ゲート「|Δ|>0.5pp→停止」は停止・報告条項であり自動REJECTではない（M1手順4の原文どおり）。
+- **承認に必要な明示的合意**: 採用するとProduction公式数字が下がる — IS 12.37→12.22% / OOS 13.48→**11.42%** / WF avg 18.37→17.99% / 2022 -2.65→-2.95%（2026-07-04 REG実測値）。この「正直な数字」への引き下げを承認すること。
+- **実行仕様（承認後・検討ゼロで実行）**:
+  1. PATCH再適用: `close_mat[next_i, _aidx]` → `open_mat[next_i, _aidx]`（grep `_addon_px` で特定・コメントも「翌日寄付執行（新規BUYと統一 2026-07 PATCH）」へ）。
+  2. fresh run で新基準値確定: IS/OOS/WF5fold/2018/2019単独 + Bootstrap（Study73 Phase3方式・N=500・seed=42）。スクリプトは既存 `reg_m1m2_addon_patch_2026-07-04.py` を流用（M2部分は触らない）。
+  3. §0.7現在地表・research_state.md冒頭の公式数字を更新。旧値は「close執行（過大評価）時代の参照値」として併記保持 — 削除しない。
+  4. **S1への波及**: Study73 Phase2のCAND_B数字は旧エンジン産。S1決裁の前に、パッチ後エンジンで CURRENT vs CAND_B を再測定（fresh run・同スクリプト改変1行 `rsr_exit=75.0`）。CAND_Bの採用根拠（2022正転・WF5/5）がパッチ後も成立するかを確認してからS1承認へ。
+  5. `src/live/live_equivalent.py` / parity計算がaddon執行価格を参照していないか grep `addon` で確認。参照があれば同値修正。
+  6. research_state.md追記 + commit（`research update: YYYY-MM-DD`）。
+- **却下する場合**: BT/Live乖離が恒久残存し、以後の全Study（74/76/77含む）がaddon分の過大評価を含んだまま進む。却下時はその旨を本書とresearch_state.mdに「既知バイアス（OOS約+2pp）」として登録すること（未登録での続行は禁止）。
+
+### M2 推奨: **コード変更は恒久放棄 → M2'（文書整合）に置換**
+
+- **判断根拠**: ×1.5撤廃=EQ Scale addon機能死は実測で確定（§2.1）。Study73のCAND_A=KEEP判定（EQ Scale除去は有害）と直接矛盾するため、コード側を変える選択肢は存在しない。design_philosophy #7「例外を持つ上限は規律の不在」は、本件では「上限の定義が実装と乖離している」ことが真因であり、例外の除去ではなく定義の明文化が正しい処方。
+- **M2' 実行仕様（2案・ユーザー選択、デフォルト推奨=案a）**:
+  - **案a（推奨・CLAUDE.md不変更）**: research_state.mdに実効上限のRCAを1段落記録するのみ:「CIRCUIT `max_single_weight=0.25` の実装実態 — エントリー経路: alpha加重cap 0.40（`MAX_POS_WEIGHT`）・均等時約33.3%。addon経路: 0.25×1.5=0.375 hard cap。0.25が単独で効く経路は現エンジンに存在しない。addon経路の0.375は機能要件（Study45/52 ADOPT済みEQ Scaleの動作条件）」。→ 本§2.2の記載を転記するだけで完了。
+  - **案b（CLAUDE.md注記・ASK_FIRST）**: CIRCUIT行に注記追加 `max_single_weight=0.25 ← 実効: entry cap=0.40(MAX_POS_WEIGHT)/addon hard cap=0.375。詳細roadmap§2.2`。CIRCUIT値自体は不変更。
+- **構造的解消の委譲先**: Study76（Clenow純正・最簡構成）にはaddonが存在しないため、Study76が勝てば不整合ごと消滅する。Study77も同様。**weight体系の再設計を独立研究として起案することは禁止**（恒久閉鎖#4「幾何・配分@¥3M」に該当）。
+
+### 追加検討4項目の実行仕様（確定）
+
+- **①（max_single_weight不整合）**: M2'案aの文書化で完了扱い。加えてStudy74実装仕様（§4 L1）に出力列1つ追加: 各セル（capital×config）で「実効max単一銘柄ウェイト実測値（日次ピーク）」を報告。¥20-30Mではlot丸め解消により均等33.3%へ張り付くはずで、その確認自体がStudy74の副産物になる。追加研究・スイープは不要。
+- **②（addon_cntバグ）**: 修正はREGスクリプトに実装済み（正キー`addon_count`）。`study73_production_migration_audit.py`本体は**修正しない**（再実行予定なし・出力JSONは「当時の判定記録」として凍結 — §9原則2）。ただしresearch_state.mdのStudy73セクションの推論「addon_cnt: Study52 B_ATR_EXT=14 vs Study73 CAND_A=0 がその証拠」はこのバグにより**証拠として無効**（Study73側の0はバグ産。なおCAND_Aはaddon_policy=NONEなので真値も0であり、F3=KEEPの結論自体はCAGR比較12.37 vs 11.83に基づくため不変）→ 訂正注記をresearch_state.mdに追記（実施済み 2026-07-04）。
+- **③（S1の実行順序）**: 確定順序 = **M1決裁 → （採用なら）パッチ後エンジンでCAND_B再測定 → S1承認 → strategy.yaml変更 → 同期確認grep → dry-run（RSR75跨ぎExit確認）→ 3営業日shadow → LIVE**。M1却下ならStudy73数字のままS1へ直行可。**M1決裁を先に済ませることが必須ではないが強く推奨** — 逆順（S1先行→後からM1採用）だと再基準化が2回発生し、shadow期間中に判定基準が変わる。
+- **④（push手順）**: `git fetch origin` → `git rev-list --left-right --count origin/main...main` で分岐確認 → 左側（リモート先行）が0なら `git push origin main`。左側>0なら**停止・ユーザー報告**（他端末push痕跡＝履歴統合の再検討要）。実行自体はASK_FIRST維持。初回push成功後は通常運用（コミット毎push可否は都度確認）。
+
+### 決裁チェックリスト（ユーザーはこの3問に答えるだけでStage1が閉じる）
+
+| # | 決裁事項 | 推奨 |
+|---|---|---|
+| D1 | M1採用（公式数字 OOS 13.48→11.42%への再基準化を含む）— YES/NO | **YES** |
+| D2 | M2'方式 — 案a（research_state.md記録のみ）/ 案b（CLAUDE.md注記） | **案a** |
+| D3 | git push実行（④手順） — YES/保留 | YES（fetch確認PASS前提） |
+
+D1=YES → M1実行仕様1-6を実施後、S1（§3）へ。D1=NO → 既知バイアス登録後、S1へ直行。いずれでもStage1完了・Stage2開始可能。
+
+---
+
 # Section 3: Stage 2 — 短期売買手法改善（2026-07〜08 / 数週間）
 
 ## S1: CAND_B移行 — rsr_exit 70→75【研究済・決断のみ・最大の短期改善】
 
 - **効果（Study73実測）**: 2022年 -2.65%→+2.37%（+5.02pp）/ WF 4/5→5/5 / Bootstrap P(>0)=100% / Fold std -4.63pp。代償: 平均リターン-1〜2.7pp。将来レバの前提=worst-year正転。
+- **⚠ 前提改訂(2026-07-04 §2.2③)**: 上記Study73数字は旧（close執行）エンジン産。M1決裁を先に確定させること（強く推奨）。M1採用時は手順1の前に「パッチ後エンジンで CURRENT vs CAND_B 再測定」を挿入し、2022正転・WF5/5がパッチ後も成立することを確認してから承認へ。M1却下時はStudy73数字のまま手順1へ直行可。
 - **ASK_FIRST**: 要（PARAMS_LOCKED隣接）。
 - **手順**:
   1. ユーザー承認取得（トレードオフを明示: 平均-2pp vs 2022+5pp・WF5/5）。
@@ -232,9 +287,9 @@ roadmap執筆時点の前提「`C:/ai-trading`がgit未初期化」は不正確�
 - **正典定義**: 成功=¥20-30MでCAGR≥22%（fix後・コスト込・WF5/5）。失敗=<18% or DD%が資本比例悪化。終了=4資本点×2構成の全測定（追加スイープ禁止）。
 - **ASK_FIRST**: 要（新規スクリプト `src/backtest/study74_capital_scaling_fresh.py`）。
 - **実装仕様**:
-  1. M1/M2 PATCH適用後のエンジンで実行（**汚染前Study42/43A/46のJSONは参照値としてのみ使用・判定に使用禁止**）。
+  1. ~~M1/M2 PATCH適用後のエンジンで実行~~ **→改訂(2026-07-04 §2.2)**: M1採否確定後のエンジンで実行（M2はコード変更放棄が確定 — §2.2参照）。M1未決裁のままの起案は禁止。（**汚染前Study42/43A/46のJSONは参照値としてのみ使用・判定に使用禁止**）。
   2. マトリクス: capital ∈ {3M, 10M, 20M, 30M} × config ∈ {D_ATR_EQ現行, CAND_B適用後}。
-  3. 各セル: IS 2018-2024 / OOS 2025 / WF5fold / MaxDD / lot_skip率 / 1銘柄あたり平均約定額。
+  3. 各セル: IS 2018-2024 / OOS 2025 / WF5fold / MaxDD / lot_skip率 / 1銘柄あたり平均約定額 / **実効max単一銘柄ウェイト実測値（日次ピーク・§2.2①）**。
   4. lot制約の解消検証: Study25/44が示した「¥3Mでlot丸めが破壊」が¥20M+で消えるか（skip率<5%を目安に報告）。
   5. 出力: `backtests/study74_capital_scaling_YYYY-MM-DD.json` + レポート。
 - **分岐（CP1・目標公式改定）**:
