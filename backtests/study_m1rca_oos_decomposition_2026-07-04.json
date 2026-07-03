@@ -1,0 +1,1337 @@
+{
+  "study": "M1_RCA_OOS_decomposition",
+  "date": "2026-07-04",
+  "period": "OOS_2025",
+  "baseline_cagr": 13.48,
+  "patched_cagr": 11.42,
+  "delta_cagr": -2.06,
+  "classification": {
+    "identical_trade": {
+      "count": 41,
+      "delta_pnl": -39268.3,
+      "pct": 71.1,
+      "detail": [
+        {
+          "key": [
+            "6506.T",
+            226
+          ],
+          "base": {
+            "symbol": "6506.T",
+            "entry_idx": 226,
+            "exit_idx": 234,
+            "entry_px": 4855.0,
+            "exit_px": 4434.0,
+            "qty": 100,
+            "pnl": -42100.0,
+            "reason": "ATR_TRAILING",
+            "hold_days": 8
+          },
+          "patch": {
+            "symbol": "6506.T",
+            "entry_idx": 226,
+            "exit_idx": 234,
+            "entry_px": 4855.0,
+            "exit_px": 4434.0,
+            "qty": 100,
+            "pnl": -42100.0,
+            "reason": "ATR_TRAILING",
+            "hold_days": 8
+          },
+          "delta_pnl": 0.0
+        },
+        {
+          "key": [
+            "5706.T",
+            108
+          ],
+          "base": {
+            "symbol": "5706.T",
+            "entry_idx": 108,
+            "exit_idx": 111,
+            "entry_px": 4738.0,
+            "exit_px": 4712.0,
+            "qty": 100,
+            "pnl": -2600.0,
+            "reason": "RSR_EXIT",
+            "hold_days": 3
+          },
+          "patch": {
+            "symbol": "5706.T",
+            "entry_idx": 108,
+            "exit_idx": 111,
+            "entry_px": 4738.0,
+            "exit_px": 4712.0,
+            "qty": 100,
+            "pnl": -2600.0,
+            "reason": "RSR_EXIT",
+            "hold_days": 3
+          },
+          "delta_pnl": 0.0
+        },
+        {
+          "key": [
+            "7011.T",
+            193
+          ],
+          "base": {
+            "symbol": "7011.T",
+            "entry_idx": 193,
+            "exit_idx": 200,
+            "entry_px": 4390.0,
+            "exit_px": 4460.0,
+            "qty": 100,
+            "pnl": 7000.0,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 7
+          },
+          "patch": {
+            "symbol": "7011.T",
+            "entry_idx": 193,
+            "exit_idx": 200,
+            "entry_px": 4390.0,
+            "exit_px": 4460.0,
+            "qty": 100,
+            "pnl": 7000.0,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 7
+          },
+          "delta_pnl": 0.0
+        },
+        {
+          "key": [
+            "8015.T",
+            146
+          ],
+          "base": {
+            "symbol": "8015.T",
+            "entry_idx": 146,
+            "exit_idx": 155,
+            "entry_px": 3847.0,
+            "exit_px": 3871.0,
+            "qty": 100,
+            "pnl": 2400.0,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 9
+          },
+          "patch": {
+            "symbol": "8015.T",
+            "entry_idx": 146,
+            "exit_idx": 155,
+            "entry_px": 3847.0,
+            "exit_px": 3871.0,
+            "qty": 100,
+            "pnl": 2400.0,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 9
+          },
+          "delta_pnl": 0.0
+        },
+        {
+          "key": [
+            "7182.T",
+            35
+          ],
+          "base": {
+            "symbol": "7182.T",
+            "entry_idx": 35,
+            "exit_idx": 38,
+            "entry_px": 1514.0,
+            "exit_px": 1488.0,
+            "qty": 400,
+            "pnl": -10400.0,
+            "reason": "RSR_EXIT",
+            "hold_days": 3
+          },
+          "patch": {
+            "symbol": "7182.T",
+            "entry_idx": 35,
+            "exit_idx": 38,
+            "entry_px": 1514.0,
+            "exit_px": 1488.0,
+            "qty": 400,
+            "pnl": -10400.0,
+            "reason": "RSR_EXIT",
+            "hold_days": 3
+          },
+          "delta_pnl": 0.0
+        },
+        {
+          "key": [
+            "8015.T",
+            161
+          ],
+          "base": {
+            "symbol": "8015.T",
+            "entry_idx": 161,
+            "exit_idx": 179,
+            "entry_px": 3986.6,
+            "exit_px": 4037.0,
+            "qty": 200,
+            "pnl": 10079.6,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 18
+          },
+          "patch": {
+            "symbol": "8015.T",
+            "entry_idx": 161,
+            "exit_idx": 179,
+            "entry_px": 4023.5,
+            "exit_px": 4037.0,
+            "qty": 200,
+            "pnl": 2700.0,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 18
+          },
+          "delta_pnl": -7379.6
+        },
+        {
+          "key": [
+            "8015.T",
+            112
+          ],
+          "base": {
+            "symbol": "8015.T",
+            "entry_idx": 112,
+            "exit_idx": 139,
+            "entry_px": 3229.15,
+            "exit_px": 3467.0,
+            "qty": 300,
+            "pnl": 71354.9,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 27
+          },
+          "patch": {
+            "symbol": "8015.T",
+            "entry_idx": 112,
+            "exit_idx": 139,
+            "entry_px": 3226.67,
+            "exit_px": 3467.0,
+            "qty": 300,
+            "pnl": 72100.0,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 27
+          },
+          "delta_pnl": 745.1
+        },
+        {
+          "key": [
+            "6501.T",
+            81
+          ],
+          "base": {
+            "symbol": "6501.T",
+            "entry_idx": 81,
+            "exit_idx": 88,
+            "entry_px": 3817.0,
+            "exit_px": 3825.0,
+            "qty": 100,
+            "pnl": 800.0,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 7
+          },
+          "patch": {
+            "symbol": "6501.T",
+            "entry_idx": 81,
+            "exit_idx": 88,
+            "entry_px": 3817.0,
+            "exit_px": 3825.0,
+            "qty": 100,
+            "pnl": 800.0,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 7
+          },
+          "delta_pnl": 0.0
+        },
+        {
+          "key": [
+            "2914.T",
+            216
+          ],
+          "base": {
+            "symbol": "2914.T",
+            "entry_idx": 216,
+            "exit_idx": 224,
+            "entry_px": 5780.0,
+            "exit_px": 5775.0,
+            "qty": 100,
+            "pnl": -500.0,
+            "reason": "RSR_EXIT",
+            "hold_days": 8
+          },
+          "patch": {
+            "symbol": "2914.T",
+            "entry_idx": 216,
+            "exit_idx": 224,
+            "entry_px": 5780.0,
+            "exit_px": 5775.0,
+            "qty": 100,
+            "pnl": -500.0,
+            "reason": "RSR_EXIT",
+            "hold_days": 8
+          },
+          "delta_pnl": 0.0
+        },
+        {
+          "key": [
+            "9531.T",
+            17
+          ],
+          "base": {
+            "symbol": "9531.T",
+            "entry_idx": 17,
+            "exit_idx": 44,
+            "entry_px": 4173.16,
+            "exit_px": 4740.0,
+            "qty": 200,
+            "pnl": 113367.3,
+            "reason": "STRATEGY_EXIT",
+            "hold_days": 27
+          },
+          "patch": {
+            "symbol": "9531.T",
+            "entry_idx": 17,
+            "exit_idx": 44,
+            "entry_px": 4291.0,
+            "exit_px": 4740.0,
+            "qty": 200,
+            "pnl": 89800.0,
+            "reason": "STRATEGY_EXIT",
+            "hold_days": 27
+          },
+          "delta_pnl": -23567.3
+        },
+        {
+          "key": [
+            "5401.T",
+            206
+          ],
+          "base": {
+            "symbol": "5401.T",
+            "entry_idx": 206,
+            "exit_idx": 210,
+            "entry_px": 596.0,
+            "exit_px": 610.0,
+            "qty": 1200,
+            "pnl": 16800.0,
+            "reason": "RSR_EXIT",
+            "hold_days": 4
+          },
+          "patch": {
+            "symbol": "5401.T",
+            "entry_idx": 206,
+            "exit_idx": 210,
+            "entry_px": 596.0,
+            "exit_px": 610.0,
+            "qty": 1200,
+            "pnl": 16800.0,
+            "reason": "RSR_EXIT",
+            "hold_days": 4
+          },
+          "delta_pnl": 0.0
+        },
+        {
+          "key": [
+            "8002.T",
+            220
+          ],
+          "base": {
+            "symbol": "8002.T",
+            "entry_idx": 220,
+            "exit_idx": 226,
+            "entry_px": 4156.5,
+            "exit_px": 4349.0,
+            "qty": 200,
+            "pnl": 38500.0,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 6
+          },
+          "patch": {
+            "symbol": "8002.T",
+            "entry_idx": 220,
+            "exit_idx": 226,
+            "entry_px": 4138.0,
+            "exit_px": 4349.0,
+            "qty": 200,
+            "pnl": 42200.0,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 6
+          },
+          "delta_pnl": 3700.0
+        },
+        {
+          "key": [
+            "6501.T",
+            96
+          ],
+          "base": {
+            "symbol": "6501.T",
+            "entry_idx": 96,
+            "exit_idx": 100,
+            "entry_px": 4024.0,
+            "exit_px": 3961.0,
+            "qty": 100,
+            "pnl": -6300.0,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 4
+          },
+          "patch": {
+            "symbol": "6501.T",
+            "entry_idx": 96,
+            "exit_idx": 100,
+            "entry_px": 4024.0,
+            "exit_px": 3961.0,
+            "qty": 100,
+            "pnl": -6300.0,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 4
+          },
+          "delta_pnl": 0.0
+        },
+        {
+          "key": [
+            "3197.T",
+            59
+          ],
+          "base": {
+            "symbol": "3197.T",
+            "entry_idx": 59,
+            "exit_idx": 68,
+            "entry_px": 2816.38,
+            "exit_px": 2975.0,
+            "qty": 300,
+            "pnl": 47584.5,
+            "reason": "STRATEGY_EXIT",
+            "hold_days": 9
+          },
+          "patch": {
+            "symbol": "3197.T",
+            "entry_idx": 59,
+            "exit_idx": 68,
+            "entry_px": 2832.5,
+            "exit_px": 2975.0,
+            "qty": 300,
+            "pnl": 42750.0,
+            "reason": "STRATEGY_EXIT",
+            "hold_days": 9
+          },
+          "delta_pnl": -4834.5
+        },
+        {
+          "key": [
+            "6762.T",
+            173
+          ],
+          "base": {
+            "symbol": "6762.T",
+            "entry_idx": 173,
+            "exit_idx": 183,
+            "entry_px": 2087.0,
+            "exit_px": 2336.5,
+            "qty": 300,
+            "pnl": 74850.0,
+            "reason": "DEFERRED_EXIT",
+            "hold_days": 10
+          },
+          "patch": {
+            "symbol": "6762.T",
+            "entry_idx": 173,
+            "exit_idx": 183,
+            "entry_px": 2087.0,
+            "exit_px": 2336.5,
+            "qty": 300,
+            "pnl": 74850.0,
+            "reason": "DEFERRED_EXIT",
+            "hold_days": 10
+          },
+          "delta_pnl": 0.0
+        },
+        {
+          "key": [
+            "3197.T",
+            120
+          ],
+          "base": {
+            "symbol": "3197.T",
+            "entry_idx": 120,
+            "exit_idx": 124,
+            "entry_px": 2969.0,
+            "exit_px": 2991.0,
+            "qty": 200,
+            "pnl": 4400.0,
+            "reason": "RSR_EXIT",
+            "hold_days": 4
+          },
+          "patch": {
+            "symbol": "3197.T",
+            "entry_idx": 120,
+            "exit_idx": 124,
+            "entry_px": 2969.0,
+            "exit_px": 2991.0,
+            "qty": 200,
+            "pnl": 4400.0,
+            "reason": "RSR_EXIT",
+            "hold_days": 4
+          },
+          "delta_pnl": 0.0
+        },
+        {
+          "key": [
+            "8002.T",
+            125
+          ],
+          "base": {
+            "symbol": "8002.T",
+            "entry_idx": 125,
+            "exit_idx": 129,
+            "entry_px": 3009.0,
+            "exit_px": 2945.0,
+            "qty": 200,
+            "pnl": -12800.0,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 4
+          },
+          "patch": {
+            "symbol": "8002.T",
+            "entry_idx": 125,
+            "exit_idx": 129,
+            "entry_px": 3009.0,
+            "exit_px": 2945.0,
+            "qty": 200,
+            "pnl": -12800.0,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 4
+          },
+          "delta_pnl": 0.0
+        },
+        {
+          "key": [
+            "8053.T",
+            211
+          ],
+          "base": {
+            "symbol": "8053.T",
+            "entry_idx": 211,
+            "exit_idx": 218,
+            "entry_px": 4850.0,
+            "exit_px": 4818.0,
+            "qty": 100,
+            "pnl": -3200.0,
+            "reason": "RSR_EXIT",
+            "hold_days": 7
+          },
+          "patch": {
+            "symbol": "8053.T",
+            "entry_idx": 211,
+            "exit_idx": 218,
+            "entry_px": 4850.0,
+            "exit_px": 4818.0,
+            "qty": 100,
+            "pnl": -3200.0,
+            "reason": "RSR_EXIT",
+            "hold_days": 7
+          },
+          "delta_pnl": 0.0
+        },
+        {
+          "key": [
+            "7011.T",
+            203
+          ],
+          "base": {
+            "symbol": "7011.T",
+            "entry_idx": 203,
+            "exit_idx": 206,
+            "entry_px": 4677.0,
+            "exit_px": 4459.0,
+            "qty": 100,
+            "pnl": -21800.0,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 3
+          },
+          "patch": {
+            "symbol": "7011.T",
+            "entry_idx": 203,
+            "exit_idx": 206,
+            "entry_px": 4677.0,
+            "exit_px": 4459.0,
+            "qty": 100,
+            "pnl": -21800.0,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 3
+          },
+          "delta_pnl": 0.0
+        },
+        {
+          "key": [
+            "7182.T",
+            189
+          ],
+          "base": {
+            "symbol": "7182.T",
+            "entry_idx": 189,
+            "exit_idx": 192,
+            "entry_px": 1681.0,
+            "exit_px": 1698.5,
+            "qty": 400,
+            "pnl": 7000.0,
+            "reason": "RSR_EXIT",
+            "hold_days": 3
+          },
+          "patch": {
+            "symbol": "7182.T",
+            "entry_idx": 189,
+            "exit_idx": 192,
+            "entry_px": 1681.0,
+            "exit_px": 1698.5,
+            "qty": 400,
+            "pnl": 7000.0,
+            "reason": "RSR_EXIT",
+            "hold_days": 3
+          },
+          "delta_pnl": 0.0
+        },
+        {
+          "key": [
+            "6702.T",
+            105
+          ],
+          "base": {
+            "symbol": "6702.T",
+            "entry_idx": 105,
+            "exit_idx": 124,
+            "entry_px": 3490.0,
+            "exit_px": 3329.0,
+            "qty": 200,
+            "pnl": -32200.0,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 19
+          },
+          "patch": {
+            "symbol": "6702.T",
+            "entry_idx": 105,
+            "exit_idx": 124,
+            "entry_px": 3490.0,
+            "exit_px": 3329.0,
+            "qty": 200,
+            "pnl": -32200.0,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 19
+          },
+          "delta_pnl": 0.0
+        },
+        {
+          "key": [
+            "3197.T",
+            3
+          ],
+          "base": {
+            "symbol": "3197.T",
+            "entry_idx": 3,
+            "exit_idx": 7,
+            "entry_px": 2321.05,
+            "exit_px": 2410.0,
+            "qty": 400,
+            "pnl": 35580.0,
+            "reason": "RSR_EXIT",
+            "hold_days": 4
+          },
+          "patch": {
+            "symbol": "3197.T",
+            "entry_idx": 3,
+            "exit_idx": 7,
+            "entry_px": 2319.38,
+            "exit_px": 2410.0,
+            "qty": 400,
+            "pnl": 36250.0,
+            "reason": "RSR_EXIT",
+            "hold_days": 4
+          },
+          "delta_pnl": 670.0
+        },
+        {
+          "key": [
+            "3197.T",
+            131
+          ],
+          "base": {
+            "symbol": "3197.T",
+            "entry_idx": 131,
+            "exit_idx": 135,
+            "entry_px": 2924.5,
+            "exit_px": 2940.0,
+            "qty": 200,
+            "pnl": 3100.0,
+            "reason": "RSR_EXIT",
+            "hold_days": 4
+          },
+          "patch": {
+            "symbol": "3197.T",
+            "entry_idx": 131,
+            "exit_idx": 135,
+            "entry_px": 2924.5,
+            "exit_px": 2940.0,
+            "qty": 200,
+            "pnl": 3100.0,
+            "reason": "RSR_EXIT",
+            "hold_days": 4
+          },
+          "delta_pnl": 0.0
+        },
+        {
+          "key": [
+            "7182.T",
+            60
+          ],
+          "base": {
+            "symbol": "7182.T",
+            "entry_idx": 60,
+            "exit_idx": 61,
+            "entry_px": 1401.0,
+            "exit_px": 1290.0,
+            "qty": 500,
+            "pnl": -55500.0,
+            "reason": "MARKET_SHOCK_EXIT",
+            "hold_days": 1
+          },
+          "patch": {
+            "symbol": "7182.T",
+            "entry_idx": 60,
+            "exit_idx": 61,
+            "entry_px": 1401.0,
+            "exit_px": 1290.0,
+            "qty": 500,
+            "pnl": -55500.0,
+            "reason": "MARKET_SHOCK_EXIT",
+            "hold_days": 1
+          },
+          "delta_pnl": 0.0
+        },
+        {
+          "key": [
+            "7203.T",
+            214
+          ],
+          "base": {
+            "symbol": "7203.T",
+            "entry_idx": 214,
+            "exit_idx": 218,
+            "entry_px": 3074.0,
+            "exit_px": 3155.0,
+            "qty": 200,
+            "pnl": 16200.0,
+            "reason": "RSR_EXIT",
+            "hold_days": 4
+          },
+          "patch": {
+            "symbol": "7203.T",
+            "entry_idx": 214,
+            "exit_idx": 218,
+            "entry_px": 3074.0,
+            "exit_px": 3155.0,
+            "qty": 200,
+            "pnl": 16200.0,
+            "reason": "RSR_EXIT",
+            "hold_days": 4
+          },
+          "delta_pnl": 0.0
+        },
+        {
+          "key": [
+            "8015.T",
+            198
+          ],
+          "base": {
+            "symbol": "8015.T",
+            "entry_idx": 198,
+            "exit_idx": 202,
+            "entry_px": 4550.0,
+            "exit_px": 4641.0,
+            "qty": 100,
+            "pnl": 9100.0,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 4
+          },
+          "patch": {
+            "symbol": "8015.T",
+            "entry_idx": 198,
+            "exit_idx": 202,
+            "entry_px": 4550.0,
+            "exit_px": 4641.0,
+            "qty": 100,
+            "pnl": 9100.0,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 4
+          },
+          "delta_pnl": 0.0
+        },
+        {
+          "key": [
+            "8002.T",
+            96
+          ],
+          "base": {
+            "symbol": "8002.T",
+            "entry_idx": 96,
+            "exit_idx": 100,
+            "entry_px": 2887.0,
+            "exit_px": 2849.5,
+            "qty": 200,
+            "pnl": -7500.0,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 4
+          },
+          "patch": {
+            "symbol": "8002.T",
+            "entry_idx": 96,
+            "exit_idx": 100,
+            "entry_px": 2887.0,
+            "exit_px": 2849.5,
+            "qty": 200,
+            "pnl": -7500.0,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 4
+          },
+          "delta_pnl": 0.0
+        },
+        {
+          "key": [
+            "8002.T",
+            157
+          ],
+          "base": {
+            "symbol": "8002.T",
+            "entry_idx": 157,
+            "exit_idx": 187,
+            "entry_px": 3332.07,
+            "exit_px": 3820.0,
+            "qty": 300,
+            "pnl": 146379.6,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 30
+          },
+          "patch": {
+            "symbol": "8002.T",
+            "entry_idx": 157,
+            "exit_idx": 187,
+            "entry_px": 3360.67,
+            "exit_px": 3820.0,
+            "qty": 300,
+            "pnl": 137800.0,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 30
+          },
+          "delta_pnl": -8579.6
+        },
+        {
+          "key": [
+            "7203.T",
+            183
+          ],
+          "base": {
+            "symbol": "7203.T",
+            "entry_idx": 183,
+            "exit_idx": 187,
+            "entry_px": 2878.33,
+            "exit_px": 2926.5,
+            "qty": 300,
+            "pnl": 14450.0,
+            "reason": "RSR_EXIT",
+            "hold_days": 4
+          },
+          "patch": {
+            "symbol": "7203.T",
+            "entry_idx": 183,
+            "exit_idx": 187,
+            "entry_px": 2870.67,
+            "exit_px": 2926.5,
+            "qty": 300,
+            "pnl": 16750.0,
+            "reason": "RSR_EXIT",
+            "hold_days": 4
+          },
+          "delta_pnl": 2300.0
+        },
+        {
+          "key": [
+            "3382.T",
+            4
+          ],
+          "base": {
+            "symbol": "3382.T",
+            "entry_idx": 4,
+            "exit_idx": 11,
+            "entry_px": 2324.5,
+            "exit_px": 2436.5,
+            "qty": 300,
+            "pnl": 33600.0,
+            "reason": "RSR_EXIT",
+            "hold_days": 7
+          },
+          "patch": {
+            "symbol": "3382.T",
+            "entry_idx": 4,
+            "exit_idx": 11,
+            "entry_px": 2324.5,
+            "exit_px": 2436.5,
+            "qty": 300,
+            "pnl": 33600.0,
+            "reason": "RSR_EXIT",
+            "hold_days": 7
+          },
+          "delta_pnl": 0.0
+        },
+        {
+          "key": [
+            "8725.T",
+            3
+          ],
+          "base": {
+            "symbol": "8725.T",
+            "entry_idx": 3,
+            "exit_idx": 12,
+            "entry_px": 3301.0,
+            "exit_px": 3259.0,
+            "qty": 200,
+            "pnl": -8400.0,
+            "reason": "STRATEGY_EXIT",
+            "hold_days": 9
+          },
+          "patch": {
+            "symbol": "8725.T",
+            "entry_idx": 3,
+            "exit_idx": 12,
+            "entry_px": 3301.0,
+            "exit_px": 3259.0,
+            "qty": 200,
+            "pnl": -8400.0,
+            "reason": "STRATEGY_EXIT",
+            "hold_days": 9
+          },
+          "delta_pnl": 0.0
+        },
+        {
+          "key": [
+            "5401.T",
+            57
+          ],
+          "base": {
+            "symbol": "5401.T",
+            "entry_idx": 57,
+            "exit_idx": 60,
+            "entry_px": 646.0,
+            "exit_px": 532.1,
+            "qty": 1100,
+            "pnl": -125290.0,
+            "reason": "RSR_EXIT",
+            "hold_days": 3
+          },
+          "patch": {
+            "symbol": "5401.T",
+            "entry_idx": 57,
+            "exit_idx": 60,
+            "entry_px": 646.0,
+            "exit_px": 532.1,
+            "qty": 1100,
+            "pnl": -125290.0,
+            "reason": "RSR_EXIT",
+            "hold_days": 3
+          },
+          "delta_pnl": 0.0
+        },
+        {
+          "key": [
+            "6501.T",
+            133
+          ],
+          "base": {
+            "symbol": "6501.T",
+            "entry_idx": 133,
+            "exit_idx": 136,
+            "entry_px": 4477.53,
+            "exit_px": 4595.0,
+            "qty": 200,
+            "pnl": 23494.1,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 3
+          },
+          "patch": {
+            "symbol": "6501.T",
+            "entry_idx": 133,
+            "exit_idx": 136,
+            "entry_px": 4476.5,
+            "exit_px": 4595.0,
+            "qty": 200,
+            "pnl": 23700.0,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 3
+          },
+          "delta_pnl": 205.9
+        },
+        {
+          "key": [
+            "8002.T",
+            80
+          ],
+          "base": {
+            "symbol": "8002.T",
+            "entry_idx": 80,
+            "exit_idx": 94,
+            "entry_px": 2677.93,
+            "exit_px": 2879.5,
+            "qty": 300,
+            "pnl": 60471.5,
+            "reason": "RSR_EXIT",
+            "hold_days": 14
+          },
+          "patch": {
+            "symbol": "8002.T",
+            "entry_idx": 80,
+            "exit_idx": 94,
+            "entry_px": 2696.67,
+            "exit_px": 2879.5,
+            "qty": 300,
+            "pnl": 54850.0,
+            "reason": "RSR_EXIT",
+            "hold_days": 14
+          },
+          "delta_pnl": -5621.5
+        },
+        {
+          "key": [
+            "8411.T",
+            44
+          ],
+          "base": {
+            "symbol": "8411.T",
+            "entry_idx": 44,
+            "exit_idx": 48,
+            "entry_px": 3992.0,
+            "exit_px": 4339.0,
+            "qty": 100,
+            "pnl": 34700.0,
+            "reason": "STRATEGY_EXIT",
+            "hold_days": 4
+          },
+          "patch": {
+            "symbol": "8411.T",
+            "entry_idx": 44,
+            "exit_idx": 48,
+            "entry_px": 3992.0,
+            "exit_px": 4339.0,
+            "qty": 100,
+            "pnl": 34700.0,
+            "reason": "STRATEGY_EXIT",
+            "hold_days": 4
+          },
+          "delta_pnl": 0.0
+        },
+        {
+          "key": [
+            "3197.T",
+            108
+          ],
+          "base": {
+            "symbol": "3197.T",
+            "entry_idx": 108,
+            "exit_idx": 117,
+            "entry_px": 3056.0,
+            "exit_px": 3045.0,
+            "qty": 200,
+            "pnl": -2200.0,
+            "reason": "STRATEGY_EXIT",
+            "hold_days": 9
+          },
+          "patch": {
+            "symbol": "3197.T",
+            "entry_idx": 108,
+            "exit_idx": 117,
+            "entry_px": 3056.0,
+            "exit_px": 3045.0,
+            "qty": 200,
+            "pnl": -2200.0,
+            "reason": "STRATEGY_EXIT",
+            "hold_days": 9
+          },
+          "delta_pnl": 0.0
+        },
+        {
+          "key": [
+            "6702.T",
+            78
+          ],
+          "base": {
+            "symbol": "6702.T",
+            "entry_idx": 78,
+            "exit_idx": 85,
+            "entry_px": 3215.03,
+            "exit_px": 3267.0,
+            "qty": 300,
+            "pnl": 15589.8,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 7
+          },
+          "patch": {
+            "symbol": "6702.T",
+            "entry_idx": 78,
+            "exit_idx": 85,
+            "entry_px": 3226.0,
+            "exit_px": 3267.0,
+            "qty": 300,
+            "pnl": 12300.0,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 7
+          },
+          "delta_pnl": -3289.8
+        },
+        {
+          "key": [
+            "8309.T",
+            190
+          ],
+          "base": {
+            "symbol": "8309.T",
+            "entry_idx": 190,
+            "exit_idx": 194,
+            "entry_px": 4121.5,
+            "exit_px": 4137.0,
+            "qty": 200,
+            "pnl": 3100.0,
+            "reason": "RSR_EXIT",
+            "hold_days": 4
+          },
+          "patch": {
+            "symbol": "8309.T",
+            "entry_idx": 190,
+            "exit_idx": 194,
+            "entry_px": 4137.0,
+            "exit_px": 4137.0,
+            "qty": 200,
+            "pnl": 0.0,
+            "reason": "RSR_EXIT",
+            "hold_days": 4
+          },
+          "delta_pnl": -3100.0
+        },
+        {
+          "key": [
+            "6762.T",
+            185
+          ],
+          "base": {
+            "symbol": "6762.T",
+            "entry_idx": 185,
+            "exit_idx": 204,
+            "entry_px": 2384.25,
+            "exit_px": 2595.0,
+            "qty": 400,
+            "pnl": 84300.0,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 19
+          },
+          "patch": {
+            "symbol": "6762.T",
+            "entry_idx": 185,
+            "exit_idx": 204,
+            "entry_px": 2378.88,
+            "exit_px": 2595.0,
+            "qty": 400,
+            "pnl": 86450.0,
+            "reason": "RSR_MOMENTUM_EXIT",
+            "hold_days": 19
+          },
+          "delta_pnl": 2150.0
+        },
+        {
+          "key": [
+            "3382.T",
+            24
+          ],
+          "base": {
+            "symbol": "3382.T",
+            "entry_idx": 24,
+            "exit_idx": 33,
+            "entry_px": 2400.0,
+            "exit_px": 2400.0,
+            "qty": 300,
+            "pnl": 0.0,
+            "reason": "STRATEGY_EXIT",
+            "hold_days": 9
+          },
+          "patch": {
+            "symbol": "3382.T",
+            "entry_idx": 24,
+            "exit_idx": 33,
+            "entry_px": 2400.0,
+            "exit_px": 2400.0,
+            "qty": 300,
+            "pnl": 0.0,
+            "reason": "STRATEGY_EXIT",
+            "hold_days": 9
+          },
+          "delta_pnl": 0.0
+        },
+        {
+          "key": [
+            "6501.T",
+            22
+          ],
+          "base": {
+            "symbol": "6501.T",
+            "entry_idx": 22,
+            "exit_idx": 33,
+            "entry_px": 4202.66,
+            "exit_px": 3775.0,
+            "qty": 200,
+            "pnl": -85533.0,
+            "reason": "ATR_TRAILING",
+            "hold_days": 11
+          },
+          "patch": {
+            "symbol": "6501.T",
+            "entry_idx": 22,
+            "exit_idx": 33,
+            "entry_px": 4166.0,
+            "exit_px": 3775.0,
+            "qty": 200,
+            "pnl": -78200.0,
+            "reason": "ATR_TRAILING",
+            "hold_days": 11
+          },
+          "delta_pnl": 7333.0
+        }
+      ]
+    },
+    "timing_shift": {
+      "count": 1,
+      "delta_pnl": -15967.5,
+      "pct": 28.9,
+      "detail": [
+        {
+          "key": [
+            "3197.T",
+            230
+          ],
+          "base": {
+            "symbol": "3197.T",
+            "entry_idx": 230,
+            "exit_idx": 234,
+            "entry_px": 3390.44,
+            "exit_px": 3444.0,
+            "qty": 300,
+            "pnl": 16067.5,
+            "reason": "RSR_EXIT",
+            "hold_days": 4
+          },
+          "patch": {
+            "symbol": "3197.T",
+            "entry_idx": 230,
+            "exit_idx": 233,
+            "entry_px": 3409.67,
+            "exit_px": 3410.0,
+            "qty": 300,
+            "pnl": 100.0,
+            "reason": "RSR_EXIT",
+            "hold_days": 3
+          },
+          "delta_pnl": -15967.5,
+          "delta_hold_days": -1
+        }
+      ]
+    },
+    "diverged_portfolio": {
+      "count": 0,
+      "delta_pnl": 0,
+      "pct": -0.0,
+      "detail": []
+    }
+  },
+  "hold_days": {
+    "baseline_avg": 8.29,
+    "patched_avg": 8.26
+  },
+  "symbol_contribution": [
+    {
+      "symbol": "9531.T",
+      "delta_pnl": -23567.3
+    },
+    {
+      "symbol": "3197.T",
+      "delta_pnl": -20132.0
+    },
+    {
+      "symbol": "8002.T",
+      "delta_pnl": -10501.1
+    },
+    {
+      "symbol": "6501.T",
+      "delta_pnl": 7538.9
+    },
+    {
+      "symbol": "8015.T",
+      "delta_pnl": -6634.5
+    },
+    {
+      "symbol": "6702.T",
+      "delta_pnl": -3289.8
+    },
+    {
+      "symbol": "8309.T",
+      "delta_pnl": -3100.0
+    },
+    {
+      "symbol": "7203.T",
+      "delta_pnl": 2300.0
+    },
+    {
+      "symbol": "6762.T",
+      "delta_pnl": 2150.0
+    },
+    {
+      "symbol": "6506.T",
+      "delta_pnl": 0.0
+    },
+    {
+      "symbol": "5706.T",
+      "delta_pnl": 0.0
+    },
+    {
+      "symbol": "7011.T",
+      "delta_pnl": 0.0
+    },
+    {
+      "symbol": "7182.T",
+      "delta_pnl": 0.0
+    },
+    {
+      "symbol": "2914.T",
+      "delta_pnl": 0.0
+    },
+    {
+      "symbol": "5401.T",
+      "delta_pnl": 0.0
+    },
+    {
+      "symbol": "8053.T",
+      "delta_pnl": 0.0
+    },
+    {
+      "symbol": "3382.T",
+      "delta_pnl": 0.0
+    },
+    {
+      "symbol": "8725.T",
+      "delta_pnl": 0.0
+    },
+    {
+      "symbol": "8411.T",
+      "delta_pnl": 0.0
+    }
+  ],
+  "addon_count": {
+    "baseline": 16,
+    "patched": 16
+  },
+  "verdict": "STRUCTURAL_CHANGE_DETECTED",
+  "price_only_pct": 71.1
+}

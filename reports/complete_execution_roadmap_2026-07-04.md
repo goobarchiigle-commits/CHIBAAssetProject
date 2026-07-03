@@ -235,13 +235,63 @@ roadmap執筆時点の前提「`C:/ai-trading`がgit未初期化」は不正確�
 
 ### 決裁チェックリスト（ユーザーはこの3問に答えるだけでStage1が閉じる）
 
-| # | 決裁事項 | 推奨 |
-|---|---|---|
-| D1 | M1採用（公式数字 OOS 13.48→11.42%への再基準化を含む）— YES/NO | **YES** |
-| D2 | M2'方式 — 案a（research_state.md記録のみ）/ 案b（CLAUDE.md注記） | **案a** |
-| D3 | git push実行（④手順） — YES/保留 | YES（fetch確認PASS前提） |
+| # | 決裁事項 | 推奨 | **ユーザー決裁(2026-07-04)** |
+|---|---|---|---|
+| D1 | M1採用（公式数字 OOS 13.48→11.42%への再基準化を含む）— YES/NO | YES | **保留（M1-RCA完了後に判断）** |
+| D2 | M2'方式 — 案a（research_state.md記録のみ）/ 案b（CLAUDE.md注記） | 案a | **案a採用（確定）** |
+| D3 | git push実行（④手順） — YES/保留 | YES（fetch確認PASS前提） | **保留** |
 
-D1=YES → M1実行仕様1-6を実施後、S1（§3）へ。D1=NO → 既知バイアス登録後、S1へ直行。いずれでもStage1完了・Stage2開始可能。
+D1=YES → M1実行仕様1-6を実施後、S1（§3）へ。D1=NO → 既知バイアス登録後、S1へ直行。**D1=保留の場合、Section 2は閉じない — 下記M1-RCA完了まで継続**（ユーザー明示指示 2026-07-04）。
+
+**ユーザー判断根拠**: OOS ΔCAGR=-2.06ppが「価格差だけ」なら安心してM1採用できるが、「Exit構造まで変化」しているならStage1の「軽微修正」の前提が崩れる。この切り分けなしにD1を確定させるのは尚早 → M1-RCAで実測してから判断。
+
+---
+
+## M1-RCA: OOS ΔCAGR=-2.06pp の要因分解【D1決裁の前提・ユーザー追加指示 2026-07-04】
+
+- **目的**: M1（addon執行価格 close→open）がOOSでのみ-2.06ppとなった理由を、以下6軸に分解して説明する。
+  1. Addon価格差だけの寄与（同一トリガー・同一日・同一銘柄で価格のみ異なる場合の直接コスト差）
+  2. 約定順位（エントリー/エグジットの実行順序が変化していないか）
+  3. 約定率（addonトリガーが発生したが資金/上限制約で不成立になった比率の変化）
+  4. 保有日数（ポジション保有期間の分布変化）
+  5. Exit連鎖（addonによるblended entry_price変化がExitトリガー・タイミングを変えていないか）
+  6. 銘柄別寄与（どの銘柄がΔCAGRを支配しているか）
+- **判定基準（ユーザー指定）**:
+  - **価格差だけの寄与が95%以上** → M1は「価格の置き換え」に閉じている → **安心してM1採用可**（D1=YESへ）。
+  - **Exit構造（保有日数・Exitトリガー・銘柄構成）まで変化** → Stage1の「軽微修正」の前提が崩れている → M1はStage1から切り離し、WF全期間での再検証（Stage2以降相当）が必要。
+- **ASK_FIRST**: 要（既存エンジンの一時パッチ適用によるA/Bトレード台帳比較・観測専用・Production変更なし）。
+- **手順**:
+  1. OOS 2025においてBASELINE（close執行・現行）とPATCHED（open執行）を同一条件でfresh run、両方の全SELLトレード（symbol/entry_idx/exit_idx/entry_px/exit_px/qty/pnl/reason）とaddon明細（date/symbol/stage/qty/px）を取得。
+  2. トレードを`(symbol, entry_idx)`でマッチングし3分類: **IDENTICAL_TRADE**（同一symbol/entry_idx/exit_idx/reason、価格差のみ）/ **TIMING_SHIFT**（同一symbol/entry_idxだが exit_idx or reason が相違 = Exitトリガーが変化）/ **DIVERGED_PORTFOLIO**（片方にのみ存在するsymbol/entry_idx組 = 保有銘柄構成そのものが変化）。
+  3. 各カテゴリのΔPnL合計をΔCAGR相当に換算し、寄与率(%)を算出。IDENTICAL_TRADEの寄与率が判定基準の「価格差だけ」に対応。
+  4. 保有日数: 全体平均 baseline vs patched、およびTIMING_SHIFT該当トレードの保有日数差分を個別報告。
+  5. 銘柄別寄与: symbol別ΔPnLを降順ソートし上位5-10銘柄を報告。
+  6. 約定率: addon_countのbaseline/patched差分を報告（既存`_addon_detail`から算出。トリガー発生も含めた真の約定率にはengine計装追加が必要な場合、追加要否をユーザーに確認してから実施）。
+- **出力**: `backtests/study_m1rca_oos_decomposition_2026-07-04.json` + 本節への結果転記。
+
+### 実行結果（2026-07-04・OOS 2025・n_trades=42）
+
+| カテゴリ | 件数 | ΔPnL | 寄与率 |
+|---|---|---|---|
+| IDENTICAL_TRADE（価格差のみ） | 41/42 | -39,268円 | **71.1%** |
+| TIMING_SHIFT（Exitトリガー変化） | 1/42 | -15,968円 | 28.9% |
+| DIVERGED_PORTFOLIO（保有銘柄構成が変化） | 0/42 | 0円 | 0.0% |
+| **合計** | 42 | **-55,236円**（ΔCAGR -2.06pp相当） | 100% |
+
+- **保有日数**: 全体平均は不変（baseline 8.3d = patched 8.3d）。TIMING_SHIFT該当の1件のみ-1日。
+- **銘柄別寄与**: 上位は9531.T(-23,567円)・3197.T(-20,132円)・8002.T(-10,501円)。3197.Tの-20,132円の大半（-15,968円）がTIMING_SHIFT側。
+- **約定率（addon件数）**: baseline=16件 / patched=16件、**完全一致** — addonの発火可否自体はM1で変化していない（発火判定はトリガー条件のみに依存し価格には依存しないため妥当）。
+- **DIVERGED_PORTFOLIO=0件**が最重要所見: どの実行順位でも「別銘柄が代わりに選ばれる」「別日に乗り換わる」というカスケード（cash timing経由の連鎖）は一切発生していない。M1の影響範囲は**addonを受けた当該ポジション自身のExitタイミングに限定**される。
+
+**TIMING_SHIFTの因果機序（RCA）**: exit_policy="A"（ATR Extension）は `_pnow = (close_today - entry_price) / entry_price`（entry_price=addon込みの加重平均取得単価）を用いてRSR Exit延期(defer)を判定する（`composite_alpha_bt.py` L1082-1088）。addon価格差でblended entry_priceが変わる→同じ終値でも`_pnow`（含み益率）が変わる→delay判定の閾値越えタイミングが変わる、という単一の明確な経路でExitが1日ずれた（3197.T: entry_idx=230固定・exit_idx 234→233、価格3444.0→3410.0で退出）。**この経路以外にaddon価格がExitへ波及する回路は存在しない**（DIVERGED_PORTFOLIO=0件がその証拠）。
+
+### 判定（ユーザー基準: 価格差だけの寄与≥95% → 安心してM1採用可）
+
+**71.1% — 95%未達 → 形式上は`STRUCTURAL_CHANGE_DETECTED`。ただし内容は限定的**:
+- 42トレード中「Exit構造が変化」したのは**1件のみ**（2.4%）。しかも変化の中身は「別のExit方式に切り替わった」のではなく、**同一Exit方式(ATR Extension)内でdefer可否の1日ずれ**という狭い現象。
+- カスケード（他ポジション・他銘柄への波及）は0件で構造的に存在しない。
+- よって「Exit構造まで変化」という悪いケースではなく、「価格差が、まれに（年1件）ATR Extension deferの1日判定を動かす」という**説明可能・再現性のある副次効果**という評価が妥当。
+- **推奨**: この副次効果を「既知の挙動」としてresearch_state.mdに明記した上でD1=YESとすることは可能（§2.2の推奨変わらず）。ただし95%の基準を厳密に適用するなら形式的にはD1保留継続が妥当 — **最終判断はユーザーに委ねる**。
 
 ---
 

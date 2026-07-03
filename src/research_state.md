@@ -15,7 +15,9 @@
   - **根本原因**: `max_positions=3`均等配分による通常エントリーの目標ウェイトが約33.3%（capital/3）であり、これは`max_single_weight=0.25`（CIRCUIT値）を**エントリー時点で既に超過**している。旧`×1.5`（37.5%上限）はCIRCUIT違反ではなく、addon機能が動作するための必須の実務的ヘッドルームだった。strategy.yamlの`symbol_cap=0.40`が意図的に0.333超に設定されているのも同じ理由（コメント参照）。
   - **結論**: design_philosophy_review「例外を持つ上限は規律の不在」という評価は、現行の均等配分ロジックとの整合性を欠く。M2の単純撤廃は**Study45/52でADOPT済みのEQ Scale addon機能を実質的に無効化**する重大な副作用があり、ロードマップ自身のゲート「|ΔCAGR|>0.5pp または 2022悪化 → 停止」に抵触。
   - **処置**: `src/backtest/composite_alpha_bt.py` は**PATCH前の状態に完全ロールバック済み**（close_mat実行・×1.5維持）。REG結果は `backtests/reg_m1m2_addon_patch_2026-07-04.json` に保存。検証用スクリプトは `src/backtest/reg_m1m2_addon_patch_2026-07-04.py`。
-  - **次のアクション（ユーザー決裁待ち）**: 推奨案をroadmap§2.2に確定済み（**M1=採用推奨**〔live=MARKET_OPEN実証確認・-2.06ppは過大評価の是正・公式数字再基準化とセット〕 / **M2=コード変更恒久放棄→M2'文書整合に置換**）。決裁チェックリストD1-D3はroadmap§2.2末尾。ロールバック完全性はfresh runで全指標Δ=0.00pp検証済み（`backtests/reg_m1m2_addon_patch_2026-07-04_rollback_verify.json`）。真のaddon件数: IS=5件/OOS=16件（OOS 2025はaddon依存度が高い — OOS解釈全般で注意）。
+  - **ユーザー決裁(2026-07-04)**: D1=**保留**（M1-RCA完了後に判断・ユーザー指示）/ D2=**案a確定**（research_state.md記録のみ、CLAUDE.md不変更）/ D3=**保留**。
+  - **M1-RCA実行結果**: OOS 2025の-2.06pp(-55,236円)を42トレードに分解 → IDENTICAL_TRADE(価格差のみ)41件・71.1% / TIMING_SHIFT(Exitタイミング変化)1件・28.9% / DIVERGED_PORTFOLIO(銘柄構成変化)0件・0%。ユーザー基準「価格差だけ≥95%」は不達だが、TIMING_SHIFTは3197.T1件のみで、exit_policy="A"(ATR Extension)の`_pnow`(含み益率=blended entry_price依存)がdefer判定を1日動かした単一・説明可能な経路（カスケード0件）。M1の影響は当該ポジション自身のExitタイミングに限定され、他銘柄・他ポジションへの波及なし。詳細→roadmap§2.2「M1-RCA」節・`backtests/study_m1rca_oos_decomposition_2026-07-04.json`。**最終D1判断はユーザー保留中**。
+  - ロールバック完全性はfresh runで全指標Δ=0.00pp検証済み（`backtests/reg_m1m2_addon_patch_2026-07-04_rollback_verify.json`）。真のaddon件数: IS=5件/OOS=16件（OOS 2025はaddon依存度が高い — OOS解釈全般で注意）。
 
 ### M3: CLAUDE.md 恒久化 — 完了
 `# OVERFIT_GUARD` に `fresh_run_required=true` 追加済み。
