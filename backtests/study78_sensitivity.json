@@ -1,0 +1,180 @@
+{
+  "date": "2026-07-04",
+  "grid": {
+    "mom_period": [
+      16,
+      19,
+      21,
+      23,
+      26
+    ],
+    "atr_ext_mult": [
+      0.8,
+      0.9,
+      1.0,
+      1.1,
+      1.2
+    ],
+    "eq_scale_frac": [
+      0.2,
+      0.225,
+      0.25,
+      0.275,
+      0.3
+    ],
+    "rsr_exit": [
+      72,
+      73.5,
+      75,
+      76.5,
+      78
+    ]
+  },
+  "default": {
+    "mom_period": 21,
+    "atr_ext_mult": 1.0,
+    "eq_scale_frac": 0.25,
+    "rsr_exit": 70.0
+  },
+  "results": {
+    "mom_period": {
+      "grid": [
+        {
+          "value": 16,
+          "cagr": 5.73,
+          "calmar": 0.185
+        },
+        {
+          "value": 19,
+          "cagr": 8.74,
+          "calmar": 0.295
+        },
+        {
+          "value": 21,
+          "cagr": 12.22,
+          "calmar": 0.671
+        },
+        {
+          "value": 23,
+          "cagr": 10.7,
+          "calmar": 0.574
+        },
+        {
+          "value": 26,
+          "cagr": 10.97,
+          "calmar": 0.573
+        }
+      ],
+      "cliffs": [
+        {
+          "from": 16,
+          "to": 19,
+          "delta_cagr": 3.01
+        },
+        {
+          "from": 19,
+          "to": 21,
+          "delta_cagr": 3.48
+        }
+      ],
+      "local_optimum_flag": "PEAK_AT_DEFAULT",
+      "robust": false
+    },
+    "atr_ext_mult": {
+      "grid": [
+        {
+          "value": 0.8,
+          "cagr": 12.22,
+          "calmar": 0.671
+        },
+        {
+          "value": 0.9,
+          "cagr": 12.22,
+          "calmar": 0.671
+        },
+        {
+          "value": 1.0,
+          "cagr": 12.22,
+          "calmar": 0.671
+        },
+        {
+          "value": 1.1,
+          "cagr": 12.22,
+          "calmar": 0.671
+        },
+        {
+          "value": 1.2,
+          "cagr": 12.22,
+          "calmar": 0.671
+        }
+      ],
+      "cliffs": [],
+      "local_optimum_flag": null,
+      "robust": true
+    },
+    "eq_scale_frac": {
+      "grid": [
+        {
+          "value": 0.2,
+          "cagr": 12.16,
+          "calmar": 0.667
+        },
+        {
+          "value": 0.225,
+          "cagr": 12.17,
+          "calmar": 0.668
+        },
+        {
+          "value": 0.25,
+          "cagr": 12.22,
+          "calmar": 0.671
+        },
+        {
+          "value": 0.275,
+          "cagr": 12.14,
+          "calmar": 0.666
+        },
+        {
+          "value": 0.3,
+          "cagr": 11.82,
+          "calmar": 0.649
+        }
+      ],
+      "cliffs": [],
+      "local_optimum_flag": "PEAK_AT_DEFAULT",
+      "robust": true
+    },
+    "rsr_exit": {
+      "grid": [
+        {
+          "value": 72,
+          "cagr": 11.35,
+          "calmar": 0.633
+        },
+        {
+          "value": 73.5,
+          "cagr": 11.26,
+          "calmar": 0.623
+        },
+        {
+          "value": 75,
+          "cagr": 11.24,
+          "calmar": 0.626
+        },
+        {
+          "value": 76.5,
+          "cagr": 10.69,
+          "calmar": 0.591
+        },
+        {
+          "value": 78,
+          "cagr": 10.69,
+          "calmar": 0.591
+        }
+      ],
+      "cliffs": [],
+      "local_optimum_flag": null,
+      "robust": true
+    }
+  }
+}

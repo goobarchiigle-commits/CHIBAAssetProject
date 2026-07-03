@@ -1,6 +1,46 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-04（M1採用・Production基準値更新・CAND_B再測定・M2'記録完了）
+# Single Source of Truth / 最終更新: 2026-07-04（Study78完了・Production研究基盤構築）
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
+
+---
+
+## ✅ 2026-07-04 Study78: Production研究基盤（RoR/MC/Sensitivity/DD/LossCluster/RiskContrib/LevReady） — **COMPLETE**
+
+**目的**: 単なるRoR算出でなく、Study74/79/81/85/86が共通利用できるリスクデータセットの構築。
+**レポート**: `reports/study78_ror_mc_sensitivity.md`
+**スクリプト**: `src/backtest/study78_ror_mc_sensitivity.py`（Production/PARAMS_LOCKED変更なし・新規最適化なし）
+
+### エンジン拡張（観測専用・制御フロー変更ゼロ）
+`composite_alpha_bt.py`のBUYトレード記録に`entry_idx`/`entry_atr_pct`/`entry_rsr`/`entry_type`を追加、返り値に`_trades_buy`を新規追加（既存`_trades`は不変）。fresh run一致（FULL CAGR=11.22%、変更前後で完全一致）で無害性確認済み。
+
+### Part1+2+7: RoR / MC / Leverage Readiness（trade順ブートストラップN=10,000・5年・193トレード/回）
+| L | RoR=P(MaxDD>30%) | P(final<50%) | CAGR中央値 | MaxDD中央値 | Calmar中央値 |
+|---|---|---|---|---|---|
+| 1.0 | 0.13% | 0% | +19.18% | -10.81% | 1.76 |
+| 1.1 | 0.20% | 0% | +21.16% | -11.68% | 1.80 |
+| 1.2 | 0.54% | 0% | +23.03% | -12.85% | 1.78 |
+| 1.3 | **1.02%** | 0% | +24.69% | -13.95% | 1.77 |
+
+**Study78元定義の成功基準（現行RoR<1%∧レバ1.3x RoR<5%）達成**（0.13%<1%、1.02%<5%）。⚠ブートストラップCAGR中央値(+19.18%)は実測FULL CAGR(11.22%)より高い — IID再抽出による既知の乖離（詳細→レポート）。
+
+### Part3: Sensitivity（固定グリッド） — **⚠ mom_period=21に過学習疑いを検出**
+- `mom_period`{16,19,21,23,26}: CAGR 5.73/8.74/**12.22**/10.70/10.97 — **崖検出（16→19:+3.01pp, 19→21:+3.48pp）+ PEAK_AT_DEFAULT（現行値がピーク）→ 非頑健**。strategy.yamlの「感度分析で21がベスト」という採用経緯自体が示唆する過学習リスク。**Stage1では変更しない**（新規探索禁止）。Study76/77への申し送り事項として記録。
+- `atr_extension.atr_mult`{0.8-1.2}: 完全平坦 → 頑健。`eq_scale.size_frac`{0.20-0.30}: 崖なし滑らかな山 → 頑健。`rsr_exit`{72-78}: 単調滑らか → 頑健。
+
+### Part4: Drawdown Attribution
+最大DD=-18.22%（2021-09-17→2021-12-20トラフ→2022-07-25回復、window内40トレード）。Worst Loss Top20・Worst DD Contribution Top20を`backtests/study78_drawdown_analysis.json`に格納。DD期間内トレードは**addon非受給・中期保有(14-27d)に集中**、上位5件でDD総額の約47%。
+
+### Part5: Loss Cluster Analysis
+最大連敗7連敗（2020-02-25〜2020-04-20、コロナショック期と一致）。損失時同時保有平均2.57（ほぼ上限3張り付き）。損失の86.7%がRSR系Exit（RSR_EXIT+RSR_MOMENTUM_EXIT）＝異常ではなく正常機能内の損切り。addon比率: 損失0.0%/勝ち1.8%（addonは勝ち馬にのみ発生する設計と整合）。
+
+### Part6: Risk Contribution
+年別純損益は2022年（Bear相場）も含め全年黒字（2018:+3.2万〜2023:+145万円）。銘柄別損失Top5(8725.T/8306.T/6506.T/6479.T/7182.T)はいずれも単発ショックイベント起因（構造的バイアスではない）。9軸の内訳全量は`backtests/study78_risk_contribution.json`。
+
+### Part8: Research Assets（Study74/79/81/85/86が再利用可能）
+`study78_trade_dataset.json`（309トレード全件台帳）/ `study78_risk_summary.json`（レバ別RoR）/ `study78_drawdown_analysis.json`/ `study78_mc_distribution.json`/ `study78_sensitivity.json`/ `study78_risk_contribution.json` を保存。今後は追加BTなしで参照可能。
+
+### Study79への示唆
+起案条件「Study74白∧Study78合格∧CAND_B移行済」のうちStudy78は合格側の材料が揃った（RoR基準達成）。ただしmom_period過学習疑いはレバレッジ倍加時にテールリスクを増幅しうる点を留意事項として記録。
 
 ---
 

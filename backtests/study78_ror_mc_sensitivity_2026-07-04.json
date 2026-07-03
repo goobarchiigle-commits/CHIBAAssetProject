@@ -1,0 +1,1155 @@
+{
+  "date": "2026-07-04",
+  "production_full_run": {
+    "cagr": 11.22,
+    "max_dd": -18.22,
+    "sharpe": 0.564,
+    "calmar": 0.616,
+    "n_trades": 309
+  },
+  "n_trades_5y_horizon": 193,
+  "leverage_readiness": {
+    "1.0": {
+      "leverage": 1.0,
+      "n_trades_5y": 193,
+      "p_maxdd_gt_30pct": 0.0013,
+      "p_final_lt_50pct": 0.0,
+      "cagr_dist": {
+        "mean": 19.58,
+        "median": 19.18,
+        "p5": 7.95,
+        "p25": 14.22,
+        "p75": 24.44,
+        "p95": 32.91
+      },
+      "maxdd_dist": {
+        "mean": -11.48,
+        "median": -10.81,
+        "p5": -18.8,
+        "p25": -13.48,
+        "p75": -8.73,
+        "p95": -6.52
+      },
+      "calmar_dist": {
+        "mean": 2.001,
+        "median": 1.76,
+        "p5": 0.5,
+        "p25": 1.125,
+        "p75": 2.589,
+        "p95": 4.348
+      },
+      "worst_year_pct_median": 2.17,
+      "worst_year_pct_p5": -10.46,
+      "recovery_trades_median": 12.0,
+      "recovery_unrecovered_rate": 0.1341
+    },
+    "1.1": {
+      "leverage": 1.1,
+      "n_trades_5y": 193,
+      "p_maxdd_gt_30pct": 0.002,
+      "p_final_lt_50pct": 0.0,
+      "cagr_dist": {
+        "mean": 21.81,
+        "median": 21.16,
+        "p5": 8.62,
+        "p25": 15.75,
+        "p75": 27.29,
+        "p95": 36.93
+      },
+      "maxdd_dist": {
+        "mean": -12.47,
+        "median": -11.68,
+        "p5": -20.36,
+        "p25": -14.68,
+        "p75": -9.55,
+        "p95": -7.1
+      },
+      "calmar_dist": {
+        "mean": 2.051,
+        "median": 1.804,
+        "p5": 0.509,
+        "p25": 1.148,
+        "p75": 2.672,
+        "p95": 4.457
+      },
+      "worst_year_pct_median": 2.41,
+      "worst_year_pct_p5": -11.46,
+      "recovery_trades_median": 12.0,
+      "recovery_unrecovered_rate": 0.1361
+    },
+    "1.2": {
+      "leverage": 1.2,
+      "n_trades_5y": 193,
+      "p_maxdd_gt_30pct": 0.0054,
+      "p_final_lt_50pct": 0.0,
+      "cagr_dist": {
+        "mean": 23.69,
+        "median": 23.03,
+        "p5": 9.35,
+        "p25": 17.09,
+        "p75": 29.55,
+        "p95": 40.43
+      },
+      "maxdd_dist": {
+        "mean": -13.67,
+        "median": -12.85,
+        "p5": -22.36,
+        "p25": -16.1,
+        "p75": -10.36,
+        "p95": -7.81
+      },
+      "calmar_dist": {
+        "mean": 2.031,
+        "median": 1.78,
+        "p5": 0.501,
+        "p25": 1.137,
+        "p75": 2.671,
+        "p95": 4.389
+      },
+      "worst_year_pct_median": 2.42,
+      "worst_year_pct_p5": -12.73,
+      "recovery_trades_median": 12.0,
+      "recovery_unrecovered_rate": 0.1379
+    },
+    "1.3": {
+      "leverage": 1.3,
+      "n_trades_5y": 193,
+      "p_maxdd_gt_30pct": 0.0102,
+      "p_final_lt_50pct": 0.0,
+      "cagr_dist": {
+        "mean": 25.49,
+        "median": 24.69,
+        "p5": 9.72,
+        "p25": 18.19,
+        "p75": 32.13,
+        "p95": 43.68
+      },
+      "maxdd_dist": {
+        "mean": -14.81,
+        "median": -13.95,
+        "p5": -24.02,
+        "p25": -17.48,
+        "p75": -11.28,
+        "p95": -8.39
+      },
+      "calmar_dist": {
+        "mean": 2.026,
+        "median": 1.766,
+        "p5": 0.484,
+        "p25": 1.102,
+        "p75": 2.638,
+        "p95": 4.495
+      },
+      "worst_year_pct_median": 2.4,
+      "worst_year_pct_p5": -13.69,
+      "recovery_trades_median": 12.0,
+      "recovery_unrecovered_rate": 0.1441
+    }
+  },
+  "sensitivity": {
+    "mom_period": {
+      "grid": [
+        {
+          "value": 16,
+          "cagr": 5.73,
+          "calmar": 0.185
+        },
+        {
+          "value": 19,
+          "cagr": 8.74,
+          "calmar": 0.295
+        },
+        {
+          "value": 21,
+          "cagr": 12.22,
+          "calmar": 0.671
+        },
+        {
+          "value": 23,
+          "cagr": 10.7,
+          "calmar": 0.574
+        },
+        {
+          "value": 26,
+          "cagr": 10.97,
+          "calmar": 0.573
+        }
+      ],
+      "cliffs": [
+        {
+          "from": 16,
+          "to": 19,
+          "delta_cagr": 3.01
+        },
+        {
+          "from": 19,
+          "to": 21,
+          "delta_cagr": 3.48
+        }
+      ],
+      "local_optimum_flag": "PEAK_AT_DEFAULT",
+      "robust": false
+    },
+    "atr_ext_mult": {
+      "grid": [
+        {
+          "value": 0.8,
+          "cagr": 12.22,
+          "calmar": 0.671
+        },
+        {
+          "value": 0.9,
+          "cagr": 12.22,
+          "calmar": 0.671
+        },
+        {
+          "value": 1.0,
+          "cagr": 12.22,
+          "calmar": 0.671
+        },
+        {
+          "value": 1.1,
+          "cagr": 12.22,
+          "calmar": 0.671
+        },
+        {
+          "value": 1.2,
+          "cagr": 12.22,
+          "calmar": 0.671
+        }
+      ],
+      "cliffs": [],
+      "local_optimum_flag": null,
+      "robust": true
+    },
+    "eq_scale_frac": {
+      "grid": [
+        {
+          "value": 0.2,
+          "cagr": 12.16,
+          "calmar": 0.667
+        },
+        {
+          "value": 0.225,
+          "cagr": 12.17,
+          "calmar": 0.668
+        },
+        {
+          "value": 0.25,
+          "cagr": 12.22,
+          "calmar": 0.671
+        },
+        {
+          "value": 0.275,
+          "cagr": 12.14,
+          "calmar": 0.666
+        },
+        {
+          "value": 0.3,
+          "cagr": 11.82,
+          "calmar": 0.649
+        }
+      ],
+      "cliffs": [],
+      "local_optimum_flag": "PEAK_AT_DEFAULT",
+      "robust": true
+    },
+    "rsr_exit": {
+      "grid": [
+        {
+          "value": 72,
+          "cagr": 11.35,
+          "calmar": 0.633
+        },
+        {
+          "value": 73.5,
+          "cagr": 11.26,
+          "calmar": 0.623
+        },
+        {
+          "value": 75,
+          "cagr": 11.24,
+          "calmar": 0.626
+        },
+        {
+          "value": 76.5,
+          "cagr": 10.69,
+          "calmar": 0.591
+        },
+        {
+          "value": 78,
+          "cagr": 10.69,
+          "calmar": 0.591
+        }
+      ],
+      "cliffs": [],
+      "local_optimum_flag": null,
+      "robust": true
+    }
+  },
+  "drawdown_attribution": {
+    "max_dd_pct": -18.22,
+    "dd_start": "2021-09-17",
+    "dd_trough": "2021-12-20",
+    "dd_end": "2022-07-25",
+    "dd_window_trade_count": 40,
+    "worst_loss_top20": [
+      {
+        "rank": 1,
+        "symbol": "8306.T",
+        "entry_date": "2024-07-26",
+        "exit_date": "2024-08-02",
+        "holding_days": 5,
+        "pnl": -179800.0,
+        "r_multiple": -3.334,
+        "dd_contribution_yen": null,
+        "dd_contribution_pct": null,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 6.66,
+        "entry_rsr": 78.6
+      },
+      {
+        "rank": 2,
+        "symbol": "5401.T",
+        "entry_date": "2025-04-01",
+        "exit_date": "2025-04-04",
+        "holding_days": 3,
+        "pnl": -125290.0,
+        "r_multiple": -2.204,
+        "dd_contribution_yen": null,
+        "dd_contribution_pct": null,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 14.24,
+        "entry_rsr": 54.8
+      },
+      {
+        "rank": 3,
+        "symbol": "6702.T",
+        "entry_date": "2020-01-14",
+        "exit_date": "2020-03-12",
+        "holding_days": 40,
+        "pnl": -121440.0,
+        "r_multiple": -2.273,
+        "dd_contribution_yen": null,
+        "dd_contribution_pct": null,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 8.38,
+        "entry_rsr": 90.2
+      },
+      {
+        "rank": 4,
+        "symbol": "8725.T",
+        "entry_date": "2024-07-26",
+        "exit_date": "2024-08-02",
+        "holding_days": 5,
+        "pnl": -100600.0,
+        "r_multiple": -1.848,
+        "dd_contribution_yen": null,
+        "dd_contribution_pct": null,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 8.88,
+        "entry_rsr": 97.6
+      },
+      {
+        "rank": 5,
+        "symbol": "9101.T",
+        "entry_date": "2022-03-07",
+        "exit_date": "2022-04-08",
+        "holding_days": 23,
+        "pnl": -100333.3,
+        "r_multiple": -3.084,
+        "dd_contribution_yen": null,
+        "dd_contribution_pct": null,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 47.07,
+        "entry_rsr": 97.6
+      },
+      {
+        "rank": 6,
+        "symbol": "9107.T",
+        "entry_date": "2021-09-07",
+        "exit_date": "2021-10-18",
+        "holding_days": 27,
+        "pnl": -100222.2,
+        "r_multiple": -1.731,
+        "dd_contribution_yen": null,
+        "dd_contribution_pct": null,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 38.55,
+        "entry_rsr": 97.6
+      },
+      {
+        "rank": 7,
+        "symbol": "6857.T",
+        "entry_date": "2021-09-10",
+        "exit_date": "2021-10-04",
+        "holding_days": 14,
+        "pnl": -89000.0,
+        "r_multiple": -2.041,
+        "dd_contribution_yen": null,
+        "dd_contribution_pct": null,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 5.27,
+        "entry_rsr": 85.7
+      },
+      {
+        "rank": 8,
+        "symbol": "6501.T",
+        "entry_date": "2021-11-09",
+        "exit_date": "2021-12-13",
+        "holding_days": 23,
+        "pnl": -87800.0,
+        "r_multiple": -1.522,
+        "dd_contribution_yen": null,
+        "dd_contribution_pct": null,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 7.75,
+        "entry_rsr": 83.3
+      },
+      {
+        "rank": 9,
+        "symbol": "6857.T",
+        "entry_date": "2019-11-14",
+        "exit_date": "2019-11-21",
+        "holding_days": 5,
+        "pnl": -81250.0,
+        "r_multiple": -1.403,
+        "dd_contribution_yen": null,
+        "dd_contribution_pct": null,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 8.7,
+        "entry_rsr": 100.0
+      },
+      {
+        "rank": 10,
+        "symbol": "6479.T",
+        "entry_date": "2024-07-18",
+        "exit_date": "2024-08-01",
+        "holding_days": 10,
+        "pnl": -76000.0,
+        "r_multiple": -1.291,
+        "dd_contribution_yen": null,
+        "dd_contribution_pct": null,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 4.13,
+        "entry_rsr": 81.0
+      },
+      {
+        "rank": 11,
+        "symbol": "8725.T",
+        "entry_date": "2020-02-28",
+        "exit_date": "2020-03-06",
+        "holding_days": 5,
+        "pnl": -67400.0,
+        "r_multiple": -1.204,
+        "dd_contribution_yen": null,
+        "dd_contribution_pct": null,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 32.89,
+        "entry_rsr": 78.0
+      },
+      {
+        "rank": 12,
+        "symbol": "7012.T",
+        "entry_date": "2023-03-09",
+        "exit_date": "2023-03-14",
+        "holding_days": 3,
+        "pnl": -64200.0,
+        "r_multiple": -1.284,
+        "dd_contribution_yen": null,
+        "dd_contribution_pct": null,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 7.58,
+        "entry_rsr": 83.3
+      },
+      {
+        "rank": 13,
+        "symbol": "4055.T",
+        "entry_date": "2023-03-28",
+        "exit_date": "2023-04-17",
+        "holding_days": 14,
+        "pnl": -61200.0,
+        "r_multiple": -1.236,
+        "dd_contribution_yen": null,
+        "dd_contribution_pct": null,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 4.89,
+        "entry_rsr": 100.0
+      },
+      {
+        "rank": 14,
+        "symbol": "6645.T",
+        "entry_date": "2019-04-18",
+        "exit_date": "2019-05-13",
+        "holding_days": 11,
+        "pnl": -58000.0,
+        "r_multiple": -1.216,
+        "dd_contribution_yen": null,
+        "dd_contribution_pct": null,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 10.99,
+        "entry_rsr": 92.7
+      },
+      {
+        "rank": 15,
+        "symbol": "8053.T",
+        "entry_date": "2022-03-25",
+        "exit_date": "2022-04-25",
+        "holding_days": 21,
+        "pnl": -57750.0,
+        "r_multiple": -1.082,
+        "dd_contribution_yen": null,
+        "dd_contribution_pct": null,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 18.97,
+        "entry_rsr": 85.7
+      },
+      {
+        "rank": 16,
+        "symbol": "6857.T",
+        "entry_date": "2023-10-13",
+        "exit_date": "2023-10-26",
+        "holding_days": 9,
+        "pnl": -56200.0,
+        "r_multiple": -1.531,
+        "dd_contribution_yen": null,
+        "dd_contribution_pct": null,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 3.85,
+        "entry_rsr": 95.2
+      },
+      {
+        "rank": 17,
+        "symbol": "6506.T",
+        "entry_date": "2020-01-15",
+        "exit_date": "2020-01-27",
+        "holding_days": 8,
+        "pnl": -55500.0,
+        "r_multiple": -1.573,
+        "dd_contribution_yen": null,
+        "dd_contribution_pct": null,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 9.51,
+        "entry_rsr": 82.9
+      },
+      {
+        "rank": 18,
+        "symbol": "7182.T",
+        "entry_date": "2025-04-04",
+        "exit_date": "2025-04-07",
+        "holding_days": 1,
+        "pnl": -55500.0,
+        "r_multiple": -0.99,
+        "dd_contribution_yen": null,
+        "dd_contribution_pct": null,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 4.7,
+        "entry_rsr": 57.1
+      },
+      {
+        "rank": 19,
+        "symbol": "7013.T",
+        "entry_date": "2022-11-11",
+        "exit_date": "2022-11-18",
+        "holding_days": 5,
+        "pnl": -54000.0,
+        "r_multiple": -0.931,
+        "dd_contribution_yen": null,
+        "dd_contribution_pct": null,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 7.54,
+        "entry_rsr": 83.3
+      },
+      {
+        "rank": 20,
+        "symbol": "5411.T",
+        "entry_date": "2021-11-09",
+        "exit_date": "2021-11-19",
+        "holding_days": 8,
+        "pnl": -53600.0,
+        "r_multiple": -1.1,
+        "dd_contribution_yen": null,
+        "dd_contribution_pct": null,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 29.04,
+        "entry_rsr": 85.7
+      }
+    ],
+    "worst_dd_contribution_top20": [
+      {
+        "rank": 1,
+        "symbol": "9101.T",
+        "entry_date": "2022-03-07",
+        "exit_date": "2022-04-08",
+        "holding_days": 23,
+        "pnl": -100333.3,
+        "r_multiple": -3.084,
+        "dd_contribution_yen": -100333.3,
+        "dd_contribution_pct": 10.78,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 47.07,
+        "entry_rsr": 97.6
+      },
+      {
+        "rank": 2,
+        "symbol": "9107.T",
+        "entry_date": "2021-09-07",
+        "exit_date": "2021-10-18",
+        "holding_days": 27,
+        "pnl": -100222.2,
+        "r_multiple": -1.731,
+        "dd_contribution_yen": -100222.2,
+        "dd_contribution_pct": 10.76,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 38.55,
+        "entry_rsr": 97.6
+      },
+      {
+        "rank": 3,
+        "symbol": "6857.T",
+        "entry_date": "2021-09-10",
+        "exit_date": "2021-10-04",
+        "holding_days": 14,
+        "pnl": -89000.0,
+        "r_multiple": -2.041,
+        "dd_contribution_yen": -89000.0,
+        "dd_contribution_pct": 9.56,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 5.27,
+        "entry_rsr": 85.7
+      },
+      {
+        "rank": 4,
+        "symbol": "6501.T",
+        "entry_date": "2021-11-09",
+        "exit_date": "2021-12-13",
+        "holding_days": 23,
+        "pnl": -87800.0,
+        "r_multiple": -1.522,
+        "dd_contribution_yen": -87800.0,
+        "dd_contribution_pct": 9.43,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 7.75,
+        "entry_rsr": 83.3
+      },
+      {
+        "rank": 5,
+        "symbol": "8053.T",
+        "entry_date": "2022-03-25",
+        "exit_date": "2022-04-25",
+        "holding_days": 21,
+        "pnl": -57750.0,
+        "r_multiple": -1.082,
+        "dd_contribution_yen": -57750.0,
+        "dd_contribution_pct": 6.2,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 18.97,
+        "entry_rsr": 85.7
+      },
+      {
+        "rank": 6,
+        "symbol": "5411.T",
+        "entry_date": "2021-11-09",
+        "exit_date": "2021-11-19",
+        "holding_days": 8,
+        "pnl": -53600.0,
+        "r_multiple": -1.1,
+        "dd_contribution_yen": -53600.0,
+        "dd_contribution_pct": 5.76,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 29.04,
+        "entry_rsr": 85.7
+      },
+      {
+        "rank": 7,
+        "symbol": "7013.T",
+        "entry_date": "2021-11-09",
+        "exit_date": "2021-11-12",
+        "holding_days": 3,
+        "pnl": -48085.7,
+        "r_multiple": -0.817,
+        "dd_contribution_yen": -48085.7,
+        "dd_contribution_pct": 5.16,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 10.29,
+        "entry_rsr": 88.1
+      },
+      {
+        "rank": 8,
+        "symbol": "8725.T",
+        "entry_date": "2021-11-22",
+        "exit_date": "2021-11-26",
+        "holding_days": 3,
+        "pnl": -42200.0,
+        "r_multiple": -0.744,
+        "dd_contribution_yen": -42200.0,
+        "dd_contribution_pct": 4.53,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 21.19,
+        "entry_rsr": 19.0
+      },
+      {
+        "rank": 9,
+        "symbol": "5401.T",
+        "entry_date": "2021-09-21",
+        "exit_date": "2021-10-05",
+        "holding_days": 9,
+        "pnl": -41400.0,
+        "r_multiple": -0.694,
+        "dd_contribution_yen": -41400.0,
+        "dd_contribution_pct": 4.45,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 43.51,
+        "entry_rsr": 83.3
+      },
+      {
+        "rank": 10,
+        "symbol": "7182.T",
+        "entry_date": "2022-02-16",
+        "exit_date": "2022-02-21",
+        "holding_days": 3,
+        "pnl": -41300.0,
+        "r_multiple": -0.695,
+        "dd_contribution_yen": -41300.0,
+        "dd_contribution_pct": 4.44,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 19.82,
+        "entry_rsr": 76.2
+      },
+      {
+        "rank": 11,
+        "symbol": "8306.T",
+        "entry_date": "2022-03-03",
+        "exit_date": "2022-03-08",
+        "holding_days": 3,
+        "pnl": -40900.0,
+        "r_multiple": -0.729,
+        "dd_contribution_yen": -40900.0,
+        "dd_contribution_pct": 4.39,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 17.09,
+        "entry_rsr": 73.8
+      },
+      {
+        "rank": 12,
+        "symbol": "6702.T",
+        "entry_date": "2022-05-09",
+        "exit_date": "2022-06-01",
+        "holding_days": 17,
+        "pnl": -34350.0,
+        "r_multiple": -0.699,
+        "dd_contribution_yen": -34350.0,
+        "dd_contribution_pct": 3.69,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 5.18,
+        "entry_rsr": 85.7
+      },
+      {
+        "rank": 13,
+        "symbol": "8058.T",
+        "entry_date": "2021-10-13",
+        "exit_date": "2021-10-21",
+        "holding_days": 6,
+        "pnl": -28800.0,
+        "r_multiple": -0.488,
+        "dd_contribution_yen": -28800.0,
+        "dd_contribution_pct": 3.09,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 15.54,
+        "entry_rsr": 76.2
+      },
+      {
+        "rank": 14,
+        "symbol": "8309.T",
+        "entry_date": "2021-11-15",
+        "exit_date": "2021-11-18",
+        "holding_days": 3,
+        "pnl": -26800.0,
+        "r_multiple": -0.45,
+        "dd_contribution_yen": -26800.0,
+        "dd_contribution_pct": 2.88,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 19.79,
+        "entry_rsr": 35.7
+      },
+      {
+        "rank": 15,
+        "symbol": "8725.T",
+        "entry_date": "2022-02-28",
+        "exit_date": "2022-03-04",
+        "holding_days": 4,
+        "pnl": -25666.7,
+        "r_multiple": -0.502,
+        "dd_contribution_yen": -25666.7,
+        "dd_contribution_pct": 2.76,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 21.46,
+        "entry_rsr": 66.7
+      },
+      {
+        "rank": 16,
+        "symbol": "6501.T",
+        "entry_date": "2022-06-03",
+        "exit_date": "2022-06-21",
+        "holding_days": 12,
+        "pnl": -25100.0,
+        "r_multiple": -0.457,
+        "dd_contribution_yen": -25100.0,
+        "dd_contribution_pct": 2.7,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 6.38,
+        "entry_rsr": 81.0
+      },
+      {
+        "rank": 17,
+        "symbol": "8058.T",
+        "entry_date": "2022-02-09",
+        "exit_date": "2022-02-22",
+        "holding_days": 8,
+        "pnl": -18833.3,
+        "r_multiple": -0.352,
+        "dd_contribution_yen": -18833.3,
+        "dd_contribution_pct": 2.02,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 14.95,
+        "entry_rsr": 78.6
+      },
+      {
+        "rank": 18,
+        "symbol": "8015.T",
+        "entry_date": "2022-01-06",
+        "exit_date": "2022-01-12",
+        "holding_days": 3,
+        "pnl": -16000.0,
+        "r_multiple": -0.272,
+        "dd_contribution_yen": -16000.0,
+        "dd_contribution_pct": 1.72,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 15.66,
+        "entry_rsr": 81.0
+      },
+      {
+        "rank": 19,
+        "symbol": "8058.T",
+        "entry_date": "2022-06-08",
+        "exit_date": "2022-06-13",
+        "holding_days": 3,
+        "pnl": -15466.7,
+        "r_multiple": -0.312,
+        "dd_contribution_yen": -15466.7,
+        "dd_contribution_pct": 1.66,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 13.12,
+        "entry_rsr": 88.1
+      },
+      {
+        "rank": 20,
+        "symbol": "9107.T",
+        "entry_date": "2021-12-06",
+        "exit_date": "2022-01-20",
+        "holding_days": 30,
+        "pnl": -13333.4,
+        "r_multiple": -0.233,
+        "dd_contribution_yen": -13333.4,
+        "dd_contribution_pct": 1.43,
+        "exit_policy": "A",
+        "addon_received": false,
+        "entry_atr_pct": 36.51,
+        "entry_rsr": 100.0
+      }
+    ]
+  },
+  "loss_cluster": {
+    "max_consecutive_losses": 7,
+    "max_loss_streak_period": [
+      "2020-02-25",
+      "2020-04-20"
+    ],
+    "loss_count": 141,
+    "win_count": 168,
+    "concurrent_positions_at_loss": {
+      "mean": 2.57,
+      "median": 3.0,
+      "min": 1.0,
+      "max": 3.0
+    },
+    "regime_at_loss": {
+      "risk_off": 42,
+      "normal": 99
+    },
+    "sector_concentration_at_loss_pct": {
+      "小売": 10.6,
+      "鉄鋼": 8.5,
+      "電機精密": 14.2,
+      "電機": 8.5,
+      "ガス": 0.7,
+      "保険": 6.4,
+      "商社": 13.5,
+      "海運": 10.6,
+      "銀行": 11.3,
+      "機械": 9.9,
+      "輸送機器": 1.4,
+      "化学": 0.7,
+      "情報通信": 2.8,
+      "食品": 0.7
+    },
+    "exit_policy_composition_loss": {
+      "A": 141
+    },
+    "addon_ratio_loss": 0.0,
+    "addon_ratio_win": 0.018,
+    "holding_days_loss": {
+      "mean": 7.79,
+      "median": 5.0,
+      "min": 1.0,
+      "max": 40.0
+    },
+    "holding_days_win": {
+      "mean": 13.86,
+      "median": 7.0,
+      "min": 3.0,
+      "max": 61.0
+    },
+    "atr_pct_loss": {
+      "mean": 14.78,
+      "median": 10.53,
+      "min": 2.05,
+      "max": 52.4
+    },
+    "atr_pct_win": {
+      "mean": 13.08,
+      "median": 10.57,
+      "min": 2.0,
+      "max": 58.59
+    },
+    "rsr_loss": {
+      "mean": 76.63,
+      "median": 81.0,
+      "min": 0.0,
+      "max": 100.0
+    },
+    "rsr_win": {
+      "mean": 74.39,
+      "median": 80.5,
+      "min": 0.0,
+      "max": 100.0
+    },
+    "exit_reason_composition_loss": {
+      "RSR_EXIT": 73,
+      "STRATEGY_EXIT": 8,
+      "RSR_MOMENTUM_EXIT": 50,
+      "TURTLE_EXIT": 2,
+      "ATR_TRAILING": 5,
+      "MARKET_SHOCK_EXIT": 3
+    },
+    "concurrent_overlap_loss_pairs_count": 24
+  },
+  "risk_contribution": {
+    "by_symbol": {
+      "8725.T": -147533.4,
+      "8306.T": -144810.0,
+      "6506.T": -134600.0,
+      "6479.T": -100800.0,
+      "7182.T": -100200.0,
+      "7012.T": -86700.0,
+      "6869.T": -45800.0,
+      "5706.T": -38500.0,
+      "5411.T": -34000.0,
+      "6146.T": -29000.0,
+      "7201.T": -26020.0,
+      "9432.T": -3978.1,
+      "8354.T": 100.0,
+      "6645.T": 4000.0,
+      "8053.T": 17900.0,
+      "3382.T": 20950.0,
+      "6702.T": 22710.0,
+      "8309.T": 29700.0,
+      "6501.T": 31820.0,
+      "2914.T": 37500.0,
+      "6920.T": 39000.0,
+      "3197.T": 59650.0,
+      "8411.T": 60450.0,
+      "8015.T": 62800.0,
+      "4021.T": 70200.0,
+      "8058.T": 81766.7,
+      "6981.T": 84233.3,
+      "5401.T": 95210.1,
+      "8001.T": 111860.0,
+      "6762.T": 152980.0,
+      "4055.T": 153800.0,
+      "7203.T": 172110.0,
+      "9531.T": 177600.0,
+      "8002.T": 264050.0,
+      "6594.T": 288500.0,
+      "7013.T": 323471.4,
+      "9107.T": 356222.2,
+      "9101.T": 488000.1,
+      "6857.T": 554175.0,
+      "9104.T": 685633.3,
+      "7011.T": 937240.0
+    },
+    "by_exit_policy": {
+      "A": 4491690.6
+    },
+    "by_holding_days_bucket": {
+      "0-5d": -539427.1,
+      "6-10d": -91166.5,
+      "11-20d": 464402.0,
+      "21-40d": 1604733.4,
+      "41d+": 3053148.8
+    },
+    "by_atr_bucket": {
+      "5-8%": 182402.4,
+      "<3%": 433400.0,
+      "3-5%": 1537825.0,
+      "8%+": 2338063.2
+    },
+    "by_rsr_bucket": {
+      "<75": 390416.7,
+      "95+": 1265587.4,
+      "85-95": 1331915.8,
+      "75-85": 1503770.7
+    },
+    "by_addon": {
+      "addon": 766625.0,
+      "no_addon": 3725065.6
+    },
+    "by_entry_type": {
+      "mean_rev": 194906.7,
+      "fujiko": 4296783.9
+    },
+    "by_year": {
+      "2018": 31616.6,
+      "2019": 75022.2,
+      "2025": 356760.0,
+      "2022": 359437.8,
+      "2020": 482617.2,
+      "2021": 772026.0,
+      "2024": 964337.1,
+      "2023": 1449873.7
+    },
+    "by_month": {
+      "2024-08": -356400.0,
+      "2020-03": -198840.0,
+      "2021-10": -179775.5,
+      "2022-04": -158083.3,
+      "2025-04": -145790.0,
+      "2021-11": -141909.0,
+      "2022-10": -101108.0,
+      "2019-03": -85166.7,
+      "2020-04": -74962.7,
+      "2021-12": -70670.0,
+      "2019-05": -59600.0,
+      "2020-01": -53660.0,
+      "2023-10": -46233.3,
+      "2021-08": -44026.7,
+      "2024-03": -41520.0,
+      "2022-11": -29828.0,
+      "2019-07": -26973.3,
+      "2021-05": -26400.0,
+      "2025-02": -26200.0,
+      "2023-04": -24550.0,
+      "2022-09": -19122.7,
+      "2025-06": -18600.0,
+      "2021-07": -18090.0,
+      "2023-01": -13200.0,
+      "2020-02": -12070.0,
+      "2019-08": -11490.0,
+      "2018-12": -9066.7,
+      "2022-01": -7383.4,
+      "2019-10": -6300.0,
+      "2024-06": -6200.0,
+      "2024-09": -5500.0,
+      "2023-03": -3453.3,
+      "2022-08": -1466.7,
+      "2024-05": -800.0,
+      "2025-12": 100.0,
+      "2023-05": 1180.0,
+      "2022-02": 1366.7,
+      "2025-08": 2400.0,
+      "2018-10": 3883.3,
+      "2019-09": 10230.0,
+      "2025-09": 11000.0,
+      "2019-02": 11700.0,
+      "2021-02": 11750.1,
+      "2019-01": 12800.0,
+      "2020-07": 13500.0,
+      "2023-12": 15520.0,
+      "2021-01": 27589.0,
+      "2025-01": 31850.0,
+      "2021-03": 32220.0,
+      "2018-11": 36800.0,
+      "2024-12": 39550.0,
+      "2025-07": 48600.0,
+      "2019-11": 56000.0,
+      "2025-11": 65150.0,
+      "2022-12": 66266.6,
+      "2025-05": 67100.0,
+      "2024-02": 67700.0,
+      "2022-07": 68700.0,
+      "2024-10": 70000.0,
+      "2019-12": 71422.2,
+      "2023-11": 77140.0,
+      "2024-01": 79400.0,
+      "2025-03": 92500.0,
+      "2020-06": 94500.0,
+      "2019-04": 102400.0,
+      "2020-11": 127333.3,
+      "2023-02": 130728.6,
+      "2020-12": 146266.6,
+      "2020-09": 187450.0,
+      "2022-03": 199213.3,
+      "2025-10": 228650.0,
+      "2023-06": 243800.0,
+      "2020-10": 253100.0,
+      "2021-06": 308451.4,
+      "2024-07": 326300.0,
+      "2022-06": 340883.3,
+      "2024-04": 358150.0,
+      "2024-11": 433657.1,
+      "2021-09": 434166.7,
+      "2021-04": 438720.0,
+      "2023-09": 470300.0,
+      "2023-08": 598641.7
+    }
+  }
+}

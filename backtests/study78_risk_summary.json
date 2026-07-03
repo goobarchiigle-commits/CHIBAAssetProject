@@ -1,0 +1,143 @@
+{
+  "date": "2026-07-04",
+  "leverage_readiness": {
+    "1.0": {
+      "leverage": 1.0,
+      "n_trades_5y": 193,
+      "p_maxdd_gt_30pct": 0.0013,
+      "p_final_lt_50pct": 0.0,
+      "cagr_dist": {
+        "mean": 19.58,
+        "median": 19.18,
+        "p5": 7.95,
+        "p25": 14.22,
+        "p75": 24.44,
+        "p95": 32.91
+      },
+      "maxdd_dist": {
+        "mean": -11.48,
+        "median": -10.81,
+        "p5": -18.8,
+        "p25": -13.48,
+        "p75": -8.73,
+        "p95": -6.52
+      },
+      "calmar_dist": {
+        "mean": 2.001,
+        "median": 1.76,
+        "p5": 0.5,
+        "p25": 1.125,
+        "p75": 2.589,
+        "p95": 4.348
+      },
+      "worst_year_pct_median": 2.17,
+      "worst_year_pct_p5": -10.46,
+      "recovery_trades_median": 12.0,
+      "recovery_unrecovered_rate": 0.1341
+    },
+    "1.1": {
+      "leverage": 1.1,
+      "n_trades_5y": 193,
+      "p_maxdd_gt_30pct": 0.002,
+      "p_final_lt_50pct": 0.0,
+      "cagr_dist": {
+        "mean": 21.81,
+        "median": 21.16,
+        "p5": 8.62,
+        "p25": 15.75,
+        "p75": 27.29,
+        "p95": 36.93
+      },
+      "maxdd_dist": {
+        "mean": -12.47,
+        "median": -11.68,
+        "p5": -20.36,
+        "p25": -14.68,
+        "p75": -9.55,
+        "p95": -7.1
+      },
+      "calmar_dist": {
+        "mean": 2.051,
+        "median": 1.804,
+        "p5": 0.509,
+        "p25": 1.148,
+        "p75": 2.672,
+        "p95": 4.457
+      },
+      "worst_year_pct_median": 2.41,
+      "worst_year_pct_p5": -11.46,
+      "recovery_trades_median": 12.0,
+      "recovery_unrecovered_rate": 0.1361
+    },
+    "1.2": {
+      "leverage": 1.2,
+      "n_trades_5y": 193,
+      "p_maxdd_gt_30pct": 0.0054,
+      "p_final_lt_50pct": 0.0,
+      "cagr_dist": {
+        "mean": 23.69,
+        "median": 23.03,
+        "p5": 9.35,
+        "p25": 17.09,
+        "p75": 29.55,
+        "p95": 40.43
+      },
+      "maxdd_dist": {
+        "mean": -13.67,
+        "median": -12.85,
+        "p5": -22.36,
+        "p25": -16.1,
+        "p75": -10.36,
+        "p95": -7.81
+      },
+      "calmar_dist": {
+        "mean": 2.031,
+        "median": 1.78,
+        "p5": 0.501,
+        "p25": 1.137,
+        "p75": 2.671,
+        "p95": 4.389
+      },
+      "worst_year_pct_median": 2.42,
+      "worst_year_pct_p5": -12.73,
+      "recovery_trades_median": 12.0,
+      "recovery_unrecovered_rate": 0.1379
+    },
+    "1.3": {
+      "leverage": 1.3,
+      "n_trades_5y": 193,
+      "p_maxdd_gt_30pct": 0.0102,
+      "p_final_lt_50pct": 0.0,
+      "cagr_dist": {
+        "mean": 25.49,
+        "median": 24.69,
+        "p5": 9.72,
+        "p25": 18.19,
+        "p75": 32.13,
+        "p95": 43.68
+      },
+      "maxdd_dist": {
+        "mean": -14.81,
+        "median": -13.95,
+        "p5": -24.02,
+        "p25": -17.48,
+        "p75": -11.28,
+        "p95": -8.39
+      },
+      "calmar_dist": {
+        "mean": 2.026,
+        "median": 1.766,
+        "p5": 0.484,
+        "p25": 1.102,
+        "p75": 2.638,
+        "p95": 4.495
+      },
+      "worst_year_pct_median": 2.4,
+      "worst_year_pct_p5": -13.69,
+      "recovery_trades_median": 12.0,
+      "recovery_unrecovered_rate": 0.1441
+    }
+  },
+  "n_trades_5y_horizon": 193,
+  "emergency_exit_pct_1R": 0.08
+}

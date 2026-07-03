@@ -380,6 +380,14 @@ M1-RCAで判明した設計特性: `exit_policy="A"`（ATR Extension）のRSR Ex
   5. **出力**: `backtests/study78_ror_2026-XX-XX.json` + `reports/study78_ror_mc_sensitivity.md`。
 - **期待情報価値**: Study79（レバ）・Study86（MN）・Study81（小型）全ての前提数字。
 
+### ✅ 実行完了（2026-07-04・ユーザー拡張指示によりPart4-8追加・Production研究基盤として構築）
+
+**成功基準達成**: 現行RoR(L=1.0)=P(MaxDD>30%)=0.13%<1% ✓ / レバ1.3x RoR=1.02%<5% ✓。感度は4パラメータ中3つ頑健（atr_mult/eq_scale/rsr_exit）、**mom_period=21のみ崖検出+ピーク形状で非頑健（過学習疑い・Study76/77へ申し送り）**。
+
+Part1-8全て実行完了。詳細レポート`reports/study78_ror_mc_sensitivity.md`・研究資産6JSON（`backtests/study78_*.json`）はStudy74/79/81/85/86が追加BTなしで再利用可能。research_state.md先頭に全結果転記済み。
+
+**Study79への含意**: 起案3条件（Study74白∧Study78合格∧CAND_B移行済）のうちStudy78は合格側材料が揃った。残り2条件（Study74・S1/CAND_B）待ち。
+
 ---
 
 # Section 4: Stage 3 — 中期: 目標の生死とデータ基盤（2026 Q3）

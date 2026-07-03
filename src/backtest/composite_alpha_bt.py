@@ -1593,6 +1593,11 @@ def run_scenario(
                     "entry": buy_px, "exit": None,
                     "qty": qty, "pnl": None,
                     "reason": f"alpha={a_val:.4f}/RSR={rsr_val:.1f}",
+                    # ── Study78 台帳拡張（観測専用・制御フロー影響なし 2026-07-04）──
+                    "entry_idx": next_i,
+                    "entry_atr_pct": _c53_atr_pct,
+                    "entry_rsr": round(float(rsr_val), 1),
+                    "entry_type": "mean_rev" if SECTOR_STRATEGY.get(_entry_sector, "fujiko") == "mean_rev" else "fujiko",
                 })
 
         # ── Study45: Q1-Q3 Idle Cash Attribution ─────────────────────────────
@@ -1833,6 +1838,9 @@ def run_scenario(
         "dyn_universe_excluded_count": dyn_universe_excluded_count,
         "mtf_excluded_count": mtf_excluded_count,
         "_trades": [t for t in trades if t["side"] == "SELL"],
+        # ── Study78 台帳拡張: BUYレコード（entry_idx/ATR/RSR/entry_type付き）を
+        #    追加公開（既存"_trades"の内容・挙動は不変・観測専用 2026-07-04）
+        "_trades_buy": [t for t in trades if t["side"] == "BUY"],
         # ── Study41 Capital Utilization ──────────────────────────────────
         "avg_idle_cash_ratio_pct": round(_idle_cash_total / max(1, n_days) * 100, 1),
         "days_at_max_positions": _days_at_max,
