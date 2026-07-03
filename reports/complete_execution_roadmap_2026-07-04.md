@@ -77,7 +77,7 @@ ADOPT ⇔ WF 5/5 ∧ 2022非悪化 ∧ ΔCAGR≥+1pp ∧ Bootstrap P(>0)≥95% �
 | 制約固定オラクル上界 | 16-18% → **30%∧1.5は制約内で理論的に矛盾**（正典Part1） |
 | 実弾 | ¥3M・auカブコム・live 35トレード |
 | 未解消High risk | Survivorship+Selection Bias（±1-3pp） |
-| ⚠ 環境 | `C:/ai-trading` が **git未初期化**（Stage1 M5で復旧） |
+| ⚠ 環境 | **訂正(M5実行後)**: `.git`は実際には`src/`配下に既存(origin一致・最終コミット2026-04-07・3ヶ月分未コミット)だった。root直下へ統合済み(commit 8641863)。詳細→§2.1 |
 
 ---
 
@@ -144,6 +144,50 @@ ADOPT ⇔ WF 5/5 ∧ 2022非悪化 ∧ ΔCAGR≥+1pp ∧ Bootstrap P(>0)≥95% �
 
 - **対象**（final_architecture_review DISCARD該当）: `entry_timing.boost_weight=0.06`（未検証）/ `fraction.bull=0.0`（OOS選定バイアス）/ `vol_adj`残置コード / `turtle_exit=55`（IS単独選定・デッドパラメータ）。
 - **Stage1では変更しない**（各変更はWF再検証が必要=軽微でない）。strategy.yaml各行に `# ⚠ DISCARD候補 (design_philosophy_review 2026-07-03)` 注記を追加するのみ。実変更はStage4のStudy76/77結果が方向を決めてから。
+
+---
+
+## 2.1 Stage1 実行ログ（2026-07-04・Sonnet実行）— 進捗・決裁待ち・追加検討事項
+
+### 進捗サマリ
+
+| タスク | 状態 | 備考 |
+|---|---|---|
+| M1 (Addon執行価格PATCH) | **REG FAIL → ロールバック** | 下記参照 |
+| M2 (×1.5バイパス撤廃) | **REG FAIL → ロールバック** | 下記参照 |
+| M3 (CLAUDE.md恒久化) | ✅完了 | `# OVERFIT_GUARD`に`fresh_run_required=true`追加 |
+| M4 (stale記述訂正) | ✅完了 | research_state.md SELL/BUY非対称記述を訂正 |
+| M5 (git復旧) | ✅完了（想定と異なる実態） | 下記参照 |
+| M6 (DISCARD注記) | ✅完了 | strategy.yaml 4箇所に注記追加、動作変更なし |
+
+### M1/M2: REG FAIL の詳細 — **ユーザー決裁待ち**
+
+`composite_alpha_bt.py`にM1(`close_mat`→`open_mat`)とM2(`×1.5`撤廃)を適用しfresh runでREG測定した結果:
+
+- **M1単独**: OOS ΔCAGR=**-2.06pp**（roadmap想定「|Δ|≤0.3pp」を6倍超過・ゲート閾値0.5pp超過）、2022 CAGR **-2.65%→-2.95%（悪化）**。
+- **M1+M2**: addon発火が**完全にゼロ化**（IS/OOS/WF全foldでaddon_cnt=0。CAND_A=EQ Scale完全除去の数値と完全一致）。
+  - **根本原因**: `max_positions=3`均等配分の通常エントリーは目標ウェイト約33.3%（capital/3）であり、これは`max_single_weight=0.25`（CIRCUIT値）を**エントリー時点で既に超過**している。旧`×1.5`（37.5%上限）はCIRCUIT違反ではなく、addon機能が動作するために必須の実務的ヘッドルームだった（strategy.yamlの`symbol_cap=0.40`が0.333超に意図的に設定されているのも同じ理由）。
+  - M2をdesign_philosophy_reviewの提言通り単純撤廃すると、Study45/52でADOPT済みのEQ Scale addon機能（Production構成D_ATR_EQの中核要素）を実質的に無効化する。roadmap自身のゲート「|ΔCAGR|>0.5pp または 2022悪化 → 停止」に抵触したため、コードは**PATCH前に完全ロールバック済み**（`composite_alpha_bt.py`は現在CURRENT/Study73と同一）。
+  - 検証物: `src/backtest/reg_m1m2_addon_patch_2026-07-04.py` / `backtests/reg_m1m2_addon_patch_2026-07-04.json`
+
+**決裁待ちの選択肢**（いずれか、または他案をユーザーが指示）:
+1. **M1/M2を完全放棄**し現状維持（addon close執行・×1.5ヘッドルームのまま）。CRO Memoの「PATCH採用決定」を覆すことになる。
+2. **max_single_weightの適用範囲を再設計**（例: 新規エントリーのみに0.25を厳格適用し、addon増分は別枠のcapとして再定義）→ 新規WF検証が必要（Stage1の「軽微」の範囲を超える）。
+3. **M1のみ採用・M2は放棄**（execution price統一は今後のBT/Live parityのために価値があるが、M1単独でも-2.06pp/2022悪化のゲート抵触があるため、これも「軽微修正」の前提が崩れており単独でもユーザー判断が必要）。
+4. 上記いずれも保留し、Stage2以降（S1 CAND_B等）を先行させる。
+
+### M5: 想定外の発見（環境認識の誤り）
+
+roadmap執筆時点の前提「`C:/ai-trading`がgit未初期化」は不正確だった。実際には`.git`が`src/`配下に単独で存在し、GitHub origin（CHIBAAssetProject.git, branch=main）と一致・HEAD=origin/mainの状態だったが、最終コミットは2026-04-07で以降3ヶ月分（src/内の再編作業＋reports/backtests/docs/scripts/tools/tests等ルート直下の新規ディレクトリ全て）が未コミットのまま放置されていた。
+
+ユーザー承認により`src/.git`を`C:/ai-trading/.git`へ移動し単一リポジトリへ統合（コミット`8641863`）。data/・.envの除外はルート/src/両方の`.gitignore`で再確認し、履歴上の混入もなし。**push未実施**（別途ASK_FIRST）。
+
+### その他、今後のroadmap実行にあたり検討が必要な項目
+
+1. **`max_single_weight=0.25`（CIRCUIT・変更禁止）と`max_positions=3`均等配分（33.3%）の構造的不整合**。この不整合はaddonだけでなく、**Study74（資本スケーリング¥20-30M検証）や将来のsizing関連研究すべてに影響する**可能性がある。CIRCUIT値自体は変更禁止だが、「何に対して0.25を適用するか」の解釈が現状コード内で一貫していない（新規エントリーには事実上適用されず、addonにのみ×1.5付きで適用）。Stage3 Study74着手前に、この解釈をRCAとして明文化しておくことを推奨。
+2. **`addon_cnt`フィールドのバグ**: `study73_production_migration_audit.py`の`extract_metrics()`は`raw.get("addon_cnt")`を参照しているが、`composite_alpha_bt.py`の実際の返り値キーは`"addon_count"`（本REGで発覚）。このため**Study70-73で報告されてきたaddon件数（addon_cnt列）は全て常に0であり、実際のaddon発火回数を反映していない**。roadmap本文中「addon発火件数の変化（現14件）」（M2節）の根拠が何であったか要再確認。過去の addon 関連判定（Study45/52/70等）のCAGR/Sharpe等の主要指標自体は別ロジックで計算されており影響ないが、addon件数に基づく解釈（発火頻度・実務インパクト評価）は再検証が必要。
+3. **CAND_B (S1, rsr_exit 70→75) は本ロールバックの影響を受けない**独立変更のため、M1/M2の決裁と切り離してStage2へ進行可能。ただしdry-run時の検証は引き続き必須。
+4. **git統合コミット(8641863)は大規模リネームを含む**（1425ファイル変更、うち126件はrename検出）。push前に、GitHub側リモートに既存コミット(639163f以降)がないか（他端末からの追加pushがないか）を`git fetch`で確認することを推奨。
 
 ---
 
