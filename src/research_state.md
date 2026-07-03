@@ -1,6 +1,57 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-04（Stage1 M1-M6実行結果反映）
+# Single Source of Truth / 最終更新: 2026-07-04（M1採用・Production基準値更新・CAND_B再測定・M2'記録完了）
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
+
+---
+
+## ★★ 2026-07-04 M1採用・Production基準値更新（Stage1最終決着） — **現行公式値はここを見ること**
+
+**決裁**: D1=**採用**（「BTをLiveへ合わせるため」。成績改善目的ではない。基準値低下も正式値として受容）/ D2=**M2'案a採用**（コード変更なし・文書化のみ）/ D3=**保留**（push未実施）。
+
+### 現行Production公式基準値（D_ATR_EQ・CURRENT・M1適用後・2026-07-04 fresh run）
+
+| 指標 | **現行公式値（M1適用後）** | ~~Addon close執行時代の参考値~~（2026-07-02 Study73） | Δ |
+|---|---|---|---|
+| IS CAGR (2018-2024) | **12.22%** | ~~12.37%~~ | -0.15pp |
+| OOS CAGR (2025) | **11.42%** | ~~13.48%~~ | -2.06pp |
+| FULL CAGR (2018-2025継続run) | **11.22%** | ~~11.35%~~ | -0.13pp |
+| WF avg CAGR | **17.99%** | ~~18.37%~~ | -0.38pp |
+| WF pass | **4/5**（変化なし） | 4/5 | — |
+| 2022 CAGR | **-2.95%** | ~~-2.65%~~ | -0.30pp |
+| IS Calmar | **0.671** | ~~0.683~~ | -0.012 |
+| Bootstrap median(N=500,IS年,seed=42) | **11.65%**　CI=[2.01%,23.63%]　P(>0)=0.984 | — | — |
+
+**旧値（close執行時代）は削除せず参考値として保持**。以降このセクションが「唯一の現行公式値」であり、下記の過去Study本文中の12.37%/13.48%等の数値は**当時の判定記録として凍結**（訂正・書き換えしない — §9原則2）。
+
+**エンジン変更内容**: `composite_alpha_bt.py` の `_addon_px` を `close_mat[next_i, _aidx]` → `open_mat[next_i, _aidx]` へ恒久変更（addon執行=翌日寄付、新規BUYと統一）。M2（`max_single_weight×1.5`バイパス）は**変更なし・維持**（次項M2'参照）。
+
+**検証物**: `src/backtest/study_m1_production_update_2026-07-04.py` / `backtests/study_m1_production_update_2026-07-04.json`
+
+### CAND_B (rsr_exit 70→75) M1適用後 再測定 — Study73旧結果は参考値扱い
+
+| 指標 | CURRENT(M1後) | CAND_B(M1後) | Δ |
+|---|---|---|---|
+| IS CAGR | 12.22% | 11.24% | -0.98pp |
+| OOS CAGR | 11.42% | 8.73% | -2.69pp |
+| FULL CAGR | 11.22% | 10.16% | -1.06pp |
+| WF avg CAGR | 17.99% | 14.92% | -3.07pp |
+| WF pass | 4/5 | **5/5** | +1 |
+| 2022 CAGR | -2.95% | **+1.51%** | **+4.46pp** |
+| Bootstrap P(>0) | 0.984 | 1.0 | +0.016 |
+
+**採用ゲート判定（WF5/5 ∧ 2022改善）: PASS**。CAND_B採用根拠はM1適用後も健在（代償は旧測定よりやや拡大: WF avg -1.99pp→-3.07pp）。**S1(strategy.yaml変更)は別途ユーザー承認が必要 — 本測定は再測定のみで自動採用ではない**。詳細→`reports/complete_execution_roadmap_2026-07-04.md` §2.3・S1節。
+
+### M2': max_single_weightの実装実態（文書化のみ・コード変更なし・案a確定）
+
+CIRCUIT `max_single_weight=0.25`（変更禁止）の実装実態を以下に明文化する:
+- **エントリー経路**: alpha加重cap = **`MAX_POS_WEIGHT=0.40`**（`composite_alpha_bt.py` L73）。`max_positions=3`均等配分時の目標ウェイトは実質約33.3%。
+- **addon経路**: `max_single_weight(0.25) × 1.5 = 0.375` のhard cap（`composite_alpha_bt.py` L1685付近）。
+- **CIRCUIT値0.25が単独（×1.5なしで）で効く経路は現エンジンに存在しない**。addon経路の0.375はStudy45/52でADOPT済みのEQ Scale addon機能が動作するための必須要件であり、これを0.25へ厳格化するとaddonが完全停止する（2026-07-04実測済み・下記M1-RCA節参照）。
+- 本項は実装変更ではなく**実装実態の文書化**。CIRCUIT値・エントリーロジック・addonロジックいずれもコード変更なし。CLAUDE.md変更なし。
+
+### Study77 申し送り事項（Stage1では変更しない）
+
+M1-RCA（下記）で判明: `exit_policy="A"`（ATR Extension、現行採用中のExit方式）のRSR Exit defer判定は `_pnow=(close-entry_price)/entry_price`（entry_price=addon込みの加重平均取得価格）に依存する（`composite_alpha_bt.py` L1082-1088）。**ポジションの加重平均取得価格を変化させるイベント（addon等）は、Exit deferタイミングに副次的に影響しうる**という設計上の結合が存在する。この結合の是非（entry_price依存を廃しシンプルな絶対%等に置き換えるべきか）はStage1のスコープ外・**修正しない**。**Study77（Exit構造置換WF）の検討事項として記録** — Study77がexit_policy="A"を代替案と比較する際、この結合の有無・影響を評価軸に加えることを推奨。
 
 ---
 

@@ -72,12 +72,14 @@ ADOPT ⇔ WF 5/5 ∧ 2022非悪化 ∧ ΔCAGR≥+1pp ∧ Bootstrap P(>0)≥95% �
 
 | 項目 | 値 |
 |---|---|
-| Production (D_ATR_EQ) | IS 12.37% / OOS2025 13.48% / Full 11.35% / Calmar IS 0.683 |
-| 素の実力（バイアス補正後） | 10-12% |
+| **Production (D_ATR_EQ) 【2026-07-04 M1適用後・現行公式値】** | **IS 12.22% / OOS2025 11.42% / Full 11.22% / Calmar IS 0.671 / WF avg 17.99%(4/5)** |
+| ~~Production (D_ATR_EQ) 参考値~~ | ~~IS 12.37% / OOS2025 13.48% / Full 11.35% / Calmar IS 0.683~~ **← Addon close執行時代の参考値（M1採用前・2026-07-02 Study73時点）。削除せず保持** |
+| 素の実力（バイアス補正後） | 10-12%（M1適用によりOOSの過大評価-2.06pp分は解消済み。上記が「正直な数字」） |
 | 制約固定オラクル上界 | 16-18% → **30%∧1.5は制約内で理論的に矛盾**（正典Part1） |
 | 実弾 | ¥3M・auカブコム・live 35トレード |
 | 未解消High risk | Survivorship+Selection Bias（±1-3pp） |
 | ⚠ 環境 | **訂正(M5実行後)**: `.git`は実際には`src/`配下に既存(origin一致・最終コミット2026-04-07・3ヶ月分未コミット)だった。root直下へ統合済み(commit 8641863)。詳細→§2.1 |
+| M1採用状態(2026-07-04) | **採用済み**（addon執行=翌日寄付。BT/Live parity目的・成績改善目的ではない）。詳細→§2.3 |
 
 ---
 
@@ -218,6 +220,58 @@ roadmap執筆時点の前提「`C:/ai-trading`がgit未初期化」は不正確�
   6. research_state.md追記 + commit（`research update: YYYY-MM-DD`）。
 - **却下する場合**: BT/Live乖離が恒久残存し、以後の全Study（74/76/77含む）がaddon分の過大評価を含んだまま進む。却下時はその旨を本書とresearch_state.mdに「既知バイアス（OOS約+2pp）」として登録すること（未登録での続行は禁止）。
 
+### §2.3 M1採用 実行結果（2026-07-04・ユーザー決裁: D1=採用）
+
+**決裁理由（ユーザー明示）**: 「BTをLiveへ合わせるため」の採用。成績改善目的ではない。Production基準値が低下してもそれを正式な基準値として受容する。M1-RCA（DIVERGED_PORTFOLIO=0件・カスケードなし）により、副次効果が限定的であることも確認済み。
+
+**実施内容**:
+1. `composite_alpha_bt.py` の `_addon_px` を `close_mat[next_i, _aidx]` → `open_mat[next_i, _aidx]` へ恒久変更（コメントも更新）。M2（×1.5バイパス）は変更なし（維持）。
+2. fresh runでIS/OOS/FULL(2018-2025継続run)/WF5fold/Bootstrapを再測定。
+3. `src/backtest/live_equivalent.py` をgrep確認 → addon関連コード無し（parity修正不要）。
+
+**新公式Production基準値（D_ATR_EQ・CURRENT・M1適用後）**:
+
+| 指標 | 旧値（close執行・参考値） | **新値（open執行・現行公式）** | Δ |
+|---|---|---|---|
+| IS CAGR (2018-2024) | 12.37% | **12.22%** | -0.15pp |
+| OOS CAGR (2025) | 13.48% | **11.42%** | -2.06pp |
+| FULL CAGR (2018-2025継続run) | 11.35% | **11.22%** | -0.13pp |
+| WF avg CAGR | 18.37% | **17.99%** | -0.38pp |
+| WF pass | 4/5 | **4/5**（変化なし） | — |
+| 2022 CAGR | -2.65% | **-2.95%** | -0.30pp |
+| IS Calmar | 0.683 | **0.671** | -0.012 |
+| Bootstrap median(N=500,IS年) | — | **11.65%** | CI=[2.01%, 23.63%] P(>0)=0.984 |
+
+検証物: `backtests/study_m1_production_update_2026-07-04.json` / `src/backtest/study_m1_production_update_2026-07-04.py`
+
+**旧値は削除せず「Addon close執行時代の参考値」として本書§0.7・research_state.mdに併記保持済み。**
+
+### CAND_B (rsr_exit=75) M1適用後 再測定結果 — Study73旧結果は参考値扱い
+
+| 指標 | CURRENT(M1後) | CAND_B(M1後) | Δ |
+|---|---|---|---|
+| IS CAGR | 12.22% | 11.24% | -0.98pp |
+| OOS CAGR | 11.42% | 8.73% | -2.69pp |
+| FULL CAGR | 11.22% | 10.16% | -1.06pp |
+| WF avg CAGR | 17.99% | 14.92% | -3.07pp |
+| WF pass | 4/5 | **5/5** | +1 |
+| 2022 CAGR | -2.95% | **+1.51%** | **+4.46pp** |
+| Bootstrap P(>0) | 0.984 | 1.0 | +0.016 |
+
+**採用ゲート判定（WF5/5 ∧ 2022改善）: PASS**。M1適用後もCAND_Bの採用根拠（2022正転・WF5/5化）は健在。ただし平均リターンの代償（IS/OOS/FULL/WF avg全てで-1〜3pp）はM1適用前（Study73: IS-1.01pp/OOS-2.69pp/WFavg-1.99pp）よりやや拡大（特にWF avg -1.99pp→-3.07pp）。**S1（CAND_B採用）は別途ユーザー承認が必要 — 本節は再測定のみで自動採用ではない**。
+
+### M2': research_state.md記録内容（案a・実施済み）
+
+CIRCUIT `max_single_weight=0.25` の実装実態を以下の通り明文化（research_state.mdに転記済み）:
+- エントリー経路: alpha加重cap **0.40**（`MAX_POS_WEIGHT`、`composite_alpha_bt.py` L73）。均等配分時は実質約33.3%。
+- addon経路: **0.375**（0.25×1.5）hard cap。
+- CIRCUIT値0.25が単独（×1.5なし）で効く経路は現エンジンに存在しない。addon経路の0.375はStudy45/52 ADOPT済みEQ Scale機能の動作要件であり、これを0.25へ厳格化するとEQ Scale addonが完全停止する（§2.1実測済み）。
+- コード変更なし。CLAUDE.md変更なし（案a確定）。
+
+### Study77 申し送り事項（Stage1では変更しない）
+
+M1-RCAで判明した設計特性: `exit_policy="A"`（ATR Extension）のRSR Exit defer判定は `_pnow=(close-entry_price)/entry_price`（entry_price=addon込みの加重平均取得価格）に依存する（`composite_alpha_bt.py` L1082-1088）。このため**ポジションの加重平均取得価格が変化するイベント（addon等）は、Exit deferタイミングに副次的に影響しうる**という設計上の結合が存在する。この結合自体の是非（entry_price依存をやめてETRシンプルな絶対%等に置き換えるべきか）はStage1のスコープ外。**Study77（Exit構造置換WF）の検討事項として記録** — Study77がexit_policy="A"を代替案と比較する際、この結合の有無・影響を評価軸に加えることを推奨。Stage1では一切変更しない。
+
 ### M2 推奨: **コード変更は恒久放棄 → M2'（文書整合）に置換**
 
 - **判断根拠**: ×1.5撤廃=EQ Scale addon機能死は実測で確定（§2.1）。Study73のCAND_A=KEEP判定（EQ Scale除去は有害）と直接矛盾するため、コード側を変える選択肢は存在しない。design_philosophy #7「例外を持つ上限は規律の不在」は、本件では「上限の定義が実装と乖離している」ことが真因であり、例外の除去ではなく定義の明文化が正しい処方。
@@ -235,15 +289,13 @@ roadmap執筆時点の前提「`C:/ai-trading`がgit未初期化」は不正確�
 
 ### 決裁チェックリスト（ユーザーはこの3問に答えるだけでStage1が閉じる）
 
-| # | 決裁事項 | 推奨 | **ユーザー決裁(2026-07-04)** |
+| # | 決裁事項 | 推奨 | **ユーザー最終決裁(2026-07-04)** |
 |---|---|---|---|
-| D1 | M1採用（公式数字 OOS 13.48→11.42%への再基準化を含む）— YES/NO | YES | **保留（M1-RCA完了後に判断）** |
-| D2 | M2'方式 — 案a（research_state.md記録のみ）/ 案b（CLAUDE.md注記） | 案a | **案a採用（確定）** |
-| D3 | git push実行（④手順） — YES/保留 | YES（fetch確認PASS前提） | **保留** |
+| D1 | M1採用（公式数字 OOS 13.48→11.42%への再基準化を含む）— YES/NO | YES | **採用・実施完了**（§2.3参照） |
+| D2 | M2'方式 — 案a（research_state.md記録のみ）/ 案b（CLAUDE.md注記） | 案a | **案a採用・実施完了** |
+| D3 | git push実行（④手順） — YES/保留 | YES（fetch確認PASS前提） | **保留（M1反映後に判断・継続保留中）** |
 
-D1=YES → M1実行仕様1-6を実施後、S1（§3）へ。D1=NO → 既知バイアス登録後、S1へ直行。**D1=保留の場合、Section 2は閉じない — 下記M1-RCA完了まで継続**（ユーザー明示指示 2026-07-04）。
-
-**ユーザー判断根拠**: OOS ΔCAGR=-2.06ppが「価格差だけ」なら安心してM1採用できるが、「Exit構造まで変化」しているならStage1の「軽微修正」の前提が崩れる。この切り分けなしにD1を確定させるのは尚早 → M1-RCAで実測してから判断。
+**M1-RCA完了 → D1確定の経緯**: OOS ΔCAGR=-2.06ppを分解した結果、DIVERGED_PORTFOLIO(カスケード)=0件・TIMING_SHIFTは42件中1件のみ（3197.T・ATR Extension defer判定の1日ずれ、因果特定済み）。95%基準は形式上不達だったが、副次効果が局所的・説明可能であることを確認した上でユーザーがD1=採用を決裁（「BTをLiveへ合わせるため」であり成績改善目的ではない、との理由）。D3(push)は引き続き保留 — 次回git操作の判断時に④手順（fetch確認）を実施。
 
 ---
 
@@ -299,11 +351,11 @@ D1=YES → M1実行仕様1-6を実施後、S1（§3）へ。D1=NO → 既知バ�
 
 ## S1: CAND_B移行 — rsr_exit 70→75【研究済・決断のみ・最大の短期改善】
 
-- **効果（Study73実測）**: 2022年 -2.65%→+2.37%（+5.02pp）/ WF 4/5→5/5 / Bootstrap P(>0)=100% / Fold std -4.63pp。代償: 平均リターン-1〜2.7pp。将来レバの前提=worst-year正転。
-- **⚠ 前提改訂(2026-07-04 §2.2③)**: 上記Study73数字は旧（close執行）エンジン産。M1決裁を先に確定させること（強く推奨）。M1採用時は手順1の前に「パッチ後エンジンで CURRENT vs CAND_B 再測定」を挿入し、2022正転・WF5/5がパッチ後も成立することを確認してから承認へ。M1却下時はStudy73数字のまま手順1へ直行可。
-- **ASK_FIRST**: 要（PARAMS_LOCKED隣接）。
+- ~~**効果（Study73実測）**: 2022年 -2.65%→+2.37%（+5.02pp）/ WF 4/5→5/5 / Bootstrap P(>0)=100% / Fold std -4.63pp。代償: 平均リターン-1〜2.7pp。将来レバの前提=worst-year正転。~~ **← M1適用前(close執行)の参考値。削除せず保持。**
+- **✅ M1適用後 再測定済み(2026-07-04・§2.3)**: 2022年 -2.95%→**+1.51%（+4.46pp）** / WF 4/5→**5/5** / Bootstrap P(>0)=0.984→1.0 / IS -0.98pp・OOS -2.69pp・WF avg -3.07pp（代償やや拡大）。**採用ゲート(WF5/5∧2022改善)=PASS**。検証物: `backtests/study_m1_production_update_2026-07-04.json`。
+- **ASK_FIRST**: 要（PARAMS_LOCKED隣接）。**手順1のユーザー承認はまだ取得していない — 上記M1適用後の新しいトレードオフ数字で改めて提示・承認を得ること**。
 - **手順**:
-  1. ユーザー承認取得（トレードオフを明示: 平均-2pp vs 2022+5pp・WF5/5）。
+  1. ユーザー承認取得（トレードオフを明示: **M1適用後の数字** — 平均IS-0.98pp/OOS-2.69pp/WFavg-3.07pp vs 2022+4.46pp・WF5/5）。
   2. `src/configs/strategy.yaml` の `rsr_exit: 70.0` → `75.0`（fujiko: セクション。grep `rsr_exit` で確認）。
   3. 同期確認: `run_live_signal.py` / `src/kabusapi/signal_bridge.py` / `live_equivalent.py` がハードコードせずconfigから読むことをgrep `rsr_exit` で確認。ハードコード発見時は同値に修正。
   4. **MORNING_ROUTINE dry-runで既存保有ポジションのRSR75跨ぎExit発火有無を必ず確認**（Audit リスク/テスト観点）。跨ぎ発火がある場合はユーザーに事前報告してからLIVE。
@@ -337,7 +389,7 @@ D1=YES → M1実行仕様1-6を実施後、S1（§3）へ。D1=NO → 既知バ�
 - **正典定義**: 成功=¥20-30MでCAGR≥22%（fix後・コスト込・WF5/5）。失敗=<18% or DD%が資本比例悪化。終了=4資本点×2構成の全測定（追加スイープ禁止）。
 - **ASK_FIRST**: 要（新規スクリプト `src/backtest/study74_capital_scaling_fresh.py`）。
 - **実装仕様**:
-  1. ~~M1/M2 PATCH適用後のエンジンで実行~~ **→改訂(2026-07-04 §2.2)**: M1採否確定後のエンジンで実行（M2はコード変更放棄が確定 — §2.2参照）。M1未決裁のままの起案は禁止。（**汚染前Study42/43A/46のJSONは参照値としてのみ使用・判定に使用禁止**）。
+  1. ~~M1/M2 PATCH適用後のエンジンで実行~~ **→確定(2026-07-04 §2.3)**: M1は採用・実施完了（addon執行=翌日寄付。M2はコード変更放棄・案a確定）。現行エンジンでそのまま実行可（追加の待機条件なし）。（**汚染前Study42/43A/46のJSONは参照値としてのみ使用・判定に使用禁止**）。
   2. マトリクス: capital ∈ {3M, 10M, 20M, 30M} × config ∈ {D_ATR_EQ現行, CAND_B適用後}。
   3. 各セル: IS 2018-2024 / OOS 2025 / WF5fold / MaxDD / lot_skip率 / 1銘柄あたり平均約定額 / **実効max単一銘柄ウェイト実測値（日次ピーク・§2.2①）**。
   4. lot制約の解消検証: Study25/44が示した「¥3Mでlot丸めが破壊」が¥20M+で消えるか（skip率<5%を目安に報告）。

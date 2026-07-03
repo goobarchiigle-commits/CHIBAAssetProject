@@ -1660,10 +1660,10 @@ def run_scenario(
                     else:
                         continue
 
-                    # 実行価格 = 翌日 close（新規 BUY と同じ）
+                    # 実行価格 = 翌日 寄付（新規 BUY と統一 2026-07 M1 PATCH採用・BT/Live parity）
                     if next_i >= len(common_dates):
                         continue
-                    _addon_px = float(close_mat[next_i, _aidx])
+                    _addon_px = float(open_mat[next_i, _aidx])
                     if np.isnan(_addon_px) or _addon_px <= 0:
                         continue
 

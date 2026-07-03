@@ -1,0 +1,363 @@
+{
+  "study": "M1_production_update",
+  "date": "2026-07-04",
+  "engine_state": "M1適用済み(addon=open執行)/M2変更なし(×1.5維持)",
+  "results": {
+    "CURRENT": {
+      "is": {
+        "cagr": 12.22,
+        "sharpe": 0.579,
+        "max_dd": -18.22,
+        "calmar": 0.671,
+        "n_trades": 263,
+        "addon_cnt": 3,
+        "avg_exp": 31.5
+      },
+      "oos": {
+        "cagr": 11.42,
+        "sharpe": 1.011,
+        "max_dd": -10.35,
+        "calmar": 1.103,
+        "n_trades": 42,
+        "addon_cnt": 16,
+        "avg_exp": 36.4
+      },
+      "full": {
+        "cagr": 11.22,
+        "sharpe": 0.564,
+        "max_dd": -18.22,
+        "calmar": 0.616,
+        "n_trades": 309,
+        "addon_cnt": 3,
+        "avg_exp": 29.4
+      },
+      "wf": {
+        "wf_count": 4,
+        "avg_cagr": 17.99,
+        "fold_std": 18.92,
+        "segments": [
+          {
+            "cagr": 5.32,
+            "sharpe": 0.323,
+            "max_dd": -18.52,
+            "calmar": 0.287,
+            "n_trades": 29,
+            "addon_cnt": 2,
+            "avg_exp": 43.8,
+            "year": "2020",
+            "wf_pass": true
+          },
+          {
+            "cagr": 6.08,
+            "sharpe": 0.346,
+            "max_dd": -20.6,
+            "calmar": 0.295,
+            "n_trades": 54,
+            "addon_cnt": 0,
+            "avg_exp": 47.9,
+            "year": "2021",
+            "wf_pass": true
+          },
+          {
+            "cagr": -2.95,
+            "sharpe": 0.047,
+            "max_dd": -20.93,
+            "calmar": -0.141,
+            "n_trades": 43,
+            "addon_cnt": 1,
+            "avg_exp": 50.4,
+            "year": "2022",
+            "wf_pass": false
+          },
+          {
+            "cagr": 43.4,
+            "sharpe": 1.754,
+            "max_dd": -9.21,
+            "calmar": 4.714,
+            "n_trades": 49,
+            "addon_cnt": 5,
+            "avg_exp": 49.6,
+            "year": "2023",
+            "wf_pass": true
+          },
+          {
+            "cagr": 38.08,
+            "sharpe": 1.791,
+            "max_dd": -14.78,
+            "calmar": 2.577,
+            "n_trades": 34,
+            "addon_cnt": 6,
+            "avg_exp": 45.8,
+            "year": "2024",
+            "wf_pass": true
+          }
+        ]
+      },
+      "annual": {
+        "2020": {
+          "cagr": 5.32,
+          "sharpe": 0.323,
+          "max_dd": -18.52,
+          "calmar": 0.287,
+          "n_trades": 29,
+          "addon_cnt": 2,
+          "avg_exp": 43.8,
+          "year": "2020",
+          "wf_pass": true
+        },
+        "2021": {
+          "cagr": 6.08,
+          "sharpe": 0.346,
+          "max_dd": -20.6,
+          "calmar": 0.295,
+          "n_trades": 54,
+          "addon_cnt": 0,
+          "avg_exp": 47.9,
+          "year": "2021",
+          "wf_pass": true
+        },
+        "2022": {
+          "cagr": -2.95,
+          "sharpe": 0.047,
+          "max_dd": -20.93,
+          "calmar": -0.141,
+          "n_trades": 43,
+          "addon_cnt": 1,
+          "avg_exp": 50.4,
+          "year": "2022",
+          "wf_pass": false
+        },
+        "2023": {
+          "cagr": 43.4,
+          "sharpe": 1.754,
+          "max_dd": -9.21,
+          "calmar": 4.714,
+          "n_trades": 49,
+          "addon_cnt": 5,
+          "avg_exp": 49.6,
+          "year": "2023",
+          "wf_pass": true
+        },
+        "2024": {
+          "cagr": 38.08,
+          "sharpe": 1.791,
+          "max_dd": -14.78,
+          "calmar": 2.577,
+          "n_trades": 34,
+          "addon_cnt": 6,
+          "avg_exp": 45.8,
+          "year": "2024",
+          "wf_pass": true
+        },
+        "2018": {
+          "cagr": 0.0,
+          "error": "'4055.T'"
+        },
+        "2019": {
+          "cagr": 0.0,
+          "error": "'4055.T'"
+        },
+        "2025": {
+          "cagr": 11.42,
+          "sharpe": 1.011,
+          "max_dd": -10.35,
+          "calmar": 1.103,
+          "n_trades": 42,
+          "addon_cnt": 16,
+          "avg_exp": 36.4
+        }
+      },
+      "bootstrap": {
+        "median": 11.65,
+        "ci_5": 2.01,
+        "ci_95": 23.63,
+        "std": 6.67,
+        "p_positive": 0.984,
+        "n_years": 7
+      }
+    },
+    "CAND_B": {
+      "is": {
+        "cagr": 11.24,
+        "sharpe": 0.543,
+        "max_dd": -17.95,
+        "calmar": 0.626,
+        "n_trades": 272,
+        "addon_cnt": 3,
+        "avg_exp": 31.4
+      },
+      "oos": {
+        "cagr": 8.73,
+        "sharpe": 0.815,
+        "max_dd": -11.02,
+        "calmar": 0.792,
+        "n_trades": 43,
+        "addon_cnt": 16,
+        "avg_exp": 33.7
+      },
+      "full": {
+        "cagr": 10.16,
+        "sharpe": 0.522,
+        "max_dd": -17.95,
+        "calmar": 0.566,
+        "n_trades": 318,
+        "addon_cnt": 3,
+        "avg_exp": 29.3
+      },
+      "wf": {
+        "wf_count": 5,
+        "avg_cagr": 14.92,
+        "fold_std": 13.84,
+        "segments": [
+          {
+            "cagr": 6.3,
+            "sharpe": 0.35,
+            "max_dd": -18.01,
+            "calmar": 0.35,
+            "n_trades": 31,
+            "addon_cnt": 2,
+            "avg_exp": 43.8,
+            "year": "2020",
+            "wf_pass": true
+          },
+          {
+            "cagr": 4.76,
+            "sharpe": 0.314,
+            "max_dd": -19.12,
+            "calmar": 0.249,
+            "n_trades": 56,
+            "addon_cnt": 1,
+            "avg_exp": 48.1,
+            "year": "2021",
+            "wf_pass": true
+          },
+          {
+            "cagr": 1.51,
+            "sharpe": 0.197,
+            "max_dd": -19.13,
+            "calmar": 0.079,
+            "n_trades": 45,
+            "addon_cnt": 1,
+            "avg_exp": 47.4,
+            "year": "2022",
+            "wf_pass": true
+          },
+          {
+            "cagr": 37.43,
+            "sharpe": 1.463,
+            "max_dd": -11.02,
+            "calmar": 3.398,
+            "n_trades": 53,
+            "addon_cnt": 3,
+            "avg_exp": 47.6,
+            "year": "2023",
+            "wf_pass": true
+          },
+          {
+            "cagr": 24.62,
+            "sharpe": 1.237,
+            "max_dd": -15.79,
+            "calmar": 1.559,
+            "n_trades": 37,
+            "addon_cnt": 8,
+            "avg_exp": 49.4,
+            "year": "2024",
+            "wf_pass": true
+          }
+        ]
+      },
+      "annual": {
+        "2020": {
+          "cagr": 6.3,
+          "sharpe": 0.35,
+          "max_dd": -18.01,
+          "calmar": 0.35,
+          "n_trades": 31,
+          "addon_cnt": 2,
+          "avg_exp": 43.8,
+          "year": "2020",
+          "wf_pass": true
+        },
+        "2021": {
+          "cagr": 4.76,
+          "sharpe": 0.314,
+          "max_dd": -19.12,
+          "calmar": 0.249,
+          "n_trades": 56,
+          "addon_cnt": 1,
+          "avg_exp": 48.1,
+          "year": "2021",
+          "wf_pass": true
+        },
+        "2022": {
+          "cagr": 1.51,
+          "sharpe": 0.197,
+          "max_dd": -19.13,
+          "calmar": 0.079,
+          "n_trades": 45,
+          "addon_cnt": 1,
+          "avg_exp": 47.4,
+          "year": "2022",
+          "wf_pass": true
+        },
+        "2023": {
+          "cagr": 37.43,
+          "sharpe": 1.463,
+          "max_dd": -11.02,
+          "calmar": 3.398,
+          "n_trades": 53,
+          "addon_cnt": 3,
+          "avg_exp": 47.6,
+          "year": "2023",
+          "wf_pass": true
+        },
+        "2024": {
+          "cagr": 24.62,
+          "sharpe": 1.237,
+          "max_dd": -15.79,
+          "calmar": 1.559,
+          "n_trades": 37,
+          "addon_cnt": 8,
+          "avg_exp": 49.4,
+          "year": "2024",
+          "wf_pass": true
+        },
+        "2018": {
+          "cagr": 0.0,
+          "error": "'4055.T'"
+        },
+        "2019": {
+          "cagr": 0.0,
+          "error": "'4055.T'"
+        },
+        "2025": {
+          "cagr": 8.73,
+          "sharpe": 0.815,
+          "max_dd": -11.02,
+          "calmar": 0.792,
+          "n_trades": 43,
+          "addon_cnt": 16,
+          "avg_exp": 33.7
+        }
+      },
+      "bootstrap": {
+        "median": 9.9,
+        "ci_5": 2.66,
+        "ci_95": 19.84,
+        "std": 5.17,
+        "p_positive": 1.0,
+        "n_years": 7
+      }
+    }
+  },
+  "cand_b_comparison": {
+    "delta_is": -0.98,
+    "delta_oos": -2.69,
+    "delta_full": -1.06,
+    "delta_wf_avg": -3.07,
+    "delta_2022": 4.46,
+    "wf_pass_current": 4,
+    "wf_pass_cand_b": 5,
+    "gate_pass": true
+  }
+}
