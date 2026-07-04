@@ -1,6 +1,33 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-04（Core Architecture Completion Review=Verdict B・Core研究終了可）
+# Single Source of Truth / 最終更新: 2026-07-04（★Core Research Closed宣言・Long Only Core Architecture研究恒久終了★）
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
+
+---
+
+## ★★★★ 2026-07-04 Core Research Closure — **「Core Research Closed」正式宣言（新規BTゼロ・コード変更ゼロ）**
+
+**目的**: Study01〜81+Core Architecture Completion Review(同日)を統合し、Long Only Core Architecture研究を正式終了する。
+**成果物**: `reports/core_closure.md`（1文結論+証明/反証/未解決+終了条件確認） / `reports/core_decision_record.md`（Closed Research 15項目・再開条件） / `reports/architecture_handover.md`（Study74-86引き継ぎ）
+
+### Core Architecture最終結論（1文）
+現行Long Only Core Architecture（max_positions=3・RSR42固定・¥3M・日次判定）は実力10-12%(素)・オラクル込み理論上界16-18%と確定し、CAGR30%到達およびCAGR30%∧Calmar1.5同時達成は共に不成立と確定した一方、内部の全構造要素は個別に改善余地を反証済みで現行構成は当該制約下の局所最適である。
+
+### 終了条件（3条件・全充足）
+| 条件 | 判定 |
+|---|---|
+| EVI High = 0（Core内） | ✅ 充足（`core_evi_matrix.md`） |
+| Architecture Decisionへ影響するOpen Question = 0 | ✅ 充足（`core_open_questions.md`集計） |
+| 期待情報価値+2pp以上の未実施研究 = 0（Core内） | ✅ 充足 |
+
+### Closed Research拡張（恒久閉鎖14→15項目）
+Final Research Roadmap既存14項目に加え、本Closureで新規15番目を確定: **クラスター（factor/macro）ベースの4銘柄目抑制ロジック**（Study81 REJECT根拠・再開条件なし）。また閉鎖#11（max_positions拡大・機会損失回収）にStudy81の結果を追記し根拠を強化。CAP_MISS矛盾の「解決策探索」自体も新規閉鎖領域として追加（Final Audit§3.5の測定レベル混同の解消による）。
+
+### Architecture Programへの引き継ぎ（4件のみ・全て非Core影響）
+OQ1(→Study85相関設計) / OQ3(→Study76/77骨格評価) / OQ4(→Study75最上流) / OQ5(→Study77・既に正典予約済み)。
+
+### 最終宣言
+# **Core Research Closed**
+運用終了ではない（月次decay監視は継続）。以降の新規研究起案はFinal Research Roadmap Part3（Study74-86）の枠内のみ有効。恒久閉鎖15項目の再訪は表現を変えても禁止。
 
 ---
 
