@@ -1,0 +1,1415 @@
+{
+  "study": "Study74_capital_scaling",
+  "date": "2026-07-04",
+  "engine": "M1適用後(addon=open執行)/M2変更なし",
+  "capital_config_matrix": {
+    "3000000": {
+      "CURRENT": {
+        "is": {
+          "cagr": 12.22,
+          "sharpe": 0.579,
+          "max_dd": -18.22,
+          "calmar": 0.671,
+          "n_trades": 263,
+          "avg_exp": 31.5,
+          "avg_candidates": 0.48,
+          "avg_simultaneous_holdings": 1.93,
+          "rejected_by_lot_count": 10,
+          "missed_by_cap_count": 427,
+          "avg_idle_cash_ratio_pct": 90.9,
+          "q1_idle_when_winner_pct": 22.3
+        },
+        "oos": {
+          "cagr": 11.42,
+          "sharpe": 1.011,
+          "max_dd": -10.35,
+          "calmar": 1.103,
+          "n_trades": 42,
+          "avg_exp": 36.4,
+          "avg_candidates": 0.34,
+          "avg_simultaneous_holdings": 1.68,
+          "rejected_by_lot_count": 5,
+          "missed_by_cap_count": 20,
+          "avg_idle_cash_ratio_pct": 65.2,
+          "q1_idle_when_winner_pct": 21.7
+        },
+        "wf": {
+          "wf_count": 4,
+          "avg_cagr": 17.99,
+          "segments": [
+            {
+              "cagr": 5.32,
+              "sharpe": 0.323,
+              "max_dd": -18.52,
+              "calmar": 0.287,
+              "n_trades": 29,
+              "avg_exp": 43.8,
+              "avg_candidates": 0.4,
+              "avg_simultaneous_holdings": 1.95,
+              "rejected_by_lot_count": 5,
+              "missed_by_cap_count": 27,
+              "avg_idle_cash_ratio_pct": 52.7,
+              "q1_idle_when_winner_pct": 19.9,
+              "year": "2020",
+              "wf_pass": true
+            },
+            {
+              "cagr": 6.08,
+              "sharpe": 0.346,
+              "max_dd": -20.6,
+              "calmar": 0.295,
+              "n_trades": 54,
+              "avg_exp": 47.9,
+              "avg_candidates": 0.7,
+              "avg_simultaneous_holdings": 2.67,
+              "rejected_by_lot_count": 1,
+              "missed_by_cap_count": 100,
+              "avg_idle_cash_ratio_pct": 56.1,
+              "q1_idle_when_winner_pct": 1.4,
+              "year": "2021",
+              "wf_pass": true
+            },
+            {
+              "cagr": -2.95,
+              "sharpe": 0.047,
+              "max_dd": -20.93,
+              "calmar": -0.141,
+              "n_trades": 43,
+              "avg_exp": 50.4,
+              "avg_candidates": 0.52,
+              "avg_simultaneous_holdings": 2.43,
+              "rejected_by_lot_count": 0,
+              "missed_by_cap_count": 70,
+              "avg_idle_cash_ratio_pct": 47.0,
+              "q1_idle_when_winner_pct": 6.4,
+              "year": "2022",
+              "wf_pass": false
+            },
+            {
+              "cagr": 43.4,
+              "sharpe": 1.754,
+              "max_dd": -9.21,
+              "calmar": 4.714,
+              "n_trades": 49,
+              "avg_exp": 49.6,
+              "avg_candidates": 0.79,
+              "avg_simultaneous_holdings": 2.37,
+              "rejected_by_lot_count": 0,
+              "missed_by_cap_count": 120,
+              "avg_idle_cash_ratio_pct": 62.3,
+              "q1_idle_when_winner_pct": 25.7,
+              "year": "2023",
+              "wf_pass": true
+            },
+            {
+              "cagr": 38.08,
+              "sharpe": 1.791,
+              "max_dd": -14.78,
+              "calmar": 2.577,
+              "n_trades": 34,
+              "avg_exp": 45.8,
+              "avg_candidates": 0.56,
+              "avg_simultaneous_holdings": 2.11,
+              "rejected_by_lot_count": 0,
+              "missed_by_cap_count": 71,
+              "avg_idle_cash_ratio_pct": 66.0,
+              "q1_idle_when_winner_pct": 48.0,
+              "year": "2024",
+              "wf_pass": true
+            }
+          ]
+        },
+        "annual_standalone": {
+          "2018": {
+            "cagr": 0.0,
+            "error": "'4055.T'"
+          },
+          "2019": {
+            "cagr": 0.0,
+            "error": "'4055.T'"
+          }
+        }
+      },
+      "CAND_B": {
+        "is": {
+          "cagr": 11.24,
+          "sharpe": 0.543,
+          "max_dd": -17.95,
+          "calmar": 0.626,
+          "n_trades": 272,
+          "avg_exp": 31.4,
+          "avg_candidates": 0.49,
+          "avg_simultaneous_holdings": 1.94,
+          "rejected_by_lot_count": 10,
+          "missed_by_cap_count": 409,
+          "avg_idle_cash_ratio_pct": 89.1,
+          "q1_idle_when_winner_pct": 22.1
+        },
+        "oos": {
+          "cagr": 8.73,
+          "sharpe": 0.815,
+          "max_dd": -11.02,
+          "calmar": 0.792,
+          "n_trades": 43,
+          "avg_exp": 33.7,
+          "avg_candidates": 0.34,
+          "avg_simultaneous_holdings": 1.54,
+          "rejected_by_lot_count": 5,
+          "missed_by_cap_count": 19,
+          "avg_idle_cash_ratio_pct": 67.7,
+          "q1_idle_when_winner_pct": 22.2
+        },
+        "wf": {
+          "wf_count": 5,
+          "avg_cagr": 14.92,
+          "segments": [
+            {
+              "cagr": 6.3,
+              "sharpe": 0.35,
+              "max_dd": -18.01,
+              "calmar": 0.35,
+              "n_trades": 31,
+              "avg_exp": 43.8,
+              "avg_candidates": 0.4,
+              "avg_simultaneous_holdings": 1.98,
+              "rejected_by_lot_count": 5,
+              "missed_by_cap_count": 22,
+              "avg_idle_cash_ratio_pct": 53.2,
+              "q1_idle_when_winner_pct": 24.1,
+              "year": "2020",
+              "wf_pass": true
+            },
+            {
+              "cagr": 4.76,
+              "sharpe": 0.314,
+              "max_dd": -19.12,
+              "calmar": 0.249,
+              "n_trades": 56,
+              "avg_exp": 48.1,
+              "avg_candidates": 0.72,
+              "avg_simultaneous_holdings": 2.64,
+              "rejected_by_lot_count": 1,
+              "missed_by_cap_count": 95,
+              "avg_idle_cash_ratio_pct": 55.1,
+              "q1_idle_when_winner_pct": 1.1,
+              "year": "2021",
+              "wf_pass": true
+            },
+            {
+              "cagr": 1.51,
+              "sharpe": 0.197,
+              "max_dd": -19.13,
+              "calmar": 0.079,
+              "n_trades": 45,
+              "avg_exp": 47.4,
+              "avg_candidates": 0.51,
+              "avg_simultaneous_holdings": 2.29,
+              "rejected_by_lot_count": 0,
+              "missed_by_cap_count": 67,
+              "avg_idle_cash_ratio_pct": 50.5,
+              "q1_idle_when_winner_pct": 7.6,
+              "year": "2022",
+              "wf_pass": true
+            },
+            {
+              "cagr": 37.43,
+              "sharpe": 1.463,
+              "max_dd": -11.02,
+              "calmar": 3.398,
+              "n_trades": 53,
+              "avg_exp": 47.6,
+              "avg_candidates": 0.79,
+              "avg_simultaneous_holdings": 2.36,
+              "rejected_by_lot_count": 0,
+              "missed_by_cap_count": 114,
+              "avg_idle_cash_ratio_pct": 63.1,
+              "q1_idle_when_winner_pct": 25.5,
+              "year": "2023",
+              "wf_pass": true
+            },
+            {
+              "cagr": 24.62,
+              "sharpe": 1.237,
+              "max_dd": -15.79,
+              "calmar": 1.559,
+              "n_trades": 37,
+              "avg_exp": 49.4,
+              "avg_candidates": 0.58,
+              "avg_simultaneous_holdings": 2.14,
+              "rejected_by_lot_count": 8,
+              "missed_by_cap_count": 67,
+              "avg_idle_cash_ratio_pct": 57.3,
+              "q1_idle_when_winner_pct": 47.3,
+              "year": "2024",
+              "wf_pass": true
+            }
+          ]
+        },
+        "annual_standalone": {
+          "2018": {
+            "cagr": 0.0,
+            "error": "'4055.T'"
+          },
+          "2019": {
+            "cagr": 0.0,
+            "error": "'4055.T'"
+          }
+        }
+      }
+    },
+    "10000000": {
+      "CURRENT": {
+        "is": {
+          "cagr": 12.51,
+          "sharpe": 0.604,
+          "max_dd": -19.04,
+          "calmar": 0.657,
+          "n_trades": 264,
+          "avg_exp": 32.9,
+          "avg_candidates": 0.49,
+          "avg_simultaneous_holdings": 1.97,
+          "rejected_by_lot_count": 7,
+          "missed_by_cap_count": 452,
+          "avg_idle_cash_ratio_pct": 90.3,
+          "q1_idle_when_winner_pct": 24.5
+        },
+        "oos": {
+          "cagr": 25.21,
+          "sharpe": 1.287,
+          "max_dd": -12.21,
+          "calmar": 2.064,
+          "n_trades": 40,
+          "avg_exp": 45.7,
+          "avg_candidates": 0.33,
+          "avg_simultaneous_holdings": 1.82,
+          "rejected_by_lot_count": 0,
+          "missed_by_cap_count": 32,
+          "avg_idle_cash_ratio_pct": 57.3,
+          "q1_idle_when_winner_pct": 35.5
+        },
+        "wf": {
+          "wf_count": 3,
+          "avg_cagr": 16.05,
+          "segments": [
+            {
+              "cagr": -1.06,
+              "sharpe": 0.145,
+              "max_dd": -20.04,
+              "calmar": -0.053,
+              "n_trades": 30,
+              "avg_exp": 51.6,
+              "avg_candidates": 0.43,
+              "avg_simultaneous_holdings": 2.18,
+              "rejected_by_lot_count": 0,
+              "missed_by_cap_count": 45,
+              "avg_idle_cash_ratio_pct": 43.4,
+              "q1_idle_when_winner_pct": 15.2,
+              "year": "2020",
+              "wf_pass": false
+            },
+            {
+              "cagr": 1.82,
+              "sharpe": 0.245,
+              "max_dd": -21.95,
+              "calmar": 0.083,
+              "n_trades": 54,
+              "avg_exp": 49.8,
+              "avg_candidates": 0.71,
+              "avg_simultaneous_holdings": 2.65,
+              "rejected_by_lot_count": 1,
+              "missed_by_cap_count": 107,
+              "avg_idle_cash_ratio_pct": 53.4,
+              "q1_idle_when_winner_pct": 2.7,
+              "year": "2021",
+              "wf_pass": true
+            },
+            {
+              "cagr": -0.25,
+              "sharpe": 0.149,
+              "max_dd": -23.98,
+              "calmar": -0.01,
+              "n_trades": 44,
+              "avg_exp": 53.3,
+              "avg_candidates": 0.53,
+              "avg_simultaneous_holdings": 2.32,
+              "rejected_by_lot_count": 0,
+              "missed_by_cap_count": 72,
+              "avg_idle_cash_ratio_pct": 43.5,
+              "q1_idle_when_winner_pct": 9.0,
+              "year": "2022",
+              "wf_pass": false
+            },
+            {
+              "cagr": 44.93,
+              "sharpe": 1.736,
+              "max_dd": -9.72,
+              "calmar": 4.623,
+              "n_trades": 52,
+              "avg_exp": 51.2,
+              "avg_candidates": 0.8,
+              "avg_simultaneous_holdings": 2.4,
+              "rejected_by_lot_count": 6,
+              "missed_by_cap_count": 122,
+              "avg_idle_cash_ratio_pct": 61.4,
+              "q1_idle_when_winner_pct": 27.1,
+              "year": "2023",
+              "wf_pass": true
+            },
+            {
+              "cagr": 34.8,
+              "sharpe": 1.564,
+              "max_dd": -16.54,
+              "calmar": 2.103,
+              "n_trades": 35,
+              "avg_exp": 49.8,
+              "avg_candidates": 0.56,
+              "avg_simultaneous_holdings": 2.12,
+              "rejected_by_lot_count": 0,
+              "missed_by_cap_count": 72,
+              "avg_idle_cash_ratio_pct": 61.0,
+              "q1_idle_when_winner_pct": 49.5,
+              "year": "2024",
+              "wf_pass": true
+            }
+          ]
+        },
+        "annual_standalone": {
+          "2018": {
+            "cagr": 0.0,
+            "error": "'4055.T'"
+          },
+          "2019": {
+            "cagr": 0.0,
+            "error": "'4055.T'"
+          }
+        }
+      },
+      "CAND_B": {
+        "is": {
+          "cagr": 11.91,
+          "sharpe": 0.574,
+          "max_dd": -19.13,
+          "calmar": 0.622,
+          "n_trades": 278,
+          "avg_exp": 32.7,
+          "avg_candidates": 0.49,
+          "avg_simultaneous_holdings": 1.98,
+          "rejected_by_lot_count": 10,
+          "missed_by_cap_count": 435,
+          "avg_idle_cash_ratio_pct": 90.9,
+          "q1_idle_when_winner_pct": 23.2
+        },
+        "oos": {
+          "cagr": 23.33,
+          "sharpe": 1.195,
+          "max_dd": -13.43,
+          "calmar": 1.738,
+          "n_trades": 41,
+          "avg_exp": 43.6,
+          "avg_candidates": 0.33,
+          "avg_simultaneous_holdings": 1.71,
+          "rejected_by_lot_count": 0,
+          "missed_by_cap_count": 32,
+          "avg_idle_cash_ratio_pct": 59.1,
+          "q1_idle_when_winner_pct": 32.7
+        },
+        "wf": {
+          "wf_count": 4,
+          "avg_cagr": 14.91,
+          "segments": [
+            {
+              "cagr": 0.8,
+              "sharpe": 0.206,
+              "max_dd": -18.88,
+              "calmar": 0.043,
+              "n_trades": 31,
+              "avg_exp": 51.0,
+              "avg_candidates": 0.42,
+              "avg_simultaneous_holdings": 2.17,
+              "rejected_by_lot_count": 0,
+              "missed_by_cap_count": 38,
+              "avg_idle_cash_ratio_pct": 44.4,
+              "q1_idle_when_winner_pct": 17.4,
+              "year": "2020",
+              "wf_pass": true
+            },
+            {
+              "cagr": 4.88,
+              "sharpe": 0.319,
+              "max_dd": -20.61,
+              "calmar": 0.237,
+              "n_trades": 54,
+              "avg_exp": 49.2,
+              "avg_candidates": 0.71,
+              "avg_simultaneous_holdings": 2.62,
+              "rejected_by_lot_count": 2,
+              "missed_by_cap_count": 106,
+              "avg_idle_cash_ratio_pct": 54.5,
+              "q1_idle_when_winner_pct": 2.6,
+              "year": "2021",
+              "wf_pass": true
+            },
+            {
+              "cagr": -3.43,
+              "sharpe": 0.047,
+              "max_dd": -20.54,
+              "calmar": -0.167,
+              "n_trades": 47,
+              "avg_exp": 52.5,
+              "avg_candidates": 0.52,
+              "avg_simultaneous_holdings": 2.35,
+              "rejected_by_lot_count": 0,
+              "missed_by_cap_count": 69,
+              "avg_idle_cash_ratio_pct": 44.5,
+              "q1_idle_when_winner_pct": 10.8,
+              "year": "2022",
+              "wf_pass": false
+            },
+            {
+              "cagr": 43.37,
+              "sharpe": 1.627,
+              "max_dd": -11.77,
+              "calmar": 3.685,
+              "n_trades": 55,
+              "avg_exp": 52.2,
+              "avg_candidates": 0.79,
+              "avg_simultaneous_holdings": 2.4,
+              "rejected_by_lot_count": 6,
+              "missed_by_cap_count": 116,
+              "avg_idle_cash_ratio_pct": 59.1,
+              "q1_idle_when_winner_pct": 28.7,
+              "year": "2023",
+              "wf_pass": true
+            },
+            {
+              "cagr": 28.93,
+              "sharpe": 1.183,
+              "max_dd": -17.76,
+              "calmar": 1.629,
+              "n_trades": 39,
+              "avg_exp": 58.6,
+              "avg_candidates": 0.56,
+              "avg_simultaneous_holdings": 2.3,
+              "rejected_by_lot_count": 1,
+              "missed_by_cap_count": 72,
+              "avg_idle_cash_ratio_pct": 46.9,
+              "q1_idle_when_winner_pct": 44.4,
+              "year": "2024",
+              "wf_pass": true
+            }
+          ]
+        },
+        "annual_standalone": {
+          "2018": {
+            "cagr": 0.0,
+            "error": "'4055.T'"
+          },
+          "2019": {
+            "cagr": 0.0,
+            "error": "'4055.T'"
+          }
+        }
+      }
+    },
+    "20000000": {
+      "CURRENT": {
+        "is": {
+          "cagr": 13.11,
+          "sharpe": 0.62,
+          "max_dd": -19.35,
+          "calmar": 0.678,
+          "n_trades": 257,
+          "avg_exp": 34.7,
+          "avg_candidates": 0.49,
+          "avg_simultaneous_holdings": 2.03,
+          "rejected_by_lot_count": 0,
+          "missed_by_cap_count": 475,
+          "avg_idle_cash_ratio_pct": 89.0,
+          "q1_idle_when_winner_pct": 23.8
+        },
+        "oos": {
+          "cagr": 25.63,
+          "sharpe": 1.209,
+          "max_dd": -12.09,
+          "calmar": 2.12,
+          "n_trades": 40,
+          "avg_exp": 46.6,
+          "avg_candidates": 0.34,
+          "avg_simultaneous_holdings": 1.79,
+          "rejected_by_lot_count": 1,
+          "missed_by_cap_count": 28,
+          "avg_idle_cash_ratio_pct": 56.6,
+          "q1_idle_when_winner_pct": 33.0
+        },
+        "wf": {
+          "wf_count": 4,
+          "avg_cagr": 16.65,
+          "segments": [
+            {
+              "cagr": -5.19,
+              "sharpe": 0.024,
+              "max_dd": -20.14,
+              "calmar": -0.257,
+              "n_trades": 30,
+              "avg_exp": 51.7,
+              "avg_candidates": 0.43,
+              "avg_simultaneous_holdings": 2.18,
+              "rejected_by_lot_count": 0,
+              "missed_by_cap_count": 43,
+              "avg_idle_cash_ratio_pct": 42.6,
+              "q1_idle_when_winner_pct": 3.0,
+              "year": "2020",
+              "wf_pass": false
+            },
+            {
+              "cagr": 5.1,
+              "sharpe": 0.322,
+              "max_dd": -20.41,
+              "calmar": 0.25,
+              "n_trades": 52,
+              "avg_exp": 51.3,
+              "avg_candidates": 0.7,
+              "avg_simultaneous_holdings": 2.66,
+              "rejected_by_lot_count": 0,
+              "missed_by_cap_count": 108,
+              "avg_idle_cash_ratio_pct": 52.1,
+              "q1_idle_when_winner_pct": 2.3,
+              "year": "2021",
+              "wf_pass": true
+            },
+            {
+              "cagr": 2.75,
+              "sharpe": 0.246,
+              "max_dd": -24.11,
+              "calmar": 0.114,
+              "n_trades": 43,
+              "avg_exp": 53.9,
+              "avg_candidates": 0.52,
+              "avg_simultaneous_holdings": 2.32,
+              "rejected_by_lot_count": 0,
+              "missed_by_cap_count": 69,
+              "avg_idle_cash_ratio_pct": 43.3,
+              "q1_idle_when_winner_pct": 8.8,
+              "year": "2022",
+              "wf_pass": true
+            },
+            {
+              "cagr": 46.06,
+              "sharpe": 1.797,
+              "max_dd": -9.91,
+              "calmar": 4.647,
+              "n_trades": 52,
+              "avg_exp": 53.8,
+              "avg_candidates": 0.77,
+              "avg_simultaneous_holdings": 2.52,
+              "rejected_by_lot_count": 0,
+              "missed_by_cap_count": 124,
+              "avg_idle_cash_ratio_pct": 58.0,
+              "q1_idle_when_winner_pct": 28.5,
+              "year": "2023",
+              "wf_pass": true
+            },
+            {
+              "cagr": 34.51,
+              "sharpe": 1.388,
+              "max_dd": -19.86,
+              "calmar": 1.738,
+              "n_trades": 36,
+              "avg_exp": 56.7,
+              "avg_candidates": 0.56,
+              "avg_simultaneous_holdings": 2.37,
+              "rejected_by_lot_count": 0,
+              "missed_by_cap_count": 82,
+              "avg_idle_cash_ratio_pct": 52.3,
+              "q1_idle_when_winner_pct": 50.2,
+              "year": "2024",
+              "wf_pass": true
+            }
+          ]
+        },
+        "annual_standalone": {
+          "2018": {
+            "cagr": 0.0,
+            "error": "'4055.T'"
+          },
+          "2019": {
+            "cagr": 0.0,
+            "error": "'4055.T'"
+          }
+        }
+      },
+      "CAND_B": {
+        "is": {
+          "cagr": 12.36,
+          "sharpe": 0.585,
+          "max_dd": -19.45,
+          "calmar": 0.636,
+          "n_trades": 266,
+          "avg_exp": 34.3,
+          "avg_candidates": 0.49,
+          "avg_simultaneous_holdings": 2.02,
+          "rejected_by_lot_count": 0,
+          "missed_by_cap_count": 461,
+          "avg_idle_cash_ratio_pct": 88.6,
+          "q1_idle_when_winner_pct": 22.7
+        },
+        "oos": {
+          "cagr": 24.23,
+          "sharpe": 1.132,
+          "max_dd": -13.56,
+          "calmar": 1.787,
+          "n_trades": 42,
+          "avg_exp": 45.0,
+          "avg_candidates": 0.35,
+          "avg_simultaneous_holdings": 1.7,
+          "rejected_by_lot_count": 1,
+          "missed_by_cap_count": 29,
+          "avg_idle_cash_ratio_pct": 57.8,
+          "q1_idle_when_winner_pct": 29.9
+        },
+        "wf": {
+          "wf_count": 4,
+          "avg_cagr": 17.61,
+          "segments": [
+            {
+              "cagr": -2.26,
+              "sharpe": 0.133,
+              "max_dd": -18.98,
+              "calmar": -0.119,
+              "n_trades": 30,
+              "avg_exp": 53.8,
+              "avg_candidates": 0.43,
+              "avg_simultaneous_holdings": 2.17,
+              "rejected_by_lot_count": 0,
+              "missed_by_cap_count": 38,
+              "avg_idle_cash_ratio_pct": 41.3,
+              "q1_idle_when_winner_pct": 1.9,
+              "year": "2020",
+              "wf_pass": false
+            },
+            {
+              "cagr": 6.79,
+              "sharpe": 0.362,
+              "max_dd": -20.41,
+              "calmar": 0.333,
+              "n_trades": 52,
+              "avg_exp": 50.8,
+              "avg_candidates": 0.7,
+              "avg_simultaneous_holdings": 2.64,
+              "rejected_by_lot_count": 0,
+              "missed_by_cap_count": 108,
+              "avg_idle_cash_ratio_pct": 52.9,
+              "q1_idle_when_winner_pct": 2.3,
+              "year": "2021",
+              "wf_pass": true
+            },
+            {
+              "cagr": 2.85,
+              "sharpe": 0.25,
+              "max_dd": -21.25,
+              "calmar": 0.134,
+              "n_trades": 46,
+              "avg_exp": 51.3,
+              "avg_candidates": 0.52,
+              "avg_simultaneous_holdings": 2.27,
+              "rejected_by_lot_count": 0,
+              "missed_by_cap_count": 66,
+              "avg_idle_cash_ratio_pct": 46.1,
+              "q1_idle_when_winner_pct": 10.2,
+              "year": "2022",
+              "wf_pass": true
+            },
+            {
+              "cagr": 44.15,
+              "sharpe": 1.683,
+              "max_dd": -11.98,
+              "calmar": 3.686,
+              "n_trades": 55,
+              "avg_exp": 54.7,
+              "avg_candidates": 0.76,
+              "avg_simultaneous_holdings": 2.53,
+              "rejected_by_lot_count": 0,
+              "missed_by_cap_count": 118,
+              "avg_idle_cash_ratio_pct": 55.4,
+              "q1_idle_when_winner_pct": 29.1,
+              "year": "2023",
+              "wf_pass": true
+            },
+            {
+              "cagr": 36.52,
+              "sharpe": 1.491,
+              "max_dd": -17.51,
+              "calmar": 2.086,
+              "n_trades": 34,
+              "avg_exp": 56.5,
+              "avg_candidates": 0.55,
+              "avg_simultaneous_holdings": 2.37,
+              "rejected_by_lot_count": 0,
+              "missed_by_cap_count": 82,
+              "avg_idle_cash_ratio_pct": 52.8,
+              "q1_idle_when_winner_pct": 50.9,
+              "year": "2024",
+              "wf_pass": true
+            }
+          ]
+        },
+        "annual_standalone": {
+          "2018": {
+            "cagr": 0.0,
+            "error": "'4055.T'"
+          },
+          "2019": {
+            "cagr": 0.0,
+            "error": "'4055.T'"
+          }
+        }
+      }
+    },
+    "30000000": {
+      "CURRENT": {
+        "is": {
+          "cagr": 12.84,
+          "sharpe": 0.606,
+          "max_dd": -19.3,
+          "calmar": 0.665,
+          "n_trades": 258,
+          "avg_exp": 35.3,
+          "avg_candidates": 0.49,
+          "avg_simultaneous_holdings": 2.03,
+          "rejected_by_lot_count": 0,
+          "missed_by_cap_count": 478,
+          "avg_idle_cash_ratio_pct": 87.6,
+          "q1_idle_when_winner_pct": 24.1
+        },
+        "oos": {
+          "cagr": 20.58,
+          "sharpe": 1.046,
+          "max_dd": -12.76,
+          "calmar": 1.612,
+          "n_trades": 42,
+          "avg_exp": 48.5,
+          "avg_candidates": 0.33,
+          "avg_simultaneous_holdings": 1.86,
+          "rejected_by_lot_count": 0,
+          "missed_by_cap_count": 32,
+          "avg_idle_cash_ratio_pct": 52.8,
+          "q1_idle_when_winner_pct": 34.0
+        },
+        "wf": {
+          "wf_count": 4,
+          "avg_cagr": 17.08,
+          "segments": [
+            {
+              "cagr": -8.0,
+              "sharpe": -0.058,
+              "max_dd": -20.36,
+              "calmar": -0.393,
+              "n_trades": 30,
+              "avg_exp": 51.3,
+              "avg_candidates": 0.44,
+              "avg_simultaneous_holdings": 2.17,
+              "rejected_by_lot_count": 0,
+              "missed_by_cap_count": 43,
+              "avg_idle_cash_ratio_pct": 42.6,
+              "q1_idle_when_winner_pct": 1.8,
+              "year": "2020",
+              "wf_pass": false
+            },
+            {
+              "cagr": 8.05,
+              "sharpe": 0.392,
+              "max_dd": -20.18,
+              "calmar": 0.399,
+              "n_trades": 52,
+              "avg_exp": 52.2,
+              "avg_candidates": 0.7,
+              "avg_simultaneous_holdings": 2.66,
+              "rejected_by_lot_count": 0,
+              "missed_by_cap_count": 108,
+              "avg_idle_cash_ratio_pct": 51.5,
+              "q1_idle_when_winner_pct": 2.2,
+              "year": "2021",
+              "wf_pass": true
+            },
+            {
+              "cagr": 1.14,
+              "sharpe": 0.196,
+              "max_dd": -24.07,
+              "calmar": 0.048,
+              "n_trades": 44,
+              "avg_exp": 54.3,
+              "avg_candidates": 0.52,
+              "avg_simultaneous_holdings": 2.33,
+              "rejected_by_lot_count": 0,
+              "missed_by_cap_count": 72,
+              "avg_idle_cash_ratio_pct": 42.8,
+              "q1_idle_when_winner_pct": 8.5,
+              "year": "2022",
+              "wf_pass": true
+            },
+            {
+              "cagr": 47.61,
+              "sharpe": 1.837,
+              "max_dd": -9.94,
+              "calmar": 4.79,
+              "n_trades": 52,
+              "avg_exp": 54.4,
+              "avg_candidates": 0.77,
+              "avg_simultaneous_holdings": 2.52,
+              "rejected_by_lot_count": 0,
+              "missed_by_cap_count": 124,
+              "avg_idle_cash_ratio_pct": 57.3,
+              "q1_idle_when_winner_pct": 30.2,
+              "year": "2023",
+              "wf_pass": true
+            },
+            {
+              "cagr": 36.61,
+              "sharpe": 1.443,
+              "max_dd": -20.57,
+              "calmar": 1.779,
+              "n_trades": 35,
+              "avg_exp": 56.9,
+              "avg_candidates": 0.57,
+              "avg_simultaneous_holdings": 2.32,
+              "rejected_by_lot_count": 0,
+              "missed_by_cap_count": 77,
+              "avg_idle_cash_ratio_pct": 52.8,
+              "q1_idle_when_winner_pct": 49.9,
+              "year": "2024",
+              "wf_pass": true
+            }
+          ]
+        },
+        "annual_standalone": {
+          "2018": {
+            "cagr": 0.0,
+            "error": "'4055.T'"
+          },
+          "2019": {
+            "cagr": 0.0,
+            "error": "'4055.T'"
+          }
+        }
+      },
+      "CAND_B": {
+        "is": {
+          "cagr": 12.17,
+          "sharpe": 0.576,
+          "max_dd": -19.4,
+          "calmar": 0.627,
+          "n_trades": 269,
+          "avg_exp": 34.9,
+          "avg_candidates": 0.49,
+          "avg_simultaneous_holdings": 2.03,
+          "rejected_by_lot_count": 0,
+          "missed_by_cap_count": 463,
+          "avg_idle_cash_ratio_pct": 87.4,
+          "q1_idle_when_winner_pct": 23.3
+        },
+        "oos": {
+          "cagr": 18.37,
+          "sharpe": 0.942,
+          "max_dd": -14.14,
+          "calmar": 1.299,
+          "n_trades": 43,
+          "avg_exp": 46.4,
+          "avg_candidates": 0.34,
+          "avg_simultaneous_holdings": 1.74,
+          "rejected_by_lot_count": 0,
+          "missed_by_cap_count": 32,
+          "avg_idle_cash_ratio_pct": 54.6,
+          "q1_idle_when_winner_pct": 30.9
+        },
+        "wf": {
+          "wf_count": 3,
+          "avg_cagr": 17.06,
+          "segments": [
+            {
+              "cagr": -4.17,
+              "sharpe": 0.082,
+              "max_dd": -19.18,
+              "calmar": -0.217,
+              "n_trades": 30,
+              "avg_exp": 51.4,
+              "avg_candidates": 0.43,
+              "avg_simultaneous_holdings": 2.17,
+              "rejected_by_lot_count": 0,
+              "missed_by_cap_count": 38,
+              "avg_idle_cash_ratio_pct": 43.1,
+              "q1_idle_when_winner_pct": 2.6,
+              "year": "2020",
+              "wf_pass": false
+            },
+            {
+              "cagr": 9.75,
+              "sharpe": 0.429,
+              "max_dd": -20.18,
+              "calmar": 0.483,
+              "n_trades": 52,
+              "avg_exp": 51.8,
+              "avg_candidates": 0.7,
+              "avg_simultaneous_holdings": 2.64,
+              "rejected_by_lot_count": 0,
+              "missed_by_cap_count": 108,
+              "avg_idle_cash_ratio_pct": 52.3,
+              "q1_idle_when_winner_pct": 2.2,
+              "year": "2021",
+              "wf_pass": true
+            },
+            {
+              "cagr": -1.83,
+              "sharpe": 0.106,
+              "max_dd": -21.41,
+              "calmar": -0.085,
+              "n_trades": 47,
+              "avg_exp": 53.4,
+              "avg_candidates": 0.52,
+              "avg_simultaneous_holdings": 2.35,
+              "rejected_by_lot_count": 0,
+              "missed_by_cap_count": 69,
+              "avg_idle_cash_ratio_pct": 43.9,
+              "q1_idle_when_winner_pct": 10.7,
+              "year": "2022",
+              "wf_pass": false
+            },
+            {
+              "cagr": 45.12,
+              "sharpe": 1.715,
+              "max_dd": -12.0,
+              "calmar": 3.76,
+              "n_trades": 55,
+              "avg_exp": 55.2,
+              "avg_candidates": 0.76,
+              "avg_simultaneous_holdings": 2.53,
+              "rejected_by_lot_count": 0,
+              "missed_by_cap_count": 118,
+              "avg_idle_cash_ratio_pct": 55.0,
+              "q1_idle_when_winner_pct": 32.6,
+              "year": "2023",
+              "wf_pass": true
+            },
+            {
+              "cagr": 36.43,
+              "sharpe": 1.364,
+              "max_dd": -18.61,
+              "calmar": 1.957,
+              "n_trades": 37,
+              "avg_exp": 60.7,
+              "avg_candidates": 0.57,
+              "avg_simultaneous_holdings": 2.41,
+              "rejected_by_lot_count": 0,
+              "missed_by_cap_count": 87,
+              "avg_idle_cash_ratio_pct": 46.8,
+              "q1_idle_when_winner_pct": 45.8,
+              "year": "2024",
+              "wf_pass": true
+            }
+          ]
+        },
+        "annual_standalone": {
+          "2018": {
+            "cagr": 0.0,
+            "error": "'4055.T'"
+          },
+          "2019": {
+            "cagr": 0.0,
+            "error": "'4055.T'"
+          }
+        }
+      }
+    }
+  },
+  "part_a_constraint_waterfall": {
+    "3000000": {
+      "capital": 3000000,
+      "variants": {
+        "baseline": {
+          "cagr": 12.22,
+          "sharpe": 0.579,
+          "max_dd": -18.22,
+          "calmar": 0.671,
+          "n_trades": 263,
+          "avg_exp": 31.5,
+          "avg_candidates": 0.48,
+          "avg_simultaneous_holdings": 1.93,
+          "rejected_by_lot_count": 10,
+          "missed_by_cap_count": 427,
+          "avg_idle_cash_ratio_pct": 90.9,
+          "q1_idle_when_winner_pct": 22.3
+        },
+        "relax_lot": {
+          "cagr": 13.34,
+          "sharpe": 0.618,
+          "max_dd": -19.05,
+          "calmar": 0.7,
+          "n_trades": 257,
+          "avg_exp": 35.8,
+          "avg_candidates": 0.49,
+          "avg_simultaneous_holdings": 2.03,
+          "rejected_by_lot_count": 0,
+          "missed_by_cap_count": 474,
+          "avg_idle_cash_ratio_pct": 87.7,
+          "q1_idle_when_winner_pct": 24.7
+        },
+        "relax_maxpos": {
+          "cagr": 12.51,
+          "sharpe": 0.542,
+          "max_dd": -21.53,
+          "calmar": 0.581,
+          "n_trades": 373,
+          "avg_exp": 37.5,
+          "avg_candidates": 0.45,
+          "avg_simultaneous_holdings": 2.5,
+          "rejected_by_lot_count": 28,
+          "missed_by_cap_count": 0,
+          "avg_idle_cash_ratio_pct": 81.3,
+          "q1_idle_when_winner_pct": 22.2
+        },
+        "relax_symcap": {
+          "cagr": 12.22,
+          "sharpe": 0.579,
+          "max_dd": -18.22,
+          "calmar": 0.671,
+          "n_trades": 263,
+          "avg_exp": 31.5,
+          "avg_candidates": 0.48,
+          "avg_simultaneous_holdings": 1.93,
+          "rejected_by_lot_count": 10,
+          "missed_by_cap_count": 427,
+          "avg_idle_cash_ratio_pct": 90.9,
+          "q1_idle_when_winner_pct": 22.3
+        },
+        "relax_all": {
+          "cagr": 13.08,
+          "sharpe": 0.549,
+          "max_dd": -27.52,
+          "calmar": 0.475,
+          "n_trades": 392,
+          "avg_exp": 44.1,
+          "avg_candidates": 0.44,
+          "avg_simultaneous_holdings": 2.71,
+          "rejected_by_lot_count": 3,
+          "missed_by_cap_count": 0,
+          "avg_idle_cash_ratio_pct": 71.3,
+          "q1_idle_when_winner_pct": 22.8
+        }
+      },
+      "cagr_drag_pp": {
+        "lot_rounding": 0.0,
+        "max_positions": 0.0,
+        "symbol_cap": 0.0
+      },
+      "delta_cagr": {
+        "lot": 1.12,
+        "max_positions": 0.29,
+        "symbol_cap": 0.0,
+        "all_combined": 0.86
+      },
+      "sum_of_individual_deltas": 1.41,
+      "interaction_effect_pp": -0.55
+    },
+    "10000000": {
+      "capital": 10000000,
+      "variants": {
+        "baseline": {
+          "cagr": 12.51,
+          "sharpe": 0.604,
+          "max_dd": -19.04,
+          "calmar": 0.657,
+          "n_trades": 264,
+          "avg_exp": 32.9,
+          "avg_candidates": 0.49,
+          "avg_simultaneous_holdings": 1.97,
+          "rejected_by_lot_count": 7,
+          "missed_by_cap_count": 452,
+          "avg_idle_cash_ratio_pct": 90.3,
+          "q1_idle_when_winner_pct": 24.5
+        },
+        "relax_lot": {
+          "cagr": 12.81,
+          "sharpe": 0.599,
+          "max_dd": -19.07,
+          "calmar": 0.672,
+          "n_trades": 259,
+          "avg_exp": 35.8,
+          "avg_candidates": 0.49,
+          "avg_simultaneous_holdings": 2.02,
+          "rejected_by_lot_count": 0,
+          "missed_by_cap_count": 469,
+          "avg_idle_cash_ratio_pct": 86.4,
+          "q1_idle_when_winner_pct": 22.3
+        },
+        "relax_maxpos": {
+          "cagr": 12.89,
+          "sharpe": 0.554,
+          "max_dd": -23.98,
+          "calmar": 0.538,
+          "n_trades": 397,
+          "avg_exp": 41.1,
+          "avg_candidates": 0.43,
+          "avg_simultaneous_holdings": 2.71,
+          "rejected_by_lot_count": 12,
+          "missed_by_cap_count": 0,
+          "avg_idle_cash_ratio_pct": 76.8,
+          "q1_idle_when_winner_pct": 25.0
+        },
+        "relax_symcap": {
+          "cagr": 12.51,
+          "sharpe": 0.604,
+          "max_dd": -19.04,
+          "calmar": 0.657,
+          "n_trades": 264,
+          "avg_exp": 32.9,
+          "avg_candidates": 0.49,
+          "avg_simultaneous_holdings": 1.97,
+          "rejected_by_lot_count": 7,
+          "missed_by_cap_count": 452,
+          "avg_idle_cash_ratio_pct": 90.3,
+          "q1_idle_when_winner_pct": 24.5
+        },
+        "relax_all": {
+          "cagr": 13.24,
+          "sharpe": 0.553,
+          "max_dd": -27.46,
+          "calmar": 0.482,
+          "n_trades": 389,
+          "avg_exp": 44.1,
+          "avg_candidates": 0.44,
+          "avg_simultaneous_holdings": 2.71,
+          "rejected_by_lot_count": 4,
+          "missed_by_cap_count": 0,
+          "avg_idle_cash_ratio_pct": 71.5,
+          "q1_idle_when_winner_pct": 22.8
+        }
+      },
+      "cagr_drag_pp": {
+        "lot_rounding": 0.0,
+        "max_positions": 0.0,
+        "symbol_cap": 0.0
+      },
+      "delta_cagr": {
+        "lot": 0.3,
+        "max_positions": 0.38,
+        "symbol_cap": 0.0,
+        "all_combined": 0.73
+      },
+      "sum_of_individual_deltas": 0.68,
+      "interaction_effect_pp": 0.05
+    },
+    "20000000": {
+      "capital": 20000000,
+      "variants": {
+        "baseline": {
+          "cagr": 13.11,
+          "sharpe": 0.62,
+          "max_dd": -19.35,
+          "calmar": 0.678,
+          "n_trades": 257,
+          "avg_exp": 34.7,
+          "avg_candidates": 0.49,
+          "avg_simultaneous_holdings": 2.03,
+          "rejected_by_lot_count": 0,
+          "missed_by_cap_count": 475,
+          "avg_idle_cash_ratio_pct": 89.0,
+          "q1_idle_when_winner_pct": 23.8
+        },
+        "relax_lot": {
+          "cagr": 12.92,
+          "sharpe": 0.603,
+          "max_dd": -19.07,
+          "calmar": 0.678,
+          "n_trades": 260,
+          "avg_exp": 35.9,
+          "avg_candidates": 0.49,
+          "avg_simultaneous_holdings": 2.02,
+          "rejected_by_lot_count": 0,
+          "missed_by_cap_count": 471,
+          "avg_idle_cash_ratio_pct": 86.3,
+          "q1_idle_when_winner_pct": 22.3
+        },
+        "relax_maxpos": {
+          "cagr": 12.69,
+          "sharpe": 0.538,
+          "max_dd": -27.0,
+          "calmar": 0.47,
+          "n_trades": 411,
+          "avg_exp": 43.9,
+          "avg_candidates": 0.42,
+          "avg_simultaneous_holdings": 2.87,
+          "rejected_by_lot_count": 4,
+          "missed_by_cap_count": 0,
+          "avg_idle_cash_ratio_pct": 69.7,
+          "q1_idle_when_winner_pct": 22.9
+        },
+        "relax_symcap": {
+          "cagr": 13.11,
+          "sharpe": 0.62,
+          "max_dd": -19.35,
+          "calmar": 0.678,
+          "n_trades": 257,
+          "avg_exp": 34.7,
+          "avg_candidates": 0.49,
+          "avg_simultaneous_holdings": 2.03,
+          "rejected_by_lot_count": 0,
+          "missed_by_cap_count": 475,
+          "avg_idle_cash_ratio_pct": 89.0,
+          "q1_idle_when_winner_pct": 23.8
+        },
+        "relax_all": {
+          "cagr": 13.34,
+          "sharpe": 0.556,
+          "max_dd": -27.56,
+          "calmar": 0.484,
+          "n_trades": 390,
+          "avg_exp": 44.2,
+          "avg_candidates": 0.44,
+          "avg_simultaneous_holdings": 2.71,
+          "rejected_by_lot_count": 4,
+          "missed_by_cap_count": 0,
+          "avg_idle_cash_ratio_pct": 71.4,
+          "q1_idle_when_winner_pct": 22.8
+        }
+      },
+      "cagr_drag_pp": {
+        "lot_rounding": 0.19,
+        "max_positions": 0.42,
+        "symbol_cap": 0.0
+      },
+      "delta_cagr": {
+        "lot": -0.19,
+        "max_positions": -0.42,
+        "symbol_cap": 0.0,
+        "all_combined": 0.23
+      },
+      "sum_of_individual_deltas": -0.61,
+      "interaction_effect_pp": 0.84
+    },
+    "30000000": {
+      "capital": 30000000,
+      "variants": {
+        "baseline": {
+          "cagr": 12.84,
+          "sharpe": 0.606,
+          "max_dd": -19.3,
+          "calmar": 0.665,
+          "n_trades": 258,
+          "avg_exp": 35.3,
+          "avg_candidates": 0.49,
+          "avg_simultaneous_holdings": 2.03,
+          "rejected_by_lot_count": 0,
+          "missed_by_cap_count": 478,
+          "avg_idle_cash_ratio_pct": 87.6,
+          "q1_idle_when_winner_pct": 24.1
+        },
+        "relax_lot": {
+          "cagr": 12.92,
+          "sharpe": 0.603,
+          "max_dd": -19.07,
+          "calmar": 0.678,
+          "n_trades": 260,
+          "avg_exp": 35.9,
+          "avg_candidates": 0.49,
+          "avg_simultaneous_holdings": 2.02,
+          "rejected_by_lot_count": 0,
+          "missed_by_cap_count": 471,
+          "avg_idle_cash_ratio_pct": 86.3,
+          "q1_idle_when_winner_pct": 22.3
+        },
+        "relax_maxpos": {
+          "cagr": 12.61,
+          "sharpe": 0.532,
+          "max_dd": -27.71,
+          "calmar": 0.455,
+          "n_trades": 423,
+          "avg_exp": 44.6,
+          "avg_candidates": 0.42,
+          "avg_simultaneous_holdings": 2.9,
+          "rejected_by_lot_count": 2,
+          "missed_by_cap_count": 4,
+          "avg_idle_cash_ratio_pct": 68.0,
+          "q1_idle_when_winner_pct": 23.4
+        },
+        "relax_symcap": {
+          "cagr": 12.84,
+          "sharpe": 0.606,
+          "max_dd": -19.3,
+          "calmar": 0.665,
+          "n_trades": 258,
+          "avg_exp": 35.3,
+          "avg_candidates": 0.49,
+          "avg_simultaneous_holdings": 2.03,
+          "rejected_by_lot_count": 0,
+          "missed_by_cap_count": 478,
+          "avg_idle_cash_ratio_pct": 87.6,
+          "q1_idle_when_winner_pct": 24.1
+        },
+        "relax_all": {
+          "cagr": 13.34,
+          "sharpe": 0.556,
+          "max_dd": -27.56,
+          "calmar": 0.484,
+          "n_trades": 390,
+          "avg_exp": 44.2,
+          "avg_candidates": 0.44,
+          "avg_simultaneous_holdings": 2.71,
+          "rejected_by_lot_count": 4,
+          "missed_by_cap_count": 0,
+          "avg_idle_cash_ratio_pct": 71.4,
+          "q1_idle_when_winner_pct": 22.8
+        }
+      },
+      "cagr_drag_pp": {
+        "lot_rounding": 0.0,
+        "max_positions": 0.23,
+        "symbol_cap": 0.0
+      },
+      "delta_cagr": {
+        "lot": 0.08,
+        "max_positions": -0.23,
+        "symbol_cap": 0.0,
+        "all_combined": 0.5
+      },
+      "sum_of_individual_deltas": -0.15,
+      "interaction_effect_pp": 0.65
+    }
+  },
+  "part_b_capacity_analysis": {
+    "3000000": {
+      "skip_rate_pct": 51.7,
+      "avg_investment_ratio_pct": 31.5,
+      "cash_idle_ratio_pct": 90.9,
+      "lot_shortage_rate_pct": 1.18,
+      "position_fill_rate_pct": 64.3,
+      "rejected_by_lot_count": 10,
+      "missed_by_cap_count": 427
+    },
+    "10000000": {
+      "skip_rate_pct": 53.19,
+      "avg_investment_ratio_pct": 32.9,
+      "cash_idle_ratio_pct": 90.3,
+      "lot_shortage_rate_pct": 0.81,
+      "position_fill_rate_pct": 65.7,
+      "rejected_by_lot_count": 7,
+      "missed_by_cap_count": 452
+    },
+    "20000000": {
+      "skip_rate_pct": 55.05,
+      "avg_investment_ratio_pct": 34.7,
+      "cash_idle_ratio_pct": 89.0,
+      "lot_shortage_rate_pct": 0.0,
+      "position_fill_rate_pct": 67.7,
+      "rejected_by_lot_count": 0,
+      "missed_by_cap_count": 475
+    },
+    "30000000": {
+      "skip_rate_pct": 55.4,
+      "avg_investment_ratio_pct": 35.3,
+      "cash_idle_ratio_pct": 87.6,
+      "lot_shortage_rate_pct": 0.0,
+      "position_fill_rate_pct": 67.7,
+      "rejected_by_lot_count": 0,
+      "missed_by_cap_count": 478
+    }
+  }
+}

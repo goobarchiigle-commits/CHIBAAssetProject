@@ -402,9 +402,44 @@ Part1-8全て実行完了。詳細レポート`reports/study78_ror_mc_sensitivit
   3. 各セル: IS 2018-2024 / OOS 2025 / WF5fold / MaxDD / lot_skip率 / 1銘柄あたり平均約定額 / **実効max単一銘柄ウェイト実測値（日次ピーク・§2.2①）**。
   4. lot制約の解消検証: Study25/44が示した「¥3Mでlot丸めが破壊」が¥20M+で消えるか（skip率<5%を目安に報告）。
   5. 出力: `backtests/study74_capital_scaling_YYYY-MM-DD.json` + レポート。
+
+### 追加仕様（2026-07-04・ユーザー拡張指示 — 「20Mで伸びた」ではなく「なぜ伸びたか」を数字で説明する）
+
+**Part A: 資本制約の分解（waterfall寄与分析）** — CURRENT(D_ATR_EQ)構成・IS 2018-2024のみ・各資本水準で実施。
+
+- **手法**: 既存エンジンに元々備わる研究用レバー（新規改修不要・全て既存kwarg/cfg）を使い、制約を1つずつ解除した反実仮想runとbaselineの差分でCAGR寄与を測定。
+  - lot丸め解除: `lot_size=1`（コード内コメントに「単元未満/フラクション研究用」と明記済みの既存パラメータ）
+  - max_positions解除: `max_positions_override=10`（実質上限撤廃、候補プール42銘柄に対し十分な値）
+  - symbol_cap解除: `cfg.risk_controls`を`dataclasses.replace`で`symbol_cap=1.0`に複製差し替え（frozen dataclass・破壊的変更なし）
+- **測定**: 資本水準ごとに [baseline, lot解除, max_pos解除, symbol_cap解除, 3つ全解除] の5パターンをrun。各単独解除のΔCAGRを「その制約が押し下げているpp」として報告。3つ全解除との差（相互作用）も報告。
+- **現金余力（cash slack）**: これは独立して解除できる「制約」ではなく他制約の結果指標のため、waterfallには含めず、既存のQ1-Q3 Idle Cash Attribution計装（Study45: `q1_idle_when_winner_pct`等）をそのまま流用し「勝ち候補があるのに現金が遊んでいる日数」として別掲する。
+- **注意（恒久閉鎖14項#4との切り分け）**: 本分析は¥3M固定でのProduction変更提案ではなく、**Study74（資本スケーリング）の因果構造を数値で説明するための診断専用ツール**。反実仮想run結果はStudy74のCP1判定材料としてのみ使用し、¥3Mでの制約緩和をProduction変更として提案しない（提案した場合は即閉鎖領域入り）。
+
+**Part B: Capacity分析** — 資本水準ごとに以下5指標を可視化（既存計装の再利用のみ・新規計装不要）。
+
+| 指標 | 定義・既存ソース |
+|---|---|
+| スキップ率 | `rejected_by_lot_count` / (候補総数) — Study42既存計装 |
+| 平均投資率 | `avg_exposure`（既存メトリクス） |
+| 現金滞留率 | `avg_idle_cash_ratio_pct`（Study41既存計装） |
+| lot不足率 | `rejected_by_lot_count` / (`rejected_by_lot_count` + `n_trades`) |
+| Position充足率 | `avg_simultaneous_holdings` / `max_positions`（1-見逃し率、Study41既存計装） |
+
+**期待成果**: 「3M→30MでCAGRが伸びる」という結果を、lot丸め・max_positions・symbol_cap・現金滞留の**内訳付き**で説明できるようにする。入金判断（¥10M/¥20M/¥30Mのどの水準で何がボトルネック解消の主因か）に直接使える形にする。
+
 - **分岐（CP1・目標公式改定）**:
   - **白** → 目標=CAGR18-22%/Calmar1.2（¥20-30M前提）。入金計画起案（capital_scaling層実装済・1.5%/日ランプ・ASK_FIRST）。Study78のレバ判定と合流。
   - **黒** → 目標=CAGR15-20%/Calmar1.2（現資本）。研究縮小・運用フェーズ移行。Stage4以降は「30%再挑戦」ではなく「Satellite分散によるCalmar改善」として継続可否をユーザー決裁。
+
+### ✅ 実行完了（2026-07-04）— **CP1判定 = 黒（失敗）・ユーザー決裁待ち**
+
+**実測**: 4資本点(¥3M/10M/20M/30M)×2構成(CURRENT/CAND_B)の全8セルでIS/OOS/WF5fold/annual標準実施。IS CAGRは¥3M(12.22%)→¥20M(13.11%)で+0.89ppのみ、¥30Mで後退(12.84%)。WF5/5はどの資本水準でも未達成（唯一例外=CAND_B¥3Mの5/5だがIS CAGR最低）。正典基準「CAGR≥22%∧WF5/5」に対し明確に未達 → **黒判定**。
+
+**ユーザー拡張指示による追加分析（Part A制約分解・Part B Capacity分析）**: 「20Mで伸びた」の主因はほぼlot丸め解消（+1.12pp止まり、¥20M以降完全解消）で説明可能。max_positions=3は資本を上げても一切緩和されず（むしろ¥20M以降は解除するとCAGR悪化）、資本規模によらない構造的天井として残存。symbol_cap(0.40)はどの資本水準でも非拘束。詳細→`reports/study74_capital_scaling.md`・`src/research_state.md`Study74節。
+
+**⚠ 副次発見**: CAND_BのWF5/5達成は¥3M固有現象（資本を上げるとWF pass低下）。S1決裁はこの点を踏まえて再評価が必要。
+
+**次アクション（ユーザー決裁待ち）**: CP1目標改定（黒→CAGR15-20%/Calmar1.2への変更）の可否。統治原則4によりユーザー明示決裁が必須 — 本書は判定材料の提示までとし、目標変更は宣言しない。
 
 ## L2: Study75 — Survivorship-free ルールベースユニバース（J-Quants）
 
