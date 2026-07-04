@@ -1,0 +1,153 @@
+{
+  "adopted_profile": {
+    "n_trades": 309,
+    "win_rate_pct": 54.4,
+    "avg_profit_yen": 50301.6,
+    "avg_loss_yen": -28077.9,
+    "profit_factor": 2.135,
+    "expectancy_yen": 14536.2,
+    "entry_atr_pct": {
+      "n": 309,
+      "mean": 13.858,
+      "median": 10.57,
+      "p25": 4.99,
+      "p75": 18.69,
+      "std": 11.798
+    },
+    "entry_rsr": {
+      "n": 309,
+      "mean": 75.412,
+      "median": 81.0,
+      "p25": 70.7,
+      "p75": 88.1,
+      "std": 21.177
+    },
+    "holding_days": {
+      "n": 309,
+      "mean": 11.087,
+      "median": 5.0,
+      "p25": 3.0,
+      "p75": 14.0,
+      "std": 12.319
+    },
+    "mfe_pct": {
+      "n": 309,
+      "mean": 7.073,
+      "median": 3.22,
+      "p25": 1.6,
+      "p75": 7.84,
+      "std": 10.801
+    },
+    "mae_pct": {
+      "n": 309,
+      "mean": -3.791,
+      "median": -2.56,
+      "p25": -5.06,
+      "p75": -1.22,
+      "std": 3.732
+    },
+    "by_regime": {
+      "risk_off": 61,
+      "normal": 247,
+      "unknown": 1
+    },
+    "by_sector": {
+      "化学": 6,
+      "小売": 28,
+      "鉄鋼": 22,
+      "ガス": 6,
+      "電機精密": 48,
+      "電機": 29,
+      "保険": 14,
+      "商社": 42,
+      "輸送機器": 13,
+      "情報通信": 8,
+      "海運": 31,
+      "銀行": 34,
+      "機械": 23,
+      "食品": 5
+    },
+    "by_entry_type": {
+      "mean_rev": 123,
+      "fujiko": 186
+    }
+  },
+  "missed_profile": {
+    "note": "見送り候補(CAP_MISS 449件)の個別(date,symbol)一覧は永続化されておらず、集計統計のみ既存JSON(study74b_candidate_shortage)から参照可能。momentum/holding_days/win_rate/profit/loss/PF/expectancy/MFE/MAEは個別レコードと事後の価格追跡が必須のため計算不可能（新規BT要）。",
+    "entry_rsr": {
+      "mean": 74.55,
+      "median": 81.0,
+      "p25": 71.4,
+      "p75": 88.1
+    },
+    "alpha_score": {
+      "mean": 0.0,
+      "median": 0.0,
+      "p25": 0.0,
+      "p75": 0.0
+    },
+    "rank_histogram": {
+      "rank0(最上位)": 251,
+      "rank1-2": 172,
+      "rank3+": 26
+    },
+    "by_regime": {
+      "risk_off": 42,
+      "normal": 407,
+      "unknown": 0
+    },
+    "by_year": {
+      "2018": 2,
+      "2019": 38,
+      "2020": 28,
+      "2021": 98,
+      "2022": 69,
+      "2023": 121,
+      "2024": 71,
+      "2025": 22
+    },
+    "by_sector": {
+      "電機精密": 130,
+      "商社": 74,
+      "銀行": 63,
+      "機械": 43,
+      "海運": 32,
+      "鉄鋼": 24,
+      "電機": 20,
+      "輸送機器": 18,
+      "小売": 13,
+      "保険": 10,
+      "食品": 7,
+      "ガス": 6,
+      "化学": 5,
+      "情報通信": 4
+    },
+    "entry_atr_pct": "N/A（未永続化）",
+    "momentum": "N/A（未永続化）",
+    "holding_days": "N/A（トレードされていないため概念自体が不成立）",
+    "win_rate": "N/A（要フォワード価格追跡・新規BT）",
+    "avg_profit": "N/A（同上）",
+    "avg_loss": "N/A（同上）",
+    "profit_factor": "N/A（同上）",
+    "expectancy": "N/A（同上）",
+    "mfe_pct": "N/A（同上）",
+    "mae_pct": "N/A（同上）"
+  },
+  "comparison_available_axes": {
+    "entry_rsr": {
+      "adopted_median": 81.0,
+      "missed_median": 81.0,
+      "verdict": "ほぼ同一（品質差なし）"
+    }
+  },
+  "comparison_blocked_axes": [
+    "momentum",
+    "sector別win_rate",
+    "holding_days(見送り側)",
+    "win_rate(見送り側)",
+    "avg_profit/avg_loss(見送り側)",
+    "profit_factor(見送り側)",
+    "expectancy(見送り側)",
+    "MFE/MAE(見送り側)"
+  ]
+}

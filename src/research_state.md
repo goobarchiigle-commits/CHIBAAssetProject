@@ -1,6 +1,31 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-04（Study74統合レビュー完了・Study74B完了・CP1=BLACK確定・ユーザー決裁待ち）
+# Single Source of Truth / 最終更新: 2026-07-04（Study74B-RCA完了・CAP_MISS矛盾は部分解明・因果証明は未解決）
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
+
+---
+
+## ★ 2026-07-04 Study74B-RCA — **COMPLETE（新規BTゼロ）→ CAP_MISS矛盾は部分解明・完全な因果証明は未解決**
+
+**目的**: Study74Bで発見した矛盾（見送り候補RSR中央値=採用候補RSR中央値=81.0なのに、max_positions緩和はCAGR悪化）のRoot Cause Analysis。
+**方針遵守**: 新規BTゼロ。既存`study78_trade_dataset.json`/`study74b_candidate_shortage_2026-07-04.json`/`study74_capital_scaling_2026-07-04.json`のみ使用（価格・regimeデータの読込はしたが`run_scenario`は未実行）。
+**レポート**: `reports/study74b_rca.md`　**検証物**: `backtests/cap_miss_pairs.json` / `backtests/opportunity_cost.json` / `backtests/hidden_factor_analysis.json` / `backtests/study74b_rca_analysis1_2026-07-04.json`
+
+### ⚠ データ制約（先に明記）
+見送り候補449件の個別(date,symbol)レコードはStudy74B実行時にメモリ上のみで処理され、集計統計のみ永続化されていた。このため**解析2（日次ペアリング）・解析3（Opportunity Cost）は構造的に実行不可能**（新規BT無しでは解消できない制約）。
+
+### 解析1: 採用トレード完全プロファイル（309件・価格データから直接算出、run_scenario不使用）
+勝率54.4%／PF=2.135／Expectancy+14,536円／トレード／MFE中央値+3.22%／MAE中央値-2.56%／ATR%中央値10.57%／保有日数中央値5.0日。RSR分布(中央値81.0)は見送り候補と完全一致 — 「見送りが低品質だから弾かれた」は統計的に不成立（再確認）。
+
+### 解析2/3: **未解決（構造的ブロック）**
+年次集計レベルの粗いペアリングのみ実施。2023年は見送り件数最多(121件)かつ採用トレード収益・勝率も最高(+144.9万円・65.4%) — 「見送りが伸びて採用が停滞」ではなく「強気相場で両群とも同時に好調」という傍証。日次厳密検証は不可能なため参考情報にとどまる。
+
+### 解析4: Hidden Factor仮説（仮説止まり・完全証明はできず）
+**ポートフォリオ状態依存仮説**: 候補の質（RSR/alpha）に差はなく、rank0(最上位)候補が見送りの55.9%を占める — 差を生むのは候補属性ではなく「到着時点の既存ポジション状態（タイミング）」。max_positions緩和がそれでも悪化する理由は「集中投資の複利効果希薄化」「見かけの分散が実質的な相関の高い集中」という仮説だが、解析2/3のブロックにより**因果の完全証明はできない**。
+
+### 結論
+**未解決**。説明できた部分（候補品質に差はない・見送りの過半数が最上位候補喪失）と説明できなかった部分（それでもなぜmax_positions緩和がCAGRを悪化させるかの因果メカニズム）を明確に分離。**Study81への申し送り**: `_missed_cands`個別レコードの永続化（新規BT1回）+ フォワードリターン追跡 + 同時保有相関の実測が必要。
+
+---
 
 ---
 

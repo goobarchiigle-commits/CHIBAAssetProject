@@ -465,6 +465,18 @@ Study74を失敗報告で終わらせず、以下3点を追加実施（詳細は
 
 上記Part3参照。ロードマップの正式Study番号ではなく、Study74の派生分析として実施・完了。将来的にこの内容を正式なStudy番号に組み込むかはユーザー判断とする（現時点では未割当のまま`reports/study74b_candidate_shortage_design.md`に格納）。
 
+### ✅ Study74B-RCA 追加実施（2026-07-04・新規BTゼロ・ユーザー指示）— **CAP_MISS矛盾は部分解明・因果証明は未解決**
+
+**目的**: 「見送り候補RSR中央値=採用候補RSR中央値=81.0（品質差なし）なのに、max_positions緩和はCAGR悪化する」という矛盾のRCA。新規BT厳禁のため既存Research Assets（trade_dataset/study74b/study74_capital_scaling）のみ使用。
+
+- **解析1**: 採用トレード(309件)の完全プロファイルを価格データから直接算出（run_scenario不使用）— 勝率54.4%/PF=2.135/Expectancy+14,536円/MFE中央値+3.22%/MAE中央値-2.56%。RSR等価性を再確認。
+- **解析2/3**: **未解決（構造的ブロック）**。見送り候補449件の個別(date,symbol)が未永続化のため日次ペアリング・Opportunity Costは実行不可能。年次集計のみ実施（2023年は見送り最多かつ採用側も最高収益 — 市場全体のモメンタムが両群に共通して効いている傍証）。
+- **解析4**: **ポートフォリオ状態依存仮説**（候補品質ではなく到着タイミングが差を生む）を提示。rank0(最上位)候補が見送りの55.9%。ただし因果の完全証明はできず「仮説」止まり。
+- **結論**: **未解決**。説明できた部分（品質差なし）と説明できなかった部分（それでもmax_positions緩和が悪化する因果メカニズム）を明確に分離。
+- **Study81への申し送り**: `_missed_cands`個別レコードの永続化（新規BT1回）+ フォワードリターン追跡 + 同時保有相関の実測が必要。
+
+詳細→`reports/study74b_rca.md` / `backtests/cap_miss_pairs.json` / `backtests/opportunity_cost.json` / `backtests/hidden_factor_analysis.json`
+
 ## L2: Study75 — Survivorship-free ルールベースユニバース（J-Quants）
 
 - **正典定義**: 成功=バイアス実測≤-1.5pp ∧ 規則ユニバースBaseline CAGR≥9%。失敗=バイアス>-3pp（→全歴史判定の再審査。これ自体が重要情報）。

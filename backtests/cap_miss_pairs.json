@@ -1,0 +1,63 @@
+{
+  "status": "PARTIAL_BLOCKED",
+  "reason": "CAP_MISS発生日ごとの個別(date,symbol)ペアが study74b 実行時に永続化されていない（集計統計のみJSON化）。日次の厳密ペアリングには新規BTでの_missed_cands再取得が必須だが、本タスクでは新規BT禁止のため実行不可能。",
+  "best_effort_year_level_pairing": [
+    {
+      "year": "2018",
+      "missed_candidate_count": 2,
+      "adopted_trade_count_exiting_that_year": 6,
+      "adopted_total_pnl_yen": 31616.6,
+      "adopted_win_rate_pct": 50.0
+    },
+    {
+      "year": "2019",
+      "missed_candidate_count": 38,
+      "adopted_trade_count_exiting_that_year": 39,
+      "adopted_total_pnl_yen": 75022.2,
+      "adopted_win_rate_pct": 46.2
+    },
+    {
+      "year": "2020",
+      "missed_candidate_count": 28,
+      "adopted_trade_count_exiting_that_year": 31,
+      "adopted_total_pnl_yen": 482617.2,
+      "adopted_win_rate_pct": 58.1
+    },
+    {
+      "year": "2021",
+      "missed_candidate_count": 98,
+      "adopted_trade_count_exiting_that_year": 57,
+      "adopted_total_pnl_yen": 772026.0,
+      "adopted_win_rate_pct": 50.9
+    },
+    {
+      "year": "2022",
+      "missed_candidate_count": 69,
+      "adopted_trade_count_exiting_that_year": 44,
+      "adopted_total_pnl_yen": 359437.8,
+      "adopted_win_rate_pct": 43.2
+    },
+    {
+      "year": "2023",
+      "missed_candidate_count": 121,
+      "adopted_trade_count_exiting_that_year": 52,
+      "adopted_total_pnl_yen": 1449873.7,
+      "adopted_win_rate_pct": 65.4
+    },
+    {
+      "year": "2024",
+      "missed_candidate_count": 71,
+      "adopted_trade_count_exiting_that_year": 35,
+      "adopted_total_pnl_yen": 964337.1,
+      "adopted_win_rate_pct": 54.3
+    },
+    {
+      "year": "2025",
+      "missed_candidate_count": 22,
+      "adopted_trade_count_exiting_that_year": 45,
+      "adopted_total_pnl_yen": 356760.0,
+      "adopted_win_rate_pct": 62.2
+    }
+  ],
+  "unresolved": true
+}

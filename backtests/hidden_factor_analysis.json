@@ -1,0 +1,24 @@
+{
+  "observed_facts": {
+    "rsr_equivalence": "見送りRSR中央値81.0 = 採用RSR中央値81.0（完全一致・品質差なし）",
+    "alpha_near_zero": "見送り候補のalpha score: mean=median=p25=p75=0.0（{'mean': 0.0, 'median': 0.0, 'p25': 0.0, 'p75': 0.0}）",
+    "rank0_dominance": "見送りの55.9%が「その日の最上位候補」（rank0）",
+    "maxpos_relax_hurts_at_scale": "Study74 Part A実測: ¥20M以降はmax_positions緩和がCAGRを悪化させる（delta_cagr=[0.29, 0.38, -0.42, -0.23]）"
+  },
+  "hypothesis": {
+    "name": "ポートフォリオ状態依存仮説（timing/slot-availability hypothesis）",
+    "statement": "見送り候補の「質」はRSR・alpha双方で採用候補と統計的に区別できない。差を生んでいるのは候補自身の属性ではなく「候補が到着した時点で既存ポジションが何日目のどの局面にあったか」というポートフォリオ側の状態（＝隠れ因子）である可能性が高い。rank0候補(最上位)が56%も見送られているのは、候補の質の問題ではなく、既存3ポジションの入れ替わりタイミングと新規候補の到着タイミングが噛み合っていないことを示す。",
+    "supporting_evidence": [
+      "rsr_equivalence",
+      "rank0_dominance"
+    ],
+    "why_maxpos_relax_still_hurts": "候補自体は良質でも、それを「同時に」保有することで既存の少数精鋭ポジション（集中投資）が持つ複利効果・比重が希薄化する。また高候補発生期（2023年など）は市場全体のモメンタムが強く、同時多発的に類似セクター・類似要因の銘柄が候補化しやすいため、見かけ上の分散が実質的な相関の高い集中（隠れた集中リスク）になっている可能性がある。",
+    "confidence": "仮説（部分的示唆はあるが解析2/3のデータ欠落により因果の完全証明はできない）"
+  },
+  "additional_hidden_factor_candidates_untested": [
+    "ATR順位（見送り候補のATR%分布は本データでは取得不可・未検証）",
+    "Momentum順位（momentumフィールド自体が未永続化・未検証）",
+    "Composite Score順位差（rank0でも僅差 vs 大差だったかは不明・未検証）",
+    "Entry日の曜日・月内位置（季節性、未検証）"
+  ]
+}
