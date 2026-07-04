@@ -1,0 +1,78 @@
+{
+  "date": "2026-07-04",
+  "cluster_stats": {
+    "cyclical_macro": {
+      "n_adopted": 179,
+      "n_missed": 312,
+      "win_rate_pct": 51.4,
+      "profit_factor": 2.236,
+      "expectancy_yen": 16615.4,
+      "missed_mean_forward_20_pct": 2.79,
+      "missed_mean_mfe_pct": 31.26,
+      "missed_mean_mae_pct": 1.22
+    },
+    "defensive": {
+      "n_adopted": 19,
+      "n_missed": 17,
+      "win_rate_pct": 68.4,
+      "profit_factor": 3.235,
+      "expectancy_yen": 19206.4,
+      "missed_mean_forward_20_pct": 6.51,
+      "missed_mean_mfe_pct": 30.18,
+      "missed_mean_mae_pct": 4.68
+    },
+    "growth_tech": {
+      "n_adopted": 105,
+      "n_missed": 272,
+      "win_rate_pct": 55.2,
+      "profit_factor": 1.785,
+      "expectancy_yen": 10308.7,
+      "missed_mean_forward_20_pct": 2.88,
+      "missed_mean_mfe_pct": 28.19,
+      "missed_mean_mae_pct": -4.47
+    },
+    "real_asset": {
+      "n_adopted": 6,
+      "n_missed": 6,
+      "win_rate_pct": 83.3,
+      "profit_factor": 8.02,
+      "expectancy_yen": 11700.0,
+      "missed_mean_forward_20_pct": 2.95,
+      "missed_mean_mfe_pct": 26.19,
+      "missed_mean_mae_pct": 3.94
+    }
+  },
+  "analysis4_same_vs_diff_cluster": {
+    "n_same_cluster": 366,
+    "n_diff_cluster": 79,
+    "same_cluster_mean_forward_20_pct": 3.46,
+    "same_cluster_median_forward_20_pct": 2.85,
+    "diff_cluster_mean_forward_20_pct": 1.71,
+    "diff_cluster_median_forward_20_pct": 1.61,
+    "mannwhitney_u": 15971.0,
+    "p_value": 0.1443,
+    "significant_at_5pct": false
+  },
+  "opportunity_cost_by_cluster": {
+    "cyclical_macro": {
+      "n": 310,
+      "mean_forward_20_pct": 2.79,
+      "median_forward_20_pct": 2.12
+    },
+    "defensive": {
+      "n": 17,
+      "mean_forward_20_pct": 6.51,
+      "median_forward_20_pct": 4.61
+    },
+    "growth_tech": {
+      "n": 272,
+      "mean_forward_20_pct": 2.88,
+      "median_forward_20_pct": 2.48
+    },
+    "real_asset": {
+      "n": 6,
+      "mean_forward_20_pct": 2.95,
+      "median_forward_20_pct": 2.79
+    }
+  }
+}

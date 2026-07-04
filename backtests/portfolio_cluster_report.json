@@ -1,0 +1,286 @@
+{
+  "n_portfolio_snapshots": 394,
+  "observed_avg_max_cluster_concentration_pct": 73.7,
+  "random_null_mean_pct": 72.16,
+  "random_null_p95_pct": 73.82,
+  "p_value_observed_gte_random": 0.0661,
+  "concentration_exceeds_random_at_5pct": false,
+  "daily_snapshots_sample": [
+    {
+      "date": "2018-10-12",
+      "held": [
+        "4021.T",
+        "3382.T",
+        "5411.T"
+      ],
+      "clusters": [
+        "real_asset",
+        "growth_tech",
+        "cyclical_macro"
+      ],
+      "max_cluster_concentration_pct": 33.3
+    },
+    {
+      "date": "2019-01-31",
+      "held": [
+        "6702.T",
+        "6857.T",
+        "9531.T"
+      ],
+      "clusters": [
+        "growth_tech",
+        "growth_tech",
+        "defensive"
+      ],
+      "max_cluster_concentration_pct": 66.7
+    },
+    {
+      "date": "2019-04-17",
+      "held": [
+        "6920.T",
+        "9531.T"
+      ],
+      "clusters": [
+        "growth_tech",
+        "defensive"
+      ],
+      "max_cluster_concentration_pct": 50.0
+    },
+    {
+      "date": "2019-07-01",
+      "held": [
+        "6501.T",
+        "6645.T",
+        "3197.T"
+      ],
+      "clusters": [
+        "growth_tech",
+        "growth_tech",
+        "growth_tech"
+      ],
+      "max_cluster_concentration_pct": 100.0
+    },
+    {
+      "date": "2019-07-02",
+      "held": [
+        "6501.T",
+        "6645.T",
+        "3197.T"
+      ],
+      "clusters": [
+        "growth_tech",
+        "growth_tech",
+        "growth_tech"
+      ],
+      "max_cluster_concentration_pct": 100.0
+    },
+    {
+      "date": "2019-09-05",
+      "held": [
+        "8001.T",
+        "6146.T",
+        "9432.T"
+      ],
+      "clusters": [
+        "cyclical_macro",
+        "growth_tech",
+        "defensive"
+      ],
+      "max_cluster_concentration_pct": 33.3
+    },
+    {
+      "date": "2019-09-09",
+      "held": [
+        "8001.T",
+        "6146.T",
+        "9432.T"
+      ],
+      "clusters": [
+        "cyclical_macro",
+        "growth_tech",
+        "defensive"
+      ],
+      "max_cluster_concentration_pct": 33.3
+    },
+    {
+      "date": "2019-09-12",
+      "held": [
+        "8001.T",
+        "6645.T",
+        "9104.T"
+      ],
+      "clusters": [
+        "cyclical_macro",
+        "growth_tech",
+        "cyclical_macro"
+      ],
+      "max_cluster_concentration_pct": 66.7
+    },
+    {
+      "date": "2019-09-18",
+      "held": [
+        "8001.T",
+        "6645.T",
+        "9104.T"
+      ],
+      "clusters": [
+        "cyclical_macro",
+        "growth_tech",
+        "cyclical_macro"
+      ],
+      "max_cluster_concentration_pct": 66.7
+    },
+    {
+      "date": "2019-09-19",
+      "held": [
+        "8001.T",
+        "6645.T",
+        "9104.T"
+      ],
+      "clusters": [
+        "cyclical_macro",
+        "growth_tech",
+        "cyclical_macro"
+      ],
+      "max_cluster_concentration_pct": 66.7
+    },
+    {
+      "date": "2019-10-07",
+      "held": [
+        "6645.T",
+        "7203.T",
+        "8306.T"
+      ],
+      "clusters": [
+        "growth_tech",
+        "cyclical_macro",
+        "cyclical_macro"
+      ],
+      "max_cluster_concentration_pct": 66.7
+    },
+    {
+      "date": "2019-10-08",
+      "held": [
+        "6645.T",
+        "7203.T",
+        "8306.T"
+      ],
+      "clusters": [
+        "growth_tech",
+        "cyclical_macro",
+        "cyclical_macro"
+      ],
+      "max_cluster_concentration_pct": 66.7
+    },
+    {
+      "date": "2019-10-15",
+      "held": [
+        "6645.T",
+        "6981.T",
+        "3197.T"
+      ],
+      "clusters": [
+        "growth_tech",
+        "growth_tech",
+        "growth_tech"
+      ],
+      "max_cluster_concentration_pct": 100.0
+    },
+    {
+      "date": "2019-10-16",
+      "held": [
+        "6645.T",
+        "6981.T",
+        "3197.T"
+      ],
+      "clusters": [
+        "growth_tech",
+        "growth_tech",
+        "growth_tech"
+      ],
+      "max_cluster_concentration_pct": 100.0
+    },
+    {
+      "date": "2019-10-17",
+      "held": [
+        "6645.T",
+        "6981.T",
+        "3197.T"
+      ],
+      "clusters": [
+        "growth_tech",
+        "growth_tech",
+        "growth_tech"
+      ],
+      "max_cluster_concentration_pct": 100.0
+    },
+    {
+      "date": "2019-10-24",
+      "held": [
+        "6645.T",
+        "6981.T"
+      ],
+      "clusters": [
+        "growth_tech",
+        "growth_tech"
+      ],
+      "max_cluster_concentration_pct": 100.0
+    },
+    {
+      "date": "2019-10-25",
+      "held": [
+        "6645.T",
+        "6981.T",
+        "6501.T"
+      ],
+      "clusters": [
+        "growth_tech",
+        "growth_tech",
+        "growth_tech"
+      ],
+      "max_cluster_concentration_pct": 100.0
+    },
+    {
+      "date": "2019-10-28",
+      "held": [
+        "6645.T",
+        "6981.T",
+        "6501.T"
+      ],
+      "clusters": [
+        "growth_tech",
+        "growth_tech",
+        "growth_tech"
+      ],
+      "max_cluster_concentration_pct": 100.0
+    },
+    {
+      "date": "2019-11-05",
+      "held": [
+        "6645.T",
+        "6981.T",
+        "3382.T"
+      ],
+      "clusters": [
+        "growth_tech",
+        "growth_tech",
+        "growth_tech"
+      ],
+      "max_cluster_concentration_pct": 100.0
+    },
+    {
+      "date": "2019-11-06",
+      "held": [
+        "6645.T",
+        "6981.T",
+        "3382.T"
+      ],
+      "clusters": [
+        "growth_tech",
+        "growth_tech",
+        "growth_tech"
+      ],
+      "max_cluster_concentration_pct": 100.0
+    }
+  ]
+}

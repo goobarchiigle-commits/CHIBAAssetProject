@@ -1,0 +1,709 @@
+{
+  "date": "2026-07-04",
+  "n_hidden_cases": 42,
+  "cases": [
+    {
+      "date": "2019-07-02",
+      "symbol": "6857.T",
+      "rank": 0,
+      "cand_cluster": "growth_tech",
+      "held_clusters": [
+        "growth_tech"
+      ],
+      "forward_20": 34.49,
+      "mae_pct": 0.39,
+      "rsr": 100.0,
+      "atr_pct": 8.85,
+      "momentum_63d_pct": 27.25,
+      "market_regime": "risk_off",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2020-01-07",
+      "symbol": "6702.T",
+      "rank": 0,
+      "cand_cluster": "growth_tech",
+      "held_clusters": [
+        "cyclical_macro",
+        "growth_tech"
+      ],
+      "forward_20": 20.6,
+      "mae_pct": -14.56,
+      "rsr": 87.8,
+      "atr_pct": 8.49,
+      "momentum_63d_pct": 23.17,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2020-10-28",
+      "symbol": "6981.T",
+      "rank": 0,
+      "cand_cluster": "growth_tech",
+      "held_clusters": [
+        "growth_tech",
+        "cyclical_macro"
+      ],
+      "forward_20": 21.21,
+      "mae_pct": 4.7,
+      "rsr": 87.8,
+      "atr_pct": 10.46,
+      "momentum_63d_pct": 12.29,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2020-12-02",
+      "symbol": "9107.T",
+      "rank": 0,
+      "cand_cluster": "cyclical_macro",
+      "held_clusters": [
+        "cyclical_macro",
+        "growth_tech"
+      ],
+      "forward_20": 16.24,
+      "mae_pct": 33.66,
+      "rsr": 82.9,
+      "atr_pct": 37.57,
+      "momentum_63d_pct": 57.04,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2021-01-22",
+      "symbol": "5401.T",
+      "rank": 0,
+      "cand_cluster": "cyclical_macro",
+      "held_clusters": [
+        "cyclical_macro",
+        "growth_tech"
+      ],
+      "forward_20": 18.84,
+      "mae_pct": 28.09,
+      "rsr": 34.1,
+      "atr_pct": 45.14,
+      "momentum_63d_pct": 19.66,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2021-01-29",
+      "symbol": "8306.T",
+      "rank": 1,
+      "cand_cluster": "cyclical_macro",
+      "held_clusters": [
+        "cyclical_macro",
+        "growth_tech"
+      ],
+      "forward_20": 19.65,
+      "mae_pct": 19.63,
+      "rsr": 22.0,
+      "atr_pct": 21.44,
+      "momentum_63d_pct": 11.9,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2021-02-22",
+      "symbol": "9107.T",
+      "rank": 1,
+      "cand_cluster": "cyclical_macro",
+      "held_clusters": [
+        "cyclical_macro"
+      ],
+      "forward_20": 23.39,
+      "mae_pct": 28.8,
+      "rsr": 87.8,
+      "atr_pct": 40.53,
+      "momentum_63d_pct": 34.7,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2021-03-04",
+      "symbol": "9107.T",
+      "rank": 0,
+      "cand_cluster": "cyclical_macro",
+      "held_clusters": [
+        "cyclical_macro"
+      ],
+      "forward_20": 18.35,
+      "mae_pct": 25.17,
+      "rsr": 87.8,
+      "atr_pct": 40.55,
+      "momentum_63d_pct": 25.81,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2021-03-11",
+      "symbol": "9107.T",
+      "rank": 0,
+      "cand_cluster": "cyclical_macro",
+      "held_clusters": [
+        "growth_tech",
+        "cyclical_macro"
+      ],
+      "forward_20": 28.93,
+      "mae_pct": 26.54,
+      "rsr": 87.8,
+      "atr_pct": 40.16,
+      "momentum_63d_pct": 13.12,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2021-03-12",
+      "symbol": "9107.T",
+      "rank": 1,
+      "cand_cluster": "cyclical_macro",
+      "held_clusters": [
+        "growth_tech",
+        "cyclical_macro"
+      ],
+      "forward_20": 25.87,
+      "mae_pct": 32.18,
+      "rsr": 92.7,
+      "atr_pct": 39.16,
+      "momentum_63d_pct": 13.6,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2021-08-19",
+      "symbol": "5401.T",
+      "rank": 0,
+      "cand_cluster": "cyclical_macro",
+      "held_clusters": [
+        "cyclical_macro"
+      ],
+      "forward_20": 17.44,
+      "mae_pct": 34.64,
+      "rsr": 85.4,
+      "atr_pct": 44.71,
+      "momentum_63d_pct": -12.01,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2021-12-23",
+      "symbol": "6857.T",
+      "rank": 1,
+      "cand_cluster": "growth_tech",
+      "held_clusters": [
+        "cyclical_macro"
+      ],
+      "forward_20": -12.74,
+      "mae_pct": -25.57,
+      "rsr": 76.2,
+      "atr_pct": 5.09,
+      "momentum_63d_pct": -1.09,
+      "market_regime": "normal",
+      "note": "別クラスターだが結果は大幅マイナス — クラスター理論だけでは説明不可"
+    },
+    {
+      "date": "2021-12-27",
+      "symbol": "6857.T",
+      "rank": 0,
+      "cand_cluster": "growth_tech",
+      "held_clusters": [
+        "cyclical_macro"
+      ],
+      "forward_20": -19.62,
+      "mae_pct": -26.45,
+      "rsr": 78.6,
+      "atr_pct": 5.07,
+      "momentum_63d_pct": -1.86,
+      "market_regime": "normal",
+      "note": "別クラスターだが結果は大幅マイナス — クラスター理論だけでは説明不可"
+    },
+    {
+      "date": "2022-01-04",
+      "symbol": "6479.T",
+      "rank": 0,
+      "cand_cluster": "growth_tech",
+      "held_clusters": [
+        "cyclical_macro"
+      ],
+      "forward_20": -14.16,
+      "mae_pct": -29.75,
+      "rsr": 85.7,
+      "atr_pct": 8.18,
+      "momentum_63d_pct": 20.19,
+      "market_regime": "normal",
+      "note": "別クラスターだが結果は大幅マイナス — クラスター理論だけでは説明不可"
+    },
+    {
+      "date": "2022-01-04",
+      "symbol": "6857.T",
+      "rank": 1,
+      "cand_cluster": "growth_tech",
+      "held_clusters": [
+        "cyclical_macro"
+      ],
+      "forward_20": -13.2,
+      "mae_pct": -28.6,
+      "rsr": 83.3,
+      "atr_pct": 4.93,
+      "momentum_63d_pct": 14.74,
+      "market_regime": "normal",
+      "note": "別クラスターだが結果は大幅マイナス — クラスター理論だけでは説明不可"
+    },
+    {
+      "date": "2022-02-18",
+      "symbol": "8002.T",
+      "rank": 0,
+      "cand_cluster": "cyclical_macro",
+      "held_clusters": [
+        "cyclical_macro"
+      ],
+      "forward_20": 15.44,
+      "mae_pct": 9.75,
+      "rsr": 92.9,
+      "atr_pct": 18.63,
+      "momentum_63d_pct": 20.27,
+      "market_regime": "risk_off",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2022-03-01",
+      "symbol": "7011.T",
+      "rank": 0,
+      "cand_cluster": "cyclical_macro",
+      "held_clusters": [
+        "cyclical_macro"
+      ],
+      "forward_20": 15.2,
+      "mae_pct": 0.06,
+      "rsr": 83.3,
+      "atr_pct": 8.46,
+      "momentum_63d_pct": 26.08,
+      "market_regime": "risk_off",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2022-03-25",
+      "symbol": "8035.T",
+      "rank": 2,
+      "cand_cluster": "growth_tech",
+      "held_clusters": [
+        "cyclical_macro"
+      ],
+      "forward_20": -11.55,
+      "mae_pct": -22.7,
+      "rsr": 76.2,
+      "atr_pct": 11.33,
+      "momentum_63d_pct": 6.53,
+      "market_regime": "normal",
+      "note": "別クラスターだが結果は大幅マイナス — クラスター理論だけでは説明不可"
+    },
+    {
+      "date": "2022-05-10",
+      "symbol": "9107.T",
+      "rank": 0,
+      "cand_cluster": "cyclical_macro",
+      "held_clusters": [
+        "growth_tech",
+        "defensive",
+        "cyclical_macro"
+      ],
+      "forward_20": 30.24,
+      "mae_pct": 17.58,
+      "rsr": 100.0,
+      "atr_pct": 28.39,
+      "momentum_63d_pct": 21.96,
+      "market_regime": "risk_off",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2023-02-07",
+      "symbol": "5411.T",
+      "rank": 0,
+      "cand_cluster": "cyclical_macro",
+      "held_clusters": [
+        "cyclical_macro"
+      ],
+      "forward_20": 16.65,
+      "mae_pct": 11.25,
+      "rsr": 52.4,
+      "atr_pct": 16.12,
+      "momentum_63d_pct": 12.75,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2023-05-09",
+      "symbol": "8058.T",
+      "rank": 1,
+      "cand_cluster": "cyclical_macro",
+      "held_clusters": [
+        "growth_tech",
+        "cyclical_macro"
+      ],
+      "forward_20": 20.0,
+      "mae_pct": 5.0,
+      "rsr": 81.0,
+      "atr_pct": 8.4,
+      "momentum_63d_pct": 22.5,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2023-05-10",
+      "symbol": "6146.T",
+      "rank": 0,
+      "cand_cluster": "growth_tech",
+      "held_clusters": [
+        "growth_tech",
+        "cyclical_macro"
+      ],
+      "forward_20": 21.94,
+      "mae_pct": 0.9,
+      "rsr": 97.6,
+      "atr_pct": 3.93,
+      "momentum_63d_pct": 25.8,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2023-05-18",
+      "symbol": "6146.T",
+      "rank": 0,
+      "cand_cluster": "growth_tech",
+      "held_clusters": [
+        "defensive",
+        "growth_tech"
+      ],
+      "forward_20": 21.96,
+      "mae_pct": 0.65,
+      "rsr": 100.0,
+      "atr_pct": 4.3,
+      "momentum_63d_pct": 41.36,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2023-05-19",
+      "symbol": "4055.T",
+      "rank": 0,
+      "cand_cluster": "defensive",
+      "held_clusters": [
+        "defensive",
+        "growth_tech"
+      ],
+      "forward_20": 43.68,
+      "mae_pct": -4.62,
+      "rsr": 95.2,
+      "atr_pct": 5.06,
+      "momentum_63d_pct": 36.51,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2023-05-24",
+      "symbol": "6146.T",
+      "rank": 0,
+      "cand_cluster": "growth_tech",
+      "held_clusters": [
+        "cyclical_macro",
+        "defensive",
+        "growth_tech"
+      ],
+      "forward_20": 22.28,
+      "mae_pct": -0.43,
+      "rsr": 100.0,
+      "atr_pct": 3.92,
+      "momentum_63d_pct": 44.23,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2023-05-24",
+      "symbol": "8058.T",
+      "rank": 1,
+      "cand_cluster": "cyclical_macro",
+      "held_clusters": [
+        "cyclical_macro",
+        "defensive",
+        "growth_tech"
+      ],
+      "forward_20": 27.76,
+      "mae_pct": 6.46,
+      "rsr": 88.1,
+      "atr_pct": 8.47,
+      "momentum_63d_pct": 23.02,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2023-05-24",
+      "symbol": "7011.T",
+      "rank": 2,
+      "cand_cluster": "cyclical_macro",
+      "held_clusters": [
+        "cyclical_macro",
+        "defensive",
+        "growth_tech"
+      ],
+      "forward_20": 17.46,
+      "mae_pct": 0.79,
+      "rsr": 76.2,
+      "atr_pct": 4.29,
+      "momentum_63d_pct": 17.06,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2023-05-26",
+      "symbol": "8058.T",
+      "rank": 0,
+      "cand_cluster": "cyclical_macro",
+      "held_clusters": [
+        "cyclical_macro",
+        "defensive",
+        "growth_tech"
+      ],
+      "forward_20": 22.29,
+      "mae_pct": 5.08,
+      "rsr": 90.5,
+      "atr_pct": 8.53,
+      "momentum_63d_pct": 23.06,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2023-10-04",
+      "symbol": "8354.T",
+      "rank": 2,
+      "cand_cluster": "cyclical_macro",
+      "held_clusters": [
+        "cyclical_macro"
+      ],
+      "forward_20": 16.59,
+      "mae_pct": -1.69,
+      "rsr": 71.4,
+      "atr_pct": 10.2,
+      "momentum_63d_pct": 13.45,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2023-12-15",
+      "symbol": "3197.T",
+      "rank": 1,
+      "cand_cluster": "growth_tech",
+      "held_clusters": [
+        "cyclical_macro",
+        "growth_tech"
+      ],
+      "forward_20": 19.44,
+      "mae_pct": -1.62,
+      "rsr": 35.7,
+      "atr_pct": 2.63,
+      "momentum_63d_pct": 1.67,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2023-12-18",
+      "symbol": "9107.T",
+      "rank": 0,
+      "cand_cluster": "cyclical_macro",
+      "held_clusters": [
+        "cyclical_macro",
+        "growth_tech"
+      ],
+      "forward_20": 32.17,
+      "mae_pct": 6.38,
+      "rsr": 97.6,
+      "atr_pct": 11.72,
+      "momentum_63d_pct": 3.75,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2023-12-22",
+      "symbol": "6920.T",
+      "rank": 0,
+      "cand_cluster": "growth_tech",
+      "held_clusters": [
+        "cyclical_macro",
+        "growth_tech"
+      ],
+      "forward_20": 16.07,
+      "mae_pct": -3.2,
+      "rsr": 92.9,
+      "atr_pct": 5.06,
+      "momentum_63d_pct": 64.22,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2024-01-10",
+      "symbol": "4055.T",
+      "rank": 0,
+      "cand_cluster": "defensive",
+      "held_clusters": [
+        "cyclical_macro"
+      ],
+      "forward_20": -13.09,
+      "mae_pct": -30.82,
+      "rsr": 97.6,
+      "atr_pct": 4.09,
+      "momentum_63d_pct": 28.45,
+      "market_regime": "normal",
+      "note": "別クラスターだが結果は大幅マイナス — クラスター理論だけでは説明不可"
+    },
+    {
+      "date": "2024-02-06",
+      "symbol": "6146.T",
+      "rank": 0,
+      "cand_cluster": "growth_tech",
+      "held_clusters": [
+        "growth_tech",
+        "cyclical_macro"
+      ],
+      "forward_20": 17.77,
+      "mae_pct": -2.03,
+      "rsr": 100.0,
+      "atr_pct": 4.25,
+      "momentum_63d_pct": 65.99,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2024-06-12",
+      "symbol": "6762.T",
+      "rank": 0,
+      "cand_cluster": "growth_tech",
+      "held_clusters": [
+        "growth_tech",
+        "cyclical_macro"
+      ],
+      "forward_20": 26.06,
+      "mae_pct": -8.05,
+      "rsr": 83.3,
+      "atr_pct": 4.13,
+      "momentum_63d_pct": 18.09,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2024-06-13",
+      "symbol": "6762.T",
+      "rank": 0,
+      "cand_cluster": "growth_tech",
+      "held_clusters": [
+        "growth_tech",
+        "cyclical_macro"
+      ],
+      "forward_20": 25.63,
+      "mae_pct": -8.2,
+      "rsr": 85.7,
+      "atr_pct": 4.14,
+      "momentum_63d_pct": 17.01,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2024-06-17",
+      "symbol": "8306.T",
+      "rank": 0,
+      "cand_cluster": "cyclical_macro",
+      "held_clusters": [
+        "growth_tech",
+        "cyclical_macro"
+      ],
+      "forward_20": 15.05,
+      "mae_pct": -18.34,
+      "rsr": 69.0,
+      "atr_pct": 6.31,
+      "momentum_63d_pct": 2.96,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2024-06-18",
+      "symbol": "6762.T",
+      "rank": 0,
+      "cand_cluster": "growth_tech",
+      "held_clusters": [
+        "growth_tech",
+        "cyclical_macro"
+      ],
+      "forward_20": 17.27,
+      "mae_pct": -14.81,
+      "rsr": 88.1,
+      "atr_pct": 4.18,
+      "momentum_63d_pct": 27.69,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2024-09-02",
+      "symbol": "7012.T",
+      "rank": 2,
+      "cand_cluster": "cyclical_macro",
+      "held_clusters": [
+        "cyclical_macro"
+      ],
+      "forward_20": 18.81,
+      "mae_pct": -17.88,
+      "rsr": 81.0,
+      "atr_pct": 6.52,
+      "momentum_63d_pct": -11.24,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2025-05-13",
+      "symbol": "7012.T",
+      "rank": 0,
+      "cand_cluster": "cyclical_macro",
+      "held_clusters": [
+        "cyclical_macro",
+        "growth_tech"
+      ],
+      "forward_20": 18.0,
+      "mae_pct": -4.07,
+      "rsr": 95.2,
+      "atr_pct": 4.4,
+      "momentum_63d_pct": 29.25,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2025-06-17",
+      "symbol": "6857.T",
+      "rank": 0,
+      "cand_cluster": "growth_tech",
+      "held_clusters": [
+        "cyclical_macro",
+        "growth_tech"
+      ],
+      "forward_20": 22.72,
+      "mae_pct": -2.67,
+      "rsr": 92.9,
+      "atr_pct": 3.57,
+      "momentum_63d_pct": 16.15,
+      "market_regime": "normal",
+      "note": "同クラスターだが大幅プラス — クラスター理論の予測(伸びないはず)に反する"
+    },
+    {
+      "date": "2025-10-06",
+      "symbol": "6146.T",
+      "rank": 0,
+      "cand_cluster": "growth_tech",
+      "held_clusters": [
+        "cyclical_macro"
+      ],
+      "forward_20": -11.96,
+      "mae_pct": -21.54,
+      "rsr": 85.7,
+      "atr_pct": 4.05,
+      "momentum_63d_pct": 30.64,
+      "market_regime": "normal",
+      "note": "別クラスターだが結果は大幅マイナス — クラスター理論だけでは説明不可"
+    }
+  ]
+}

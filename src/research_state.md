@@ -1,6 +1,28 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-04（Study80A完了・観測基盤構築・CAP_MISS矛盾に統計的裏付け獲得）
+# Single Source of Truth / 最終更新: 2026-07-04（Study81完了・Cluster Diversification仮説=棄却）
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
+
+---
+
+## ★ 2026-07-04 Study81: Cluster Diversification Hypothesis — **COMPLETE（追加BTゼロ）→ 仮説は棄却（REJECT）**
+
+**目的**: 「max_positions=3が最適なのではなく、4銘柄目は既存3銘柄と同じクラスターに属するため期待値が増えない」仮説の検証。
+**方針遵守**: 追加BTゼロ。Study80AのResearch Assetsのみ使用。
+**レポート**: `reports/study81.md`　**検証物**: `backtests/cluster_dataset.json` / `backtests/cluster_statistics.json` / `backtests/portfolio_cluster_report.json` / `backtests/hidden_cases.json`
+
+### Cluster ID設計
+`macro_cluster`（Production既存`src/strategy/cluster.py`のCLUSTER_MAP_DEFAULT・cyclical_macro/defensive/growth_tech/real_asset/otherを再利用）× `factor_cluster`（momentum_63d_pct/atr_pct/rsrのtercile）。alpha_scoreはdegenerate（全件≒0）のため除外。
+
+### 核心検定（解析4）: 仮説と逆方向の結果
+CAP_MISS候補を「既存保有と同clusterか否か」で二分: **同cluster群(n=366) forward_20平均=+3.46% > 別cluster群(n=79)=+1.71%**（Mann-Whitney p=0.1443・非有意だが方向性は仮説と正反対）。Hidden Factor探索(解析6)でもCluster理論からの逸脱42件中35件(83%)が「同clusterなのに好成績」という同方向の反証パターンで一貫。
+
+### Portfolio内集中度（解析3）: 粒度依存の重要な留保
+macro_cluster(4分類)レベルでは実測73.7% vs ランダム72.16%でp=0.0661（非有意）。Study80Aのraw sector(13-14分類)ではp=0.0(有意)だったのと対比し、**「クラスター」の粒度定義次第で結論が変わる**ことが判明。
+
+### 結論: **棄却（REJECT）**
+「同クラスター＝期待値が低い」という狭義の仮説は、解析4・6の一貫した逆方向の証拠により棄却。ただしStudy80Aの「同日競合3候補群の分散縮小率24.8%（リターンの大きさではなくばらつき＝リスク相関構造の知見）」は本Studyのスコープ外であり、否定も肯定もしていない（未解決のまま残置）。改善案は提示せず（指示通り説明のみ）。
+
+---
 
 ---
 

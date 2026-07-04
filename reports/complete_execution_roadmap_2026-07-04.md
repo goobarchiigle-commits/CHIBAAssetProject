@@ -487,6 +487,17 @@ Study74を失敗報告で終わらせず、以下3点を追加実施（詳細は
 - **⚠ 副産物（Study74B-RCA未解決事項への統計的裏付け）**: 同日に実際に競合していた3候補群の分散縮小率=**24.8%**（日をまたぐ無作為抽出の67.3%＝理論的独立水準と比べ大幅に低い）— 「見かけの分散が実質的な相関の高い集中になっている」という仮説を初めて定量的に裏付け。セクター集中度も偶然を有意に上回る(p=0.0)。rank0見送り率63.6%は継続。詳細→`reports/study80a_observation_infrastructure.md`。
 - **申し送り**: 上記知見はStudy81での正式検証・報告対象（本Studyは基盤構築が主目的のため速報扱い）。
 
+## L1D: Study81 — Cluster Diversification Hypothesis【完了・2026-07-04・追加BTゼロ】
+
+**目的**: 「max_positions=3が最適なのではなく、4銘柄目は既存3銘柄と同じクラスターに属するため期待値が増えない」仮説の検証。改善案は提示せず説明のみ（指示通り）。
+
+- **Cluster ID設計**: Production既存の`src/strategy/cluster.py`(CLUSTER_MAP_DEFAULT)を再利用したmacro_cluster × momentum/ATR/RSRのtercileによるfactor_clusterの組み合わせ。alpha_scoreはdegenerateのため除外。
+- **核心検定（解析4）**: CAP_MISS候補を同cluster/別clusterで二分 → **同cluster群(n=366)forward_20=+3.46% > 別cluster群(n=79)=+1.71%**（仮説と逆方向、p=0.1443非有意）。
+- **Hidden Factor（解析6）**: Cluster理論からの逸脱42件中35件(83%)が「同clusterなのに好成績」で解析4と同方向に一貫。
+- **重要な留保**: macro_cluster(4分類)レベルの集中度はランダムと非有意(p=0.0661)。Study80Aのraw sector(13-14分類)では有意(p=0.0)だったこととの対比で、**クラスター粒度定義次第で結論が変わる**ことが判明。
+- **結論**: **棄却（REJECT）**。ただしStudy80Aの「同日競合3候補群の分散縮小率24.8%」（リターンの大きさではなくリスク相関構造の知見）は本Studyのスコープ外であり否定も肯定もしていない（未解決のまま残置）。
+- 詳細→`reports/study81.md`
+
 ## L2: Study75 — Survivorship-free ルールベースユニバース（J-Quants）
 
 - **正典定義**: 成功=バイアス実測≤-1.5pp ∧ 規則ユニバースBaseline CAGR≥9%。失敗=バイアス>-3pp（→全歴史判定の再審査。これ自体が重要情報）。
