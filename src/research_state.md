@@ -1,6 +1,32 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-04（Study81完了・Cluster Diversification仮説=棄却）
+# Single Source of Truth / 最終更新: 2026-07-04（Core Architecture Completion Review=Verdict B・Core研究終了可）
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
+
+---
+
+## ★★★ 2026-07-04 Core Architecture Completion Review（Final Audit） — **Verdict B: COMPLETE WITH OPEN QUESTIONS（新規BTゼロ・コード変更ゼロ）**
+
+**目的**: Study01〜81+正典ロードマップを対象に「Core（現行Long Only・固定制約）研究を終了できるか」の第三者最終監査。改善案・新戦略提案なし、事実確認と終了判定のみ。
+**成果物**: `reports/core_architecture_completion_review.md`（本体） / `reports/core_open_questions.md`（OQ台帳10件） / `reports/core_evi_matrix.md`（EVI行列）
+
+### 最終判定
+| 項目 | 結論 |
+|---|---|
+| 研究終了可否 | **終了可（Verdict B）** — Core内にEVI High/Medium項目ゼロ |
+| 残す未解決事項 | 4件のみ: OQ1 リスク相関構造(→Study85) / OQ3 mom_period過学習(→Study76/77) / OQ4 survivorship幅(→Study75) / OQ5 Exit構造回収(→Study77)。他6件は閉鎖or決断待ち |
+| Architecture選択への影響 | **なし** — 緩和5軸の優先順位はいずれのOQ帰結でも不変 |
+| 恒久終了可否 | **可**（条件: 恒久閉鎖14項維持 / OQ帰属先変更禁止 / fresh run原則） |
+
+### 「制約固定で30%困難」の反証可能性 = 覆らない
+オラクル合算上界16-18%（Study52/73基準10-12% + Study64 +6.37pp + 25/27/28≈0 + Entry WF実績0 + 53/74A枠拡大≦+0.33pp + 74資本+0.89pp）。最後の未測定候補もStudy74B/80A/81で測定完了。残存未測定（OQ3/OQ4）は下方リスクのみ＝判定を強化する方向。
+
+### ⚠最重要所見（§3.5）: 「3ポジ最適∧見逃しα」矛盾は論理的に解消済み — 閉鎖してよい
+矛盾ではなく**「候補単体α」と「ポートフォリオ限界寄与」の測定レベル混同**:
+(a) forward_20 +2.8%(80A)と限界寄与+0.29〜-0.42pp(74A)は両立する別の量。
+(b) 希薄化コストは常時（4枠目で既存比重33%→25%・毎営業日）、α取得は散発（cap_saturation 40.6%の日のみ, 74B）。
+(c) 4銘柄目=保有中の賭けの相関コピー（同日競合の分散縮小24.8% vs 独立67.3%, 80A）→リスク線形加算・分散便益なし（全解除MaxDD-27.5%, 74A）。
+(d) 候補は強レジームに同時多発（2023年=見送り最多∧採用側最高収益, 74B-RCA / Hidden Factor 83%が同cluster好成績, 81）。
+∴ 見逃しαは実在するが回収コストが系統的に相殺、純効果≦+0.33ppは4系列独立実測（Study8系/41/53/74A）で確定。残余（寄与比率分解）はOQ1としてStudy85へ帰属、Core内での再着手禁止。
 
 ---
 
