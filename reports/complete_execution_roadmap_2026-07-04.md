@@ -80,6 +80,7 @@ ADOPT ⇔ WF 5/5 ∧ 2022非悪化 ∧ ΔCAGR≥+1pp ∧ Bootstrap P(>0)≥95% �
 | 未解消High risk | Survivorship+Selection Bias（±1-3pp） |
 | ⚠ 環境 | **訂正(M5実行後)**: `.git`は実際には`src/`配下に既存(origin一致・最終コミット2026-04-07・3ヶ月分未コミット)だった。root直下へ統合済み(commit 8641863)。詳細→§2.1 |
 | M1採用状態(2026-07-04) | **採用済み**（addon執行=翌日寄付。BT/Live parity目的・成績改善目的ではない）。詳細→§2.3 |
+| **CP1判定(2026-07-04)** | **🔴 BLACK**（¥20-30MでCAGR≥22%∧WF5/5未達）。目標改定はユーザー決裁待ち。詳細→L1節・`reports/study74_final_review.md` |
 
 ---
 
@@ -440,6 +441,29 @@ Part1-8全て実行完了。詳細レポート`reports/study78_ror_mc_sensitivit
 **⚠ 副次発見**: CAND_BのWF5/5達成は¥3M固有現象（資本を上げるとWF pass低下）。S1決裁はこの点を踏まえて再評価が必要。
 
 **次アクション（ユーザー決裁待ち）**: CP1目標改定（黒→CAGR15-20%/Calmar1.2への変更）の可否。統治原則4によりユーザー明示決裁が必須 — 本書は判定材料の提示までとし、目標変更は宣言しない。
+
+### 🔴 CP1判定: **BLACK**（確定・ユーザー決裁待ち）
+
+正典ゲート「¥20-30MでCAGR≥22% ∧ WF5/5」に対し全8セル未達。**BLACK判定**（roadmap統治原則の分岐表記に合わせ英語表記で明示）。目標改定（→CAGR15-20%/Calmar1.2）はユーザー決裁待ちのまま据え置き、本書では宣言しない。
+
+### 統合レビュー（Part1-3・2026-07-04・ユーザー拡張指示・新規BTは合計1回のみ）
+
+Study74を失敗報告で終わらせず、以下3点を追加実施（詳細は各レポート参照）:
+
+- **Part1（①制約分類・②Capacity Curve・③CP1=BLACKの論理整理）**: `reports/study74_final_review.md` + `backtests/study74_capacity_curve_2026-07-04.png` + `backtests/study74_integrated_review_2026-07-04.json`。**新規BTゼロ**（既存study74 JSONの再集計のみ）。
+  - 制約6種を「🟢改善可能(lot丸め=資本で解消済み)」「🔴構造限界(max_positions/candidate不足/entry頻度=資本非依存)」「⚪非該当(symbol_cap=非拘束)」「🟡従属指標(cash滞留)」に分類。
+  - 「資本拡大の理論上限=lot丸め解消分(+1.12pp)のみ」であり「目標(18-22%)とのギャップ(5-9pp)は資本経路だけでは埋まらない」ことを論理証明（QED形式でreport内に明記）。
+- **Part2（Study78 Research Assets拡張・Worst10 Drawdown Episode）**: `reports/study78_ror_mc_sensitivity.md`のPart4に追記 + `backtests/study78_worst10_dd_episodes_2026-07-04.json`。単一最大DDだけでなく全DDエピソード(閾値-3%)を検出しワースト10件を寄与トレード全量付きで格納。**今後Study81-86は「この変更でWorstDDが改善したか」をこのJSONとの比較のみで判定可能**（新規BT不要）。
+- **Part3（Study74B: 候補不足構造分析）**: `reports/study74b_candidate_shortage_design.md` + `backtests/study74b_candidate_shortage_2026-07-04.json`。**⚠命名注意: ロードマップ既存のL2 Study75(J-Quants)とは別物のため「Study74B」と呼称**（Study75の定義・優先順位は変更なし）。
+  - 見送り理由の74%がCAP_MISS(スロット競合)。うち56%は「その日の最上位候補」の喪失（質の劣化ではなく機会そのものの喪失）。
+  - 見送り候補と採用候補のRSR中央値は完全一致(81.0)— 「質が低いから弾かれた」わけではない。しかしmax_positions緩和はCAGR悪化（Part1）という**未解決の矛盾**をStudy81/85への申し送り事項として記録。
+  - 候補不足の9割は通常相場（risk_off以外）で発生。idle-cash日の75%は真に候補が存在しない日。
+
+**唯一の追加BT**: `src/backtest/study74b_diagnostics_2026-07-04.py`（FULL 2018-2025・CURRENT・M1適用後を1回のみ再実行し、既存計装`_skip_detail`/`_missed_cands`/equity・drawdown曲線を初めて永続化。Part2/Part3双方で共用）。Part1は新規BTゼロ。
+
+## L1B: Study74B — 候補不足構造分析【完了・2026-07-04・番号衝突回避のため暫定命名】
+
+上記Part3参照。ロードマップの正式Study番号ではなく、Study74の派生分析として実施・完了。将来的にこの内容を正式なStudy番号に組み込むかはユーザー判断とする（現時点では未割当のまま`reports/study74b_candidate_shortage_design.md`に格納）。
 
 ## L2: Study75 — Survivorship-free ルールベースユニバース（J-Quants）
 

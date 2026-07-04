@@ -1,0 +1,81 @@
+{
+  "date": "2026-07-04",
+  "study": "Study74_integrated_review_part1",
+  "constraint_classification": [
+    {
+      "constraint": "lot丸め",
+      "category": "改善可能（資本で解消済み）",
+      "evidence": "delta_cagr(3M→30M)=[1.12, 0.3, -0.19, 0.08] / lot_shortage_rate: [1.18, 0.81, 0.0, 0.0]",
+      "verdict": "¥20M以降で完全解消。資本拡大で自然に改善する唯一の制約。"
+    },
+    {
+      "constraint": "max_positions=3",
+      "category": "構造限界（PARAMS_LOCKED・恒久閉鎖#11）",
+      "evidence": "delta_cagr(3M→30M)=[0.29, 0.38, -0.42, -0.23]（¥20M以降は解除するとCAGR悪化） / missed_by_cap_count(3M→30M)=[427, 452, 475, 478]（資本を上げても減らない）",
+      "verdict": "資本非依存の構造限界。緩和は変更禁止パラメータのため対象外。"
+    },
+    {
+      "constraint": "symbol_cap(0.40)",
+      "category": "非該当（そもそも非拘束）",
+      "evidence": "delta_cagr(3M→30M)=[0.0, 0.0, 0.0, 0.0]（全資本水準で0.00pp）",
+      "verdict": "現行設計で十分な余裕があり、資本規模によらず一切効いていない。"
+    },
+    {
+      "constraint": "candidate不足",
+      "category": "構造限界（資本では解決しない）",
+      "evidence": "平均候補数/日=0.47（候補不足率84.3%） / 見送り理由ランキング1位=CAP_MISS(449件、圧倒的多数)",
+      "verdict": "資本を増やしても候補の絶対数は増えない。Study74Bで見送り理由の9割近くがCAP_MISS(スロット競合)と確認 — 真因はシグナル生成側（ユニバース・エントリー条件）にあり、Study75/76/77/81の領域。"
+    },
+    {
+      "constraint": "cash滞留",
+      "category": "構造限界の帰結（独立制約ではない）",
+      "evidence": "現金滞留率(3M→30M)=[90.9, 90.3, 89.0, 87.6]（87.6-90.9%でほぼ一定） / q1_idle_when_winner_pct（勝ち候補があるのに滞留）=25.0%",
+      "verdict": "candidate不足・max_positions=3の結果として生じる従属指標。独立に改善する対象ではない。"
+    },
+    {
+      "constraint": "entry頻度",
+      "category": "構造限界（資本に対して不変）",
+      "evidence": "IS期間 n_trades(3M→30M)=[263, 264, 257, 258]（263→264→257→258、資本を10倍にしてもほぼ一定）",
+      "verdict": "取引頻度はシグナル生成条件(RSR/モメンタム)が支配し資本には反応しない。"
+    }
+  ],
+  "capacity_curve_data": {
+    "capital_million": [
+      3,
+      10,
+      20,
+      30
+    ],
+    "cagr_is": [
+      12.22,
+      12.51,
+      13.11,
+      12.84
+    ],
+    "avg_investment_ratio_pct": [
+      31.5,
+      32.9,
+      34.7,
+      35.3
+    ],
+    "cash_idle_ratio_pct": [
+      90.9,
+      90.3,
+      89.0,
+      87.6
+    ],
+    "candidate_shortage_rate_pct": [
+      84.0,
+      83.66666666666666,
+      83.66666666666666,
+      83.66666666666666
+    ],
+    "position_fill_rate_pct": [
+      64.3,
+      65.7,
+      67.7,
+      67.7
+    ]
+  },
+  "chart_file": "study74_capacity_curve_2026-07-04.png"
+}

@@ -1,6 +1,50 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-04（Study74完了・CP1判定=黒・ユーザー決裁待ち）
+# Single Source of Truth / 最終更新: 2026-07-04（Study74統合レビュー完了・Study74B完了・CP1=BLACK確定・ユーザー決裁待ち）
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
+
+---
+
+## ★ 2026-07-04 Study74統合レビュー（Part1-3）+ Study74B — **COMPLETE → CP1=BLACK確定・新規BTは合計1回のみ**
+
+**目的**: Study74（CP1=黒判定）を失敗報告で終わらせず、原因の制約別分解・Capacity Curve可視化・Study78 DD Attribution拡張・候補不足構造の特定まで実施（ユーザー拡張指示）。
+**方針遵守**: 新規BTは必要最小限（合計1回・FULL 2018-2025 CURRENT）。既存Research Assets（Study74/78）を最大限再利用。
+
+### Part1: Study74 Final Review（新規BTゼロ・既存JSON再集計のみ）
+**レポート**: `reports/study74_final_review.md` / `backtests/study74_capacity_curve_2026-07-04.png` / `backtests/study74_integrated_review_2026-07-04.json`
+
+制約6種の分類:
+| 制約 | 分類 |
+|---|---|
+| lot丸め | 🟢改善可能（¥20M以降完全解消・寄与は+1.12pp止まり） |
+| max_positions=3 | 🔴構造限界（資本非依存・¥20M以降は緩和するとCAGR悪化・PARAMS_LOCKED） |
+| symbol_cap(0.40) | ⚪非該当（全資本水準で非拘束） |
+| candidate不足 | 🔴構造限界（資本では解決しない・見送りの74%がCAP_MISS） |
+| cash滞留 | 🟡従属指標（candidate不足/max_positionsの結果） |
+| entry頻度 | 🔴構造限界（IS trades 263→264→257→258と資本に対し不変） |
+
+**論理証明**: 資本拡大で動く制約はlot丸めのみ(理論上限+1.12pp)。実測¥20M CAGR(13.11%)は理論上限とほぼ一致。目標(18-22%)とのギャップ(5-9pp)は資本経路だけでは埋まらない → **「資本増加だけでは30%へ届かない」を数値的に証明**。
+
+### Part2: Study78 Research Assets拡張（Worst10 Drawdown Episode）
+`reports/study78_ror_mc_sensitivity.md` Part4に追記 / `backtests/study78_worst10_dd_episodes_2026-07-04.json`。単一最大DDに加え閾値-3%の全DDエピソード検出、Worst10を寄与トレード全量（symbol/entry/exit/holding_days/PnL/R倍率/DD寄与率/entry_type/ATR%/RSR/exit_policy/addon有無/exit理由）付きで格納。最大3件(-18%台)はRSR_MOMENTUM_EXIT/ATR_TRAILING/RSR_EXITの正常機能内損失。**Study81-86は「WorstDD改善したか」をこのJSONとの比較のみで判定可能（新規BT不要）**。
+
+### Part3: Study74B（候補不足構造分析・⚠Study75とは別物）
+**レポート**: `reports/study74b_candidate_shortage_design.md` / `backtests/study74b_candidate_shortage_2026-07-04.json`
+**⚠命名**: ロードマップ既存「L2 Study75(J-Quants survivorship-free)」とは無関係な別研究。番号衝突回避のため「Study74B」と呼称（Study75の定義・優先順位は不変）。
+
+- 見送り理由: CAP_MISS(スロット競合) 449件(74.0%) > SECTOR_CAP 75件 > CLUSTER_CAP 66件 > LOT_REJECT 15件 > GROSS_EXPOSURE 2件。
+- max_positions到達率(cap_saturation_rate)=40.6%。
+- **候補品質の発見**: 見送られた候補と採用候補のRSR中央値は完全一致(81.0)— 質の劣化で弾かれたのではない。うち56%(251/449)は「その日の最上位候補」の喪失。
+- **未解決の矛盾（Study81/85へ申し送り）**: 質が同等なのにmax_positions緩和はCAGR悪化（Part1）— 「同水準候補を増やせば伸びるはず」という直感と矛盾。分散効果の実在性を再検証する価値あり。
+- 見送りの90.6%は通常相場（risk_off以外）で発生。idle-cash日の75%は真に候補が存在しない日（Q1_idle_when_winner=25.0%）。
+- 年別ピークは2023年(121件・強気相場)、セクター別は電機精密(130件)突出。
+
+### 唯一の追加BT
+`src/backtest/study74b_diagnostics_2026-07-04.py`（FULL 2018-2025・CURRENT・M1適用後を1回のみ実行し、既存計装`_skip_detail`/`_rejected_by_lot_detail`/`_missed_cands`/equity・drawdown曲線全系列を初めて永続化）。Part1は既存JSON再集計のみで新規BTゼロ。
+
+### CP1判定確定
+🔴 **BLACK**（roadmap統治原則の分岐表記に合わせ明示）。目標改定（→CAGR15-20%/Calmar1.2）はユーザー決裁待ちのまま — 本更新では宣言しない。
+
+---
 
 ---
 

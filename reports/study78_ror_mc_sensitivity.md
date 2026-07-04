@@ -6,6 +6,7 @@
 **エンジン拡張**: 台帳出力フィールド追加のみ実施（`entry_idx`/`entry_atr_pct`/`entry_rsr`/`entry_type`をBUYレコードに、`_trades_buy`を返り値に追加）。既存`"_trades"`の内容・全メトリクス（CAGR/Sharpe/MaxDD/Calmar等）は不変であることをfresh run一致（FULL CAGR=11.22%）で確認済み。**制御フロー変更ゼロ**。
 
 **検証物**: `src/backtest/study78_ror_mc_sensitivity.py` / `backtests/study78_ror_mc_sensitivity_2026-07-04.json` / `backtests/study78_trade_dataset.json` / `backtests/study78_risk_summary.json` / `backtests/study78_drawdown_analysis.json` / `backtests/study78_mc_distribution.json` / `backtests/study78_sensitivity.json` / `backtests/study78_risk_contribution.json`
+**追記（2026-07-04）**: `src/backtest/study74b_diagnostics_2026-07-04.py` / `backtests/study78_worst10_dd_episodes_2026-07-04.json`（Worst10 Drawdown Episode拡張・Part4参照）
 
 ---
 
@@ -83,6 +84,27 @@ Production FULL run（2018-01-01〜2025-12-30, M1適用後）: **CAGR=+11.22% / 
 | 5 | 8053.T | 2022-03-25 | 2022-04-25 | 21 | -57,750円 | -1.08R | 6.20% |
 
 **所見**: 最大DD期間（2021-09〜2022-07、2022年Bear相場のQ1-Q2を含む）のトレードは**いずれもaddon非受給（addon_received=False）**・保有日数14〜27日の中期保有トレードに集中。上位5件でDD総額の約47%を占める（少数トレードへの集中度が高い）。
+
+### 追記（2026-07-04）: Worst10 Drawdown Episode 拡張（Study74確定後・ユーザー拡張指示）
+
+単一の最大DDだけでなく、**閾値-3%を跨ぐ全ドローダウンエピソードを検出しワースト10件を抽出**（`src/backtest/study74b_diagnostics_2026-07-04.py`で実施・唯一の追加BT〔FULL 2018-2025 CURRENT〕。既存`trade_dataset.json`を再利用し新規BTは1回のみ）。各エピソードにDD開始日/トラフ日/回復日/深さ/期間/寄与トレード一覧（銘柄/保有日数/PnL/R倍率/DD寄与率/entry_type/ATR%/RSR/exit_policy/addon有無/exit理由）を付与。
+
+| # | 期間(開始~トラフ~回復) | 深さ | 期間(日) | 損失トレード数 |
+|---|---|---|---|---|
+| 1 | 2021-09-21~2021-12-20~2022-07-25 | -18.22% | 205 | 24 |
+| 2 | 2020-12-18~2021-02-05~2021-04-08 | -18.07% | 74 | 9 |
+| 3 | 2019-04-15~2019-08-13~2020-11-13 | -18.02% | 382 | 28 |
+| 4 | 2021-08-03~2021-08-20~2021-09-15 | -12.97% | 30 | 4 |
+| 5 | 2018-10-12~2018-10-15~2018-10-18 | -12.68% | 4 | 2 |
+| 6 | 2021-04-22~2021-05-12~2021-06-07 | -12.22% | 28 | 1 |
+| 7 | 2022-08-04~2022-10-28~2023-05-25 | -9.70% | 196 | 21 |
+| 8 | 2021-06-16~2021-06-21~2021-07-05 | -9.43% | 13 | 0 |
+| 9 | 2024-07-25~2024-08-26~2024-10-31 | -8.69% | 66 | 4 |
+| 10 | 2019-01-28~2019-01-30~2019-02-12 | -8.49% | 10 | 0 |
+
+**所見**: 上位3エピソード（-18%台）はいずれもRSR_MOMENTUM_EXIT/ATR_TRAILING/RSR_EXITによる通常のExit機構内の損失で、異常や機構破綻は見られない。#3(2019-2020)は382日と最長で、コロナショックを跨いで緩やかに進行・回復。#8/#10は損失トレードゼロ（DD自体はunrealized評価損によるもので、実現損なし）。
+
+**用途**: `backtests/study78_worst10_dd_episodes_2026-07-04.json`にWorst10全件（寄与トレード全量含む）を保存。**今後のStudy81-86は「この変更でWorstDDが改善したか」をこのJSONとの比較のみで判定可能**（新規BT不要）。
 
 ---
 

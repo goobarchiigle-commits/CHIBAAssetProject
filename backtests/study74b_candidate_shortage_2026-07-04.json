@@ -1,0 +1,113 @@
+{
+  "date": "2026-07-04",
+  "study": "Study74B_candidate_shortage_structural_analysis",
+  "note": "roadmap既存Study75(J-Quants survivorship-free)とは別物。番号衝突回避のためStudy74Bと呼称。",
+  "analysis": {
+    "avg_candidates_per_day": 0.47,
+    "candidate_shortage_rate_pct": 84.3,
+    "reason_ranking": [
+      [
+        "CAP_MISS",
+        449
+      ],
+      [
+        "SECTOR_CAP",
+        75
+      ],
+      [
+        "CLUSTER_CAP",
+        66
+      ],
+      [
+        "LOT_REJECT",
+        15
+      ],
+      [
+        "GROSS_EXPOSURE",
+        2
+      ]
+    ],
+    "max_positions_saturation": {
+      "days_at_max_positions": 798,
+      "cap_saturation_rate_pct": 40.6,
+      "total_days": 1967
+    },
+    "candidate_quality": {
+      "missed_candidates_rsr": {
+        "mean": 74.55,
+        "median": 81.0,
+        "p25": 71.4,
+        "p75": 88.1
+      },
+      "missed_candidates_alpha": {
+        "mean": 0.0,
+        "median": 0.0,
+        "p25": 0.0,
+        "p75": 0.0
+      },
+      "traded_entries_rsr": {
+        "mean": 75.41,
+        "median": 81.0,
+        "p25": 70.7,
+        "p75": 88.1
+      }
+    },
+    "candidate_competition_rank_histogram": {
+      "rank0(最上位)": 251,
+      "rank1-2": 172,
+      "rank3+": 26
+    },
+    "missed_by_regime": {
+      "risk_off": 42,
+      "normal": 407,
+      "unknown": 0
+    },
+    "missed_by_year": {
+      "2018": 2,
+      "2019": 38,
+      "2020": 28,
+      "2021": 98,
+      "2022": 69,
+      "2023": 121,
+      "2024": 71,
+      "2025": 22
+    },
+    "missed_by_month_sample": {
+      "2018-10": 2,
+      "2019-01": 1,
+      "2019-04": 2,
+      "2019-07": 4,
+      "2019-09": 7,
+      "2019-10": 10,
+      "2019-11": 8,
+      "2019-12": 6,
+      "2020-01": 6,
+      "2020-02": 1,
+      "2020-07": 1,
+      "2020-08": 7
+    },
+    "missed_by_sector": {
+      "電機精密": 130,
+      "商社": 74,
+      "銀行": 63,
+      "機械": 43,
+      "海運": 32,
+      "鉄鋼": 24,
+      "電機": 20,
+      "輸送機器": 18,
+      "小売": 13,
+      "保険": 10,
+      "食品": 7,
+      "ガス": 6,
+      "化学": 5,
+      "情報通信": 4
+    },
+    "cash_idle_cause": {
+      "q_idle_days": 1966,
+      "q1_idle_when_winner_pct": 25.0,
+      "q2_idle_days_with_winner_pct": 21.3,
+      "q3_deployable_idle_cash_avg_pct": 25.8
+    },
+    "opportunity_loss_reference": "Study53(2026-06-28): 候補ゼロ日66.4%・機会損失¥19k/年(参照値・本Studyでの再計測ではない)"
+  }
+}
