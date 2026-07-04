@@ -1,0 +1,1353 @@
+{
+  "date": "2026-07-04",
+  "n_multi_candidate_days": 192,
+  "avg_max_sector_concentration_pct": 63.8,
+  "avg_momentum_same_direction_pct": 91.0,
+  "daily_records": [
+    {
+      "date": "2018-10-12",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2019-04-17",
+      "n_candidates": 3,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2019-07-01",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2019-07-02",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2019-09-05",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2019-09-09",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2019-10-07",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 50.0
+    },
+    {
+      "date": "2019-10-15",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2019-10-24",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2019-11-08",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2019-11-19",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2019-11-26",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2019-12-12",
+      "n_candidates": 4,
+      "distinct_sectors": 3,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2020-01-06",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2020-01-16",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2020-01-23",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2020-02-19",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2020-09-23",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2020-11-26",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2020-11-30",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2020-12-03",
+      "n_candidates": 3,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 66.7,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-01-04",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-01-12",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-01-14",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-01-29",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-02-22",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-03-04",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-03-11",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-03-12",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-04-02",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-04-21",
+      "n_candidates": 5,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 80.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-05-14",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 50.0
+    },
+    {
+      "date": "2021-05-24",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 50.0
+    },
+    {
+      "date": "2021-06-01",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-06-08",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-06-15",
+      "n_candidates": 4,
+      "distinct_sectors": 4,
+      "max_sector_concentration_pct": 25.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-06-18",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-08-03",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-08-19",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 50.0
+    },
+    {
+      "date": "2021-09-06",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-09-07",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-09-09",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-09-10",
+      "n_candidates": 3,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 66.7,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-09-13",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-09-14",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-09-29",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-10-01",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 50.0
+    },
+    {
+      "date": "2021-11-17",
+      "n_candidates": 3,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-11-22",
+      "n_candidates": 3,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 66.7,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-12-07",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 50.0
+    },
+    {
+      "date": "2021-12-23",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2022-01-04",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2022-02-15",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2022-02-25",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2022-03-01",
+      "n_candidates": 3,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 66.7,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2022-03-25",
+      "n_candidates": 3,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 66.7,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2022-04-06",
+      "n_candidates": 3,
+      "distinct_sectors": 3,
+      "max_sector_concentration_pct": 33.3,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2022-04-07",
+      "n_candidates": 3,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 66.7
+    },
+    {
+      "date": "2022-04-08",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 50.0
+    },
+    {
+      "date": "2022-05-19",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2022-08-03",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 50.0
+    },
+    {
+      "date": "2022-08-12",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2022-09-07",
+      "n_candidates": 3,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 66.7,
+      "momentum_same_direction_pct": 66.7
+    },
+    {
+      "date": "2022-09-26",
+      "n_candidates": 3,
+      "distinct_sectors": 3,
+      "max_sector_concentration_pct": 33.3,
+      "momentum_same_direction_pct": 66.7
+    },
+    {
+      "date": "2022-10-06",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2022-11-01",
+      "n_candidates": 3,
+      "distinct_sectors": 3,
+      "max_sector_concentration_pct": 33.3,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2022-11-02",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2022-11-04",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 50.0
+    },
+    {
+      "date": "2022-11-08",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2022-11-10",
+      "n_candidates": 3,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 66.7,
+      "momentum_same_direction_pct": 66.7
+    },
+    {
+      "date": "2022-11-11",
+      "n_candidates": 4,
+      "distinct_sectors": 3,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2022-11-15",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-01-24",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-02-06",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-03-02",
+      "n_candidates": 3,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 66.7,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-03-13",
+      "n_candidates": 4,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 75.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-03-14",
+      "n_candidates": 3,
+      "distinct_sectors": 3,
+      "max_sector_concentration_pct": 33.3,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-03-15",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 50.0
+    },
+    {
+      "date": "2023-03-30",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-04-12",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-04-14",
+      "n_candidates": 3,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-04-17",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-04-18",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-04-19",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-04-25",
+      "n_candidates": 3,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 66.7,
+      "momentum_same_direction_pct": 66.7
+    },
+    {
+      "date": "2023-04-27",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-05-09",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-05-12",
+      "n_candidates": 4,
+      "distinct_sectors": 3,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 75.0
+    },
+    {
+      "date": "2023-05-18",
+      "n_candidates": 4,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 75.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-05-24",
+      "n_candidates": 3,
+      "distinct_sectors": 3,
+      "max_sector_concentration_pct": 33.3,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-05-26",
+      "n_candidates": 3,
+      "distinct_sectors": 3,
+      "max_sector_concentration_pct": 33.3,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-05-29",
+      "n_candidates": 5,
+      "distinct_sectors": 4,
+      "max_sector_concentration_pct": 40.0,
+      "momentum_same_direction_pct": 80.0
+    },
+    {
+      "date": "2023-06-06",
+      "n_candidates": 3,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 66.7,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-06-09",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-06-12",
+      "n_candidates": 5,
+      "distinct_sectors": 3,
+      "max_sector_concentration_pct": 40.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-06-13",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-06-14",
+      "n_candidates": 4,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 75.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-07-14",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-08-01",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-10-03",
+      "n_candidates": 6,
+      "distinct_sectors": 4,
+      "max_sector_concentration_pct": 33.3,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-10-04",
+      "n_candidates": 5,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 80.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-11-06",
+      "n_candidates": 3,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 66.7,
+      "momentum_same_direction_pct": 66.7
+    },
+    {
+      "date": "2023-11-08",
+      "n_candidates": 3,
+      "distinct_sectors": 3,
+      "max_sector_concentration_pct": 33.3,
+      "momentum_same_direction_pct": 66.7
+    },
+    {
+      "date": "2023-12-14",
+      "n_candidates": 3,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 66.7,
+      "momentum_same_direction_pct": 66.7
+    },
+    {
+      "date": "2023-12-15",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 50.0
+    },
+    {
+      "date": "2023-12-18",
+      "n_candidates": 4,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 75.0,
+      "momentum_same_direction_pct": 75.0
+    },
+    {
+      "date": "2023-12-20",
+      "n_candidates": 5,
+      "distinct_sectors": 4,
+      "max_sector_concentration_pct": 40.0,
+      "momentum_same_direction_pct": 80.0
+    },
+    {
+      "date": "2023-12-21",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-12-26",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2024-01-05",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 50.0
+    },
+    {
+      "date": "2024-01-11",
+      "n_candidates": 4,
+      "distinct_sectors": 3,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2024-01-12",
+      "n_candidates": 4,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2024-01-15",
+      "n_candidates": 4,
+      "distinct_sectors": 3,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2024-01-22",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2024-01-31",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2024-02-09",
+      "n_candidates": 3,
+      "distinct_sectors": 3,
+      "max_sector_concentration_pct": 33.3,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2024-02-13",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2024-02-15",
+      "n_candidates": 3,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 66.7,
+      "momentum_same_direction_pct": 66.7
+    },
+    {
+      "date": "2024-04-16",
+      "n_candidates": 3,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 66.7,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2024-05-10",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2024-05-16",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2024-05-21",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2024-06-05",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 50.0
+    },
+    {
+      "date": "2024-06-13",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2024-06-17",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2024-07-04",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2024-07-25",
+      "n_candidates": 5,
+      "distinct_sectors": 3,
+      "max_sector_concentration_pct": 60.0,
+      "momentum_same_direction_pct": 80.0
+    },
+    {
+      "date": "2024-09-02",
+      "n_candidates": 3,
+      "distinct_sectors": 3,
+      "max_sector_concentration_pct": 33.3,
+      "momentum_same_direction_pct": 66.7
+    },
+    {
+      "date": "2024-09-26",
+      "n_candidates": 3,
+      "distinct_sectors": 3,
+      "max_sector_concentration_pct": 33.3,
+      "momentum_same_direction_pct": 66.7
+    },
+    {
+      "date": "2024-09-27",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2024-10-07",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 50.0
+    },
+    {
+      "date": "2025-01-14",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2025-06-18",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2025-09-18",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2025-10-06",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2018-12-21",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2019-02-13",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2019-04-01",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2019-04-03",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2019-04-05",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2019-04-09",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2019-10-11",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 50.0
+    },
+    {
+      "date": "2020-04-17",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2020-06-04",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2020-06-08",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2020-09-11",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2020-09-16",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 50.0
+    },
+    {
+      "date": "2020-10-08",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2020-11-12",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2020-11-24",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-01-13",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-01-26",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-05-06",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-11-04",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-11-12",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2022-03-08",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2022-04-25",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2022-04-27",
+      "n_candidates": 4,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 75.0,
+      "momentum_same_direction_pct": 75.0
+    },
+    {
+      "date": "2023-03-29",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-09-15",
+      "n_candidates": 3,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 66.7,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-09-19",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-10-12",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 50.0
+    },
+    {
+      "date": "2023-11-15",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-11-16",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2024-01-25",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2024-02-22",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2024-03-01",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2024-07-17",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2024-10-25",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2025-04-02",
+      "n_candidates": 3,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 66.7,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2025-04-03",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 50.0
+    },
+    {
+      "date": "2025-10-02",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2025-10-31",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2020-01-14",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2025-01-08",
+      "n_candidates": 3,
+      "distinct_sectors": 3,
+      "max_sector_concentration_pct": 33.3,
+      "momentum_same_direction_pct": 66.7
+    },
+    {
+      "date": "2025-06-13",
+      "n_candidates": 3,
+      "distinct_sectors": 3,
+      "max_sector_concentration_pct": 33.3,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2025-07-01",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 50.0
+    },
+    {
+      "date": "2018-10-11",
+      "n_candidates": 3,
+      "distinct_sectors": 3,
+      "max_sector_concentration_pct": 33.3,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2019-09-02",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-04-27",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-11-08",
+      "n_candidates": 3,
+      "distinct_sectors": 3,
+      "max_sector_concentration_pct": 33.3,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2021-11-29",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2022-03-04",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2022-07-06",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 50.0
+    },
+    {
+      "date": "2023-03-20",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-05-22",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2023-10-23",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 50.0
+    },
+    {
+      "date": "2024-01-04",
+      "n_candidates": 2,
+      "distinct_sectors": 1,
+      "max_sector_concentration_pct": 100.0,
+      "momentum_same_direction_pct": 100.0
+    },
+    {
+      "date": "2024-04-30",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 50.0
+    },
+    {
+      "date": "2025-05-28",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 50.0
+    },
+    {
+      "date": "2025-10-17",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 50.0
+    },
+    {
+      "date": "2025-12-11",
+      "n_candidates": 2,
+      "distinct_sectors": 2,
+      "max_sector_concentration_pct": 50.0,
+      "momentum_same_direction_pct": 100.0
+    }
+  ],
+  "purpose": "「4銘柄目は本当に独立リスクだったのか」をStudy81で検証するための同日候補集中度データ。新規ロジックなし・観測のみ。"
+}

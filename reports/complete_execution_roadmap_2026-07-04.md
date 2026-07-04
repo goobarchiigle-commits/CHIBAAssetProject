@@ -477,6 +477,16 @@ Study74を失敗報告で終わらせず、以下3点を追加実施（詳細は
 
 詳細→`reports/study74b_rca.md` / `backtests/cap_miss_pairs.json` / `backtests/opportunity_cost.json` / `backtests/hidden_factor_analysis.json`
 
+## L1C: Study80A — Observation Infrastructure & CAP_MISS Root Cause Foundation【完了・2026-07-04・新規BT1回のみ・Parity PASS】
+
+**目的**: Study74B-RCAが未解決に終わった原因（見送り候補の個別レコード未永続化）を恒久的に解消する観測基盤の構築。改善研究ではない。
+
+- **Parity**: PASS（CAGR=11.22%/Trades=309/Sharpe=0.564/MaxDD=-18.22%/Calmar=0.616、全て変更前と完全一致）。詳細→`reports/parity_report.md`。
+- **エンジン変更**（観測専用）: 候補ログ4種に日次コンテキスト(cash_before_entry/used_slots/max_slots/selected_symbols/selected_scores/position_weights/momentum_63d_pct/sector/market_regime/skip_reason)を追加、新規`_selected_cands`リスト追加。制御フロー変更ゼロ。
+- **成果物**（Study81が追加BTなしで再利用可能）: `trade_dataset_v2.json` / `missed_candidates_full.json`(見送り607件・個別記録) / `forward_return_dataset.json` / `opportunity_cost_dataset.json` / `correlation_dataset.json` / `study81_analysis_template.py`(統計解析7関数実装済み)。詳細スキーマ→`reports/observation_schema.md`。
+- **⚠ 副産物（Study74B-RCA未解決事項への統計的裏付け）**: 同日に実際に競合していた3候補群の分散縮小率=**24.8%**（日をまたぐ無作為抽出の67.3%＝理論的独立水準と比べ大幅に低い）— 「見かけの分散が実質的な相関の高い集中になっている」という仮説を初めて定量的に裏付け。セクター集中度も偶然を有意に上回る(p=0.0)。rank0見送り率63.6%は継続。詳細→`reports/study80a_observation_infrastructure.md`。
+- **申し送り**: 上記知見はStudy81での正式検証・報告対象（本Studyは基盤構築が主目的のため速報扱い）。
+
 ## L2: Study75 — Survivorship-free ルールベースユニバース（J-Quants）
 
 - **正典定義**: 成功=バイアス実測≤-1.5pp ∧ 規則ユニバースBaseline CAGR≥9%。失敗=バイアス>-3pp（→全歴史判定の再審査。これ自体が重要情報）。

@@ -1,6 +1,30 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-04（Study74B-RCA完了・CAP_MISS矛盾は部分解明・因果証明は未解決）
+# Single Source of Truth / 最終更新: 2026-07-04（Study80A完了・観測基盤構築・CAP_MISS矛盾に統計的裏付け獲得）
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
+
+---
+
+## ★★ 2026-07-04 Study80A: Observation Infrastructure & CAP_MISS Root Cause Foundation — **COMPLETE（新規BT1回のみ・Parity PASS）**
+
+**目的**: Study74B-RCAで未解決だった原因（見送り候補の個別レコード未永続化）を恒久的に解消する観測基盤の構築。改善研究ではない。
+**レポート**: `reports/study80a_observation_infrastructure.md` / `reports/observation_schema.md` / `reports/parity_report.md`
+**Parity**: **PASS**（CAGR=11.22%/Trades=309/Sharpe=0.564/MaxDD=-18.22%/Calmar=0.616、全て変更前と完全一致）
+
+### エンジン変更（観測専用・composite_alpha_bt.py）
+BUYトレード記録・候補ログ4種（`_missed_cands`/`_skip_detail`/`_rejected_by_lot_detail`/`_admitted_by_ratio_detail`）に日次コンテキスト（cash_before_entry/used_slots/max_slots/selected_symbols/selected_scores/position_weights/candidate_count_today/momentum_63d_pct/sector/market_regime/skip_reason）を追加。新規`_selected_cands`リスト追加（SELECTED候補の同一スキーマ記録）。全て既存dict literalへのキー追加または新規1リスト・1追加箇所のみ、制御フロー変更ゼロ。
+
+### 成果物（Study81以降が追加BTなしで再利用可能）
+`trade_dataset_v2.json`（採用309件+v2拡張）/ `missed_candidates_full.json`（見送り607件・個別レコード）/ `forward_return_dataset.json`（forward_5/10/20/40/60・MFE・MAE・最大DD付与済み）/ `opportunity_cost_dataset.json`（Sector/Regime/Rank/skip_reason別）/ `correlation_dataset.json`（同日候補集中度）/ `study81_analysis_template.py`（Mann-Whitney U・KS検定・Permutation Test・Bootstrap CI実装済み）。
+
+### ⚠ 副産物: Study74B-RCA未解決事項への統計的裏付け（本Studyの主目的ではないが重要）
+1. **RSR差**: 見送り理由を区別すると（607件全体）採用(中央値81.0) vs 見送り(中央値83.3)でp=0.0355（有意）。CAP_MISS単独では品質差なし（Study74B通り）だが全体では有意差あり。
+2. **セクター集中度**: 実測63.8%は母集団分布ベースのランダム配分(57.26%)を有意に上回る（p=0.0、permutation test）。
+3. **【最重要】同日群 vs 日をまたぐ群の分散縮小率**: 日をまたぐ無作為3件抽出=67.3%縮小（理論値≈66.7%と整合＝真の独立）に対し、**同日に実際に競合していた3候補群=24.8%縮小のみ**。→ **「見かけの分散が実質的な相関の高い集中になっている」というStudy74B-RCA仮説を初めて定量的に裏付け**。max_positions緩和がCAGRを改善しない一因である可能性が高い。
+4. rank0見送り率（607件ベース）=63.6%（95%CI[60.5%,66.9%]）— 最良機会喪失説を継続的に支持。
+
+**次のアクション**: 上記4点はStudy81での正式検証・報告に申し送る（本Studyは基盤構築が主目的のため速報扱い）。
+
+---
 
 ---
 

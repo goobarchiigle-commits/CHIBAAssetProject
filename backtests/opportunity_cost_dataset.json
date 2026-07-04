@@ -1,0 +1,143 @@
+{
+  "date": "2026-07-04",
+  "adopted_baseline": {
+    "n": 309,
+    "mean_return_pct": 2.05,
+    "profit_factor": 2.135,
+    "expectancy_yen": 14536.2,
+    "win_rate_pct": 54.4
+  },
+  "missed_candidates_forward20_overall": {
+    "n": 607,
+    "mean_forward_20_pct": 2.94
+  },
+  "opportunity_cost_by_sector": {
+    "銀行": {
+      "n": 72,
+      "mean_forward_20_pct": 2.0,
+      "median_forward_20_pct": 2.04
+    },
+    "保険": {
+      "n": 12,
+      "mean_forward_20_pct": 4.01,
+      "median_forward_20_pct": 3.63
+    },
+    "商社": {
+      "n": 78,
+      "mean_forward_20_pct": 4.07,
+      "median_forward_20_pct": 2.8
+    },
+    "電機精密": {
+      "n": 236,
+      "mean_forward_20_pct": 2.61,
+      "median_forward_20_pct": 2.13
+    },
+    "情報通信": {
+      "n": 4,
+      "mean_forward_20_pct": 10.62,
+      "median_forward_20_pct": 5.95
+    },
+    "鉄鋼": {
+      "n": 30,
+      "mean_forward_20_pct": 4.25,
+      "median_forward_20_pct": 4.26
+    },
+    "電機": {
+      "n": 22,
+      "mean_forward_20_pct": 5.76,
+      "median_forward_20_pct": 5.93
+    },
+    "小売": {
+      "n": 14,
+      "mean_forward_20_pct": 2.89,
+      "median_forward_20_pct": 0.24
+    },
+    "化学": {
+      "n": 6,
+      "mean_forward_20_pct": 2.95,
+      "median_forward_20_pct": 2.79
+    },
+    "海運": {
+      "n": 46,
+      "mean_forward_20_pct": 1.87,
+      "median_forward_20_pct": -1.58
+    },
+    "輸送機器": {
+      "n": 20,
+      "mean_forward_20_pct": 3.51,
+      "median_forward_20_pct": 7.03
+    },
+    "機械": {
+      "n": 52,
+      "mean_forward_20_pct": 1.39,
+      "median_forward_20_pct": 1.34
+    },
+    "ガス": {
+      "n": 6,
+      "mean_forward_20_pct": 5.68,
+      "median_forward_20_pct": 3.94
+    },
+    "食品": {
+      "n": 7,
+      "mean_forward_20_pct": 4.86,
+      "median_forward_20_pct": 4.61
+    }
+  },
+  "opportunity_cost_by_regime": {
+    "risk_off": {
+      "n": 95,
+      "mean_forward_20_pct": 2.85,
+      "median_forward_20_pct": 2.93
+    },
+    "normal": {
+      "n": 510,
+      "mean_forward_20_pct": 2.95,
+      "median_forward_20_pct": 2.42
+    }
+  },
+  "opportunity_cost_by_rank": {
+    "rank0": {
+      "n": 384,
+      "mean_forward_20_pct": 3.41,
+      "median_forward_20_pct": 2.66
+    },
+    "rank1-2": {
+      "n": 194,
+      "mean_forward_20_pct": 2.01,
+      "median_forward_20_pct": 2.08
+    },
+    "rank3+": {
+      "n": 27,
+      "mean_forward_20_pct": 2.95,
+      "median_forward_20_pct": 1.82
+    }
+  },
+  "opportunity_cost_by_skip_reason": {
+    "CAP_MISS": {
+      "n": 448,
+      "mean_forward_20_pct": 3.14,
+      "median_forward_20_pct": 2.65
+    },
+    "SECTOR_CAP": {
+      "n": 75,
+      "mean_forward_20_pct": -0.97,
+      "median_forward_20_pct": -1.31
+    },
+    "CLUSTER_CAP": {
+      "n": 65,
+      "mean_forward_20_pct": 4.43,
+      "median_forward_20_pct": 3.71
+    },
+    "GROSS_EXPOSURE": {
+      "n": 2,
+      "mean_forward_20_pct": 7.15,
+      "median_forward_20_pct": 7.15
+    },
+    "LOT_REJECT": {
+      "n": 15,
+      "mean_forward_20_pct": 9.4,
+      "median_forward_20_pct": 9.75
+    }
+  },
+  "note": "forward_20(20営業日後リターン)を基準指標として使用。adopted側のreturn_pctとの直接比較は保有期間が異なるため単純差分ではなくmean/median水準の並列比較にとどめる。"
+}

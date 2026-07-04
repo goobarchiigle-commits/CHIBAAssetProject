@@ -879,6 +879,9 @@ def run_scenario(
     _admitted_by_ratio_count  = 0            # ratio救済で1ロット強制入場した件数
     _admitted_by_ratio_detail: list[dict] = []  # 詳細（後処理でfwd_return計算用）
 
+    # ── Study80A Observation Infrastructure: 採用候補ログ（観測専用）────────
+    _selected_cands: list[dict] = []  # SELECTEDされた候補の詳細（見送り側との比較用）
+
     # ── Study45 Q1-Q3 Attribution 計測変数 ───────────────────────────────
     _q_days_total        = 0               # ループした全日数
     _q_idle_days         = 0               # cash > 0 の日数
@@ -1362,6 +1365,20 @@ def run_scenario(
                 if _gross_cap < _gross_cap_normal:
                     _gross_cap_active_days += 1
 
+            # ── Study80A Observation Infrastructure: 日次コンテキストスナップショット
+            #    （観測専用・読み取りのみ・制御フロー影響なし 2026-07-04）──────────
+            _obs_selected_syms = [p.symbol for p in positions.values()]
+            _obs_selected_scores = {p.symbol: round(float(p.alpha_score), 4) for p in positions.values()}
+            _obs_position_weights = {
+                p.symbol: round(p.qty * float(close_mat[i, sym_to_idx[p.symbol]]) / max(1.0, capital), 4)
+                for p in positions.values() if p.symbol in sym_to_idx
+            }
+            _obs_cash_before = round(float(cash), 1)
+            _obs_used_slots = len(positions)
+            _obs_max_slots = _eff_max_pos
+            _obs_regime = "risk_off" if _is_bear else "normal"
+            _obs_candidate_count = len(buy_candidates)
+
             for _rank_idx, (rank_score, a_val, rsr_val, sym) in enumerate(buy_candidates):
                 # Study53: per-candidate atr_pct (close-based, current day)
                 _c53_sidx = sym_to_idx.get(sym, -1)
@@ -1371,6 +1388,22 @@ def run_scenario(
                     _c53_atr_pct = round(_c53_a / _c53_c * 100, 2) if _c53_c > 0 and not np.isnan(_c53_a) else 0.0
                 else:
                     _c53_atr_pct = 0.0
+
+                # ── Study80A: momentum(63日リターン)・sector（観測専用） ──────
+                _c53_mom63 = None
+                if _c53_sidx >= 0 and i >= 63:
+                    _c53_c0 = float(close_mat[i, _c53_sidx])
+                    _c53_c63 = float(close_mat[i - 63, _c53_sidx])
+                    if _c53_c63 > 0 and not np.isnan(_c53_c0) and not np.isnan(_c53_c63):
+                        _c53_mom63 = round((_c53_c0 / _c53_c63 - 1) * 100, 2)
+                _c53_sector = trade_syms.get(sym, "不明")
+                _obs_common_fields = {
+                    "momentum_63d_pct": _c53_mom63, "sector": _c53_sector, "market_regime": _obs_regime,
+                    "cash_before_entry": _obs_cash_before, "used_slots": _obs_used_slots,
+                    "max_slots": _obs_max_slots, "selected_symbols": _obs_selected_syms,
+                    "selected_scores": _obs_selected_scores, "position_weights": _obs_position_weights,
+                    "candidate_count_today": _obs_candidate_count,
+                }
 
                 open_slots = _eff_max_pos - len(positions)
                 if open_slots <= 0:
@@ -1384,6 +1417,8 @@ def run_scenario(
                             "alpha": round(float(a_val), 4),
                             "atr_pct": _c53_atr_pct,
                             "rank": _rank_idx,
+                            "skip_reason": "CAP_MISS",
+                            **_obs_common_fields,
                         })
                     continue  # breakからcontinueへ: 全見逃し候補をカウント
 
@@ -1415,7 +1450,8 @@ def run_scenario(
                                 "composite_score": round(float(rank_score), 4),
                                 "alpha": round(float(a_val), 4),
                                 "atr_pct": _c53_atr_pct, "rank": _rank_idx,
-                                "reason": "SECTOR_CAP",
+                                "reason": "SECTOR_CAP", "skip_reason": "SECTOR_CAP",
+                                **_obs_common_fields,
                             })
                         continue  # セクター上限超過: このセクターは追加 BUY 禁止
 
@@ -1443,7 +1479,8 @@ def run_scenario(
                                     "composite_score": round(float(rank_score), 4),
                                     "alpha": round(float(a_val), 4),
                                     "atr_pct": _c53_atr_pct, "rank": _rank_idx,
-                                    "reason": "CLUSTER_CAP",
+                                    "reason": "CLUSTER_CAP", "skip_reason": "CLUSTER_CAP",
+                                    **_obs_common_fields,
                                 })
                             continue  # クラスター上限超過: この銘柄は追加 BUY 禁止
 
@@ -1464,7 +1501,8 @@ def run_scenario(
                                 "composite_score": round(float(rank_score), 4),
                                 "alpha": round(float(a_val), 4),
                                 "atr_pct": _c53_atr_pct, "rank": _rank_idx,
-                                "reason": "GROSS_EXPOSURE",
+                                "reason": "GROSS_EXPOSURE", "skip_reason": "GROSS_EXPOSURE",
+                                **_obs_common_fields,
                             })
                         continue  # gross exposure 上限超過: 新規 BUY 禁止
 
@@ -1554,6 +1592,8 @@ def run_scenario(
                                         "symbol": sym, "lot_cost": round(_lot_cost44),
                                         "buy_px": round(buy_px, 1), "rsr": round(float(rsr_val), 1),
                                         "lot_cost_ratio": round(_lot_cost44 / max(1.0, capital), 4),
+                                        "skip_reason": "ADMITTED_BY_RATIO",
+                                        **_obs_common_fields,
                                     })
                         if not _admitted_by_ratio:
                             # Study42: lot切り捨てによる約定不可を計測
@@ -1567,6 +1607,8 @@ def run_scenario(
                                     "alpha": round(float(a_val), 4),
                                     "atr_pct": _c53_atr_pct,
                                     "rank": _rank_idx,
+                                    "skip_reason": "LOT_REJECT",
+                                    **_obs_common_fields,
                                 })
                             continue
 
@@ -1599,6 +1641,17 @@ def run_scenario(
                     "entry_rsr": round(float(rsr_val), 1),
                     "entry_type": "mean_rev" if SECTOR_STRATEGY.get(_entry_sector, "fujiko") == "mean_rev" else "fujiko",
                 })
+                # ── Study80A Observation Infrastructure: SELECTED候補ログ（観測専用）─
+                if len(_selected_cands) < 5000:
+                    _selected_cands.append({
+                        "date": str(date.date()) if hasattr(date, "date") else str(date),
+                        "symbol": sym, "rsr": round(float(rsr_val), 1),
+                        "composite_score": round(float(rank_score), 4),
+                        "alpha": round(float(a_val), 4),
+                        "atr_pct": _c53_atr_pct, "rank": _rank_idx,
+                        "skip_reason": "SELECTED",
+                        **_obs_common_fields,
+                    })
 
         # ── Study45: Q1-Q3 Idle Cash Attribution ─────────────────────────────
         _q_days_total += 1
@@ -1855,6 +1908,8 @@ def run_scenario(
         "_admitted_by_ratio_detail": _admitted_by_ratio_detail,
         # ── Study53 Opportunity Loss ──────────────────────────────────────────
         "_skip_detail": _skip_detail,
+        # ── Study80A Observation Infrastructure（観測専用・SELECTED候補ログ）───
+        "_selected_cands": _selected_cands,
         # ── Study45 Q1-Q3 Attribution ─────────────────────────────────────
         "q_days_total":         _q_days_total,
         "q_idle_days":          _q_idle_days,
