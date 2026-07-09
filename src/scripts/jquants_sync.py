@@ -6,8 +6,11 @@ J-Quants データ同期 CLI（Study75 データ取得基盤）。
   # 小規模ユニバース限定・初回フル取得（後方互換モード）
   python -m src.scripts.jquants_sync --mode full --universe src/configs/rsr_universe_42.csv --start 2010-01-01 --end 2025-12-31
 
-  # 全上場銘柄（上場廃止含む）を対象にした差分更新
+  # 全上場銘柄（上場廃止含む）を対象にした差分更新（旧・銘柄別エンジン）
   python -m src.scripts.jquants_sync --full-market --end 2026-07-09
+
+  # Study75 Full Download（Strategy C・日次イテレーション・正本。中断しても再実行で自動再開）
+  python -m src.scripts.jquants_sync --study75-download --end 2026-07-09
 
   # Universeイベントログの全営業日フル復元（初回のみ・重い処理）
   python -m src.scripts.jquants_sync --rebuild-universe --start 2016-01-01 --end 2026-07-09
@@ -44,7 +47,10 @@ sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 import pandas as pd
 
-from src.jquants import cache, compaction, preflight as preflight_module, universe, verify as verify_module
+from src.jquants import (
+    cache, catalog, compaction, manifest, preflight as preflight_module,
+    study75_downloader, universe, verify as verify_module,
+)
 from src.jquants.config import load_config
 from src.jquants.downloader import JQuantsDownloader
 from src.jquants.exceptions import JQuantsError
@@ -100,7 +106,15 @@ def main() -> int:
     )
     parser.add_argument("--end", help="取得終了日")
     parser.add_argument("--mode", choices=["full", "incremental"], default="incremental")
-    parser.add_argument("--full-market", action="store_true", help="全上場銘柄（上場廃止含む）を対象に同期")
+    parser.add_argument("--full-market", action="store_true", help="[旧・銘柄別エンジン] 全上場銘柄（上場廃止含む）を対象に同期")
+    parser.add_argument(
+        "--study75-download", action="store_true",
+        help="[Strategy C・正本] 日次イテレーションでFull Download。中断しても再実行で自動再開",
+    )
+    parser.add_argument(
+        "--catalog", action="store_true",
+        help="metadata/catalog.json 生成 + manifest.json へのランレコード追記（再取得なし・API通信なし）",
+    )
     parser.add_argument(
         "--rebuild-universe", action="store_true",
         help="[Option B・正本] Universeイベントログをcache/daily/の検証済みステージングから完全オフラインで復元（API通信ゼロ）",
@@ -211,6 +225,28 @@ def main() -> int:
         print(f"[ENRICH_UNIVERSE] 補完済み銘柄数: {enriched} / 全体: {len(ref)}")
         return 0
 
+    if args.catalog:
+        from datetime import datetime, timezone
+        catalog_snapshot = catalog.build_catalog()
+        catalog.save_catalog()
+        record = manifest.record_run(
+            download_started=datetime.now(timezone.utc),
+            download_finished=datetime.now(timezone.utc),
+            first_date=catalog_snapshot.get("coverage_start"),
+            last_date=catalog_snapshot.get("coverage_end"),
+            symbol_count=catalog_snapshot.get("total_symbols", 0),
+            record_count=catalog_snapshot.get("total_rows", 0),
+        )
+        print("=" * 60)
+        print(f"  coverage_start   : {catalog_snapshot.get('coverage_start')}")
+        print(f"  coverage_end     : {catalog_snapshot.get('coverage_end')}")
+        print(f"  total_rows       : {catalog_snapshot.get('total_rows')}")
+        print(f"  total_symbols    : {catalog_snapshot.get('total_symbols')}")
+        print(f"  dataset_hash     : {catalog_snapshot.get('dataset_hash', '')[:16]}...")
+        print(f"  git_commit       : {record.get('git_commit', '')[:12]}")
+        print("=" * 60)
+        return 0
+
     if not args.end:
         logger.error(
             "--end は必須です"
@@ -220,6 +256,26 @@ def main() -> int:
 
     if args.start is None:
         args.start = estimate_subscription_floor()
+
+    if args.study75_download:
+        provider = JQuantsProvider()
+        try:
+            result = study75_downloader.download_full_market_by_day(
+                provider, args.start, args.end, force_full=(args.mode == "full"),
+            )
+        except JQuantsError as e:
+            logger.error("Study75 Full Download失敗: %s", e)
+            return 1
+        print("=" * 60)
+        print(f"  処理日数         : {result['days_processed']}")
+        print(f"  スキップ済み日数 : {result['days_skipped']}")
+        print(f"  検証エラー日数   : {result['days_failed_validation']}")
+        print(f"  総レコード数     : {result['total_rows']}")
+        print(f"  再構築した年     : {result['years_touched']}")
+        if result["validation_issues"]:
+            print(f"  検証issues件数   : {len(result['validation_issues'])}")
+        print("=" * 60)
+        return 0 if result["days_failed_validation"] == 0 else 1
 
     if args.rebuild_universe_live:
         # Option B・ライブAPI版: daily barsを日毎に取得しながらUniverseを導出する
