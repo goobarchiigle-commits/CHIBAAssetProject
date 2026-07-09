@@ -1,6 +1,79 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-04（★Core Research Closed宣言・Long Only Core Architecture研究恒久終了★）
+# Single Source of Truth / 最終更新: 2026-07-10（★Universe復元方式をOption B（daily bars由来）へ切替・正本化。ASK_FIRST③未着手★）
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
+
+---
+
+## ★★★★★★ 2026-07-10 Study75: Universe Event Source を Option B へ切替（正本化・実行なし）
+
+**決定**: Universe ADD/REMOVEイベントの導出元を listed/master日次ポーリング（Option A）から
+daily bars日次スナップショット由来（Option B）へ変更。詳細比較:
+`reports/study75_universe_event_source_comparison.md`。
+
+**結論**: Bがリクエスト数（Strategy Cと統合時ゼロコスト）・再現性（ローカル検証済みステージングのみで
+完全オフライン・決定論的に再構築可能）で優位。Aの完全性優位（取引停止日でも上場ステータス捕捉）は
+Study75の実務上の影響が限定的と判断し許容。listed/masterは銘柄単位・1回限りのメタデータ補完専用に縮小
+（`enrich_universe_reference_with_listed_info()`）。Aは削除せずレガシーとして残置（比較用）。
+
+**実装**: `src/jquants/universe.py` に `derive_codes_from_daily_bars()` /
+`rebuild_universe_events_from_daily_bars()`（ライブ）/ `rebuild_universe_events_from_staged_bars()`
+（完全オフライン・正本）/ `enrich_universe_reference_with_listed_info()` 追加。CLI:
+`--rebuild-universe`（B・オフライン正本）/ `--rebuild-universe-live` / `--rebuild-universe-legacy`（A）/
+`--enrich-universe`。加えて同日、契約データ提供開始日の動的検出（`provider.estimate_subscription_floor()`
+/ `detect_subscription_floor()`）・ステージング検証（rows>0/必須列/低行数警告）・ディスク空き容量
+事前チェック（最低10GB）・`--preflight`（見積もり専用・API通信なし）・throttle既定値0.05秒化を実装済み。
+
+`pytest tests/jquants/` **95/95 pass**（ネットワーク・認証情報なし）。`data/jquants/` に実データは
+まだ1件もない（Full Download・Universe復元とも未実行）。
+
+**副次的な運用含意**: Bの採用によりFull Download（Strategy C）を先に実行し、その副産物として
+Universeイベントをオフライン導出する方が効率的（従来の「Universe復元→Full Download」の順序は非推奨）。
+
+**次アクション**: ASK_FIRST③（Universe復元本実行）はユーザー承認待ちのまま未着手。
+
+---
+
+## ★★★★★★ 2026-07-09 Study75 前提: J-Quants Data Lake Bootstrap 実装完了（コード・テストのみ）
+
+**契約状況更新**: J-Quants Standardプラン契約完了（前セクションの「契約待ち」は解消）。認証はrefreshToken
+方式（`JQUANTS_REFRESH_TOKEN`・password保存不要）。
+
+**実装内容**: 全上場銘柄（上場廃止含む）・2016年〜現在を対象とした年パーティションData Lake基盤を
+`src/jquants/` に構築（universe.py=イベントソーシングUniverse復元／cache.py=ステージング／
+normalize.py・compaction.py=raw/processed責務分離・年パーティション再構築／study75_adapter.py=
+Study76互換層／catalog.py・manifest.py=メタデータ）。`pytest tests/jquants/` 38/38 pass（ネットワーク・
+認証情報なし）。詳細: `docs/implementation/jquants_execution_infrastructure.md` /
+`reports/complete_execution_roadmap_2026-07-04.md`§実行ログ追記(2026-07-09)。
+
+**未実施（ASK_FIRSTゲート待ち）**: .env反映 → API疎通smoke test → Universeイベントログ フル復元 →
+Full Download本番実行。実データはまだ1件も取得していない（`data/jquants/` は空）。
+
+**Study75本体（Survivorship-free Universe選定ロジック）は本タスクのスコープ外・未着手のまま**。
+
+---
+
+## ★★★★★★ 2026-07-04 Universe統制ポリシー確定（ユーザー決裁・恒久ルール・Study76/77/85全てに適用）
+
+**決裁内容**: Study75完了時点で、Survivorship-free Universeを新しい基準Universeと定義する。以降のStudy76・Study77（および将来のStudy85統合評価等、Universe横断比較を伴う全研究）で使用する**全比較対象（D_ATR_EQを含む）は必ず同一（Study75）Universe上でfresh run再測定した値のみを使用する**。旧Universe（RSR42）値との比較は禁止。Universe差とArchitecture差が交絡しないよう統制する。
+
+**適用手順**: Study75終了後、本ポリシーの適用をASK_FIRSTで確認してからStudy76へ進む（確認は再検討ではなく実行着手ゲート）。
+
+**影響**: `study76_execution_plan.md`§2.4/§5/§6・`study76_dependency_matrix.md`§2/§4/§5・`study76_checklist.md`Phase1/Phase3を本決裁に合わせ訂正済み（2026-07-04）。旧RSR42ベースのD_ATR_EQ公式値（M1適用後: IS 12.22%/OOS 11.42%/FULL 11.22%/Calmar IS 0.671/WF avg 17.99%・4/5/2022 -2.95%）は「旧Universe参考値」として凍結保持するが、Study76以降の成功/失敗判定には使用しない。
+
+---
+
+## ★★★★★ 2026-07-04 Study75 保留 + Study76 実行計画準備完了（新規BT/コード変更ゼロ）
+
+**Study75状況**: J-Quants APIプラン契約が前提（正典ASK_FIRST指定）。料金プラン確認済み（Free ¥0/Light ¥1,650/Standard ¥3,300/Premium ¥16,500・税込月額）だが上場廃止銘柄データの対応可否が公開情報からは未確定、かつ契約行為自体はユーザー本人のみ実行可能。ユーザーへ進め方を確認中（保留・未着手）。`data/jquants/`未構築・`src/.env`にJQUANTS認証情報未設定。
+
+**Study76対応**: Study75完了を待つ間にStudy76（Clenow純正ベンチマークWF）の実行計画のみ先行整備（新規BT・コード変更ゼロ・既存Research Assetsのみ使用）。
+成果物: `reports/study76_execution_plan.md`（目的明文化・Production差分5項目〔レジーム5機構/Exit複数系統/Entry複合スコア/Addon・Sizing機構/Capital Scaling層〕・固定10条件・評価指標・成功基準ΔCAGR≥-2pp/失敗基準<-4pp・Research Assets棚卸し）/ `reports/study76_dependency_matrix.md`（Study75→76→77依存図・変数分離確認・ブロッキング状態サマリ）/ `reports/study76_checklist.md`（Phase0-5実行チェックリスト）。
+
+**未解決の仕様確認事項（Study75完了後に最優先ASK_FIRST）**: 正典「Study75規則ユニバース上で純正構成 vs D_ATR_EQ」が、比較対象のD_ATR_EQ自体もStudy75ユニバースで再測定する前提を含むか未確定。現行RSR42ベースの公式値をそのまま流用すると、ユニバース差とアーキテクチャ差が交絡し「複雑性の対価」測定が汚染されるリスクがあるため、Study75完了直後に確認必須。
+
+**Study77への影響**: Study77は「Study76勝者構成に対して」実施が正典定義のため、Study76が失敗（現行維持確定）で終わればStudy77は起案自体不成立。対応（対象差し替え/研究終了）はStudy76結果確定後にユーザー決裁。
+
+**次アクション**: (1) J-Quants契約方針についてユーザー回答待ち（Study75再開条件）。(2) Study75完了後、上記仕様確認事項をASK_FIRSTで提示してからStudy76新規スクリプト作成へ。
 
 ---
 

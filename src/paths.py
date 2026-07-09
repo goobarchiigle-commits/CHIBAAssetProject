@@ -598,6 +598,40 @@ KABUS_PASSWORD: str = _env_str("KABU_API_PASSWORD", "")
 _LAST_ORDER_FILE: Path = RUNTIME_DIR / "_last_order_ts.json"
 
 
+# ── J-Quants execution infrastructure (Study75 prerequisite) ────────────────
+JQUANTS_DATA_DIR:      Path = DATASET_DIR / "jquants"
+JQUANTS_RAW_DIR:       Path = JQUANTS_DATA_DIR / "raw"
+JQUANTS_CACHE_DIR:     Path = JQUANTS_DATA_DIR / "cache"
+JQUANTS_STAGING_DIR:   Path = JQUANTS_CACHE_DIR / "staging"
+JQUANTS_DAILY_STAGING_DIR: Path = JQUANTS_CACHE_DIR / "daily"  # Strategy C（日次イテレーション・study75_downloader.py）
+JQUANTS_PROCESSED_DIR: Path = JQUANTS_DATA_DIR / "processed"
+JQUANTS_METADATA_DIR:  Path = JQUANTS_DATA_DIR / "metadata"
+JQUANTS_LOGS_DIR:      Path = JQUANTS_DATA_DIR / "logs"
+
+# J-Quants API v2（2026-07時点の公式クイックスタート準拠）: 認証は x-api-key ヘッダーの静的APIキー。
+# ダッシュボード [設定 » APIキー] で発行。mailaddress/password や refreshToken/idToken のフローは使わない。
+JQUANTS_API_KEY: str = _env_str("JQUANTS_API_KEY", "")
+
+
+def ensure_jquants_dirs() -> None:
+    """data/jquants/ 配下の標準ディレクトリ群を事前作成する。"""
+    for path in (
+        JQUANTS_RAW_DIR, JQUANTS_CACHE_DIR, JQUANTS_STAGING_DIR, JQUANTS_DAILY_STAGING_DIR,
+        JQUANTS_PROCESSED_DIR, JQUANTS_METADATA_DIR, JQUANTS_LOGS_DIR,
+    ):
+        path.mkdir(parents=True, exist_ok=True)
+
+
+# ── Study75/76 research pipeline ─────────────────────────────────────────────
+# Study75 完了後に生成される規則ユニバース（月次再適用・survivorship-free）ファイル。
+# スキーマ: {"monthly_universe": {"YYYY-MM-DD": ["1301.T", ...], ...}, "meta": {...}}
+#           key は各月の再適用日（第1営業日）。Study76/77 共通で使用（正典: study76_execution_plan.md §2.2）。
+# 未生成の間は STUDY75_UNIVERSE_FILE 環境変数か --universe-file 引数で明示指定する。
+STUDY75_UNIVERSE_FILE: Path = _resolve_path(
+    "STUDY75_UNIVERSE_FILE", UNIVERSE_DIR / "study75_survivorship_free.json"
+)
+
+
 def ensure_base_dirs() -> None:
     """paths.py が管理する標準ディレクトリ群を事前作成する。"""
     for path in (

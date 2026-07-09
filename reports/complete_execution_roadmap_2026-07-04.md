@@ -520,6 +520,18 @@ Study74を失敗報告で終わらせず、以下3点を追加実施（詳細は
 - **仕様**: Study75規則ユニバース上で、{週次回転・`(slope90d×R²)`ランクのみ・TOPIX>MA200のみ・回転Exit} の最簡構成 vs D_ATR_EQ。Turtleトリガー有無の2アーム。パラメータ<10個・全て事前固定。
 - **勝敗の使い方**: 勝てば現行の多層（レジーム5機構・Exit7系統・boost群）を削る根拠。負ければ複雑性は正当化されStage1 M6のDISCARD候補は現状維持。
 
+### ✅ 実行計画準備完了（2026-07-04・新規BT/コード変更ゼロ・Research Assetsのみ）
+
+Study75がJ-Quants契約待ちで着手不可のため、Study76を「Study75完了後に即実行できる状態」まで計画のみ先行整備。成果物: `reports/study76_execution_plan.md`（目的明文化・Production差分5項目・固定10条件・成功/失敗基準・Research Assets棚卸し）/ `reports/study76_dependency_matrix.md`（Study75/77依存関係・変数分離確認・ブロッキング状態）/ `reports/study76_checklist.md`（Phase0-5実行チェックリスト）。
+
+**未確定のまま残した仕様確認事項（Study75完了後に最優先でASK_FIRST）**: 正典「Study75規則ユニバース上で純正構成 vs D_ATR_EQ」の一文が、比較対象のD_ATR_EQ自体もStudy75ユニバース上で再測定する前提を含むか未確定。現行D_ATR_EQ公式値（RSR42ベース）をそのまま比較対象に流用すると、ユニバース差とアーキテクチャ差が交絡し「複雑性の対価」の測定が汚染されるリスクがある。Study75完了直後の最初のアクションとして確認必須（詳細→`study76_execution_plan.md`§5）。
+
+**Study77への影響整理**: Study77は「Study76勝者構成に対して」実施が正典定義のため、Study76失敗（現行維持確定）で終わった場合Study77は起案自体が成立しない。この場合の扱い（対象差し替え/研究終了）はStudy76結果確定後にユーザー決裁が必要（詳細→`study76_dependency_matrix.md`§3）。
+
+### 🔒 Universe統制ポリシー確定（2026-07-04・ユーザー決裁・Study76/77/85全てに恒久適用）
+
+Study75完了時点で、Survivorship-free Universeを新基準Universeと定義。以降のStudy76・Study77（将来のStudy85統合評価含む）で使用する**全比較対象（D_ATR_EQを含む）は必ずStudy75 Universe上でfresh run再測定した値のみ使用**。旧Universe（RSR42）値との比較は禁止 — Universe差とArchitecture差の交絡を排除するための恒久統制。Study75終了後、本ポリシーの適用をASK_FIRSTで確認してからStudy76へ進む（再検討ではなく実行着手ゲート）。`study76_execution_plan.md`/`study76_dependency_matrix.md`/`study76_checklist.md`は本決裁に合わせ訂正済み。旧RSR42ベースのD_ATR_EQ公式値は「旧Universe参考値」として凍結保持するのみで判定には不使用。
+
 ## L4: Study77 — Exit構造置換WF（回転 vs 災害ストップ+トレイル）
 
 - **正典定義**: 成功=A(回転+災害ストップ) or B(災害ストップ+ATRトレイルのみ) がC(現行多層)比 ΔCAGR≥+1.5pp ∧ WF5/5 ∧ tail_capture≥80%。失敗=全アームC劣位（→**Exit領域を恒久閉鎖**）。
@@ -619,6 +631,49 @@ Study77 ─黒→ Exit領域恒久閉鎖
 3. **REJECTは資産**。73 Studyの大半はREJECTだが、それが閉鎖14項という「掘ってはいけない場所の地図」を作った。REJECTされた領域を「新しいアイデア」として再提案しないこと — 表現を変えた再訪が最頻の失敗モード。
 4. **ユーザー承認は目標変更の唯一の経路**。CP1/CP2/CP4の目標改定は必ずユーザー決裁。エージェントが目標を勝手に上げ下げしない。
 5. **迷ったら0.4ゲートで機械判定**。「惜しい」「もう少しで」は全て禁止語。WF4/5は0/5と同じREJECTである。
+
+---
+
+## 実行ログ追記（2026-07-09・Sonnet実行）— L2 Study75: J-Quants Data Lake Bootstrap 実装フェーズ完了
+
+**背景**: J-Quants Standardプラン契約完了（ユーザー確認済み）。前回セッション（2026-07-04）は契約前の
+"pre-implementation"（`src/jquants/` 骨格のみ・小規模ユニバース限定設計）だった。今回はユーザーから
+「全上場銘柄（上場廃止含む）・2016年〜現在・年パーティションParquet」という本格スコープの指示を受け、
+取得オーケストレーション層と保存レイアウトを再設計・実装した（`reports/study76_execution_plan.md` 等の
+既存正典・Study76側コードは無改修）。
+
+### 発見事項（認証情報の配線ミス）
+- ルート直下 `C:\ai-trading\.env` の `JQUANTS_API_KEY` はどのコードからも読まれていなかった
+  （アプリが実際に読むのは `src/.env` のみ・`src/paths.py` の `PROJECT_ROOT` 起点）。
+- `src/.env` 側にも同キーはあったがコメントアウトされ無効だった。
+- ユーザー確認によりこの値は J-Quantsダッシュボード発行の **refreshToken**（mailaddress/password不要）と判明。
+  → `JQUANTS_REFRESH_TOKEN` を正式環境変数名として新設し、`auth.py`/`config.py` に直接注入経路を追加。
+
+### 実装完了（コード・テストのみ。ネットワーク通信は未実施）
+- `src/jquants/universe.py`（新規）: Universeのイベントソーシング復元（ADD/REMOVE・営業日粒度・
+  `JPXCalendar`再利用・チェックポイント/再開対応）。`metadata/universe_events.parquet` が正本。
+- `src/jquants/cache.py`（再設計）: 銘柄別ステージング方式（`cache/staging/{symbol}.parquet`）。
+- `src/jquants/normalize.py` + `compaction.py`（新規）: raw/processedの責務分離
+  （raw=列名リネームなし、processed=固定正規化スキーマ）。年パーティション `daily_bars_{year}.parquet` を
+  ステージングから冪等に再構築。
+- `src/jquants/study75_adapter.py`（新規）: Study76互換の `processed/{symbol}.parquet` 生成層。
+- `src/jquants/catalog.py` + `manifest.py`（新規）: `metadata/catalog.json`（現在状態集約）・
+  `metadata/manifest.json`（実行ごとの再現性レコード: git_commit・dataset_hash等）。
+- `src/jquants/provider.py`: `topix_raw()`/`topix_df()` 追加（`/indices/topix`、実エンドポイントは未検証）。
+- `src/scripts/jquants_sync.py`: `--full-market` / `--rebuild-universe` / `--materialize` / `--compact-only` 追加。
+- `docs/implementation/jquants_execution_infrastructure.md`: 新アーキテクチャに合わせ全面改訂。
+
+### テスト結果
+`pytest tests/jquants/ -v` → **38/38 pass**（認証情報・ネットワークなしで全件確認）。
+広域回帰確認: `pytest tests/` 全体で本タスク由来の regression なし（既存の13件のtest失敗は
+`git stash` で本タスクの変更を除いた状態でも再現する無関係な事前存在の問題と確認済み・対応不要）。
+
+### 未実施（ASK_FIRSTゲート待ち・次アクション）
+①`src/.env` への `JQUANTS_REFRESH_TOKEN` 反映（ユーザーがエディタで直接編集） →
+②初回API疎通smoke test（TOPIXエンドポイント名・コード桁数の実測確認） →
+③Universeイベントログのフル復元実行（約2,600営業日分） →
+④Full Download本番実行（推定4,000〜5,000銘柄）。いずれも本書§0.3/CLAUDE.md ASK_FIRSTに従い
+個別に承認を得てから実行する。
 
 ---
 
