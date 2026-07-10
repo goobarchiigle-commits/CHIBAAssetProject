@@ -385,6 +385,7 @@ def rebuild_universe_events_from_staged_bars(
     processed = 0
     stopped_at_missing_day: str | None = None
     last_flushed_date: pd.Timestamp | None = None
+    last_processed_day: pd.Timestamp | None = None
     available_set = set(d.strftime("%Y-%m-%d") for d in available_dates)
 
     for i, day in enumerate(remaining_days, start=1):
@@ -398,6 +399,7 @@ def rebuild_universe_events_from_staged_bars(
         buffer.extend(_diff_events(day, prev_codes, snapshot, {}))
         prev_codes = set(snapshot.keys())
         processed += 1
+        last_processed_day = day
 
         is_flush_point = (processed % flush_interval_days == 0) or (i == len(remaining_days))
         if is_flush_point:
@@ -410,6 +412,20 @@ def rebuild_universe_events_from_staged_bars(
                 "[JQUANTS_UNIVERSE] (option-B offline) progress=%d date=%s cumulative_codes=%d",
                 processed, day_str, len(prev_codes),
             )
+
+    # ギャップで早期break（またはその他の理由）でループを抜けた際、flush_interval_days境界に
+    # 満たない未flushの buffer が残っていれば、失わずに書き出す（さもないと最大flush_interval_days-1日分の
+    # 導出済みイベントが握りつぶされ、次回resumeで再計算が必要になる＝非効率だが実害はdedupで防げる。
+    # とはいえ正しくは毎回確実にflushすべき）。
+    if buffer:
+        append_universe_events(buffer)
+        events_written += len(buffer)
+        last_flushed_date = last_processed_day
+        _save_state({"last_processed_date": last_processed_day.strftime("%Y-%m-%d")})
+        logger.info(
+            "[JQUANTS_UNIVERSE] (option-B offline) 終端flush date=%s",
+            last_processed_day.strftime("%Y-%m-%d"),
+        )
 
     return {
         "processed_days": processed,

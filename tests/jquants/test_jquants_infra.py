@@ -1211,6 +1211,22 @@ class TestRebuildUniverseEventsFromStagedBars:
         assert result["processed_days"] == 1
         assert result["stopped_at_missing_day"] == "2024-01-05"
 
+    def test_gap_break_still_flushes_partial_buffer(self, tmp_path, monkeypatch):
+        """ギャップでの早期break時、flush_interval_days境界に満たない分の未flushイベントも
+        失わずに書き出す（実運用で発生したバグの再現テスト・2026-07-10）。"""
+        _, _, daily_dir = _patch_universe_and_daily_dirs(tmp_path, monkeypatch)
+        self._stage(daily_dir, "2024-01-04", ["1301"])
+        self._stage(daily_dir, "2024-01-08", ["1301", "1302"])
+
+        result = universe.rebuild_universe_events_from_staged_bars(
+            "2024-01-04", "2024-01-08", flush_interval_days=20,  # 1日 << 20 なので通常のflush点には届かない
+        )
+
+        assert result["events_written"] > 0  # 修正前はここが0（buffer握りつぶし）だった
+        assert result["last_processed_date"] == "2024-01-04"
+        events = universe.load_universe_events()
+        assert ("1301", "ADD") in {(row["code"], row["event_type"]) for _, row in events.iterrows()}
+
     def test_only_validated_days_are_trusted_not_just_files_on_disk(self, tmp_path, monkeypatch):
         """cache/daily/にファイルがあってもdaily_completed_dates.jsonに未記録なら信用しない
         （validate_staged_dayがerror判定した0行ファイル等が物理的に残っているケースを想定）。"""
