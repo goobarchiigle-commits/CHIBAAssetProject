@@ -677,4 +677,38 @@ Study77 ─黒→ Exit領域恒久閉鎖
 
 ---
 
+## 実行ログ追記（2026-07-10・Sonnet実行）— L2 Study75: Full Download完了 + Universe復元完了 + Universe Design記述分析完了
+
+**J-Quants API v2実態判明**: 契約後の実APIは事前ドキュメント（v1想定）と異なり、
+`x-api-key`静的キー認証・略記フィールド名（O/H/L/C等）・エンドポイント`/v2/equities/bars/daily`
+`/v2/equities/master`。ASK_FIRST②スモークテストで実測確認し互換レイヤー（`src/jquants/schema.py`）を
+構築。Download Strategy Validationにより「1営業日1リクエストで全銘柄取得（Strategy C）」が
+銘柄別リクエストより効率的（総リクエスト数少・再現性高）と判明し採用。
+
+**ASK_FIRST③④ 実施完了（2026-07-10・ユーザー承認）**:
+- Full Download（`--study75-download`）: 2016-07-11〜2026-07-09の全2,439営業日、
+  **10,084,970行・5,376銘柄**（上場廃止944件含むsurvivorship-free）取得。
+  バックグラウンド実行中に一度中断したが、チェックポイント設計により再開は1リクエストのみで完了。
+- verify: 2,439日全件 status=ok（欠落・破損・行数不一致・ハッシュ不一致ゼロ）。
+- catalog.json / manifest.json 生成。dataset_hash記録。
+- Universe復元（`--rebuild-universe`・Option B・完全オフライン・API通信ゼロ）:
+  6,326イベント（ADD 5,382 / REMOVE 944）、現在上場中4,438銘柄。
+
+**実行中に発見・修正した実バグ**: オフラインUniverse復元のギャップ時break処理で末尾未flushバッファが
+破棄される不具合を発見・修正（`git 4649743`・回帰テスト追加）。データ破損はなし
+（dedupにより自己修復可能な設計だった）。
+
+**Study75 Universe Design（記述分析のみ・バックテストなし）**: `reports/study75_universe_design.md`。
+現行ユニバース統計（銘柄数/年・上場廃止数/年・流動性分布・ロットコスト分布）+
+候補フィルター4案（A全銘柄/B ADV20/C ADV20+ロット/D TOPIX500近似）を評価。
+全て point-in-time 実装であれば生存者バイアス・lookahead biasの新規混入なしと確認。
+現行資本¥3MではC、将来¥20-30M想定ではDがキャパシティ面で有利という所見（決定はユーザー判断）。
+検証物: `backtests/study75_universe_design_2026-07-10.json`。
+
+**未実施**: `enrich_universe_reference_with_listed_info()`（TOPIX500真値化用メタデータ補完・
+API通信約5,376件・別途ASK_FIRST）。Study75本体（月次規則ユニバース生成ロジック）。
+Study75データセット上でのWFバックテスト（Study76が既に待機中・Study75完了後着手）。
+
+---
+
 *作成: CRO/Chief Architect, 2026-07-04。新規バックテスト実行なし。本書の全タスクは実行前にASK_FIRST該当有無を0.3で確認すること。正典（final_research_roadmap_2026-07-04.md）と矛盾する場合は正典が優先。*
