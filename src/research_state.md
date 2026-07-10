@@ -1,6 +1,40 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-10（★Universe復元方式をOption B（daily bars由来）へ切替・正本化。ASK_FIRST③未着手★）
+# Single Source of Truth / 最終更新: 2026-07-10（★J-Quants Full Download完了・Universe復元完了・Study75データ基盤稼働開始★）
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
+
+---
+
+## ★★★★★★★ 2026-07-10 Study75: Full Download完了 + Universe復元完了（ASK_FIRST③④実施済み）
+
+**ASK_FIRST④（Full Download）実施**: `--study75-download`（Strategy C・日次イテレーション）。
+2016-07-10（実測契約データ提供開始日・`detect_subscription_floor()`確認済み）〜2026-07-09（当日はまだ
+未公表のため対象外）の全2,439営業日を取得。バックグラウンド実行中に一度中断（`killed`）したが、
+チェックポイント（`daily_completed_dates.json`）により2,439/2,440日が既完了状態で残っており、
+再実行は1日（当日分・検証エラーで想定通りスキップ）のみで完了。
+
+**実行中に発見・修正した実バグ**: オフラインUniverse復元のギャップ時break処理で、
+`flush_interval_days`境界に満たない末尾バッファが破棄される不具合を発見（`git 4649743`で修正・
+回帰テスト追加）。データ破損はなし（dedupにより自己修復可能な設計だった）が、正しく修正した。
+
+**成果物**:
+| 指標 | 値 |
+|---|---|
+| 対象期間 | 2016-07-11 〜 2026-07-09 |
+| 総レコード数 | 10,084,970 |
+| 対象銘柄数（上場廃止含む・survivorship-free） | 5,376 |
+| Universeイベント | 6,326件（ADD 5,382 / REMOVE 944） |
+| 現在上場中 | 4,438銘柄 |
+| verify結果 | 2,439日 全件 status=ok（欠落・破損・行数不一致・ハッシュ不一致 全てゼロ） |
+| dataset_hash | `c736b5027a52bc09...`（`metadata/manifest.json`に記録） |
+
+**ASK_FIRST③（Universe復元）実施**: `--rebuild-universe`（Option B・オフライン・API通信ゼロ）。
+既にダウンロード済みの日次ステージングのみから導出（listed/masterへの追加リクエストなし）。
+
+**未実施**: `enrich_universe_reference_with_listed_info()`（会社名・セクター等のメタデータ補完）は
+まだ実行していない（`processed/universe.parquet`のcompany_name等は空欄のまま）。Study75本体
+（survivorship-free規則ユニバース選定ロジック）も未着手。
+
+**次アクション**: Study75本体の実装（月次規則適用・TOPIX500∩流動性∩lot制約フィルター）。
 
 ---
 
