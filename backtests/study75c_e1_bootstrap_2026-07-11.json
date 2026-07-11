@@ -1,0 +1,2118 @@
+{
+  "study": "Study75C_E1_pit_bootstrap",
+  "generated_at": "2026-07-11T19:58:57.440821+09:00",
+  "started_at": "2026-07-11T19:54:04.062893+09:00",
+  "config": {
+    "k_draws": 20,
+    "seed": 42,
+    "snapshot_date": "2017-12-29",
+    "adv_band_jpy": [
+      1478788048.275862,
+      62520265852.413795
+    ],
+    "eligible_pool": 350,
+    "eligible_survivors": 322,
+    "eligible_eventually_dead": 28,
+    "bear_sector_exclusion": "disabled_for_consistency（セクター情報なし・U0'にも同一適用）"
+  },
+  "u0_jquants_reference_with_sector_filter": {
+    "IS": 8.71,
+    "OOS": -0.98
+  },
+  "u0_prime": {
+    "effective_size": 42,
+    "short_history_excluded": 0,
+    "missing": 0,
+    "IS": {
+      "cagr": 8.82,
+      "sharpe": 0.624,
+      "calmar": 0.368,
+      "max_dd": -23.99,
+      "n_trades": 226,
+      "n_trades_yr": 33.3,
+      "avg_hold_days": 16.1,
+      "win_rate": 42.9,
+      "avg_exposure": 51.1,
+      "avg_simultaneous_holdings": 2.27,
+      "annual_returns": {
+        "2018": -14.85,
+        "2019": 18.3,
+        "2020": 13.95,
+        "2021": 6.12,
+        "2022": -3.68,
+        "2023": 28.15,
+        "2024": 17.25
+      },
+      "turnover_annual_x": 6.76
+    },
+    "OOS": {
+      "cagr": 32.73,
+      "sharpe": 1.638,
+      "calmar": 2.869,
+      "max_dd": -11.41,
+      "n_trades": 36,
+      "n_trades_yr": 37.3,
+      "avg_hold_days": 12.5,
+      "win_rate": 41.7,
+      "avg_exposure": 48.8,
+      "avg_simultaneous_holdings": 2.09,
+      "annual_returns": {
+        "2025": 31.39
+      },
+      "turnover_annual_x": 6.97
+    }
+  },
+  "summary": {
+    "IS": {
+      "pit_distribution": {
+        "n": 20,
+        "mean": -2.12,
+        "median": -2.48,
+        "std": 5.51,
+        "p5": -11.87,
+        "p25": -4.73,
+        "p75": 1.6,
+        "p95": 6.06,
+        "values": [
+          5.91,
+          -2.95,
+          1.72,
+          -1.63,
+          -5.53,
+          -2.82,
+          -4.06,
+          -8.76,
+          -3.9,
+          0.97,
+          1.56,
+          8.98,
+          3.93,
+          -2.14,
+          4.4,
+          -11.83,
+          -4.46,
+          -7.34,
+          -12.64,
+          -1.84
+        ]
+      },
+      "twin_distribution": {
+        "n": 20,
+        "mean": -2.99,
+        "median": -3.44,
+        "std": 4.72,
+        "p5": -9.84,
+        "p25": -6.0,
+        "p75": -0.48,
+        "p95": 3.62,
+        "values": [
+          3.27,
+          -4.1,
+          3.3,
+          -5.02,
+          -5.46,
+          -2.79,
+          -4.88,
+          -9.11,
+          -5.92,
+          -6.58,
+          -0.54,
+          9.64,
+          -0.28,
+          -6.22,
+          -1.8,
+          -9.83,
+          -1.36,
+          -2.22,
+          -9.96,
+          -0.04
+        ]
+      },
+      "u0_prime_cagr": 8.82,
+      "u0_percentile_in_pit_distribution": 95.0,
+      "survivorship_bias_pp_paired": -0.87,
+      "selection_bias_pp": 12.26,
+      "combined_bias_pp": 11.3
+    },
+    "OOS": {
+      "pit_distribution": {
+        "n": 20,
+        "mean": 25.32,
+        "median": 25.17,
+        "std": 26.18,
+        "p5": -11.11,
+        "p25": 6.0,
+        "p75": 36.39,
+        "p95": 80.68,
+        "values": [
+          13.2,
+          30.17,
+          51.39,
+          80.92,
+          33.15,
+          -1.09,
+          80.67,
+          26.27,
+          46.11,
+          32.38,
+          4.43,
+          51.73,
+          24.08,
+          11.73,
+          28.22,
+          -11.06,
+          -12.15,
+          -5.46,
+          15.17,
+          6.53
+        ]
+      },
+      "twin_distribution": {
+        "n": 20,
+        "mean": 22.67,
+        "median": 17.69,
+        "std": 23.52,
+        "p5": -13.57,
+        "p25": 7.54,
+        "p75": 42.84,
+        "p95": 58.69,
+        "values": [
+          8.5,
+          57.88,
+          7.38,
+          52.95,
+          14.76,
+          -3.88,
+          37.17,
+          11.09,
+          43.6,
+          74.17,
+          10.62,
+          43.39,
+          24.71,
+          7.59,
+          42.66,
+          -13.55,
+          -13.97,
+          24.9,
+          20.62,
+          2.73
+        ]
+      },
+      "u0_prime_cagr": 32.73,
+      "u0_percentile_in_pit_distribution": 70.0,
+      "survivorship_bias_pp_paired": -2.65,
+      "selection_bias_pp": 15.04,
+      "combined_bias_pp": 7.56
+    }
+  },
+  "draws": [
+    {
+      "k": 0,
+      "n_dead": 2,
+      "dead_codes": [
+        "50020",
+        "39380"
+      ],
+      "pit": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": 5.91,
+          "sharpe": 0.439,
+          "calmar": 0.283,
+          "max_dd": -20.86,
+          "n_trades": 252,
+          "n_trades_yr": 37.2,
+          "avg_hold_days": 14.3,
+          "win_rate": 44.4,
+          "avg_exposure": 55.2,
+          "avg_simultaneous_holdings": 2.28,
+          "annual_returns": {
+            "2018": -3.64,
+            "2019": -1.43,
+            "2020": 5.19,
+            "2021": 10.9,
+            "2022": 4.05,
+            "2023": 11.68,
+            "2024": 13.89
+          },
+          "turnover_annual_x": 7.44
+        },
+        "OOS": {
+          "cagr": 13.2,
+          "sharpe": 0.796,
+          "calmar": 0.858,
+          "max_dd": -15.38,
+          "n_trades": 42,
+          "n_trades_yr": 43.6,
+          "avg_hold_days": 11.0,
+          "win_rate": 40.5,
+          "avg_exposure": 60.2,
+          "avg_simultaneous_holdings": 2.37,
+          "annual_returns": {
+            "2025": 12.7
+          },
+          "turnover_annual_x": 9.04
+        }
+      },
+      "twin": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": 3.27,
+          "sharpe": 0.279,
+          "calmar": 0.161,
+          "max_dd": -20.33,
+          "n_trades": 264,
+          "n_trades_yr": 38.9,
+          "avg_hold_days": 13.4,
+          "win_rate": 41.7,
+          "avg_exposure": 56.6,
+          "avg_simultaneous_holdings": 2.25,
+          "annual_returns": {
+            "2018": -4.85,
+            "2019": 6.96,
+            "2020": -2.42,
+            "2021": 7.23,
+            "2022": 0.02,
+            "2023": 12.83,
+            "2024": 3.61
+          },
+          "turnover_annual_x": 7.9
+        },
+        "OOS": {
+          "cagr": 8.5,
+          "sharpe": 0.536,
+          "calmar": 0.53,
+          "max_dd": -16.02,
+          "n_trades": 42,
+          "n_trades_yr": 43.6,
+          "avg_hold_days": 11.4,
+          "win_rate": 38.1,
+          "avg_exposure": 61.8,
+          "avg_simultaneous_holdings": 2.36,
+          "annual_returns": {
+            "2025": 8.18
+          },
+          "turnover_annual_x": 8.95
+        }
+      }
+    },
+    {
+      "k": 1,
+      "n_dead": 5,
+      "dead_codes": [
+        "42170",
+        "80280",
+        "39380",
+        "72050",
+        "35400"
+      ],
+      "pit": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": -2.95,
+          "sharpe": -0.089,
+          "calmar": -0.071,
+          "max_dd": -41.73,
+          "n_trades": 265,
+          "n_trades_yr": 39.1,
+          "avg_hold_days": 13.5,
+          "win_rate": 37.7,
+          "avg_exposure": 56.4,
+          "avg_simultaneous_holdings": 2.28,
+          "annual_returns": {
+            "2018": -5.14,
+            "2019": 12.37,
+            "2020": -2.35,
+            "2021": -2.3,
+            "2022": -24.67,
+            "2023": 7.82,
+            "2024": 0.67
+          },
+          "turnover_annual_x": 6.89
+        },
+        "OOS": {
+          "cagr": 30.17,
+          "sharpe": 1.021,
+          "calmar": 1.766,
+          "max_dd": -17.08,
+          "n_trades": 34,
+          "n_trades_yr": 35.3,
+          "avg_hold_days": 13.3,
+          "win_rate": 38.2,
+          "avg_exposure": 53.3,
+          "avg_simultaneous_holdings": 2.09,
+          "annual_returns": {
+            "2025": 28.95
+          },
+          "turnover_annual_x": 7.48
+        }
+      },
+      "twin": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": -4.1,
+          "sharpe": -0.163,
+          "calmar": -0.095,
+          "max_dd": -43.08,
+          "n_trades": 259,
+          "n_trades_yr": 38.2,
+          "avg_hold_days": 13.8,
+          "win_rate": 33.6,
+          "avg_exposure": 55.4,
+          "avg_simultaneous_holdings": 2.27,
+          "annual_returns": {
+            "2018": -19.54,
+            "2019": 15.32,
+            "2020": -16.11,
+            "2021": 0.87,
+            "2022": -21.83,
+            "2023": 16.22,
+            "2024": 7.37
+          },
+          "turnover_annual_x": 5.39
+        },
+        "OOS": {
+          "cagr": 57.88,
+          "sharpe": 1.305,
+          "calmar": 2.509,
+          "max_dd": -23.07,
+          "n_trades": 38,
+          "n_trades_yr": 39.4,
+          "avg_hold_days": 12.4,
+          "win_rate": 39.5,
+          "avg_exposure": 45.6,
+          "avg_simultaneous_holdings": 2.14,
+          "annual_returns": {
+            "2025": 55.33
+          },
+          "turnover_annual_x": 6.98
+        }
+      }
+    },
+    {
+      "k": 2,
+      "n_dead": 2,
+      "dead_codes": [
+        "96130",
+        "24270"
+      ],
+      "pit": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": 1.72,
+          "sharpe": 0.186,
+          "calmar": 0.053,
+          "max_dd": -32.77,
+          "n_trades": 243,
+          "n_trades_yr": 35.8,
+          "avg_hold_days": 14.3,
+          "win_rate": 43.6,
+          "avg_exposure": 54.5,
+          "avg_simultaneous_holdings": 2.23,
+          "annual_returns": {
+            "2018": -22.48,
+            "2019": -3.13,
+            "2020": 22.36,
+            "2021": 28.49,
+            "2022": -19.59,
+            "2023": 0.27,
+            "2024": 19.3
+          },
+          "turnover_annual_x": 6.2
+        },
+        "OOS": {
+          "cagr": 51.39,
+          "sharpe": 2.132,
+          "calmar": 4.381,
+          "max_dd": -11.73,
+          "n_trades": 33,
+          "n_trades_yr": 34.2,
+          "avg_hold_days": 16.1,
+          "win_rate": 51.5,
+          "avg_exposure": 61.3,
+          "avg_simultaneous_holdings": 2.46,
+          "annual_returns": {
+            "2025": 49.16
+          },
+          "turnover_annual_x": 7.61
+        }
+      },
+      "twin": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": 3.3,
+          "sharpe": 0.278,
+          "calmar": 0.113,
+          "max_dd": -29.13,
+          "n_trades": 245,
+          "n_trades_yr": 36.1,
+          "avg_hold_days": 14.2,
+          "win_rate": 40.0,
+          "avg_exposure": 55.1,
+          "avg_simultaneous_holdings": 2.22,
+          "annual_returns": {
+            "2018": -12.65,
+            "2019": 4.94,
+            "2020": 1.97,
+            "2021": -4.23,
+            "2022": -10.76,
+            "2023": 4.57,
+            "2024": 47.41
+          },
+          "turnover_annual_x": 6.14
+        },
+        "OOS": {
+          "cagr": 7.38,
+          "sharpe": 0.457,
+          "calmar": 0.608,
+          "max_dd": -12.14,
+          "n_trades": 32,
+          "n_trades_yr": 33.2,
+          "avg_hold_days": 16.4,
+          "win_rate": 43.8,
+          "avg_exposure": 62.9,
+          "avg_simultaneous_holdings": 2.42,
+          "annual_returns": {
+            "2025": 7.11
+          },
+          "turnover_annual_x": 7.43
+        }
+      }
+    },
+    {
+      "k": 3,
+      "n_dead": 8,
+      "dead_codes": [
+        "65020",
+        "24270",
+        "32500",
+        "45550",
+        "65410",
+        "85150",
+        "90620",
+        "42170"
+      ],
+      "pit": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": -1.63,
+          "sharpe": -0.015,
+          "calmar": -0.036,
+          "max_dd": -45.46,
+          "n_trades": 260,
+          "n_trades_yr": 38.3,
+          "avg_hold_days": 13.1,
+          "win_rate": 33.8,
+          "avg_exposure": 53.8,
+          "avg_simultaneous_holdings": 2.16,
+          "annual_returns": {
+            "2018": -26.5,
+            "2019": -13.41,
+            "2020": 25.23,
+            "2021": -1.46,
+            "2022": -13.06,
+            "2023": 19.45,
+            "2024": 7.7
+          },
+          "turnover_annual_x": 5.15
+        },
+        "OOS": {
+          "cagr": 80.92,
+          "sharpe": 1.778,
+          "calmar": 3.758,
+          "max_dd": -21.53,
+          "n_trades": 30,
+          "n_trades_yr": 31.1,
+          "avg_hold_days": 13.5,
+          "win_rate": 36.7,
+          "avg_exposure": 53.3,
+          "avg_simultaneous_holdings": 2.22,
+          "annual_returns": {
+            "2025": 77.13
+          },
+          "turnover_annual_x": 6.4
+        }
+      },
+      "twin": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": -5.02,
+          "sharpe": -0.241,
+          "calmar": -0.117,
+          "max_dd": -43.0,
+          "n_trades": 267,
+          "n_trades_yr": 39.4,
+          "avg_hold_days": 13.2,
+          "win_rate": 34.8,
+          "avg_exposure": 55.6,
+          "avg_simultaneous_holdings": 2.22,
+          "annual_returns": {
+            "2018": -20.51,
+            "2019": -10.33,
+            "2020": 14.14,
+            "2021": -10.77,
+            "2022": -5.11,
+            "2023": 7.04,
+            "2024": -7.46
+          },
+          "turnover_annual_x": 5.31
+        },
+        "OOS": {
+          "cagr": 52.95,
+          "sharpe": 1.315,
+          "calmar": 2.282,
+          "max_dd": -23.2,
+          "n_trades": 35,
+          "n_trades_yr": 36.3,
+          "avg_hold_days": 12.4,
+          "win_rate": 28.6,
+          "avg_exposure": 55.6,
+          "avg_simultaneous_holdings": 2.37,
+          "annual_returns": {
+            "2025": 50.65
+          },
+          "turnover_annual_x": 6.81
+        }
+      }
+    },
+    {
+      "k": 4,
+      "n_dead": 5,
+      "dead_codes": [
+        "43210",
+        "65410",
+        "94370",
+        "90620",
+        "76470"
+      ],
+      "pit": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": -5.53,
+          "sharpe": -0.337,
+          "calmar": -0.112,
+          "max_dd": -49.35,
+          "n_trades": 250,
+          "n_trades_yr": 36.9,
+          "avg_hold_days": 13.3,
+          "win_rate": 34.4,
+          "avg_exposure": 50.7,
+          "avg_simultaneous_holdings": 2.11,
+          "annual_returns": {
+            "2018": -20.02,
+            "2019": -9.76,
+            "2020": 1.21,
+            "2021": -10.56,
+            "2022": -14.97,
+            "2023": 6.21,
+            "2024": 16.76
+          },
+          "turnover_annual_x": 4.69
+        },
+        "OOS": {
+          "cagr": 33.15,
+          "sharpe": 1.227,
+          "calmar": 2.156,
+          "max_dd": -15.38,
+          "n_trades": 37,
+          "n_trades_yr": 38.4,
+          "avg_hold_days": 13.6,
+          "win_rate": 40.5,
+          "avg_exposure": 60.6,
+          "avg_simultaneous_holdings": 2.29,
+          "annual_returns": {
+            "2025": 31.79
+          },
+          "turnover_annual_x": 8.29
+        }
+      },
+      "twin": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": -5.46,
+          "sharpe": -0.32,
+          "calmar": -0.109,
+          "max_dd": -49.9,
+          "n_trades": 259,
+          "n_trades_yr": 38.2,
+          "avg_hold_days": 13.7,
+          "win_rate": 35.9,
+          "avg_exposure": 54.2,
+          "avg_simultaneous_holdings": 2.25,
+          "annual_returns": {
+            "2018": -10.28,
+            "2019": -8.44,
+            "2020": -3.44,
+            "2021": -14.93,
+            "2022": -12.9,
+            "2023": 22.04,
+            "2024": -4.18
+          },
+          "turnover_annual_x": 5.18
+        },
+        "OOS": {
+          "cagr": 14.76,
+          "sharpe": 0.847,
+          "calmar": 1.099,
+          "max_dd": -13.43,
+          "n_trades": 41,
+          "n_trades_yr": 42.5,
+          "avg_hold_days": 12.2,
+          "win_rate": 41.5,
+          "avg_exposure": 59.5,
+          "avg_simultaneous_holdings": 2.28,
+          "annual_returns": {
+            "2025": 14.2
+          },
+          "turnover_annual_x": 8.69
+        }
+      }
+    },
+    {
+      "k": 5,
+      "n_dead": 5,
+      "dead_codes": [
+        "45080",
+        "94370",
+        "62010",
+        "83550",
+        "43210"
+      ],
+      "pit": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": -2.82,
+          "sharpe": -0.119,
+          "calmar": -0.084,
+          "max_dd": -33.57,
+          "n_trades": 267,
+          "n_trades_yr": 39.4,
+          "avg_hold_days": 13.6,
+          "win_rate": 40.8,
+          "avg_exposure": 57.3,
+          "avg_simultaneous_holdings": 2.29,
+          "annual_returns": {
+            "2018": -16.87,
+            "2019": -6.52,
+            "2020": 6.05,
+            "2021": 0.13,
+            "2022": -5.9,
+            "2023": 8.44,
+            "2024": -1.81
+          },
+          "turnover_annual_x": 5.92
+        },
+        "OOS": {
+          "cagr": -1.09,
+          "sharpe": 0.031,
+          "calmar": -0.066,
+          "max_dd": -16.6,
+          "n_trades": 40,
+          "n_trades_yr": 41.5,
+          "avg_hold_days": 12.7,
+          "win_rate": 40.0,
+          "avg_exposure": 63.2,
+          "avg_simultaneous_holdings": 2.36,
+          "annual_returns": {
+            "2025": -1.05
+          },
+          "turnover_annual_x": 8.56
+        }
+      },
+      "twin": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": -2.79,
+          "sharpe": -0.082,
+          "calmar": -0.088,
+          "max_dd": -31.75,
+          "n_trades": 277,
+          "n_trades_yr": 40.8,
+          "avg_hold_days": 13.7,
+          "win_rate": 40.1,
+          "avg_exposure": 59.8,
+          "avg_simultaneous_holdings": 2.39,
+          "annual_returns": {
+            "2018": -17.83,
+            "2019": -6.91,
+            "2020": 13.71,
+            "2021": -5.06,
+            "2022": -2.28,
+            "2023": 9.11,
+            "2024": -5.23
+          },
+          "turnover_annual_x": 6.4
+        },
+        "OOS": {
+          "cagr": -3.88,
+          "sharpe": -0.167,
+          "calmar": -0.223,
+          "max_dd": -17.35,
+          "n_trades": 43,
+          "n_trades_yr": 44.6,
+          "avg_hold_days": 11.7,
+          "win_rate": 41.9,
+          "avg_exposure": 59.3,
+          "avg_simultaneous_holdings": 2.36,
+          "annual_returns": {
+            "2025": -3.74
+          },
+          "turnover_annual_x": 8.75
+        }
+      }
+    },
+    {
+      "k": 6,
+      "n_dead": 3,
+      "dead_codes": [
+        "80280",
+        "45080",
+        "26510"
+      ],
+      "pit": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": -4.06,
+          "sharpe": -0.232,
+          "calmar": -0.129,
+          "max_dd": -31.62,
+          "n_trades": 247,
+          "n_trades_yr": 36.4,
+          "avg_hold_days": 14.4,
+          "win_rate": 40.1,
+          "avg_exposure": 53.9,
+          "avg_simultaneous_holdings": 2.24,
+          "annual_returns": {
+            "2018": -13.63,
+            "2019": -9.2,
+            "2020": 1.76,
+            "2021": 2.24,
+            "2022": -12.81,
+            "2023": 8.56,
+            "2024": -2.55
+          },
+          "turnover_annual_x": 5.21
+        },
+        "OOS": {
+          "cagr": 80.67,
+          "sharpe": 1.777,
+          "calmar": 3.986,
+          "max_dd": -20.24,
+          "n_trades": 39,
+          "n_trades_yr": 40.4,
+          "avg_hold_days": 13.5,
+          "win_rate": 53.8,
+          "avg_exposure": 57.5,
+          "avg_simultaneous_holdings": 2.48,
+          "annual_returns": {
+            "2025": 76.89
+          },
+          "turnover_annual_x": 8.18
+        }
+      },
+      "twin": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": -4.88,
+          "sharpe": -0.273,
+          "calmar": -0.149,
+          "max_dd": -32.75,
+          "n_trades": 253,
+          "n_trades_yr": 37.3,
+          "avg_hold_days": 14.5,
+          "win_rate": 39.9,
+          "avg_exposure": 57.7,
+          "avg_simultaneous_holdings": 2.32,
+          "annual_returns": {
+            "2018": -6.62,
+            "2019": -5.55,
+            "2020": 7.61,
+            "2021": -3.11,
+            "2022": -16.18,
+            "2023": 4.54,
+            "2024": -13.15
+          },
+          "turnover_annual_x": 6.32
+        },
+        "OOS": {
+          "cagr": 37.17,
+          "sharpe": 1.646,
+          "calmar": 2.279,
+          "max_dd": -16.31,
+          "n_trades": 39,
+          "n_trades_yr": 40.4,
+          "avg_hold_days": 13.1,
+          "win_rate": 38.5,
+          "avg_exposure": 61.9,
+          "avg_simultaneous_holdings": 2.44,
+          "annual_returns": {
+            "2025": 35.63
+          },
+          "turnover_annual_x": 8.07
+        }
+      }
+    },
+    {
+      "k": 7,
+      "n_dead": 1,
+      "dead_codes": [
+        "62010"
+      ],
+      "pit": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": -8.76,
+          "sharpe": -0.488,
+          "calmar": -0.188,
+          "max_dd": -46.71,
+          "n_trades": 259,
+          "n_trades_yr": 38.2,
+          "avg_hold_days": 13.1,
+          "win_rate": 35.5,
+          "avg_exposure": 52.2,
+          "avg_simultaneous_holdings": 2.17,
+          "annual_returns": {
+            "2018": -24.89,
+            "2019": -11.84,
+            "2020": -8.13,
+            "2021": 5.2,
+            "2022": -5.1,
+            "2023": -0.42,
+            "2024": -13.01
+          },
+          "turnover_annual_x": 4.43
+        },
+        "OOS": {
+          "cagr": 26.27,
+          "sharpe": 1.363,
+          "calmar": 1.659,
+          "max_dd": -15.84,
+          "n_trades": 39,
+          "n_trades_yr": 40.4,
+          "avg_hold_days": 14.3,
+          "win_rate": 38.5,
+          "avg_exposure": 62.4,
+          "avg_simultaneous_holdings": 2.53,
+          "annual_returns": {
+            "2025": 25.22
+          },
+          "turnover_annual_x": 8.16
+        }
+      },
+      "twin": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": -9.11,
+          "sharpe": -0.51,
+          "calmar": -0.189,
+          "max_dd": -48.09,
+          "n_trades": 271,
+          "n_trades_yr": 40.0,
+          "avg_hold_days": 12.6,
+          "win_rate": 35.1,
+          "avg_exposure": 52.9,
+          "avg_simultaneous_holdings": 2.19,
+          "annual_returns": {
+            "2018": -24.89,
+            "2019": -10.66,
+            "2020": -8.79,
+            "2021": -5.52,
+            "2022": 10.21,
+            "2023": -3.28,
+            "2024": -13.43
+          },
+          "turnover_annual_x": 4.62
+        },
+        "OOS": {
+          "cagr": 11.09,
+          "sharpe": 0.708,
+          "calmar": 0.701,
+          "max_dd": -15.84,
+          "n_trades": 40,
+          "n_trades_yr": 41.5,
+          "avg_hold_days": 14.2,
+          "win_rate": 42.5,
+          "avg_exposure": 65.1,
+          "avg_simultaneous_holdings": 2.59,
+          "annual_returns": {
+            "2025": 10.68
+          },
+          "turnover_annual_x": 8.59
+        }
+      }
+    },
+    {
+      "k": 8,
+      "n_dead": 4,
+      "dead_codes": [
+        "32500",
+        "65410",
+        "50020",
+        "65020"
+      ],
+      "pit": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": -3.9,
+          "sharpe": -0.184,
+          "calmar": -0.093,
+          "max_dd": -41.79,
+          "n_trades": 269,
+          "n_trades_yr": 39.7,
+          "avg_hold_days": 13.7,
+          "win_rate": 36.4,
+          "avg_exposure": 55.1,
+          "avg_simultaneous_holdings": 2.33,
+          "annual_returns": {
+            "2018": -20.16,
+            "2019": -15.79,
+            "2020": 21.25,
+            "2021": -19.01,
+            "2022": 1.46,
+            "2023": -6.7,
+            "2024": 20.92
+          },
+          "turnover_annual_x": 4.88
+        },
+        "OOS": {
+          "cagr": 46.11,
+          "sharpe": 2.008,
+          "calmar": 2.985,
+          "max_dd": -15.45,
+          "n_trades": 31,
+          "n_trades_yr": 32.1,
+          "avg_hold_days": 14.2,
+          "win_rate": 45.2,
+          "avg_exposure": 57.9,
+          "avg_simultaneous_holdings": 2.18,
+          "annual_returns": {
+            "2025": 44.15
+          },
+          "turnover_annual_x": 6.74
+        }
+      },
+      "twin": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": -5.92,
+          "sharpe": -0.343,
+          "calmar": -0.117,
+          "max_dd": -50.75,
+          "n_trades": 259,
+          "n_trades_yr": 38.2,
+          "avg_hold_days": 13.8,
+          "win_rate": 37.5,
+          "avg_exposure": 54.8,
+          "avg_simultaneous_holdings": 2.26,
+          "annual_returns": {
+            "2018": -9.55,
+            "2019": -8.43,
+            "2020": -7.99,
+            "2021": -17.89,
+            "2022": -9.22,
+            "2023": -9.38,
+            "2024": 27.36
+          },
+          "turnover_annual_x": 4.91
+        },
+        "OOS": {
+          "cagr": 43.6,
+          "sharpe": 1.83,
+          "calmar": 2.5,
+          "max_dd": -17.44,
+          "n_trades": 31,
+          "n_trades_yr": 32.1,
+          "avg_hold_days": 14.6,
+          "win_rate": 41.9,
+          "avg_exposure": 59.8,
+          "avg_simultaneous_holdings": 2.23,
+          "annual_returns": {
+            "2025": 41.76
+          },
+          "turnover_annual_x": 6.22
+        }
+      }
+    },
+    {
+      "k": 9,
+      "n_dead": 3,
+      "dead_codes": [
+        "90620",
+        "83820",
+        "18240"
+      ],
+      "pit": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": 0.97,
+          "sharpe": 0.143,
+          "calmar": 0.027,
+          "max_dd": -35.86,
+          "n_trades": 265,
+          "n_trades_yr": 39.1,
+          "avg_hold_days": 14.0,
+          "win_rate": 41.9,
+          "avg_exposure": 56.2,
+          "avg_simultaneous_holdings": 2.35,
+          "annual_returns": {
+            "2018": -4.7,
+            "2019": -10.6,
+            "2020": 11.88,
+            "2021": -3.15,
+            "2022": -0.44,
+            "2023": 3.38,
+            "2024": 12.28
+          },
+          "turnover_annual_x": 6.96
+        },
+        "OOS": {
+          "cagr": 32.38,
+          "sharpe": 1.233,
+          "calmar": 2.116,
+          "max_dd": -15.3,
+          "n_trades": 34,
+          "n_trades_yr": 35.3,
+          "avg_hold_days": 15.6,
+          "win_rate": 47.1,
+          "avg_exposure": 62.1,
+          "avg_simultaneous_holdings": 2.41,
+          "annual_returns": {
+            "2025": 31.06
+          },
+          "turnover_annual_x": 7.96
+        }
+      },
+      "twin": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": -6.58,
+          "sharpe": -0.316,
+          "calmar": -0.149,
+          "max_dd": -44.06,
+          "n_trades": 266,
+          "n_trades_yr": 39.2,
+          "avg_hold_days": 14.0,
+          "win_rate": 36.1,
+          "avg_exposure": 55.7,
+          "avg_simultaneous_holdings": 2.35,
+          "annual_returns": {
+            "2018": -13.23,
+            "2019": -8.41,
+            "2020": -1.9,
+            "2021": -8.43,
+            "2022": -2.06,
+            "2023": 1.61,
+            "2024": -10.85
+          },
+          "turnover_annual_x": 5.29
+        },
+        "OOS": {
+          "cagr": 74.17,
+          "sharpe": 1.927,
+          "calmar": 4.006,
+          "max_dd": -18.51,
+          "n_trades": 36,
+          "n_trades_yr": 37.3,
+          "avg_hold_days": 14.7,
+          "win_rate": 58.3,
+          "avg_exposure": 56.1,
+          "avg_simultaneous_holdings": 2.44,
+          "annual_returns": {
+            "2025": 70.75
+          },
+          "turnover_annual_x": 8.3
+        }
+      }
+    },
+    {
+      "k": 10,
+      "n_dead": 4,
+      "dead_codes": [
+        "83550",
+        "18240",
+        "54860",
+        "65410"
+      ],
+      "pit": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": 1.56,
+          "sharpe": 0.177,
+          "calmar": 0.063,
+          "max_dd": -24.84,
+          "n_trades": 244,
+          "n_trades_yr": 36.0,
+          "avg_hold_days": 14.7,
+          "win_rate": 35.7,
+          "avg_exposure": 53.3,
+          "avg_simultaneous_holdings": 2.25,
+          "annual_returns": {
+            "2018": -10.36,
+            "2019": 6.25,
+            "2020": 8.99,
+            "2021": 7.99,
+            "2022": -2.94,
+            "2023": 2.87,
+            "2024": -4.7
+          },
+          "turnover_annual_x": 6.86
+        },
+        "OOS": {
+          "cagr": 4.43,
+          "sharpe": 0.31,
+          "calmar": 0.213,
+          "max_dd": -20.76,
+          "n_trades": 41,
+          "n_trades_yr": 42.5,
+          "avg_hold_days": 12.4,
+          "win_rate": 36.6,
+          "avg_exposure": 61.1,
+          "avg_simultaneous_holdings": 2.33,
+          "annual_returns": {
+            "2025": 4.27
+          },
+          "turnover_annual_x": 8.59
+        }
+      },
+      "twin": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": -0.54,
+          "sharpe": 0.054,
+          "calmar": -0.019,
+          "max_dd": -29.05,
+          "n_trades": 248,
+          "n_trades_yr": 36.6,
+          "avg_hold_days": 14.3,
+          "win_rate": 36.3,
+          "avg_exposure": 55.8,
+          "avg_simultaneous_holdings": 2.25,
+          "annual_returns": {
+            "2018": -16.53,
+            "2019": 8.54,
+            "2020": -6.92,
+            "2021": 16.92,
+            "2022": -2.29,
+            "2023": 4.65,
+            "2024": -6.44
+          },
+          "turnover_annual_x": 6.45
+        },
+        "OOS": {
+          "cagr": 10.62,
+          "sharpe": 0.566,
+          "calmar": 0.649,
+          "max_dd": -16.37,
+          "n_trades": 35,
+          "n_trades_yr": 36.3,
+          "avg_hold_days": 14.6,
+          "win_rate": 45.7,
+          "avg_exposure": 65.2,
+          "avg_simultaneous_holdings": 2.43,
+          "annual_returns": {
+            "2025": 10.22
+          },
+          "turnover_annual_x": 7.54
+        }
+      }
+    },
+    {
+      "k": 11,
+      "n_dead": 1,
+      "dead_codes": [
+        "54860"
+      ],
+      "pit": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": 8.98,
+          "sharpe": 0.601,
+          "calmar": 0.351,
+          "max_dd": -25.54,
+          "n_trades": 242,
+          "n_trades_yr": 35.7,
+          "avg_hold_days": 15.1,
+          "win_rate": 45.0,
+          "avg_exposure": 53.6,
+          "avg_simultaneous_holdings": 2.32,
+          "annual_returns": {
+            "2018": -15.89,
+            "2019": 3.07,
+            "2020": 22.63,
+            "2021": 12.66,
+            "2022": -2.6,
+            "2023": 9.52,
+            "2024": 39.71
+          },
+          "turnover_annual_x": 7.12
+        },
+        "OOS": {
+          "cagr": 51.73,
+          "sharpe": 1.418,
+          "calmar": 2.17,
+          "max_dd": -23.84,
+          "n_trades": 41,
+          "n_trades_yr": 42.5,
+          "avg_hold_days": 11.9,
+          "win_rate": 36.6,
+          "avg_exposure": 55.3,
+          "avg_simultaneous_holdings": 2.3,
+          "annual_returns": {
+            "2025": 49.49
+          },
+          "turnover_annual_x": 8.22
+        }
+      },
+      "twin": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": 9.64,
+          "sharpe": 0.642,
+          "calmar": 0.369,
+          "max_dd": -26.12,
+          "n_trades": 236,
+          "n_trades_yr": 34.8,
+          "avg_hold_days": 15.7,
+          "win_rate": 44.9,
+          "avg_exposure": 53.3,
+          "avg_simultaneous_holdings": 2.34,
+          "annual_returns": {
+            "2018": -15.89,
+            "2019": 3.44,
+            "2020": 17.21,
+            "2021": 18.24,
+            "2022": 1.19,
+            "2023": 10.48,
+            "2024": 37.85
+          },
+          "turnover_annual_x": 7.0
+        },
+        "OOS": {
+          "cagr": 43.39,
+          "sharpe": 1.293,
+          "calmar": 1.801,
+          "max_dd": -24.09,
+          "n_trades": 44,
+          "n_trades_yr": 45.6,
+          "avg_hold_days": 11.1,
+          "win_rate": 38.6,
+          "avg_exposure": 54.2,
+          "avg_simultaneous_holdings": 2.29,
+          "annual_returns": {
+            "2025": 41.56
+          },
+          "turnover_annual_x": 8.56
+        }
+      }
+    },
+    {
+      "k": 12,
+      "n_dead": 3,
+      "dead_codes": [
+        "76470",
+        "96130",
+        "80280"
+      ],
+      "pit": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": 3.93,
+          "sharpe": 0.33,
+          "calmar": 0.156,
+          "max_dd": -25.17,
+          "n_trades": 256,
+          "n_trades_yr": 37.7,
+          "avg_hold_days": 14.6,
+          "win_rate": 43.0,
+          "avg_exposure": 54.8,
+          "avg_simultaneous_holdings": 2.34,
+          "annual_returns": {
+            "2018": -10.66,
+            "2019": 7.6,
+            "2020": 16.92,
+            "2021": -6.61,
+            "2022": -3.06,
+            "2023": 4.19,
+            "2024": 22.3
+          },
+          "turnover_annual_x": 7.22
+        },
+        "OOS": {
+          "cagr": 24.08,
+          "sharpe": 1.354,
+          "calmar": 2.416,
+          "max_dd": -9.97,
+          "n_trades": 35,
+          "n_trades_yr": 36.3,
+          "avg_hold_days": 14.5,
+          "win_rate": 54.3,
+          "avg_exposure": 61.3,
+          "avg_simultaneous_holdings": 2.43,
+          "annual_returns": {
+            "2025": 23.13
+          },
+          "turnover_annual_x": 8.0
+        }
+      },
+      "twin": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": -0.28,
+          "sharpe": 0.062,
+          "calmar": -0.009,
+          "max_dd": -31.88,
+          "n_trades": 260,
+          "n_trades_yr": 38.3,
+          "avg_hold_days": 14.4,
+          "win_rate": 40.4,
+          "avg_exposure": 56.9,
+          "avg_simultaneous_holdings": 2.36,
+          "annual_returns": {
+            "2018": -22.16,
+            "2019": 4.8,
+            "2020": 11.06,
+            "2021": -6.78,
+            "2022": -7.88,
+            "2023": -1.91,
+            "2024": 28.3
+          },
+          "turnover_annual_x": 5.98
+        },
+        "OOS": {
+          "cagr": 24.71,
+          "sharpe": 1.307,
+          "calmar": 2.293,
+          "max_dd": -10.78,
+          "n_trades": 35,
+          "n_trades_yr": 36.3,
+          "avg_hold_days": 14.5,
+          "win_rate": 45.7,
+          "avg_exposure": 66.3,
+          "avg_simultaneous_holdings": 2.44,
+          "annual_returns": {
+            "2025": 23.73
+          },
+          "turnover_annual_x": 8.1
+        }
+      }
+    },
+    {
+      "k": 13,
+      "n_dead": 5,
+      "dead_codes": [
+        "45080",
+        "62010",
+        "35400",
+        "80280",
+        "85150"
+      ],
+      "pit": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": -2.14,
+          "sharpe": -0.034,
+          "calmar": -0.049,
+          "max_dd": -43.49,
+          "n_trades": 259,
+          "n_trades_yr": 38.2,
+          "avg_hold_days": 13.3,
+          "win_rate": 37.5,
+          "avg_exposure": 56.0,
+          "avg_simultaneous_holdings": 2.2,
+          "annual_returns": {
+            "2018": -23.88,
+            "2019": -0.77,
+            "2020": 0.69,
+            "2021": -16.52,
+            "2022": -4.44,
+            "2023": 13.18,
+            "2024": 27.17
+          },
+          "turnover_annual_x": 4.81
+        },
+        "OOS": {
+          "cagr": 11.73,
+          "sharpe": 0.682,
+          "calmar": 0.738,
+          "max_dd": -15.9,
+          "n_trades": 41,
+          "n_trades_yr": 42.5,
+          "avg_hold_days": 13.0,
+          "win_rate": 36.6,
+          "avg_exposure": 65.1,
+          "avg_simultaneous_holdings": 2.46,
+          "annual_returns": {
+            "2025": 11.29
+          },
+          "turnover_annual_x": 8.7
+        }
+      },
+      "twin": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": -6.22,
+          "sharpe": -0.281,
+          "calmar": -0.141,
+          "max_dd": -43.93,
+          "n_trades": 260,
+          "n_trades_yr": 38.3,
+          "avg_hold_days": 13.6,
+          "win_rate": 35.8,
+          "avg_exposure": 55.9,
+          "avg_simultaneous_holdings": 2.27,
+          "annual_returns": {
+            "2018": -17.2,
+            "2019": -6.14,
+            "2020": 9.47,
+            "2021": -17.71,
+            "2022": -13.83,
+            "2023": 8.61,
+            "2024": -1.08
+          },
+          "turnover_annual_x": 5.14
+        },
+        "OOS": {
+          "cagr": 7.59,
+          "sharpe": 0.47,
+          "calmar": 0.414,
+          "max_dd": -18.31,
+          "n_trades": 37,
+          "n_trades_yr": 38.4,
+          "avg_hold_days": 14.1,
+          "win_rate": 37.8,
+          "avg_exposure": 69.2,
+          "avg_simultaneous_holdings": 2.56,
+          "annual_returns": {
+            "2025": 7.31
+          },
+          "turnover_annual_x": 7.8
+        }
+      }
+    },
+    {
+      "k": 14,
+      "n_dead": 2,
+      "dead_codes": [
+        "65410",
+        "42170"
+      ],
+      "pit": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": 4.4,
+          "sharpe": 0.362,
+          "calmar": 0.179,
+          "max_dd": -24.54,
+          "n_trades": 250,
+          "n_trades_yr": 36.9,
+          "avg_hold_days": 14.2,
+          "win_rate": 40.4,
+          "avg_exposure": 52.5,
+          "avg_simultaneous_holdings": 2.25,
+          "annual_returns": {
+            "2018": -19.56,
+            "2019": 6.23,
+            "2020": 45.16,
+            "2021": 0.46,
+            "2022": -9.95,
+            "2023": 7.22,
+            "2024": 11.05
+          },
+          "turnover_annual_x": 7.14
+        },
+        "OOS": {
+          "cagr": 28.22,
+          "sharpe": 1.424,
+          "calmar": 2.489,
+          "max_dd": -11.34,
+          "n_trades": 33,
+          "n_trades_yr": 34.2,
+          "avg_hold_days": 15.8,
+          "win_rate": 51.5,
+          "avg_exposure": 62.1,
+          "avg_simultaneous_holdings": 2.37,
+          "annual_returns": {
+            "2025": 27.08
+          },
+          "turnover_annual_x": 7.61
+        }
+      },
+      "twin": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": -1.8,
+          "sharpe": -0.05,
+          "calmar": -0.049,
+          "max_dd": -36.84,
+          "n_trades": 247,
+          "n_trades_yr": 36.4,
+          "avg_hold_days": 13.7,
+          "win_rate": 40.1,
+          "avg_exposure": 52.5,
+          "avg_simultaneous_holdings": 2.16,
+          "annual_returns": {
+            "2018": -23.53,
+            "2019": -4.09,
+            "2020": 11.0,
+            "2021": 1.38,
+            "2022": -11.33,
+            "2023": 4.22,
+            "2024": 16.28
+          },
+          "turnover_annual_x": 5.01
+        },
+        "OOS": {
+          "cagr": 42.66,
+          "sharpe": 1.953,
+          "calmar": 4.264,
+          "max_dd": -10.0,
+          "n_trades": 29,
+          "n_trades_yr": 30.1,
+          "avg_hold_days": 20.2,
+          "win_rate": 62.1,
+          "avg_exposure": 65.9,
+          "avg_simultaneous_holdings": 2.6,
+          "annual_returns": {
+            "2025": 40.87
+          },
+          "turnover_annual_x": 6.5
+        }
+      }
+    },
+    {
+      "k": 15,
+      "n_dead": 1,
+      "dead_codes": [
+        "72050"
+      ],
+      "pit": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": -11.83,
+          "sharpe": -0.793,
+          "calmar": -0.193,
+          "max_dd": -61.37,
+          "n_trades": 265,
+          "n_trades_yr": 39.1,
+          "avg_hold_days": 13.5,
+          "win_rate": 38.5,
+          "avg_exposure": 56.0,
+          "avg_simultaneous_holdings": 2.26,
+          "annual_returns": {
+            "2018": -26.66,
+            "2019": -3.92,
+            "2020": -18.1,
+            "2021": -11.4,
+            "2022": -10.53,
+            "2023": -9.82,
+            "2024": 2.15
+          },
+          "turnover_annual_x": 4.21
+        },
+        "OOS": {
+          "cagr": -11.06,
+          "sharpe": -0.693,
+          "calmar": -0.623,
+          "max_dd": -17.74,
+          "n_trades": 41,
+          "n_trades_yr": 42.5,
+          "avg_hold_days": 10.8,
+          "win_rate": 26.8,
+          "avg_exposure": 60.5,
+          "avg_simultaneous_holdings": 2.33,
+          "annual_returns": {
+            "2025": -10.69
+          },
+          "turnover_annual_x": 8.79
+        }
+      },
+      "twin": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": -9.83,
+          "sharpe": -0.666,
+          "calmar": -0.176,
+          "max_dd": -55.96,
+          "n_trades": 258,
+          "n_trades_yr": 38.0,
+          "avg_hold_days": 13.6,
+          "win_rate": 38.8,
+          "avg_exposure": 55.3,
+          "avg_simultaneous_holdings": 2.23,
+          "annual_returns": {
+            "2018": -24.49,
+            "2019": -1.55,
+            "2020": -16.23,
+            "2021": -12.98,
+            "2022": -5.89,
+            "2023": -3.0,
+            "2024": 0.38
+          },
+          "turnover_annual_x": 4.24
+        },
+        "OOS": {
+          "cagr": -13.55,
+          "sharpe": -0.86,
+          "calmar": -0.687,
+          "max_dd": -19.73,
+          "n_trades": 44,
+          "n_trades_yr": 45.6,
+          "avg_hold_days": 11.3,
+          "win_rate": 31.8,
+          "avg_exposure": 57.5,
+          "avg_simultaneous_holdings": 2.33,
+          "annual_returns": {
+            "2025": -13.1
+          },
+          "turnover_annual_x": 8.15
+        }
+      }
+    },
+    {
+      "k": 16,
+      "n_dead": 2,
+      "dead_codes": [
+        "24270",
+        "72050"
+      ],
+      "pit": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": -4.46,
+          "sharpe": -0.176,
+          "calmar": -0.104,
+          "max_dd": -43.07,
+          "n_trades": 242,
+          "n_trades_yr": 35.7,
+          "avg_hold_days": 14.4,
+          "win_rate": 36.4,
+          "avg_exposure": 52.4,
+          "avg_simultaneous_holdings": 2.19,
+          "annual_returns": {
+            "2018": -14.77,
+            "2019": -10.49,
+            "2020": 1.32,
+            "2021": -10.69,
+            "2022": -12.71,
+            "2023": 17.5,
+            "2024": 4.09
+          },
+          "turnover_annual_x": 4.43
+        },
+        "OOS": {
+          "cagr": -12.15,
+          "sharpe": -0.395,
+          "calmar": -0.618,
+          "max_dd": -19.66,
+          "n_trades": 39,
+          "n_trades_yr": 40.4,
+          "avg_hold_days": 13.2,
+          "win_rate": 35.9,
+          "avg_exposure": 58.7,
+          "avg_simultaneous_holdings": 2.34,
+          "annual_returns": {
+            "2025": -11.74
+          },
+          "turnover_annual_x": 7.12
+        }
+      },
+      "twin": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": -1.36,
+          "sharpe": 0.015,
+          "calmar": -0.035,
+          "max_dd": -38.49,
+          "n_trades": 249,
+          "n_trades_yr": 36.7,
+          "avg_hold_days": 14.2,
+          "win_rate": 35.3,
+          "avg_exposure": 54.0,
+          "avg_simultaneous_holdings": 2.22,
+          "annual_returns": {
+            "2018": -14.19,
+            "2019": -14.86,
+            "2020": -4.64,
+            "2021": 8.9,
+            "2022": -9.15,
+            "2023": 27.52,
+            "2024": 3.88
+          },
+          "turnover_annual_x": 4.8
+        },
+        "OOS": {
+          "cagr": -13.97,
+          "sharpe": -0.414,
+          "calmar": -0.554,
+          "max_dd": -25.19,
+          "n_trades": 38,
+          "n_trades_yr": 39.4,
+          "avg_hold_days": 13.3,
+          "win_rate": 34.2,
+          "avg_exposure": 55.6,
+          "avg_simultaneous_holdings": 2.26,
+          "annual_returns": {
+            "2025": -13.5
+          },
+          "turnover_annual_x": 6.6
+        }
+      }
+    },
+    {
+      "k": 17,
+      "n_dead": 5,
+      "dead_codes": [
+        "54860",
+        "83790",
+        "39380",
+        "26510",
+        "45080"
+      ],
+      "pit": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": -7.34,
+          "sharpe": -0.461,
+          "calmar": -0.164,
+          "max_dd": -44.84,
+          "n_trades": 249,
+          "n_trades_yr": 36.7,
+          "avg_hold_days": 13.6,
+          "win_rate": 32.1,
+          "avg_exposure": 52.5,
+          "avg_simultaneous_holdings": 2.14,
+          "annual_returns": {
+            "2018": -17.24,
+            "2019": -7.98,
+            "2020": 9.72,
+            "2021": -11.3,
+            "2022": -16.23,
+            "2023": -7.29,
+            "2024": 6.23
+          },
+          "turnover_annual_x": 4.85
+        },
+        "OOS": {
+          "cagr": -5.46,
+          "sharpe": -0.237,
+          "calmar": -0.259,
+          "max_dd": -21.04,
+          "n_trades": 34,
+          "n_trades_yr": 35.3,
+          "avg_hold_days": 14.6,
+          "win_rate": 35.3,
+          "avg_exposure": 61.9,
+          "avg_simultaneous_holdings": 2.36,
+          "annual_returns": {
+            "2025": -5.27
+          },
+          "turnover_annual_x": 6.81
+        }
+      },
+      "twin": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": -2.22,
+          "sharpe": -0.065,
+          "calmar": -0.061,
+          "max_dd": -36.33,
+          "n_trades": 259,
+          "n_trades_yr": 38.2,
+          "avg_hold_days": 14.0,
+          "win_rate": 34.0,
+          "avg_exposure": 57.1,
+          "avg_simultaneous_holdings": 2.29,
+          "annual_returns": {
+            "2018": -16.29,
+            "2019": 0.2,
+            "2020": 9.59,
+            "2021": 1.96,
+            "2022": -18.67,
+            "2023": -2.39,
+            "2024": 13.51
+          },
+          "turnover_annual_x": 6.25
+        },
+        "OOS": {
+          "cagr": 24.9,
+          "sharpe": 1.262,
+          "calmar": 1.387,
+          "max_dd": -17.95,
+          "n_trades": 33,
+          "n_trades_yr": 34.2,
+          "avg_hold_days": 13.8,
+          "win_rate": 39.4,
+          "avg_exposure": 65.9,
+          "avg_simultaneous_holdings": 2.39,
+          "annual_returns": {
+            "2025": 23.91
+          },
+          "turnover_annual_x": 7.48
+        }
+      }
+    },
+    {
+      "k": 18,
+      "n_dead": 4,
+      "dead_codes": [
+        "83790",
+        "35400",
+        "39380",
+        "54860"
+      ],
+      "pit": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": -12.64,
+          "sharpe": -0.726,
+          "calmar": -0.197,
+          "max_dd": -64.29,
+          "n_trades": 257,
+          "n_trades_yr": 37.9,
+          "avg_hold_days": 13.2,
+          "win_rate": 30.7,
+          "avg_exposure": 52.0,
+          "avg_simultaneous_holdings": 2.16,
+          "annual_returns": {
+            "2018": -30.0,
+            "2019": 19.54,
+            "2020": -12.51,
+            "2021": -9.67,
+            "2022": -16.62,
+            "2023": -22.5,
+            "2024": -5.69
+          },
+          "turnover_annual_x": 4.26
+        },
+        "OOS": {
+          "cagr": 15.17,
+          "sharpe": 1.047,
+          "calmar": 1.058,
+          "max_dd": -14.34,
+          "n_trades": 41,
+          "n_trades_yr": 42.5,
+          "avg_hold_days": 12.2,
+          "win_rate": 46.3,
+          "avg_exposure": 59.0,
+          "avg_simultaneous_holdings": 2.32,
+          "annual_returns": {
+            "2025": 14.59
+          },
+          "turnover_annual_x": 9.05
+        }
+      },
+      "twin": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": -9.96,
+          "sharpe": -0.584,
+          "calmar": -0.172,
+          "max_dd": -57.87,
+          "n_trades": 259,
+          "n_trades_yr": 38.2,
+          "avg_hold_days": 13.2,
+          "win_rate": 30.1,
+          "avg_exposure": 53.7,
+          "avg_simultaneous_holdings": 2.18,
+          "annual_returns": {
+            "2018": -31.44,
+            "2019": 12.87,
+            "2020": -20.78,
+            "2021": -0.89,
+            "2022": -10.96,
+            "2023": -16.44,
+            "2024": 8.55
+          },
+          "turnover_annual_x": 4.27
+        },
+        "OOS": {
+          "cagr": 20.62,
+          "sharpe": 1.305,
+          "calmar": 1.513,
+          "max_dd": -13.63,
+          "n_trades": 38,
+          "n_trades_yr": 39.4,
+          "avg_hold_days": 13.9,
+          "win_rate": 52.6,
+          "avg_exposure": 62.2,
+          "avg_simultaneous_holdings": 2.39,
+          "annual_returns": {
+            "2025": 19.82
+          },
+          "turnover_annual_x": 8.23
+        }
+      }
+    },
+    {
+      "k": 19,
+      "n_dead": 2,
+      "dead_codes": [
+        "26510",
+        "45080"
+      ],
+      "pit": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": -1.84,
+          "sharpe": -0.031,
+          "calmar": -0.062,
+          "max_dd": -29.69,
+          "n_trades": 272,
+          "n_trades_yr": 40.1,
+          "avg_hold_days": 12.9,
+          "win_rate": 39.3,
+          "avg_exposure": 54.8,
+          "avg_simultaneous_holdings": 2.22,
+          "annual_returns": {
+            "2018": -17.58,
+            "2019": 2.09,
+            "2020": 20.61,
+            "2021": -6.82,
+            "2022": -11.22,
+            "2023": 8.41,
+            "2024": -2.54
+          },
+          "turnover_annual_x": 6.68
+        },
+        "OOS": {
+          "cagr": 6.53,
+          "sharpe": 0.422,
+          "calmar": 0.277,
+          "max_dd": -23.54,
+          "n_trades": 40,
+          "n_trades_yr": 41.5,
+          "avg_hold_days": 13.7,
+          "win_rate": 35.0,
+          "avg_exposure": 65.1,
+          "avg_simultaneous_holdings": 2.56,
+          "annual_returns": {
+            "2025": 6.29
+          },
+          "turnover_annual_x": 7.88
+        }
+      },
+      "twin": {
+        "effective_size": 42,
+        "short_history_excluded": 0,
+        "missing": 0,
+        "IS": {
+          "cagr": -0.04,
+          "sharpe": 0.078,
+          "calmar": -0.002,
+          "max_dd": -26.29,
+          "n_trades": 273,
+          "n_trades_yr": 40.3,
+          "avg_hold_days": 13.0,
+          "win_rate": 39.9,
+          "avg_exposure": 56.3,
+          "avg_simultaneous_holdings": 2.26,
+          "annual_returns": {
+            "2018": -13.8,
+            "2019": 5.78,
+            "2020": 16.51,
+            "2021": -8.33,
+            "2022": -6.72,
+            "2023": 14.61,
+            "2024": -4.42
+          },
+          "turnover_annual_x": 7.37
+        },
+        "OOS": {
+          "cagr": 2.73,
+          "sharpe": 0.244,
+          "calmar": 0.139,
+          "max_dd": -19.64,
+          "n_trades": 40,
+          "n_trades_yr": 41.5,
+          "avg_hold_days": 12.8,
+          "win_rate": 35.0,
+          "avg_exposure": 65.1,
+          "avg_simultaneous_holdings": 2.51,
+          "annual_returns": {
+            "2025": 2.63
+          },
+          "turnover_annual_x": 8.1
+        }
+      }
+    }
+  ]
+}
