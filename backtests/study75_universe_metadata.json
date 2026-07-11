@@ -1,0 +1,26 @@
+{
+  "U0": {
+    "rank_universe": "RSR42(42)",
+    "tradable_universe": "RSR42(42)",
+    "effective_size": 42,
+    "short_history_excluded": 0
+  },
+  "U1": {
+    "rank_universe": "RSR42+all_delisted(938)",
+    "tradable_universe": "same",
+    "effective_size": 817,
+    "short_history_excluded": 157
+  },
+  "U2": {
+    "rank_universe": "RSR42+PIT_delisted(432)",
+    "tradable_universe": "same",
+    "effective_size": 452,
+    "short_history_excluded": 22
+  },
+  "U3": {
+    "rank_universe": "UniverseC_union(3020)",
+    "tradable_universe": "UniverseC(monthly)",
+    "effective_size": 2967,
+    "short_history_excluded": 53
+  }
+}

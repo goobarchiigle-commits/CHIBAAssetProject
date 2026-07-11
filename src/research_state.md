@@ -1,6 +1,50 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-10（★J-Quants Full Download完了・Universe復元完了・Study75データ基盤稼働開始★）
+# Single Source of Truth / 最終更新: 2026-07-11（★Study75A/B完了・生存者バイアス実測・Study76ブロック解除条件充足★）
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
+
+---
+
+## ★★★★★★★ 2026-07-11 Study75A/75B完了 — 生存者バイアス実測（Survivorship Bias Measurement）
+
+**成果物**: `reports/study75_dataset_snapshot.md` / `reports/study75_pit_audit.md` /
+`reports/study75_survivorship_report.md`（本体）/ `backtests/study75_rule_universe.json`（Universe C・
+月次120ヶ月・平均907銘柄）/ `backtests/study75_survivorship_2026-07-11.json` /
+`study75_bias_decomposition.json` / `study75_universe_metadata.json` /
+`src/backtest/study75_universe_generator.py` / `src/backtest/study75b_survivorship_bias.py`
+
+### 最重要: Diagnostic A（wiring検証・parity再定義）
+当初Parity Guard FAIL（U0初回1.97% vs 公式12.22%）→ 原因分解の結果、公式パイプライン
+（yfinanceスナップショット+dyn_rsr42_bear_rs0+42銘柄CSV）の完全再実行で**IS 12.22/OOS 11.42を
+完全一致再現**。エンジン・wiringは無傷。ギャップの正体= (1)データソース（yfinance Adj Close=
+配当込み vs J-Quants=分割調整のみ）(2)初回U0のdyn層未配線（修正済み）(3)ユニバース正本の誤用
+（44銘柄json→42銘柄CSVに修正）。**J-Quants基盤を新価格基盤として再基準化**
+（M1前例・Universe統制ポリシー2026-07-04に整合）。旧公式値はyfinance基盤の凍結参考値へ。
+
+### 結果（IS 2018-2024 / J-Quants基盤内の内部比較）
+| | U0(RSR42) | U1(+全廃止938) | U2(+PIT適合432) | U3(Universe C) |
+|---|---|---|---|---|
+| IS CAGR | +8.71% | -3.29% | -8.25% | -30.60% |
+| IS WinRate | 45.9% | 37.6% | 35.5% | 27.9% |
+
+**Delta_A公式(U2-U0)=IS -16.96pp / Delta_A_max(U1-U0)=IS -12.00pp / Delta_B(U3-U2)=IS -22.35pp**
+
+### 解釈（要点）
+- 判定ルール上は最重度「bias≤-5pp→主要結論の再検証」に該当。ただし**交絡3種を明記**:
+  ①パーセンタイル・セマンティクス（min_rsr/Top30がプールサイズ相対→452プールでは戦略が別物化。
+  勝率のプールサイズ単調劣化+U2<U1の非単調性が証拠）②U2プールの96%が廃止銘柄という非現実構成
+  ③3スロット集中PFの経路依存ノイズ（OOS 1年の数値は無情報）。
+- **交絡を除いても立つ本質**: U2/ISで廃止銘柄トレード（221/301件）はPnL -¥1.30M、現存銘柄は
+  +¥0.35M — 「いずれ死ぬ銘柄」は同一ルール下で系統的に損失側。**旧公式値は上方バイアスを含む**。
+- バイアス符号は年次反転: 2018-2023負（distress型）・2024-2025正（TOB/MBOプレミアム型）。
+- U3壊滅はユニバース再設計の否定ではなく「パーセンタイル型パラメータの3020プール無調整移植」の
+  失敗の実証 → Study76（プールサイズ非依存のランク上位固定数選択）の設計を強く裏付ける。
+- **Study74 BLACK維持（強化）**: 構造的結論はデータソース非依存・絶対値バイアスは不利方向。
+
+### Study76ブロック解除
+Study75A（Universe Generator）✅ / PIT audit ✅ / Study75B ✅ — **3条件充足・Study76着手可能**。
+着手時はUniverse統制ポリシー（2026-07-04決裁）の適用確認をASK_FIRSTで行うこと。
+
+---
 
 ---
 

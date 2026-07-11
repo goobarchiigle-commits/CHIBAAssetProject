@@ -711,4 +711,21 @@ Study75データセット上でのWFバックテスト（Study76が既に待機�
 
 ---
 
+---
+
+## 実行ログ追記（2026-07-11・Sonnet実行）— L2 Study75A/75B 完了
+
+- **Study75A**: PIT Universe Generator（`src/backtest/study75_universe_generator.py`）完成。
+  Universe C（ADV20≥¥300M∧lot feasible∧上場60営業日以上・月次T-1スナップショット）120ヶ月分を
+  `backtests/study75_rule_universe.json` へ出力（STUDY75_UNIVERSE_FILEスキーマ・Study76が直接消費可能）。
+- **PIT audit**（`reports/study75_pit_audit.md`）: rebalance/snapshot分離=SAFE・IPO 60日=SAFE・
+  ADV20=SAFE・**lot feasibility=PARTIAL**（2018-10単元統一以前は未検証・診断に記録）。
+- **Study75B**（`reports/study75_survivorship_report.md`）: 4シナリオ比較。
+  Diagnostic Aで公式値12.22/11.42を完全一致再現（wiring証明）後、J-Quants基盤へ再基準化。
+  U0=+8.71% / U2=-8.25%（IS）→ **Delta_A=-16.96pp（交絡3種の注記付き・詳細は本体報告）**。
+  廃止銘柄トレードの系統的損失（-¥1.30M vs 現存+¥0.35M）を実証 — 旧公式値の上方バイアス確認。
+  Study74 BLACK維持（強化）。**Study76ブロック解除条件は3つとも充足**。
+- 実行中に修正した実バグ: エンジンの上場廃止セマンティクス欠如への対応（ffill+alive-mask二重ビュー・
+  エンジン本体は無改変）・276A0型直近上場銘柄のspan切り詰め・欠落17銘柄のmaterialize。
+
 *作成: CRO/Chief Architect, 2026-07-04。新規バックテスト実行なし。本書の全タスクは実行前にASK_FIRST該当有無を0.3で確認すること。正典（final_research_roadmap_2026-07-04.md）と矛盾する場合は正典が優先。*

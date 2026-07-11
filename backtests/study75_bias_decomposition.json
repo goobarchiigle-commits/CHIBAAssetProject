@@ -1,0 +1,13 @@
+{
+  "survivorship_bias_pp": -16.96,
+  "survivorship_bias_upper_bound_pp": -12.0,
+  "universe_change_pp": -22.35,
+  "total_delta_pp": -39.31,
+  "oos": {
+    "delta_a_official_pp": 28.04,
+    "delta_a_max_pp": 15.66,
+    "delta_b_pp": 74.68,
+    "total_delta_pp": 102.72
+  },
+  "note": "IS(2018-2024)基準。全てJ-Quants基盤内の内部比較（データソース差は含まない）。"
+}
