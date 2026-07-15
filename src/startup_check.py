@@ -652,6 +652,147 @@ def _check_snapshot_date(
     )
 
 
+def _compute_startup_equity(state: dict) -> dict[str, Any]:
+    """
+    Health Check用のcurrent_equity/DD/PEAK_ANOMALYを計算する（2026-07-15 SSOT修正）。
+
+    優先ソース: broker snapshot（kabuステーションAPI）+ OHLCVキャッシュ終値。
+    run_live_signal.py本体（SignalBridge._get_current_positions等）と同一ソース。
+    失敗時のみ state ファイルの available_cash/position_qtys へ FAIL_OPEN する
+    （旧実装。stale な場合がある——2026-07-14 08:41 incidentのRCAで
+    ¥483,150の乖離を実測し、DD -21.9%(誤) vs 実際-10.2% という誤警告を招いた）。
+
+    Returns:
+        {equity_peak, current_equity, dd, cash_used, equity_fallback,
+         equity_src, broker_available, dd_breach, warnings}
+    """
+    from src.portfolio.equity import compute_live_equity
+
+    ep = float(state.get("equity_peak", 0))
+    ac = float(state.get("available_cash", 0))
+    _pos_qtys  = state.get("position_qtys", {})
+    _avg_costs = {**state.get("position_entry_prices", {}),
+                  **state.get("snapshot_avg_costs", {})}
+
+    _broker_cash: float | None = None
+    _broker_positions: dict[str, dict] | None = None
+    _broker_fetch_error: str = ""
+    try:
+        from src.kabusapi.client import KabuClient
+        _kc = KabuClient()
+        _wallet = _kc.get_wallet_cash()
+        _raw_positions = _kc.get_positions()
+        _broker_cash = float(_wallet["StockAccountWallet"])
+
+        from src.common.position_normalizer import filter_live_positions
+        _live_positions = filter_live_positions(_raw_positions)
+        _broker_positions = {}
+        for _p in _live_positions:
+            _sym_code = _p.get("Symbol", "")
+            _sym = f"{_sym_code}.T" if not _sym_code.endswith(".T") else _sym_code
+            _qty = int(_p.get("LeavesQty", 0) or 0)
+            if _qty > 0:
+                _broker_positions[_sym] = {
+                    "qty": _qty, "avg_price": float(_p.get("Price", 0.0) or 0.0),
+                }
+    except Exception as _bf_exc:
+        _broker_fetch_error = str(_bf_exc)
+        _logger.debug("[EQUITY_PEAK_DIAG] broker snapshot fetch failed (FAIL_OPEN): %s", _bf_exc)
+
+    _broker_available = _broker_cash is not None and _broker_positions is not None
+    if _broker_available:
+        _cash_used = _broker_cash
+        _positions = _broker_positions
+    else:
+        _cash_used = ac
+        _positions = {
+            sym: {"qty": int(qty), "avg_price": float(_avg_costs.get(sym, 0.0))}
+            for sym, qty in _pos_qtys.items()
+            if int(qty) > 0
+        }
+
+    _universe_raw = None
+    _ohlcv_cache  = _BASE_DIR / "cache" / "ohlcv"
+    if _ohlcv_cache.exists() and _positions:
+        try:
+            import pandas as _pd_sc
+            _universe_raw = {}
+            for _sym in _positions:
+                _fp = _ohlcv_cache / f"{_sym}.parquet"
+                if _fp.exists():
+                    _universe_raw[_sym] = {"df": _pd_sc.read_parquet(_fp)}
+        except Exception:
+            _universe_raw = None   # FAIL_OPEN: avg_price fallback
+
+    current_equity = compute_live_equity(
+        live_cash        = _cash_used,
+        positions        = _positions,
+        universe_raw     = _universe_raw,
+        mode             = "startup",
+        equity_peak      = ep,
+        persist_snapshot = False,   # 副作用なし（読み取り専用モード）
+    )
+    dd = compute_drawdown(current_equity, ep) * 100 if ep > 0 else 0.0
+
+    _has_positions   = bool(_positions)
+    _ohlcv_ok        = bool(_universe_raw)
+    _equity_fallback = _has_positions and not _ohlcv_ok
+
+    try:
+        _state_mtime = datetime.fromtimestamp(
+            _PORTFOLIO_FILE.stat().st_mtime, tz=timezone(timedelta(hours=9))
+        ).strftime("%Y-%m-%dT%H:%M:%S%z")
+    except OSError:
+        _state_mtime = "unknown"
+    if _broker_available:
+        _equity_src = "broker_snapshot"
+    elif _equity_fallback:
+        _equity_src = "avg_price_fallback"
+    else:
+        _equity_src = "ohlcv_cache(stale_state_fallback)"
+    _logger.info(
+        "[EQUITY_PEAK_DIAG] equity_peak=%s current_equity=%s dd=%.2f%% source=%s mtime=%s"
+        + (" broker_fetch_error=%s" % _broker_fetch_error if _broker_fetch_error else ""),
+        f"{ep:,.0f}", f"{current_equity:,.0f}", dd, _equity_src, _state_mtime,
+    )
+    if _equity_fallback:
+        _logger.warning(
+            "[DD_WARNING] live equity unavailable, fallback active"
+            " — broker snapshot failed AND OHLCV cache missing/empty, using avg_price"
+        )
+
+    out_warnings: list[str] = []
+    dd_breach = ep > 0 and dd < _DD_WARN_THRESHOLD * 100
+    if dd_breach:
+        _eq_label = f"¥{current_equity:,.0f}(fallback)" if _equity_fallback else f"¥{current_equity:,.0f}"
+        out_warnings.append(
+            f"⚠️ DD警告: {dd:.1f}%  equity={_eq_label} / peak=¥{ep:,.0f}"
+            f"  (BUY_STOP閾値 {_DD_WARN_THRESHOLD*100:.0f}%)"
+        )
+
+    if ep > 0 and current_equity > 0:
+        _ratio = ep / current_equity
+        if _ratio > 1.25:
+            _anomaly_src = "(avg_price_fallback)" if _equity_fallback else ""
+            out_warnings.append(
+                f"⚠️ PEAK_ANOMALY: equity_peak=¥{ep:,.0f}"
+                f" / equity=¥{current_equity:,.0f}{_anomaly_src}"
+                f" ratio={_ratio:.2f} > 1.25 — state ファイル破損の可能性"
+            )
+
+    return {
+        "equity_peak":      ep,
+        "current_equity":   current_equity,
+        "dd":               dd,
+        "cash_used":        _cash_used,
+        "equity_fallback":  _equity_fallback,
+        "equity_src":       _equity_src,
+        "broker_available": _broker_available,
+        "dd_breach":        dd_breach,
+        "warnings":         out_warnings,
+    }
+
+
 # ── メイン公開関数 ────────────────────────────────────────────────────────────
 
 def run_startup_check(is_live: bool = False) -> dict[str, Any]:
@@ -729,96 +870,21 @@ def run_startup_check(is_live: bool = False) -> dict[str, Any]:
     ok = len(issues) == 0
 
     if ok:
-        ep = float(state.get("equity_peak", 0))
-        ac = float(state.get("available_cash", 0))
-        # compute_live_equity() と同一ソースで current_equity を推定する。
-        # last_equity は前回 LIVE run 時の snapshot 値であり equity_peak と一致するケースが
-        # 多く DD=0 に見える問題がある。OHLCV キャッシュ終値を使うことで
-        # run_live_signal.py の DD 表示と同一ベースになる。
-        from src.portfolio.equity import compute_live_equity
-        _pos_qtys  = state.get("position_qtys", {})
-        _avg_costs = {**state.get("position_entry_prices", {}),
-                      **state.get("snapshot_avg_costs", {})}
-        _positions = {
-            sym: {"qty": int(qty), "avg_price": float(_avg_costs.get(sym, 0.0))}
-            for sym, qty in _pos_qtys.items()
-            if int(qty) > 0
-        }
-        _universe_raw = None
-        _ohlcv_cache  = _BASE_DIR / "cache" / "ohlcv"
-        if _ohlcv_cache.exists() and _positions:
-            try:
-                import pandas as _pd_sc
-                _universe_raw = {}
-                for _sym in _positions:
-                    _fp = _ohlcv_cache / f"{_sym}.parquet"
-                    if _fp.exists():
-                        _universe_raw[_sym] = {"df": _pd_sc.read_parquet(_fp)}
-            except Exception:
-                _universe_raw = None   # FAIL_OPEN: avg_price fallback
-        current_equity = compute_live_equity(
-            live_cash        = ac,
-            positions        = _positions,
-            universe_raw     = _universe_raw,
-            mode             = "startup",
-            equity_peak      = ep,
-            persist_snapshot = False,   # 副作用なし（読み取り専用モード）
-        )
-        dd = compute_drawdown(current_equity, ep) * 100 if ep > 0 else 0.0
+        eq_result = _compute_startup_equity(state)
+        ep              = eq_result["equity_peak"]
+        current_equity  = eq_result["current_equity"]
+        dd              = eq_result["dd"]
+        _equity_fallback = eq_result["equity_fallback"]
+        _cash_used      = eq_result["cash_used"]
+        warnings.extend(eq_result["warnings"])
 
-        # OHLCV キャッシュが使えたかどうかを判定（ポジションなし時は現金のみで正確）
-        _has_positions = bool(_positions)
-        _ohlcv_ok = bool(_universe_raw)
-        _equity_fallback = _has_positions and not _ohlcv_ok
-
-        # EQUITY_PEAK_DIAG（DD ソースを明示）
-        try:
-            _state_mtime = datetime.fromtimestamp(
-                _PORTFOLIO_FILE.stat().st_mtime, tz=timezone(timedelta(hours=9))
-            ).strftime("%Y-%m-%dT%H:%M:%S%z")
-        except OSError:
-            _state_mtime = "unknown"
-        _equity_src = "avg_price_fallback" if _equity_fallback else "ohlcv_cache"
-        _logger.info(
-            "[EQUITY_PEAK_DIAG] equity_peak=%s current_equity=%s dd=%.2f%% source=%s mtime=%s",
-            f"{ep:,.0f}", f"{current_equity:,.0f}", dd, _equity_src, _state_mtime,
-        )
-
-        if _equity_fallback:
-            _logger.warning(
-                "[DD_WARNING] live equity unavailable, fallback active"
-                " — OHLCV cache missing or empty, using avg_price"
-            )
-
-        # [3] DD 水準チェック（compute_live_equity ベース）
-        if ep > 0 and dd < _DD_WARN_THRESHOLD * 100:
-            _eq_label = (
-                f"¥{current_equity:,.0f}(fallback)"
-                if _equity_fallback
-                else f"¥{current_equity:,.0f}"
-            )
-            warnings.append(
-                f"⚠️ DD警告: {dd:.1f}%  equity={_eq_label} / peak=¥{ep:,.0f}"
-                f"  (BUY_STOP閾値 {_DD_WARN_THRESHOLD*100:.0f}%)"
-            )
-            _cb_now = str(state.get("cb_state", "NORMAL"))
-            if _cb_now == "NORMAL":
-                warnings.append(f"cb_state=NORMAL だが DD={dd:.1f}% → 手動確認推奨")
-
-        # [5b] PEAK_ANOMALY（forensic 用）— last_equity ではなく current_equity で評価
-        if ep > 0 and current_equity > 0:
-            _ratio = ep / current_equity
-            if _ratio > 1.25:
-                _anomaly_src = "(avg_price_fallback)" if _equity_fallback else ""
-                warnings.append(
-                    f"⚠️ PEAK_ANOMALY: equity_peak=¥{ep:,.0f}"
-                    f" / equity=¥{current_equity:,.0f}{_anomaly_src}"
-                    f" ratio={_ratio:.2f} > 1.25 — state ファイル破損の可能性"
-                )
+        _cb_now = str(state.get("cb_state", "NORMAL"))
+        if eq_result["dd_breach"] and _cb_now == "NORMAL":
+            warnings.append(f"cb_state=NORMAL だが DD={dd:.1f}% → 手動確認推奨")
 
         stale_suffix = f" [STALE_DATA: {snapshot_date}→{expected_date}]" if stale_detected else ""
         _dd_display = f"DD={dd:.1f}%" + (" (fallback)" if _equity_fallback else "")
-        summary = f"OK — equity_peak={ep:,.0f}円, cash={ac:,.0f}円, {_dd_display}{stale_suffix}"
+        summary = f"OK — equity_peak={ep:,.0f}円, cash={_cash_used:,.0f}円, {_dd_display}{stale_suffix}"
     else:
         summary = f"FAIL — {len(issues)}件の致命的問題 / {len(warnings)}件の警告"
 

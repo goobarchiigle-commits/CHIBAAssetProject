@@ -364,6 +364,29 @@ class TestSavePortfolioState(unittest.TestCase):
         self.assertEqual(loaded["positions_count"], 2)
         p.unlink()
 
+    def test_save_refreshes_stale_hash_without_commit_broker_snapshot(self):
+        """
+        2026-07-15 SSOT修正の回帰テスト。
+
+        commit_broker_snapshot() を経由せず save_portfolio_state() だけを
+        呼ぶ経路（run_morning_signal.py の起動時sync等・実際に複数箇所存在した）
+        でも、保存後のsnapshot_hashは常にrecomputeと一致すること。
+        パッチ前はここでstale hashのまま保存されていた
+        （2026-07-14 08:41 incidentのRCAで発見された構造的root cause）。
+        """
+        p = _tmp_path()
+        s = _make_valid_state()
+        s["snapshot_hash"] = "0000000000000000"  # 明らかに古い/不正なhashを模擬
+        s["position_qtys"] = {"6981.T": 100}
+        s["snapshot_avg_costs"] = {"6981.T": 4864.0}
+        s["available_cash"] = 1_706_591.0
+        save_portfolio_state(s, path=p, data_source="morning_sync")
+        loaded = json.loads(p.read_text(encoding="utf-8"))
+        self.assertEqual(loaded["snapshot_hash"], _recompute_hash_from_state(loaded))
+        vr = validate_state(loaded)
+        self.assertFalse(any("mismatch" in w for w in vr.warnings))
+        p.unlink()
+
 
 class TestBrokerSnapshotPersistence(unittest.TestCase):
 

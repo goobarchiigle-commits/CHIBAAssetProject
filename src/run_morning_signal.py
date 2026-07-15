@@ -47,6 +47,22 @@ sys.path.insert(0, str(_here))           # C:/ai-trading/src/ → backtest.xxx i
 sys.path.insert(0, str(_here.parent))    # C:/ai-trading/     → src.xxx imports
 sys.stdout.reconfigure(encoding="utf-8")
 
+# ── DEPRECATED (2026-07-15 SSOT監査・Option A統合) ───────────────────────────
+# 実発注経路を run_live_signal.py へ一本化した。理由・詳細:
+#   reports/execution_path_ssot_audit_2026-07-14.md
+# このスクリプトは ExecutionLock/InflightRegistry/StagedSupervisor を経由せず
+# 独自の ORDER_LOCK_FILE のみで動作していたため、run_live_signal.py と並行
+# 実行された場合に二重発注リスク・state不整合(snapshot_hash mismatch)の
+# 原因となっていた（2026-07-14 08:41 incident RCA）。
+# Capital Efficiency (CE) 機能は run_live_signal.py へ Shadow Mode として
+# 移植済み（実発注数量への影響なし・ce_compare_daily.csv に比較記録）。
+# 復活させる場合は上記監査文書のOption A/Bを再検討すること。
+raise RuntimeError(
+    "run_morning_signal.py は 2026-07-15 SSOT監査により廃止されました。"
+    "run_live_signal.py を使用してください。"
+    "詳細: reports/execution_path_ssot_audit_2026-07-14.md"
+)
+
 from src.config_loader import load_strategy_config
 from src.paths import SIGNALS_DIR, LIVE_UNIVERSE_FILE, ORDER_LOCK_FILE, RUNTIME_DIR, LOGS_DIR
 from src.utils.morning_smoke_test import run_morning_smoke_test
@@ -797,12 +813,105 @@ def main() -> int:
             saved_path = save_signal_json(result, args.output_dir)
             print(f"\n💾 シグナル保存: {saved_path}")
 
+        # ── Opportunity Capture: forward-return enrichment (2026-07-08 fix) ──
+        # 同一処理をrun_live_signal.pyにも実装済み。DRY/LIVE分岐前に1回だけ実行。
+        try:
+            import pandas as _pd_sor
+            from src.analytics.skipped_opportunity_analytics import enrich_and_rewrite_store as _sor_enrich_rw
+            from src.paths import SKIPPED_OPPORTUNITY_FILE as _sor_enrich_path, CACHE_DIR as _sor_cache_dir
+
+            def _sor_price_fetcher(sym: str, iso_date: str):
+                _p = _sor_cache_dir / "ohlcv" / f"{sym}.parquet"
+                if not _p.exists():
+                    return None
+                try:
+                    _df = _pd_sor.read_parquet(_p)
+                    _df.index = _pd_sor.to_datetime(_df.index)
+                    _mask = _df.index >= _pd_sor.Timestamp(iso_date)
+                    if not _mask.any():
+                        return None
+                    return _df.loc[_mask, "Close"].tolist()[:6]
+                except Exception:
+                    return None
+
+            _sor_n_enriched = _sor_enrich_rw(_sor_enrich_path, _sor_price_fetcher)
+            if _sor_n_enriched:
+                logger.info("[SKIPPED_OPP] enriched %d record(s) source=run_morning_signal.py", _sor_n_enriched)
+        except Exception as _sor_enrich_err:
+            logger.warning("[SKIPPED_OPP] enrichment hook failed (%s) — continuing", _sor_enrich_err)
+
         # ---- 発注 ----
         if not args.live:
             print("\n" + "=" * 60)
             print("  ドライランのため発注は行いません。")
             print("  実際に発注するには --live オプションを付けて実行してください。")
             print("=" * 60)
+            # EVS integrity fix (2026-07-08): run_morning_signal.py は実発注可能
+            # なスクリプトでありながらEVS計測が一切存在しなかった
+            # （2026-06-29 EVS RCA follow-upで判明した根本原因の一部）。
+            # run_id/timestampはEVS・Opportunity Capture両方で共有する
+            # （どちらかのtryブロックが単独で失敗してもrun_idがズレないよう、
+            #  両ブロックの外側で1回だけ確定させる）。
+            _evs_run_id = datetime.now(JST).strftime("%Y%m%d_%H%M%S")
+            _evs_run_ts_dry = datetime.now(JST).strftime("%Y-%m-%dT%H:%M:%S%z")
+            try:
+                from src.analytics.executed_vs_skipped_expectancy import (
+                    build_opportunity_records as _evs_build,
+                    append_opportunity        as _evs_append,
+                    DEFAULT_STORE_PATH        as _evs_path,
+                )
+                _evs_recs = _evs_build(
+                    signals=result.signals,
+                    stage_audit=getattr(bridge, "_last_stage_audit", []),
+                    send_results=[],
+                    run_id=_evs_run_id,
+                    run_timestamp=_evs_run_ts_dry,
+                    mode="DRY",
+                    source_script="run_morning_signal.py",
+                    capital_available_pct=(
+                        result.portfolio_summary.get("available_cash", 0.0)
+                        / max(1.0, cfg.portfolio.capital)
+                    ),
+                    portfolio_heat=float(result.portfolio_summary.get("portfolio_heat", 0.0)),
+                    market_regime="unknown",
+                    max_positions=cfg.portfolio.max_positions,
+                )
+                for _evs_rec in _evs_recs:
+                    _evs_append(_evs_rec, _evs_path)
+                if _evs_recs:
+                    logger.info(
+                        "[EVS] DRY recorded %d opportunity records (executed=%d skipped=%d) source=run_morning_signal.py",
+                        len(_evs_recs),
+                        sum(1 for r in _evs_recs if r.executed),
+                        sum(1 for r in _evs_recs if not r.executed),
+                    )
+            except Exception as _evs_err:
+                logger.warning("[EVS] DRY build_opportunity_records failed (%s) — continuing", _evs_err)
+
+            # Opportunity Capture integrity fix (2026-07-08): same gap as EVS —
+            # run_morning_signal.py never wrote skipped_opportunities.jsonl either.
+            try:
+                from src.analytics.skipped_opportunity_analytics import (
+                    build_skipped_opportunity_records as _sor_build,
+                    append_skipped_opportunity         as _sor_append,
+                )
+                from src.paths import SKIPPED_OPPORTUNITY_FILE as _sor_path
+                _sor_recs = _sor_build(
+                    signals=result.signals,
+                    stage_audit=getattr(bridge, "_last_stage_audit", []),
+                    send_results=[],
+                    run_id=_evs_run_id,
+                    run_timestamp=_evs_run_ts_dry,
+                    mode="DRY",
+                    source_script="run_morning_signal.py",
+                    available_cash=result.portfolio_summary.get("available_cash", 0.0),
+                )
+                for _sor_rec in _sor_recs:
+                    _sor_append(_sor_rec, _sor_path)
+                if _sor_recs:
+                    logger.info("[SKIPPED_OPP] DRY recorded %d record(s) source=run_morning_signal.py", len(_sor_recs))
+            except Exception as _sor_err:
+                logger.warning("[SKIPPED_OPP] DRY build failed (%s) — continuing", _sor_err)
             return 0
 
         # ---- P0-3: LIVE_MODE 環境変数ガード（--live 指定時のみ） ----
@@ -1019,7 +1128,80 @@ def main() -> int:
         # 発注成功した銘柄のエントリー日・価格・ATR を portfolio_state.json に記録する。
         # これがないと次回起動時に「ポジションなし」と誤認され二重発注が起きる。
         today_str = datetime.now(JST).strftime("%Y-%m-%d")
-        bridge.update_state_after_execution(send_results, today_str)
+        # 2026-07-08 RCA: signal_rsr_map を渡さないと Quality Replacement Engine の
+        # entry_rsr が記録されず「entry_rsr missing (pre-v3 position)」が発生する
+        # (src/kabusapi/signal_bridge.py::update_state_after_execution 参照)。
+        _signal_rsr_map = {
+            _s["symbol"]: float(_s.get("rsr", 0.0))
+            for _s in result.signals
+            if _s.get("symbol")
+        }
+        bridge.update_state_after_execution(send_results, today_str, signal_rsr_map=_signal_rsr_map)
+
+        # ── EVS: Executed vs Skipped Expectancy — LIVE record ─────────────────
+        # EVS integrity fix (2026-07-08): このスクリプト経由の実発注がEVSに
+        # 一切記録されていなかった根本原因の修正。send_results（実際のBroker
+        # 応答）を使うため "executed" は真に約定成功した銘柄のみ True になる。
+        # run_id/timestampはEVS・Opportunity Capture両方で共有する。
+        _evs_run_id_lv = datetime.now(JST).strftime("%Y%m%d_%H%M%S")
+        _evs_run_ts_lv = datetime.now(JST).strftime("%Y-%m-%dT%H:%M:%S%z")
+        try:
+            from src.analytics.executed_vs_skipped_expectancy import (
+                build_opportunity_records as _evs_build_lv,
+                append_opportunity        as _evs_append_lv,
+                DEFAULT_STORE_PATH        as _evs_path_lv,
+            )
+            _evs_recs_lv = _evs_build_lv(
+                signals=result.signals,
+                stage_audit=getattr(bridge, "_last_stage_audit", []),
+                send_results=send_results,
+                run_id=_evs_run_id_lv,
+                run_timestamp=_evs_run_ts_lv,
+                mode="LIVE",
+                source_script="run_morning_signal.py",
+                capital_available_pct=(
+                    result.portfolio_summary.get("available_cash", 0.0)
+                    / max(1.0, cfg.portfolio.capital)
+                ),
+                portfolio_heat=float(result.portfolio_summary.get("portfolio_heat", 0.0)),
+                market_regime="unknown",
+                max_positions=cfg.portfolio.max_positions,
+            )
+            for _evs_rec_lv in _evs_recs_lv:
+                _evs_append_lv(_evs_rec_lv, _evs_path_lv)
+            if _evs_recs_lv:
+                logger.info(
+                    "[EVS] LIVE recorded %d opportunity records (executed=%d skipped=%d) source=run_morning_signal.py",
+                    len(_evs_recs_lv),
+                    sum(1 for r in _evs_recs_lv if r.executed),
+                    sum(1 for r in _evs_recs_lv if not r.executed),
+                )
+        except Exception as _evs_err_lv:
+            logger.warning("[EVS] LIVE build_opportunity_records failed (%s) — continuing", _evs_err_lv)
+
+        # ── Opportunity Capture integrity fix (2026-07-08) — LIVE record ──────
+        try:
+            from src.analytics.skipped_opportunity_analytics import (
+                build_skipped_opportunity_records as _sor_build_lv,
+                append_skipped_opportunity         as _sor_append_lv,
+            )
+            from src.paths import SKIPPED_OPPORTUNITY_FILE as _sor_path_lv
+            _sor_recs_lv = _sor_build_lv(
+                signals=result.signals,
+                stage_audit=getattr(bridge, "_last_stage_audit", []),
+                send_results=send_results,
+                run_id=_evs_run_id_lv,
+                run_timestamp=_evs_run_ts_lv,
+                mode="LIVE",
+                source_script="run_morning_signal.py",
+                available_cash=result.portfolio_summary.get("available_cash", 0.0),
+            )
+            for _sor_rec_lv in _sor_recs_lv:
+                _sor_append_lv(_sor_rec_lv, _sor_path_lv)
+            if _sor_recs_lv:
+                logger.info("[SKIPPED_OPP] LIVE recorded %d record(s) source=run_morning_signal.py", len(_sor_recs_lv))
+        except Exception as _sor_err_lv:
+            logger.warning("[SKIPPED_OPP] LIVE build failed (%s) — continuing", _sor_err_lv)
 
         # 結果を JSON に追記して再保存
         result_dict = json.loads(result.to_json())

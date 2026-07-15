@@ -687,7 +687,18 @@ def save_portfolio_state(
 
     - generation_id をインクリメントし watermark を更新
     - schema_version / updated_at / data_source を自動付与
+    - snapshot_hash を必ず再計算してから永続化する（2026-07-15 SSOT修正）
     - atomic write (tmp → fsync → os.replace)
+
+    snapshot_hash の意味論（2026-07-15 確定）:
+      「broker snapshotとの一致証明」ではなく「永続化されるcash/qtys/costs
+      フィールド自体の自己整合性チェックサム」。commit_broker_snapshot() を
+      経由したか否かに関わらず、save_portfolio_state() を呼べば必ず
+      その時点のcash/position_qtys/snapshot_avg_costsと一致する値になる。
+      validate_state() の mismatch 警告は「state_storeを経由しない外部からの
+      直接編集」のみを検知する意味に純化される（本来の意図通り）。
+      snapshot_hash はいかなる発注可否判定・authority/deployment gatingにも
+      使われていないことを2026-07-15 SSOT監査で確認済み（純粋診断用）。
     """
     target  = Path(path) if path else _DEFAULT_PATH
     now_iso = datetime.now(JST).strftime("%Y-%m-%dT%H:%M:%S%z")
@@ -703,6 +714,7 @@ def save_portfolio_state(
     state["positions_count"] = sum(
         1 for q in state.get("position_qtys", {}).values() if int(q) > 0
     )
+    state["snapshot_hash"] = _recompute_hash_from_state(state)
 
     atomic_write_json(target, state)
 
