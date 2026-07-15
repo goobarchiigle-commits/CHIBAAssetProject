@@ -1,0 +1,591 @@
+{
+  "study": "Study76_dynamic_rsr42_pathology_diagnostics",
+  "generated_at": "2026-07-13T08:10:53.462483+09:00",
+  "started_at": "2026-07-13T08:09:31.896226+09:00",
+  "note": "パラメータ変更・最適化なし。RunBと完全同一構成の再実行（決定論的）+ 生データ保持による診断。",
+  "candidate_count_distribution": {
+    "avg_candidates_per_day": 0.446,
+    "total_days": 1709,
+    "total_zero_candidate_days": 1101,
+    "zero_candidate_day_pct": 64.4,
+    "n_months_total": 84,
+    "n_months_with_zero_mean_candidates": 1,
+    "monthly_distribution_head20": [
+      {
+        "Date": "2018-01-01",
+        "mean": "0.8421052631578947",
+        "max": "2",
+        "min": "0",
+        "zero_days": "7"
+      },
+      {
+        "Date": "2018-02-01",
+        "mean": "0.5263157894736842",
+        "max": "2",
+        "min": "0",
+        "zero_days": "11"
+      },
+      {
+        "Date": "2018-03-01",
+        "mean": "0.3333333333333333",
+        "max": "2",
+        "min": "0",
+        "zero_days": "15"
+      },
+      {
+        "Date": "2018-04-01",
+        "mean": "0.3",
+        "max": "2",
+        "min": "0",
+        "zero_days": "15"
+      },
+      {
+        "Date": "2018-05-01",
+        "mean": "0.23809523809523808",
+        "max": "1",
+        "min": "0",
+        "zero_days": "16"
+      },
+      {
+        "Date": "2018-06-01",
+        "mean": "0.38095238095238093",
+        "max": "1",
+        "min": "0",
+        "zero_days": "13"
+      },
+      {
+        "Date": "2018-07-01",
+        "mean": "0.23809523809523808",
+        "max": "2",
+        "min": "0",
+        "zero_days": "17"
+      },
+      {
+        "Date": "2018-08-01",
+        "mean": "0.17391304347826086",
+        "max": "1",
+        "min": "0",
+        "zero_days": "19"
+      },
+      {
+        "Date": "2018-09-01",
+        "mean": "0.8333333333333334",
+        "max": "3",
+        "min": "0",
+        "zero_days": "9"
+      },
+      {
+        "Date": "2018-10-01",
+        "mean": "0.2727272727272727",
+        "max": "2",
+        "min": "0",
+        "zero_days": "17"
+      },
+      {
+        "Date": "2018-11-01",
+        "mean": "0.19047619047619047",
+        "max": "1",
+        "min": "0",
+        "zero_days": "17"
+      },
+      {
+        "Date": "2018-12-01",
+        "mean": "0.21052631578947367",
+        "max": "2",
+        "min": "0",
+        "zero_days": "16"
+      },
+      {
+        "Date": "2019-01-01",
+        "mean": "0.21052631578947367",
+        "max": "1",
+        "min": "0",
+        "zero_days": "15"
+      },
+      {
+        "Date": "2019-02-01",
+        "mean": "0.2631578947368421",
+        "max": "1",
+        "min": "0",
+        "zero_days": "14"
+      },
+      {
+        "Date": "2019-03-01",
+        "mean": "0.2",
+        "max": "2",
+        "min": "0",
+        "zero_days": "17"
+      },
+      {
+        "Date": "2019-04-01",
+        "mean": "0.3",
+        "max": "2",
+        "min": "0",
+        "zero_days": "16"
+      },
+      {
+        "Date": "2019-05-01",
+        "mean": "0.05263157894736842",
+        "max": "1",
+        "min": "0",
+        "zero_days": "18"
+      },
+      {
+        "Date": "2019-06-01",
+        "mean": "0.15",
+        "max": "1",
+        "min": "0",
+        "zero_days": "17"
+      },
+      {
+        "Date": "2019-07-01",
+        "mean": "0.0",
+        "max": "0",
+        "min": "0",
+        "zero_days": "22"
+      },
+      {
+        "Date": "2019-08-01",
+        "mean": "0.3333333333333333",
+        "max": "1",
+        "min": "0",
+        "zero_days": "14"
+      }
+    ]
+  },
+  "exposure": {
+    "pnl_by_year": {
+      "2018": {
+        "sum": -1099459.9487304685,
+        "count": 53,
+        "mean": -20744.527334537142
+      },
+      "2019": {
+        "sum": -457629.9743652344,
+        "count": 35,
+        "mean": -13075.142124720982
+      },
+      "2020": {
+        "sum": -580600.0,
+        "count": 36,
+        "mean": -16127.777777777777
+      },
+      "2021": {
+        "sum": -38079.99725341794,
+        "count": 37,
+        "mean": -1029.1891149572416
+      },
+      "2022": {
+        "sum": 83809.99145507814,
+        "count": 32,
+        "mean": 2619.062232971192
+      },
+      "2023": {
+        "sum": 51149.9862670898,
+        "count": 47,
+        "mean": 1088.297580150847
+      },
+      "2024": {
+        "sum": 197799.96032714844,
+        "count": 42,
+        "mean": 4709.522864932105
+      }
+    },
+    "note": "position-level daily exposure series not persisted by engine; using trade-level pnl aggregation by exit year as proxy"
+  },
+  "top_20_losing_trades": [
+    {
+      "entry_date": "2020-02-07",
+      "exit_date": "2020-02-27",
+      "symbol": "66560",
+      "entry": 5285.0,
+      "exit": 3330.0,
+      "qty": 200,
+      "pnl": -391000.0,
+      "reason": "ATR_TRAILING"
+    },
+    {
+      "entry_date": "2024-07-25",
+      "exit_date": "2024-07-31",
+      "symbol": "33500",
+      "entry": 177.0,
+      "exit": 81.69999694824219,
+      "qty": 3000,
+      "pnl": -285900.00915527344,
+      "reason": "ATR_TRAILING"
+    },
+    {
+      "entry_date": "2018-06-12",
+      "exit_date": "2018-06-27",
+      "symbol": "47640",
+      "entry": 640.0,
+      "exit": 424.0,
+      "qty": 1100,
+      "pnl": -237600.0,
+      "reason": "ATR_TRAILING"
+    },
+    {
+      "entry_date": "2018-09-25",
+      "exit_date": "2018-10-10",
+      "symbol": "33560",
+      "entry": 1724.0,
+      "exit": 1132.0,
+      "qty": 400,
+      "pnl": -236800.0,
+      "reason": "ATR_TRAILING"
+    },
+    {
+      "entry_date": "2018-01-09",
+      "exit_date": "2018-02-13",
+      "symbol": "45790",
+      "entry": 2877.3333333333335,
+      "exit": 2100.0,
+      "qty": 300,
+      "pnl": -233200.00000000006,
+      "reason": "RSR_MOMENTUM_EXIT"
+    },
+    {
+      "entry_date": "2024-06-26",
+      "exit_date": "2024-07-19",
+      "symbol": "27760",
+      "entry": 198.43243243243242,
+      "exit": 152.0,
+      "qty": 3700,
+      "pnl": -171799.99999999997,
+      "reason": "ATR_TRAILING"
+    },
+    {
+      "entry_date": "2018-10-18",
+      "exit_date": "2018-10-24",
+      "symbol": "36550",
+      "entry": 2250.0,
+      "exit": 1720.0,
+      "qty": 300,
+      "pnl": -159000.0,
+      "reason": "RSR_MOMENTUM_EXIT"
+    },
+    {
+      "entry_date": "2018-03-15",
+      "exit_date": "2018-03-20",
+      "symbol": "89270",
+      "entry": 1000.0,
+      "exit": 800.0,
+      "qty": 700,
+      "pnl": -140000.0,
+      "reason": "ATR_TRAILING"
+    },
+    {
+      "entry_date": "2019-05-15",
+      "exit_date": "2019-05-20",
+      "symbol": "76120",
+      "entry": 159.0,
+      "exit": 124.0,
+      "qty": 3800,
+      "pnl": -133000.0,
+      "reason": "ATR_TRAILING"
+    },
+    {
+      "entry_date": "2021-12-08",
+      "exit_date": "2021-12-28",
+      "symbol": "45910",
+      "entry": 822.25,
+      "exit": 511.0,
+      "qty": 400,
+      "pnl": -124500.0,
+      "reason": "RSR_EXIT"
+    },
+    {
+      "entry_date": "2024-07-04",
+      "exit_date": "2024-07-22",
+      "symbol": "52460",
+      "entry": 1978.5,
+      "exit": 1401.0,
+      "qty": 200,
+      "pnl": -115500.0,
+      "reason": "ATR_TRAILING"
+    },
+    {
+      "entry_date": "2021-09-03",
+      "exit_date": "2021-09-14",
+      "symbol": "63350",
+      "entry": 2185.5,
+      "exit": 1635.0,
+      "qty": 200,
+      "pnl": -110100.0,
+      "reason": "ATR_TRAILING"
+    },
+    {
+      "entry_date": "2018-10-18",
+      "exit_date": "2018-11-02",
+      "symbol": "43440",
+      "entry": 690.4,
+      "exit": 583.5,
+      "qty": 1000,
+      "pnl": -106899.99999999997,
+      "reason": "ATR_TRAILING"
+    },
+    {
+      "entry_date": "2018-12-14",
+      "exit_date": "2018-12-26",
+      "symbol": "35410",
+      "entry": 1042.0,
+      "exit": 871.0,
+      "qty": 600,
+      "pnl": -102600.0,
+      "reason": "ATR_TRAILING"
+    },
+    {
+      "entry_date": "2024-06-04",
+      "exit_date": "2024-06-10",
+      "symbol": "66960",
+      "entry": 818.0,
+      "exit": 580.0,
+      "qty": 400,
+      "pnl": -95200.0,
+      "reason": "RSR_EXIT"
+    },
+    {
+      "entry_date": "2018-04-09",
+      "exit_date": "2018-04-13",
+      "symbol": "46640",
+      "entry": 1770.0,
+      "exit": 1535.0,
+      "qty": 400,
+      "pnl": -94000.0,
+      "reason": "RSR_MOMENTUM_EXIT"
+    },
+    {
+      "entry_date": "2019-12-18",
+      "exit_date": "2019-12-23",
+      "symbol": "36720",
+      "entry": 1136.6666666666667,
+      "exit": 877.0,
+      "qty": 300,
+      "pnl": -77900.00000000003,
+      "reason": "ATR_TRAILING"
+    },
+    {
+      "entry_date": "2018-07-17",
+      "exit_date": "2018-07-24",
+      "symbol": "53010",
+      "entry": 2176.0,
+      "exit": 1934.0,
+      "qty": 300,
+      "pnl": -72600.0,
+      "reason": "RSR_EXIT"
+    },
+    {
+      "entry_date": "2018-03-09",
+      "exit_date": "2018-03-22",
+      "symbol": "62920",
+      "entry": 2157.75,
+      "exit": 1978.0,
+      "qty": 400,
+      "pnl": -71900.0,
+      "reason": "RSR_EXIT"
+    },
+    {
+      "entry_date": "2023-07-03",
+      "exit_date": "2023-07-07",
+      "symbol": "31330",
+      "entry": 826.0,
+      "exit": 474.0,
+      "qty": 200,
+      "pnl": -70400.0,
+      "reason": "ATR_TRAILING"
+    }
+  ],
+  "top10_loser_dynamic_membership_crosscheck": [
+    {
+      "symbol": "66560",
+      "entry_date": "2020-02-07",
+      "exit_date": "2020-02-27",
+      "pnl": -391000.0,
+      "reason": "ATR_TRAILING",
+      "applicable_month": "2020-02-03",
+      "was_dynamic_member_that_month": true
+    },
+    {
+      "symbol": "33500",
+      "entry_date": "2024-07-25",
+      "exit_date": "2024-07-31",
+      "pnl": -285900.00915527344,
+      "reason": "ATR_TRAILING",
+      "applicable_month": "2024-07-01",
+      "was_dynamic_member_that_month": true
+    },
+    {
+      "symbol": "47640",
+      "entry_date": "2018-06-12",
+      "exit_date": "2018-06-27",
+      "pnl": -237600.0,
+      "reason": "ATR_TRAILING",
+      "applicable_month": "2018-06-01",
+      "was_dynamic_member_that_month": true
+    },
+    {
+      "symbol": "33560",
+      "entry_date": "2018-09-25",
+      "exit_date": "2018-10-10",
+      "pnl": -236800.0,
+      "reason": "ATR_TRAILING",
+      "applicable_month": "2018-09-03",
+      "was_dynamic_member_that_month": true
+    },
+    {
+      "symbol": "45790",
+      "entry_date": "2018-01-09",
+      "exit_date": "2018-02-13",
+      "pnl": -233200.00000000006,
+      "reason": "RSR_MOMENTUM_EXIT",
+      "applicable_month": "2018-01-04",
+      "was_dynamic_member_that_month": true
+    },
+    {
+      "symbol": "27760",
+      "entry_date": "2024-06-26",
+      "exit_date": "2024-07-19",
+      "pnl": -171799.99999999997,
+      "reason": "ATR_TRAILING",
+      "applicable_month": "2024-06-03",
+      "was_dynamic_member_that_month": true
+    },
+    {
+      "symbol": "36550",
+      "entry_date": "2018-10-18",
+      "exit_date": "2018-10-24",
+      "pnl": -159000.0,
+      "reason": "RSR_MOMENTUM_EXIT",
+      "applicable_month": "2018-10-01",
+      "was_dynamic_member_that_month": true
+    },
+    {
+      "symbol": "89270",
+      "entry_date": "2018-03-15",
+      "exit_date": "2018-03-20",
+      "pnl": -140000.0,
+      "reason": "ATR_TRAILING",
+      "applicable_month": "2018-03-01",
+      "was_dynamic_member_that_month": true
+    },
+    {
+      "symbol": "76120",
+      "entry_date": "2019-05-15",
+      "exit_date": "2019-05-20",
+      "pnl": -133000.0,
+      "reason": "ATR_TRAILING",
+      "applicable_month": "2019-05-07",
+      "was_dynamic_member_that_month": true
+    },
+    {
+      "symbol": "45910",
+      "entry_date": "2021-12-08",
+      "exit_date": "2021-12-28",
+      "pnl": -124500.0,
+      "reason": "RSR_EXIT",
+      "applicable_month": "2021-12-01",
+      "was_dynamic_member_that_month": true
+    }
+  ],
+  "date_alignment_check": {
+    "sampled_symbols": [
+      "31850",
+      "99800",
+      "61710"
+    ],
+    "per_symbol": [
+      {
+        "symbol": "31850",
+        "n_member_months": 1,
+        "n_total_months": 119,
+        "mismatches": [],
+        "mismatch_count": 0
+      },
+      {
+        "symbol": "99800",
+        "n_member_months": 1,
+        "n_total_months": 119,
+        "mismatches": [],
+        "mismatch_count": 0
+      },
+      {
+        "symbol": "61710",
+        "n_member_months": 1,
+        "n_total_months": 119,
+        "mismatches": [],
+        "mismatch_count": 0
+      }
+    ]
+  },
+  "ffill_contamination_simulation": {
+    "note": "非在籍月にffill()を適用した場合に漏れ込む「古いRSR値」の日数を直接計測（シミュレーション）。FujikoStrategy.precompute_signals()が実際にこの操作をrsr_seriesへ適用している（fujiko_strategy.py L279 fill_method='ffill'・コード読解で確認済み）。",
+    "per_symbol": [
+      {
+        "symbol": "31850",
+        "total_days": 2178,
+        "raw_valid_days": 22,
+        "days_leaked_by_ffill": 2156,
+        "leaked_pct_of_total": 99.0,
+        "sample_leaked_stale_rsr_values": {
+          "2017-09-01 00:00:00": 88.1,
+          "2017-09-04 00:00:00": 88.1,
+          "2017-09-05 00:00:00": 88.1,
+          "2017-09-06 00:00:00": 88.1,
+          "2017-09-07 00:00:00": 88.1
+        }
+      },
+      {
+        "symbol": "99800",
+        "total_days": 2178,
+        "raw_valid_days": 22,
+        "days_leaked_by_ffill": 2156,
+        "leaked_pct_of_total": 99.0,
+        "sample_leaked_stale_rsr_values": {
+          "2017-09-01 00:00:00": 31.0,
+          "2017-09-04 00:00:00": 31.0,
+          "2017-09-05 00:00:00": 31.0,
+          "2017-09-06 00:00:00": 31.0,
+          "2017-09-07 00:00:00": 31.0
+        }
+      },
+      {
+        "symbol": "61710",
+        "total_days": 2178,
+        "raw_valid_days": 22,
+        "days_leaked_by_ffill": 2156,
+        "leaked_pct_of_total": 99.0,
+        "sample_leaked_stale_rsr_values": {
+          "2017-09-01 00:00:00": 66.7,
+          "2017-09-04 00:00:00": 66.7,
+          "2017-09-05 00:00:00": 66.7,
+          "2017-09-06 00:00:00": 66.7,
+          "2017-09-07 00:00:00": 66.7
+        }
+      }
+    ]
+  },
+  "funnel_sample": {
+    "sample_date": "2021-07-07",
+    "stage_1_universe42": 42,
+    "stage_2_rsr_geq_75_measured_from_clean_rolling_rsr": 11,
+    "stage_3_top30_bear20_active_mask": 30,
+    "stage_4_breadth": "day-level gate (risk_off flag), not per-symbol funnel — see breadth_series value separately",
+    "stage_5_sector_cap": 4,
+    "stage_6_position_cap": 127,
+    "caveat": "stage_2はFujikoStrategy内部の実際のゲート判定(ffill汚染の影響を受ける可能性)ではなく、cleanなrolling_rsr(本来あるべき値)から独立に再計算した値。stage_5/6はIS全期間の累計値（sample_dateのみの値ではない・run_scenarioが日次分解を公開していないため）。"
+  },
+  "engine_level_counters_full_is_period": {
+    "dyn_universe_excluded_count": 818,
+    "skip_stats": {
+      "sector_cap": 4,
+      "cluster_cap": 18,
+      "bear_adaptive": 8,
+      "gross_exposure": 1
+    },
+    "missed_by_cap_count": 127,
+    "rejected_by_lot_count": 328,
+    "n_trades": 282,
+    "max_dd": -85.02,
+    "cagr": -16.46
+  }
+}

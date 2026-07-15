@@ -1,0 +1,1015 @@
+{
+  "study": "Study76_prerequisite_D_ATR_EQ_universe_c_rebaseline",
+  "canon_note": "reports/study76_execution_plan.mdが定義する「Study76」(Clenow純正ベンチマーク)とは別物。本結果はStudy76が比較対象として必要とする前提工程（D_ATR_EQのStudy75 Universe再測定）。",
+  "generated_at": "2026-07-13T07:25:57.464224+09:00",
+  "started_at": "2026-07-13T07:23:52.437372+09:00",
+  "config": {
+    "fixed_n": 42,
+    "capital": 3000000,
+    "min_hold": 3,
+    "is_window": [
+      "2018-01-01",
+      "2024-12-31"
+    ],
+    "oos_window": [
+      "2025-01-01",
+      "2025-12-31"
+    ],
+    "sector_source": "database/market/master/companies.parquet (current classification, retroactively applied)"
+  },
+  "primary_metric_delta_dynamic": {
+    "definition": "RunB(Dynamic RSR42) - U0(static hindsight RSR42)",
+    "IS_pp": -25.17,
+    "OOS_pp": 62.27
+  },
+  "run_b_dynamic_rsr42": {
+    "IS": {
+      "cagr": -16.46,
+      "sharpe": -0.175,
+      "calmar": -0.194,
+      "max_dd": -85.02,
+      "n_trades": 282,
+      "n_trades_yr": 41.6,
+      "avg_hold_days": 8.4,
+      "win_rate": 32.6,
+      "avg_exposure": 42.6,
+      "avg_simultaneous_holdings": 1.56,
+      "annual_returns": {
+        "2018": -40.03,
+        "2019": -26.92,
+        "2020": -46.84,
+        "2021": -8.69,
+        "2022": 7.87,
+        "2023": 6.8,
+        "2024": 23.14
+      },
+      "turnover_annual_x": 3.42
+    },
+    "OOS": {
+      "cagr": 61.29,
+      "sharpe": 1.172,
+      "calmar": 1.548,
+      "max_dd": -39.59,
+      "n_trades": 51,
+      "n_trades_yr": 52.9,
+      "avg_hold_days": 7.9,
+      "win_rate": 35.3,
+      "avg_exposure": 40.5,
+      "avg_simultaneous_holdings": 1.95,
+      "annual_returns": {
+        "2025": 58.56
+      },
+      "turnover_annual_x": 11.86
+    },
+    "IS_capacity": {
+      "avg_candidates": 0.45,
+      "avg_simultaneous_holdings": 1.56,
+      "cap_saturation_rate_pct": 17.2,
+      "days_at_max_positions": 294,
+      "avg_idle_cash_ratio_pct": 22.4,
+      "dyn_universe_excluded_count": 818,
+      "skip_stats": {
+        "sector_cap": 4,
+        "cluster_cap": 18,
+        "bear_adaptive": 8,
+        "gross_exposure": 1
+      },
+      "missed_by_cap_count": 127,
+      "rejected_by_lot_count": 328,
+      "admitted_by_ratio_count": 0,
+      "skip_reason_breakdown": {
+        "CLUSTER_CAP": 18,
+        "GROSS_EXPOSURE": 1,
+        "SECTOR_CAP": 4
+      }
+    },
+    "OOS_capacity": {
+      "avg_candidates": 0.37,
+      "avg_simultaneous_holdings": 1.95,
+      "cap_saturation_rate_pct": 35.4,
+      "days_at_max_positions": 86,
+      "avg_idle_cash_ratio_pct": 88.6,
+      "dyn_universe_excluded_count": 130,
+      "skip_stats": {
+        "sector_cap": 4,
+        "cluster_cap": 1,
+        "bear_adaptive": 0,
+        "gross_exposure": 1
+      },
+      "missed_by_cap_count": 31,
+      "rejected_by_lot_count": 0,
+      "admitted_by_ratio_count": 0,
+      "skip_reason_breakdown": {
+        "CLUSTER_CAP": 1,
+        "SECTOR_CAP": 4,
+        "GROSS_EXPOSURE": 1
+      }
+    },
+    "wf_5fold": {
+      "segments": [
+        {
+          "year": "2020",
+          "cagr": -27.21,
+          "sharpe": -0.476,
+          "calmar": -0.582,
+          "max_dd": -46.79,
+          "n_trades": 50,
+          "n_trades_yr": 51.9,
+          "avg_hold_days": 7.6,
+          "win_rate": 20.0,
+          "avg_exposure": 46.0,
+          "avg_simultaneous_holdings": 1.84,
+          "annual_returns": {
+            "2020": -26.38
+          },
+          "turnover_annual_x": 7.83,
+          "wf_pass": "False"
+        },
+        {
+          "year": "2021",
+          "cagr": -19.37,
+          "sharpe": -0.29,
+          "calmar": -0.514,
+          "max_dd": -37.66,
+          "n_trades": 52,
+          "n_trades_yr": 53.5,
+          "avg_hold_days": 9.4,
+          "win_rate": 42.3,
+          "avg_exposure": 54.9,
+          "avg_simultaneous_holdings": 2.22,
+          "annual_returns": {
+            "2021": -18.89
+          },
+          "turnover_annual_x": 9.78,
+          "wf_pass": "False"
+        },
+        {
+          "year": "2022",
+          "cagr": -38.87,
+          "sharpe": -1.152,
+          "calmar": -0.914,
+          "max_dd": -42.52,
+          "n_trades": 49,
+          "n_trades_yr": 50.6,
+          "avg_hold_days": 8.3,
+          "win_rate": 28.6,
+          "avg_exposure": 45.7,
+          "avg_simultaneous_holdings": 1.95,
+          "annual_returns": {
+            "2022": -37.9
+          },
+          "turnover_annual_x": 8.56,
+          "wf_pass": "False"
+        },
+        {
+          "year": "2023",
+          "cagr": 25.07,
+          "sharpe": 0.78,
+          "calmar": 0.506,
+          "max_dd": -49.54,
+          "n_trades": 48,
+          "n_trades_yr": 49.2,
+          "avg_hold_days": 9.9,
+          "win_rate": 33.3,
+          "avg_exposure": 47.8,
+          "avg_simultaneous_holdings": 2.12,
+          "annual_returns": {
+            "2023": 24.41
+          },
+          "turnover_annual_x": 10.59,
+          "wf_pass": "True"
+        },
+        {
+          "year": "2024",
+          "cagr": 96.22,
+          "sharpe": 2.08,
+          "calmar": 4.411,
+          "max_dd": -21.82,
+          "n_trades": 45,
+          "n_trades_yr": 46.3,
+          "avg_hold_days": 10.3,
+          "win_rate": 55.6,
+          "avg_exposure": 34.2,
+          "avg_simultaneous_holdings": 2.14,
+          "annual_returns": {
+            "2024": 92.58
+          },
+          "turnover_annual_x": 10.53,
+          "wf_pass": "True"
+        }
+      ],
+      "pass_count": 2,
+      "avg_cagr": 7.17
+    }
+  },
+  "u0_reference_static_rsr42": {
+    "source": "backtests/study75_survivorship_2026-07-11.json scenario_summary.U0",
+    "IS": {
+      "cagr": 8.71,
+      "sharpe": 0.677,
+      "calmar": 0.421,
+      "max_dd": -20.72,
+      "n_trades": 279,
+      "avg_exposure": 43.8,
+      "avg_simultaneous_holdings": 1.99
+    },
+    "OOS": {
+      "cagr": -0.98,
+      "sharpe": -0.027,
+      "calmar": -0.097,
+      "max_dd": -10.07,
+      "n_trades": 40,
+      "avg_exposure": 38.1,
+      "avg_simultaneous_holdings": 1.63
+    }
+  },
+  "official_production_reference": {
+    "source": "backtests/study_m1_production_update_2026-07-04.json results.CURRENT (yfinance basis)",
+    "IS": {
+      "cagr": 12.22,
+      "sharpe": 0.579,
+      "calmar": 0.671,
+      "max_dd": -18.22,
+      "n_trades": 263,
+      "avg_exposure": 31.5
+    },
+    "OOS": {
+      "cagr": 11.42,
+      "sharpe": 1.011,
+      "calmar": 1.103,
+      "max_dd": -10.35,
+      "n_trades": 42,
+      "avg_exposure": 36.4
+    }
+  },
+  "runA_negative_control_reference": {
+    "source": "backtests/study75_survivorship_2026-07-11.json scenario_summary.U3 (Universe C union(3020) rank pool, direct percentile RSR, monthly membership AND-mask)",
+    "note": "既知の二重汚染（パーセンタイル距離歪み + 全銘柄'不明'セクターによるセクターキャップ崩壊、study75c_interpretation.md §6.0）。主結論・selection bias推定には使用しない。反証専用参照値。",
+    "IS_cagr_approx": -30.6
+  },
+  "membership_turnover": {
+    "monthly_turnover": [
+      {
+        "month": "2017-09-01",
+        "retained": 25,
+        "added": 17,
+        "removed": 17,
+        "turnover_pct": 40.48
+      },
+      {
+        "month": "2017-10-02",
+        "retained": 25,
+        "added": 17,
+        "removed": 17,
+        "turnover_pct": 40.48
+      },
+      {
+        "month": "2017-11-01",
+        "retained": 25,
+        "added": 17,
+        "removed": 17,
+        "turnover_pct": 40.48
+      },
+      {
+        "month": "2017-12-01",
+        "retained": 24,
+        "added": 18,
+        "removed": 18,
+        "turnover_pct": 42.86
+      },
+      {
+        "month": "2018-01-04",
+        "retained": 22,
+        "added": 20,
+        "removed": 20,
+        "turnover_pct": 47.62
+      },
+      {
+        "month": "2018-02-01",
+        "retained": 19,
+        "added": 23,
+        "removed": 23,
+        "turnover_pct": 54.76
+      },
+      {
+        "month": "2018-03-01",
+        "retained": 25,
+        "added": 17,
+        "removed": 17,
+        "turnover_pct": 40.48
+      },
+      {
+        "month": "2018-04-02",
+        "retained": 20,
+        "added": 22,
+        "removed": 22,
+        "turnover_pct": 52.38
+      },
+      {
+        "month": "2018-05-01",
+        "retained": 23,
+        "added": 19,
+        "removed": 19,
+        "turnover_pct": 45.24
+      },
+      {
+        "month": "2018-06-01",
+        "retained": 19,
+        "added": 23,
+        "removed": 23,
+        "turnover_pct": 54.76
+      },
+      {
+        "month": "2018-07-02",
+        "retained": 22,
+        "added": 20,
+        "removed": 20,
+        "turnover_pct": 47.62
+      },
+      {
+        "month": "2018-08-01",
+        "retained": 27,
+        "added": 15,
+        "removed": 15,
+        "turnover_pct": 35.71
+      },
+      {
+        "month": "2018-09-03",
+        "retained": 18,
+        "added": 24,
+        "removed": 24,
+        "turnover_pct": 57.14
+      },
+      {
+        "month": "2018-10-01",
+        "retained": 28,
+        "added": 14,
+        "removed": 14,
+        "turnover_pct": 33.33
+      },
+      {
+        "month": "2018-11-01",
+        "retained": 26,
+        "added": 16,
+        "removed": 16,
+        "turnover_pct": 38.1
+      },
+      {
+        "month": "2018-12-03",
+        "retained": 26,
+        "added": 16,
+        "removed": 16,
+        "turnover_pct": 38.1
+      },
+      {
+        "month": "2019-01-04",
+        "retained": 23,
+        "added": 19,
+        "removed": 19,
+        "turnover_pct": 45.24
+      },
+      {
+        "month": "2019-02-01",
+        "retained": 26,
+        "added": 16,
+        "removed": 16,
+        "turnover_pct": 38.1
+      },
+      {
+        "month": "2019-03-01",
+        "retained": 23,
+        "added": 19,
+        "removed": 19,
+        "turnover_pct": 45.24
+      },
+      {
+        "month": "2019-04-01",
+        "retained": 17,
+        "added": 25,
+        "removed": 25,
+        "turnover_pct": 59.52
+      },
+      {
+        "month": "2019-05-07",
+        "retained": 24,
+        "added": 18,
+        "removed": 18,
+        "turnover_pct": 42.86
+      },
+      {
+        "month": "2019-06-03",
+        "retained": 22,
+        "added": 20,
+        "removed": 20,
+        "turnover_pct": 47.62
+      },
+      {
+        "month": "2019-07-01",
+        "retained": 25,
+        "added": 17,
+        "removed": 17,
+        "turnover_pct": 40.48
+      },
+      {
+        "month": "2019-08-01",
+        "retained": 25,
+        "added": 17,
+        "removed": 17,
+        "turnover_pct": 40.48
+      },
+      {
+        "month": "2019-09-02",
+        "retained": 18,
+        "added": 24,
+        "removed": 24,
+        "turnover_pct": 57.14
+      },
+      {
+        "month": "2019-10-01",
+        "retained": 26,
+        "added": 16,
+        "removed": 16,
+        "turnover_pct": 38.1
+      },
+      {
+        "month": "2019-11-01",
+        "retained": 22,
+        "added": 20,
+        "removed": 20,
+        "turnover_pct": 47.62
+      },
+      {
+        "month": "2019-12-02",
+        "retained": 15,
+        "added": 27,
+        "removed": 27,
+        "turnover_pct": 64.29
+      },
+      {
+        "month": "2020-01-06",
+        "retained": 23,
+        "added": 19,
+        "removed": 19,
+        "turnover_pct": 45.24
+      },
+      {
+        "month": "2020-02-03",
+        "retained": 21,
+        "added": 21,
+        "removed": 21,
+        "turnover_pct": 50.0
+      },
+      {
+        "month": "2020-03-02",
+        "retained": 22,
+        "added": 20,
+        "removed": 20,
+        "turnover_pct": 47.62
+      },
+      {
+        "month": "2020-04-01",
+        "retained": 28,
+        "added": 14,
+        "removed": 14,
+        "turnover_pct": 33.33
+      },
+      {
+        "month": "2020-05-01",
+        "retained": 27,
+        "added": 15,
+        "removed": 15,
+        "turnover_pct": 35.71
+      },
+      {
+        "month": "2020-06-01",
+        "retained": 22,
+        "added": 20,
+        "removed": 20,
+        "turnover_pct": 47.62
+      },
+      {
+        "month": "2020-07-01",
+        "retained": 16,
+        "added": 26,
+        "removed": 26,
+        "turnover_pct": 61.9
+      },
+      {
+        "month": "2020-08-03",
+        "retained": 25,
+        "added": 17,
+        "removed": 17,
+        "turnover_pct": 40.48
+      },
+      {
+        "month": "2020-09-01",
+        "retained": 23,
+        "added": 19,
+        "removed": 19,
+        "turnover_pct": 45.24
+      },
+      {
+        "month": "2020-10-01",
+        "retained": 24,
+        "added": 18,
+        "removed": 18,
+        "turnover_pct": 42.86
+      },
+      {
+        "month": "2020-11-02",
+        "retained": 22,
+        "added": 20,
+        "removed": 20,
+        "turnover_pct": 47.62
+      },
+      {
+        "month": "2020-12-01",
+        "retained": 27,
+        "added": 15,
+        "removed": 15,
+        "turnover_pct": 35.71
+      },
+      {
+        "month": "2021-01-04",
+        "retained": 25,
+        "added": 17,
+        "removed": 17,
+        "turnover_pct": 40.48
+      },
+      {
+        "month": "2021-02-01",
+        "retained": 22,
+        "added": 20,
+        "removed": 20,
+        "turnover_pct": 47.62
+      },
+      {
+        "month": "2021-03-01",
+        "retained": 25,
+        "added": 17,
+        "removed": 17,
+        "turnover_pct": 40.48
+      },
+      {
+        "month": "2021-04-01",
+        "retained": 22,
+        "added": 20,
+        "removed": 20,
+        "turnover_pct": 47.62
+      },
+      {
+        "month": "2021-05-06",
+        "retained": 24,
+        "added": 18,
+        "removed": 18,
+        "turnover_pct": 42.86
+      },
+      {
+        "month": "2021-06-01",
+        "retained": 28,
+        "added": 14,
+        "removed": 14,
+        "turnover_pct": 33.33
+      },
+      {
+        "month": "2021-07-01",
+        "retained": 23,
+        "added": 19,
+        "removed": 19,
+        "turnover_pct": 45.24
+      },
+      {
+        "month": "2021-08-02",
+        "retained": 26,
+        "added": 16,
+        "removed": 16,
+        "turnover_pct": 38.1
+      },
+      {
+        "month": "2021-09-01",
+        "retained": 21,
+        "added": 21,
+        "removed": 21,
+        "turnover_pct": 50.0
+      },
+      {
+        "month": "2021-10-01",
+        "retained": 27,
+        "added": 15,
+        "removed": 15,
+        "turnover_pct": 35.71
+      },
+      {
+        "month": "2021-11-01",
+        "retained": 26,
+        "added": 16,
+        "removed": 16,
+        "turnover_pct": 38.1
+      },
+      {
+        "month": "2021-12-01",
+        "retained": 15,
+        "added": 27,
+        "removed": 27,
+        "turnover_pct": 64.29
+      },
+      {
+        "month": "2022-01-04",
+        "retained": 26,
+        "added": 16,
+        "removed": 16,
+        "turnover_pct": 38.1
+      },
+      {
+        "month": "2022-02-01",
+        "retained": 29,
+        "added": 13,
+        "removed": 13,
+        "turnover_pct": 30.95
+      },
+      {
+        "month": "2022-03-01",
+        "retained": 22,
+        "added": 20,
+        "removed": 20,
+        "turnover_pct": 47.62
+      },
+      {
+        "month": "2022-04-01",
+        "retained": 22,
+        "added": 20,
+        "removed": 20,
+        "turnover_pct": 47.62
+      },
+      {
+        "month": "2022-05-02",
+        "retained": 24,
+        "added": 18,
+        "removed": 18,
+        "turnover_pct": 42.86
+      },
+      {
+        "month": "2022-06-01",
+        "retained": 21,
+        "added": 21,
+        "removed": 21,
+        "turnover_pct": 50.0
+      },
+      {
+        "month": "2022-07-01",
+        "retained": 20,
+        "added": 22,
+        "removed": 22,
+        "turnover_pct": 52.38
+      },
+      {
+        "month": "2022-08-01",
+        "retained": 28,
+        "added": 14,
+        "removed": 14,
+        "turnover_pct": 33.33
+      },
+      {
+        "month": "2022-09-01",
+        "retained": 18,
+        "added": 24,
+        "removed": 24,
+        "turnover_pct": 57.14
+      },
+      {
+        "month": "2022-10-03",
+        "retained": 24,
+        "added": 18,
+        "removed": 18,
+        "turnover_pct": 42.86
+      },
+      {
+        "month": "2022-11-01",
+        "retained": 21,
+        "added": 21,
+        "removed": 21,
+        "turnover_pct": 50.0
+      },
+      {
+        "month": "2022-12-01",
+        "retained": 17,
+        "added": 25,
+        "removed": 25,
+        "turnover_pct": 59.52
+      },
+      {
+        "month": "2023-01-04",
+        "retained": 24,
+        "added": 18,
+        "removed": 18,
+        "turnover_pct": 42.86
+      },
+      {
+        "month": "2023-02-01",
+        "retained": 27,
+        "added": 15,
+        "removed": 15,
+        "turnover_pct": 35.71
+      },
+      {
+        "month": "2023-03-01",
+        "retained": 21,
+        "added": 21,
+        "removed": 21,
+        "turnover_pct": 50.0
+      },
+      {
+        "month": "2023-04-03",
+        "retained": 24,
+        "added": 18,
+        "removed": 18,
+        "turnover_pct": 42.86
+      },
+      {
+        "month": "2023-05-01",
+        "retained": 26,
+        "added": 16,
+        "removed": 16,
+        "turnover_pct": 38.1
+      },
+      {
+        "month": "2023-06-01",
+        "retained": 19,
+        "added": 23,
+        "removed": 23,
+        "turnover_pct": 54.76
+      },
+      {
+        "month": "2023-07-03",
+        "retained": 23,
+        "added": 19,
+        "removed": 19,
+        "turnover_pct": 45.24
+      },
+      {
+        "month": "2023-08-01",
+        "retained": 22,
+        "added": 20,
+        "removed": 20,
+        "turnover_pct": 47.62
+      },
+      {
+        "month": "2023-09-01",
+        "retained": 17,
+        "added": 25,
+        "removed": 25,
+        "turnover_pct": 59.52
+      },
+      {
+        "month": "2023-10-02",
+        "retained": 24,
+        "added": 18,
+        "removed": 18,
+        "turnover_pct": 42.86
+      },
+      {
+        "month": "2023-11-01",
+        "retained": 24,
+        "added": 18,
+        "removed": 18,
+        "turnover_pct": 42.86
+      },
+      {
+        "month": "2023-12-01",
+        "retained": 21,
+        "added": 21,
+        "removed": 21,
+        "turnover_pct": 50.0
+      },
+      {
+        "month": "2024-01-04",
+        "retained": 24,
+        "added": 18,
+        "removed": 18,
+        "turnover_pct": 42.86
+      },
+      {
+        "month": "2024-02-01",
+        "retained": 25,
+        "added": 17,
+        "removed": 17,
+        "turnover_pct": 40.48
+      },
+      {
+        "month": "2024-03-01",
+        "retained": 26,
+        "added": 16,
+        "removed": 16,
+        "turnover_pct": 38.1
+      },
+      {
+        "month": "2024-04-01",
+        "retained": 24,
+        "added": 18,
+        "removed": 18,
+        "turnover_pct": 42.86
+      },
+      {
+        "month": "2024-05-01",
+        "retained": 25,
+        "added": 17,
+        "removed": 17,
+        "turnover_pct": 40.48
+      },
+      {
+        "month": "2024-06-03",
+        "retained": 24,
+        "added": 18,
+        "removed": 18,
+        "turnover_pct": 42.86
+      },
+      {
+        "month": "2024-07-01",
+        "retained": 29,
+        "added": 13,
+        "removed": 13,
+        "turnover_pct": 30.95
+      },
+      {
+        "month": "2024-08-01",
+        "retained": 25,
+        "added": 17,
+        "removed": 17,
+        "turnover_pct": 40.48
+      },
+      {
+        "month": "2024-09-02",
+        "retained": 26,
+        "added": 16,
+        "removed": 16,
+        "turnover_pct": 38.1
+      },
+      {
+        "month": "2024-10-01",
+        "retained": 28,
+        "added": 14,
+        "removed": 14,
+        "turnover_pct": 33.33
+      },
+      {
+        "month": "2024-11-01",
+        "retained": 25,
+        "added": 17,
+        "removed": 17,
+        "turnover_pct": 40.48
+      },
+      {
+        "month": "2024-12-02",
+        "retained": 20,
+        "added": 22,
+        "removed": 22,
+        "turnover_pct": 52.38
+      },
+      {
+        "month": "2025-01-06",
+        "retained": 24,
+        "added": 18,
+        "removed": 18,
+        "turnover_pct": 42.86
+      },
+      {
+        "month": "2025-02-03",
+        "retained": 25,
+        "added": 17,
+        "removed": 17,
+        "turnover_pct": 40.48
+      },
+      {
+        "month": "2025-03-03",
+        "retained": 19,
+        "added": 23,
+        "removed": 23,
+        "turnover_pct": 54.76
+      },
+      {
+        "month": "2025-04-01",
+        "retained": 26,
+        "added": 16,
+        "removed": 16,
+        "turnover_pct": 38.1
+      },
+      {
+        "month": "2025-05-01",
+        "retained": 22,
+        "added": 20,
+        "removed": 20,
+        "turnover_pct": 47.62
+      },
+      {
+        "month": "2025-06-02",
+        "retained": 20,
+        "added": 22,
+        "removed": 22,
+        "turnover_pct": 52.38
+      },
+      {
+        "month": "2025-07-01",
+        "retained": 21,
+        "added": 21,
+        "removed": 21,
+        "turnover_pct": 50.0
+      },
+      {
+        "month": "2025-08-01",
+        "retained": 28,
+        "added": 14,
+        "removed": 14,
+        "turnover_pct": 33.33
+      },
+      {
+        "month": "2025-09-01",
+        "retained": 20,
+        "added": 22,
+        "removed": 22,
+        "turnover_pct": 52.38
+      },
+      {
+        "month": "2025-10-01",
+        "retained": 26,
+        "added": 16,
+        "removed": 16,
+        "turnover_pct": 38.1
+      },
+      {
+        "month": "2025-11-04",
+        "retained": 23,
+        "added": 19,
+        "removed": 19,
+        "turnover_pct": 45.24
+      },
+      {
+        "month": "2025-12-01",
+        "retained": 21,
+        "added": 21,
+        "removed": 21,
+        "turnover_pct": 50.0
+      },
+      {
+        "month": "2026-01-05",
+        "retained": 23,
+        "added": 19,
+        "removed": 19,
+        "turnover_pct": 45.24
+      },
+      {
+        "month": "2026-02-02",
+        "retained": 27,
+        "added": 15,
+        "removed": 15,
+        "turnover_pct": 35.71
+      },
+      {
+        "month": "2026-03-02",
+        "retained": 22,
+        "added": 20,
+        "removed": 20,
+        "turnover_pct": 47.62
+      },
+      {
+        "month": "2026-04-01",
+        "retained": 24,
+        "added": 18,
+        "removed": 18,
+        "turnover_pct": 42.86
+      },
+      {
+        "month": "2026-05-01",
+        "retained": 22,
+        "added": 20,
+        "removed": 20,
+        "turnover_pct": 47.62
+      },
+      {
+        "month": "2026-06-01",
+        "retained": 26,
+        "added": 16,
+        "removed": 16,
+        "turnover_pct": 38.1
+      },
+      {
+        "month": "2026-07-01",
+        "retained": 23,
+        "added": 19,
+        "removed": 19,
+        "turnover_pct": 45.24
+      }
+    ],
+    "avg_monthly_turnover_pct": 44.57,
+    "median_membership_duration_months": 3.0,
+    "mean_membership_duration_months": 4.079136690647482,
+    "n_unique_symbols_ever_included": 1112,
+    "n_months": 119
+  },
+  "membership_file": "C:\\ai-trading\\backtests\\dynamic_rsr42_membership_2026-07-13.json",
+  "data_quality": {
+    "union_symbols": 3020,
+    "loaded": 2967,
+    "missing": 0,
+    "short_history_excluded": 53
+  }
+}

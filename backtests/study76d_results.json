@@ -1,0 +1,841 @@
+{
+  "study": "Study76D_contamination_ablation",
+  "generated_at": "2026-07-13T19:52:24.237460+09:00",
+  "started_at": "2026-07-13T19:50:26.213301+09:00",
+  "run_b_contaminated_baseline": {
+    "IS": {
+      "cagr": -16.46,
+      "sharpe": -0.175,
+      "calmar": -0.194,
+      "max_dd": -85.02,
+      "n_trades": 282,
+      "avg_exposure": 42.6,
+      "avg_candidates": 0.45,
+      "avg_simultaneous_holdings": 1.56
+    },
+    "OOS": {
+      "cagr": 61.29,
+      "sharpe": 1.172,
+      "calmar": 1.548,
+      "max_dd": -39.59,
+      "n_trades": 51,
+      "avg_exposure": 40.5,
+      "avg_candidates": 0.37,
+      "avg_simultaneous_holdings": 1.95
+    }
+  },
+  "run_b_fixed_zerofilled": {
+    "IS": {
+      "cagr": -24.98,
+      "sharpe": -0.39,
+      "calmar": -0.272,
+      "max_dd": -91.76,
+      "n_trades": 250,
+      "avg_exposure": 40.9,
+      "avg_candidates": 0.67,
+      "avg_simultaneous_holdings": 1.48
+    },
+    "OOS": {
+      "cagr": 42.71,
+      "sharpe": 0.896,
+      "calmar": 0.886,
+      "max_dd": -48.21,
+      "n_trades": 56,
+      "avg_exposure": 46.5,
+      "avg_candidates": 0.44,
+      "avg_simultaneous_holdings": 2.26
+    }
+  },
+  "delta_bug_fixed_minus_contaminated": {
+    "IS": {
+      "cagr": -8.52,
+      "sharpe": -0.215,
+      "calmar": -0.078,
+      "max_dd": -6.74,
+      "n_trades": -32,
+      "avg_exposure": -1.7,
+      "avg_candidates": 0.22,
+      "avg_simultaneous_holdings": -0.08
+    },
+    "OOS": {
+      "cagr": -18.58,
+      "sharpe": -0.276,
+      "calmar": -0.662,
+      "max_dd": -8.62,
+      "n_trades": 5,
+      "avg_exposure": 6.0,
+      "avg_candidates": 0.07,
+      "avg_simultaneous_holdings": 0.31
+    }
+  },
+  "judgment": {
+    "threshold_pp": 5.0,
+    "delta_is_cagr_pp": -8.52,
+    "delta_oos_cagr_pp": -18.58,
+    "verdict": "A_large_delta_bug",
+    "note": "Delta_bugが閾値(±5pp)を超過。Study76(RunB)結果はffill汚染の影響を無視できず、無効化・Dynamic Universeの再評価が必要。RunB_fixedを新しい基準として扱うべき。"
+  },
+  "monthly_contamination": [
+    {
+      "month": "2017-08-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 0,
+      "contamination_rate_symbols_pct": 0.0,
+      "n_contaminated_symbol_days": 0
+    },
+    {
+      "month": "2017-09-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 17,
+      "contamination_rate_symbols_pct": 1.59,
+      "n_contaminated_symbol_days": 340
+    },
+    {
+      "month": "2017-10-02",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 34,
+      "contamination_rate_symbols_pct": 3.18,
+      "n_contaminated_symbol_days": 714
+    },
+    {
+      "month": "2017-11-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 48,
+      "contamination_rate_symbols_pct": 4.49,
+      "n_contaminated_symbol_days": 960
+    },
+    {
+      "month": "2017-12-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 63,
+      "contamination_rate_symbols_pct": 5.89,
+      "n_contaminated_symbol_days": 1323
+    },
+    {
+      "month": "2018-01-04",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 77,
+      "contamination_rate_symbols_pct": 7.2,
+      "n_contaminated_symbol_days": 1463
+    },
+    {
+      "month": "2018-02-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 92,
+      "contamination_rate_symbols_pct": 8.6,
+      "n_contaminated_symbol_days": 1748
+    },
+    {
+      "month": "2018-03-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 103,
+      "contamination_rate_symbols_pct": 9.63,
+      "n_contaminated_symbol_days": 2163
+    },
+    {
+      "month": "2018-04-02",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 118,
+      "contamination_rate_symbols_pct": 11.03,
+      "n_contaminated_symbol_days": 2360
+    },
+    {
+      "month": "2018-05-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 130,
+      "contamination_rate_symbols_pct": 12.15,
+      "n_contaminated_symbol_days": 2730
+    },
+    {
+      "month": "2018-06-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 146,
+      "contamination_rate_symbols_pct": 13.64,
+      "n_contaminated_symbol_days": 3066
+    },
+    {
+      "month": "2018-07-02",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 160,
+      "contamination_rate_symbols_pct": 14.95,
+      "n_contaminated_symbol_days": 3360
+    },
+    {
+      "month": "2018-08-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 169,
+      "contamination_rate_symbols_pct": 15.79,
+      "n_contaminated_symbol_days": 3887
+    },
+    {
+      "month": "2018-09-03",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 184,
+      "contamination_rate_symbols_pct": 17.2,
+      "n_contaminated_symbol_days": 3312
+    },
+    {
+      "month": "2018-10-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 195,
+      "contamination_rate_symbols_pct": 18.22,
+      "n_contaminated_symbol_days": 4290
+    },
+    {
+      "month": "2018-11-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 203,
+      "contamination_rate_symbols_pct": 18.97,
+      "n_contaminated_symbol_days": 4263
+    },
+    {
+      "month": "2018-12-03",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 217,
+      "contamination_rate_symbols_pct": 20.28,
+      "n_contaminated_symbol_days": 4123
+    },
+    {
+      "month": "2019-01-04",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 229,
+      "contamination_rate_symbols_pct": 21.4,
+      "n_contaminated_symbol_days": 4351
+    },
+    {
+      "month": "2019-02-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 237,
+      "contamination_rate_symbols_pct": 22.15,
+      "n_contaminated_symbol_days": 4503
+    },
+    {
+      "month": "2019-03-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 246,
+      "contamination_rate_symbols_pct": 22.99,
+      "n_contaminated_symbol_days": 4920
+    },
+    {
+      "month": "2019-04-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 261,
+      "contamination_rate_symbols_pct": 24.39,
+      "n_contaminated_symbol_days": 5220
+    },
+    {
+      "month": "2019-05-07",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 269,
+      "contamination_rate_symbols_pct": 25.14,
+      "n_contaminated_symbol_days": 5111
+    },
+    {
+      "month": "2019-06-03",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 284,
+      "contamination_rate_symbols_pct": 26.54,
+      "n_contaminated_symbol_days": 5680
+    },
+    {
+      "month": "2019-07-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 295,
+      "contamination_rate_symbols_pct": 27.57,
+      "n_contaminated_symbol_days": 6490
+    },
+    {
+      "month": "2019-08-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 305,
+      "contamination_rate_symbols_pct": 28.5,
+      "n_contaminated_symbol_days": 6405
+    },
+    {
+      "month": "2019-09-02",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 321,
+      "contamination_rate_symbols_pct": 30.0,
+      "n_contaminated_symbol_days": 6099
+    },
+    {
+      "month": "2019-10-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 334,
+      "contamination_rate_symbols_pct": 31.21,
+      "n_contaminated_symbol_days": 7014
+    },
+    {
+      "month": "2019-11-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 346,
+      "contamination_rate_symbols_pct": 32.34,
+      "n_contaminated_symbol_days": 6920
+    },
+    {
+      "month": "2019-12-02",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 355,
+      "contamination_rate_symbols_pct": 33.18,
+      "n_contaminated_symbol_days": 7455
+    },
+    {
+      "month": "2020-01-06",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 367,
+      "contamination_rate_symbols_pct": 34.3,
+      "n_contaminated_symbol_days": 6973
+    },
+    {
+      "month": "2020-02-03",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 384,
+      "contamination_rate_symbols_pct": 35.89,
+      "n_contaminated_symbol_days": 6912
+    },
+    {
+      "month": "2020-03-02",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 397,
+      "contamination_rate_symbols_pct": 37.1,
+      "n_contaminated_symbol_days": 8337
+    },
+    {
+      "month": "2020-04-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 406,
+      "contamination_rate_symbols_pct": 37.94,
+      "n_contaminated_symbol_days": 8526
+    },
+    {
+      "month": "2020-05-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 412,
+      "contamination_rate_symbols_pct": 38.5,
+      "n_contaminated_symbol_days": 7416
+    },
+    {
+      "month": "2020-06-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 422,
+      "contamination_rate_symbols_pct": 39.44,
+      "n_contaminated_symbol_days": 9284
+    },
+    {
+      "month": "2020-07-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 439,
+      "contamination_rate_symbols_pct": 41.03,
+      "n_contaminated_symbol_days": 9219
+    },
+    {
+      "month": "2020-08-03",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 447,
+      "contamination_rate_symbols_pct": 41.78,
+      "n_contaminated_symbol_days": 8940
+    },
+    {
+      "month": "2020-09-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 461,
+      "contamination_rate_symbols_pct": 43.08,
+      "n_contaminated_symbol_days": 9220
+    },
+    {
+      "month": "2020-10-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 469,
+      "contamination_rate_symbols_pct": 43.83,
+      "n_contaminated_symbol_days": 9380
+    },
+    {
+      "month": "2020-11-02",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 481,
+      "contamination_rate_symbols_pct": 44.95,
+      "n_contaminated_symbol_days": 9139
+    },
+    {
+      "month": "2020-12-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 486,
+      "contamination_rate_symbols_pct": 45.42,
+      "n_contaminated_symbol_days": 10692
+    },
+    {
+      "month": "2021-01-04",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 492,
+      "contamination_rate_symbols_pct": 45.98,
+      "n_contaminated_symbol_days": 9348
+    },
+    {
+      "month": "2021-02-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 501,
+      "contamination_rate_symbols_pct": 46.82,
+      "n_contaminated_symbol_days": 9018
+    },
+    {
+      "month": "2021-03-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 511,
+      "contamination_rate_symbols_pct": 47.76,
+      "n_contaminated_symbol_days": 11753
+    },
+    {
+      "month": "2021-04-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 522,
+      "contamination_rate_symbols_pct": 48.79,
+      "n_contaminated_symbol_days": 10962
+    },
+    {
+      "month": "2021-05-06",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 530,
+      "contamination_rate_symbols_pct": 49.53,
+      "n_contaminated_symbol_days": 9540
+    },
+    {
+      "month": "2021-06-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 537,
+      "contamination_rate_symbols_pct": 50.19,
+      "n_contaminated_symbol_days": 11814
+    },
+    {
+      "month": "2021-07-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 549,
+      "contamination_rate_symbols_pct": 51.31,
+      "n_contaminated_symbol_days": 10980
+    },
+    {
+      "month": "2021-08-02",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 554,
+      "contamination_rate_symbols_pct": 51.78,
+      "n_contaminated_symbol_days": 11634
+    },
+    {
+      "month": "2021-09-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 566,
+      "contamination_rate_symbols_pct": 52.9,
+      "n_contaminated_symbol_days": 11320
+    },
+    {
+      "month": "2021-10-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 578,
+      "contamination_rate_symbols_pct": 54.02,
+      "n_contaminated_symbol_days": 11560
+    },
+    {
+      "month": "2021-11-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 585,
+      "contamination_rate_symbols_pct": 54.67,
+      "n_contaminated_symbol_days": 11700
+    },
+    {
+      "month": "2021-12-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 596,
+      "contamination_rate_symbols_pct": 55.7,
+      "n_contaminated_symbol_days": 13112
+    },
+    {
+      "month": "2022-01-04",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 604,
+      "contamination_rate_symbols_pct": 56.45,
+      "n_contaminated_symbol_days": 11476
+    },
+    {
+      "month": "2022-02-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 608,
+      "contamination_rate_symbols_pct": 56.82,
+      "n_contaminated_symbol_days": 10944
+    },
+    {
+      "month": "2022-03-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 621,
+      "contamination_rate_symbols_pct": 58.04,
+      "n_contaminated_symbol_days": 13662
+    },
+    {
+      "month": "2022-04-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 629,
+      "contamination_rate_symbols_pct": 58.79,
+      "n_contaminated_symbol_days": 12580
+    },
+    {
+      "month": "2022-05-02",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 637,
+      "contamination_rate_symbols_pct": 59.53,
+      "n_contaminated_symbol_days": 12103
+    },
+    {
+      "month": "2022-06-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 643,
+      "contamination_rate_symbols_pct": 60.09,
+      "n_contaminated_symbol_days": 14146
+    },
+    {
+      "month": "2022-07-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 655,
+      "contamination_rate_symbols_pct": 61.21,
+      "n_contaminated_symbol_days": 13100
+    },
+    {
+      "month": "2022-08-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 661,
+      "contamination_rate_symbols_pct": 61.78,
+      "n_contaminated_symbol_days": 14542
+    },
+    {
+      "month": "2022-09-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 676,
+      "contamination_rate_symbols_pct": 63.18,
+      "n_contaminated_symbol_days": 13520
+    },
+    {
+      "month": "2022-10-03",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 684,
+      "contamination_rate_symbols_pct": 63.93,
+      "n_contaminated_symbol_days": 13680
+    },
+    {
+      "month": "2022-11-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 693,
+      "contamination_rate_symbols_pct": 64.77,
+      "n_contaminated_symbol_days": 13860
+    },
+    {
+      "month": "2022-12-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 704,
+      "contamination_rate_symbols_pct": 65.79,
+      "n_contaminated_symbol_days": 15488
+    },
+    {
+      "month": "2023-01-04",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 711,
+      "contamination_rate_symbols_pct": 66.45,
+      "n_contaminated_symbol_days": 13509
+    },
+    {
+      "month": "2023-02-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 721,
+      "contamination_rate_symbols_pct": 67.38,
+      "n_contaminated_symbol_days": 13699
+    },
+    {
+      "month": "2023-03-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 733,
+      "contamination_rate_symbols_pct": 68.5,
+      "n_contaminated_symbol_days": 16126
+    },
+    {
+      "month": "2023-04-03",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 742,
+      "contamination_rate_symbols_pct": 69.35,
+      "n_contaminated_symbol_days": 14840
+    },
+    {
+      "month": "2023-05-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 749,
+      "contamination_rate_symbols_pct": 70.0,
+      "n_contaminated_symbol_days": 14980
+    },
+    {
+      "month": "2023-06-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 759,
+      "contamination_rate_symbols_pct": 70.93,
+      "n_contaminated_symbol_days": 16698
+    },
+    {
+      "month": "2023-07-03",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 767,
+      "contamination_rate_symbols_pct": 71.68,
+      "n_contaminated_symbol_days": 15340
+    },
+    {
+      "month": "2023-08-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 783,
+      "contamination_rate_symbols_pct": 73.18,
+      "n_contaminated_symbol_days": 17226
+    },
+    {
+      "month": "2023-09-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 795,
+      "contamination_rate_symbols_pct": 74.3,
+      "n_contaminated_symbol_days": 15900
+    },
+    {
+      "month": "2023-10-02",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 800,
+      "contamination_rate_symbols_pct": 74.77,
+      "n_contaminated_symbol_days": 16800
+    },
+    {
+      "month": "2023-11-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 808,
+      "contamination_rate_symbols_pct": 75.51,
+      "n_contaminated_symbol_days": 16160
+    },
+    {
+      "month": "2023-12-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 816,
+      "contamination_rate_symbols_pct": 76.26,
+      "n_contaminated_symbol_days": 17136
+    },
+    {
+      "month": "2024-01-04",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 821,
+      "contamination_rate_symbols_pct": 76.73,
+      "n_contaminated_symbol_days": 15599
+    },
+    {
+      "month": "2024-02-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 833,
+      "contamination_rate_symbols_pct": 77.85,
+      "n_contaminated_symbol_days": 15827
+    },
+    {
+      "month": "2024-03-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 841,
+      "contamination_rate_symbols_pct": 78.6,
+      "n_contaminated_symbol_days": 16820
+    },
+    {
+      "month": "2024-04-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 853,
+      "contamination_rate_symbols_pct": 79.72,
+      "n_contaminated_symbol_days": 17913
+    },
+    {
+      "month": "2024-05-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 862,
+      "contamination_rate_symbols_pct": 80.56,
+      "n_contaminated_symbol_days": 18102
+    },
+    {
+      "month": "2024-06-03",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 871,
+      "contamination_rate_symbols_pct": 81.4,
+      "n_contaminated_symbol_days": 17420
+    },
+    {
+      "month": "2024-07-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 875,
+      "contamination_rate_symbols_pct": 81.78,
+      "n_contaminated_symbol_days": 19250
+    },
+    {
+      "month": "2024-08-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 885,
+      "contamination_rate_symbols_pct": 82.71,
+      "n_contaminated_symbol_days": 18585
+    },
+    {
+      "month": "2024-09-02",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 890,
+      "contamination_rate_symbols_pct": 83.18,
+      "n_contaminated_symbol_days": 16910
+    },
+    {
+      "month": "2024-10-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 894,
+      "contamination_rate_symbols_pct": 83.55,
+      "n_contaminated_symbol_days": 19668
+    },
+    {
+      "month": "2024-11-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 902,
+      "contamination_rate_symbols_pct": 84.3,
+      "n_contaminated_symbol_days": 18040
+    },
+    {
+      "month": "2024-12-02",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 912,
+      "contamination_rate_symbols_pct": 85.23,
+      "n_contaminated_symbol_days": 19152
+    },
+    {
+      "month": "2025-01-06",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 921,
+      "contamination_rate_symbols_pct": 86.07,
+      "n_contaminated_symbol_days": 17499
+    },
+    {
+      "month": "2025-02-03",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 930,
+      "contamination_rate_symbols_pct": 86.92,
+      "n_contaminated_symbol_days": 16740
+    },
+    {
+      "month": "2025-03-03",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 940,
+      "contamination_rate_symbols_pct": 87.85,
+      "n_contaminated_symbol_days": 18800
+    },
+    {
+      "month": "2025-04-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 945,
+      "contamination_rate_symbols_pct": 88.32,
+      "n_contaminated_symbol_days": 19845
+    },
+    {
+      "month": "2025-05-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 954,
+      "contamination_rate_symbols_pct": 89.16,
+      "n_contaminated_symbol_days": 19080
+    },
+    {
+      "month": "2025-06-02",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 958,
+      "contamination_rate_symbols_pct": 89.53,
+      "n_contaminated_symbol_days": 20118
+    },
+    {
+      "month": "2025-07-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 966,
+      "contamination_rate_symbols_pct": 90.28,
+      "n_contaminated_symbol_days": 21252
+    },
+    {
+      "month": "2025-08-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 971,
+      "contamination_rate_symbols_pct": 90.75,
+      "n_contaminated_symbol_days": 19420
+    },
+    {
+      "month": "2025-09-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 984,
+      "contamination_rate_symbols_pct": 91.96,
+      "n_contaminated_symbol_days": 18696
+    },
+    {
+      "month": "2025-10-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 991,
+      "contamination_rate_symbols_pct": 92.62,
+      "n_contaminated_symbol_days": 21802
+    },
+    {
+      "month": "2025-11-04",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 998,
+      "contamination_rate_symbols_pct": 93.27,
+      "n_contaminated_symbol_days": 17964
+    },
+    {
+      "month": "2025-12-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 1007,
+      "contamination_rate_symbols_pct": 94.11,
+      "n_contaminated_symbol_days": 22154
+    },
+    {
+      "month": "2026-01-05",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 1015,
+      "contamination_rate_symbols_pct": 94.86,
+      "n_contaminated_symbol_days": 19285
+    },
+    {
+      "month": "2026-02-02",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 1023,
+      "contamination_rate_symbols_pct": 95.61,
+      "n_contaminated_symbol_days": 18414
+    },
+    {
+      "month": "2026-03-02",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 1030,
+      "contamination_rate_symbols_pct": 96.26,
+      "n_contaminated_symbol_days": 21630
+    },
+    {
+      "month": "2026-04-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 1036,
+      "contamination_rate_symbols_pct": 96.82,
+      "n_contaminated_symbol_days": 21756
+    },
+    {
+      "month": "2026-05-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 1046,
+      "contamination_rate_symbols_pct": 97.76,
+      "n_contaminated_symbol_days": 18828
+    },
+    {
+      "month": "2026-06-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 1058,
+      "contamination_rate_symbols_pct": 98.88,
+      "n_contaminated_symbol_days": 23276
+    },
+    {
+      "month": "2026-07-01",
+      "n_non_member_symbols": 1070,
+      "n_non_member_symbols_referenced_rsr_gt_0": 1069,
+      "contamination_rate_symbols_pct": 99.91,
+      "n_contaminated_symbol_days": 7483
+    }
+  ],
+  "contamination_summary": {
+    "avg_monthly_contamination_rate_symbols_pct": 54.87,
+    "total_contaminated_symbol_days_all_months": 1271892,
+    "n_months": 108
+  }
+}

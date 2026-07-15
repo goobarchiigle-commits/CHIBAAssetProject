@@ -1,6 +1,366 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-11（★Study75C完了: 生存者バイアス≈0・選定バイアス≈+11pp確定★）
+# Single Source of Truth / 最終更新: 2026-07-15（★★★実発注経路SSOT統合完了: run_morning_signal.py廃止・run_live_signal.py一本化・snapshot_hash自動再計算・Health Check broker snapshot優先化・CE Shadow Mode移植・Legacyタスク4件削除★★★）
+# ※研究(Study)系列は2026-07-14 Study95が最新（下記参照）。本セクションは運用インフラ変更の記録。
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
+
+---
+
+## ★★★★★★★★★★★★ 2026-07-15 実発注経路SSOT統合完了（インフラ・非研究）
+
+**発端**: 2026-07-14 08:41、`run_morning_signal.py`（未把握の旧スケジュールタスク）が
+6981.T/5301.T/6506.TのATRトレーリングストップSELLを発注（正当な理由・Circuit Breaker無関係と
+RCAで確定済み）。調査の過程で`run_morning_signal.py`と`run_live_signal.py`が並行して実発注可能な
+状態にあり、`snapshot_hash`不一致・equity計算の複数系統分岐（Health Check誤警告DD=-21.9% vs
+実際-10.2%）を招く構造的欠陥と判明。詳細: `reports/execution_path_ssot_audit_2026-07-14.md`。
+
+**実施（ユーザー承認7フェーズ・全完了・2026-07-15）**:
+1. snapshot_hash意味論確定（発注可否判定に無関係な純粋診断値と確認）
+2. Option A採用（実発注経路をrun_live_signal.pyへ一本化）
+3. Capital Efficiency機能をShadow Mode化（`src/live/ce_shadow_tracking.py`・実発注数量へ影響ゼロ）
+4. Legacyタスク4件削除（AI-Trading-DryRun/Live・CHIBAAsset_DryRun/Live）
+5. `state_store.save_portfolio_state()`にhash自動再計算追加
+6. `startup_check.py`のequity計算をbroker snapshot優先へ変更（DD誤警告を実環境で解消確認）
+7. DRY検証・回帰テスト284件全合格
+
+**Windows Task Scheduler**: `\run_morning_signal`無効化。稼働継続は`CHIBATrading_DryRun`(08:43)/
+`CHIBATrading_Live`(08:44)の2つのみ——実発注経路はこれで完全に一本化された。
+
+**未実施**: コミット（明示的指示待ち）。次回市場日が実運用最終確認。
+詳細ログ: `docs/research/2026-07-15.md`。
+
+---
+
+## ★★★★★★★★★★★ 2026-07-14 Study95 — CS Momentum Factor-Level Ground Truth（H0）完了・KILL機械発動
+
+**性格**: 新規fresh run（factor-levelクロスセクション分析・BTエンジン/フジコ法/RSR/percentile型
+トレーディングパラメータ一切不使用）。成果物: `backtests/study95_cs_momentum_factor_level.json` /
+`reports/study95_cs_momentum_factor_level.md` / `reports/study95_decile_chart.png` /
+`src/backtest/study95_cs_momentum_factor_level.py`。コミット未実施。
+
+**データ**: Universe C（Study75A・119ヶ月・PIT月次）・panel=108,895行（rebalance×code）・
+価格ファイル欠落=0銘柄。2ファクター: (1) 12-1モメンタム（P[t-21]/P[t-252]-1）
+(2) Clenow slope90d×R²（canon Study76と同一定義を再利用）。
+
+**判定（ユーザー指定基準を機械適用）**:
+- **12-1モメンタム: FAIL_ZERO_SPREAD**（12M年率spread=-1.83%・NW-t=-0.368・正のhorizon数=0/4）
+- **Clenow slope×R²: FAIL_ZERO_SPREAD**（12M年率spread=-1.79%・NW-t=-0.669・正のhorizon数=3/4）
+- **Kill基準発動=True**（機械判定）
+
+**重要な補足（自動ラベルだけでは伝わらないニュアンス）**:
+1. 12-1モメンタムは「スプレッドがゼロ」というより**弱い逆転（reversal）**——IC符号が
+   全horizonで負（mean IC -0.024〜-0.048）、3M/6M/12M horizonでt統計量が有意に負
+   （t=-2.77/-3.46/-2.83）。Decile10（過去12-1リターン最上位=勝者）が6M/12Mで明確に最下位
+   （6M=0.28% vs 他decile 3.3-4.6% / 12M=3.07% vs 他decile 6-8%）。Study61の
+   FalseHero率67.8%・BigWinner=Day1判別不能という既存内部知見と整合する
+   （個別戦略文脈の発見がfactor-levelでも再現）。
+2. Clenowは1M/3M/6M horizonで正の単調性（Spearman ρ=0.818(p=0.004)/0.697(p=0.025)/0.539）
+   ・スプレッドも正（1M=+7.02%/3M=+6.77%/6M=+3.83%）だが、**12Mで反転**（-1.79%）。
+   t>2の有意水準に届かず（1M t=1.11・3M t=1.74）「複数期間で一貫」の基準を満たさない。
+   Bear regimeで顕著に悪化（-7.64%・t=-2.681・有意）——短期トレンドフォローシグナルが
+   存在する可能性はあるが、頑健性基準（規定の12M一貫性）を満たさず不採用。
+3. Sector-neutral（TOPIX17内demean後）でもパターンは不変（sector bet起因ではない）。
+   容量（ADV20 median ¥900M-930M、Q1/Q10で大差なし）も交絡していない
+   （流動性アーティファクトではない）。turnover: mom Q10=34.6%/月・Clenow Q10=49.6%/月
+   （高回転・Study75E/Fの病理と整合）。
+
+**未決（ユーザー決裁待ち）**: プログラムレベルKill条件（fujiko_r2_research_roadmap.md v2）に
+従えば「Candidate A-E全凍結・旧正典ARCH系（PEAD/TSMOM）への転進提起」が機械的帰結。
+ただし2の短期Clenowシグナル（1-6M・regime依存）は完全なゼロではなく、regime-gated型で
+再検討する余地がある。**ユーザー判断が必要**: (a) Kill条件通り全面凍結してPEAD/TSMOMへ
+転進するか (b) Clenow短期シグナルをregime-gated型として限定的に継続検証するか。
+
+---
+
+---
+
+## ★★★★★★★★★★ 2026-07-13/14 FUJIKO 2.0 Ground Truth Reconstruction（fujiko_r2 v2）完了
+
+**性格**: 文書統合作業のみ（新規BT・コード変更なし）。ユーザー指示「FUJIKO 2.0 Ground Truth
+Reconstruction」Part1-5に準拠し`reports/fujiko_r2_research_roadmap.md`を**v2へ全面改定**
+（2026-07-13・Fable 5）。SAVE伝播（本ファイル・complete_execution_roadmap追記）=2026-07-14。
+下記v1セクション（Part A分類・Market→Sector→Stock単一アーキテクチャ・Study87-94）は
+**v2で上書き改定済み**——最新はv2を参照。コミット未実施。
+
+- **Part1**: Study01-77をStudy単位でA/B/C/D分類。A=75系バイアス実測・インフラ・手法。
+  B=構造的発見（絶対値再較正必須）。C=全Production採用判定・D_ATR_EQ系譜・
+  **strategy_review_2026-06-28**・M1後Official値。D=Dynamic42 v1・**strategy_review_2026-04-13**・
+  Study75B Delta_A・Study52キャッシュ旧数値（凍結保持・意思決定根拠使用禁止）。
+- **Part2**: 6仮説事前確率——CS momentum=0.45 / 階層=0.35 / セクター持続=0.40 /
+  **RSR定義無効=0.75** / Entry/Exitエッジ残存=0.30 / Dynamic universe=6a(PIT必須)≈0.95・
+  6b(月次ローテーション)≈0.25。全仮説に検証Study割当。
+- **Part3/4**: Candidate A(Clenow)/B(Sector階層)/C(Sector ETF)/D(Top500)/E(Hybrid)を6軸評価。
+  **検証順A→D→B→C・Eは原則起案しない**。
+- **Part5**: Phase R0-R4。**Study95(CSモメンタムfactor-level・H0・最優先・即時着手可)/
+  Study96(Entry/Exit帰属分解・H5)/Study97(Sector ETF実現性・条件付き)新設**。
+  統治原則: factor-first・honestベースライン3基準・パーセンタイル型パラメータ新規採用禁止・
+  Study94まで実弾変更を派生させない。H0失敗→ARCH系(PEAD/TSMOM)転進提起。
+- **RSRランク付け**: プールサイズ非依存の絶対スコア（Clenow slope×R²等）へ置換方針。
+
+**未決（ユーザー決裁待ち5点）**: (1)Study75D/E/F改番 (2)Study95/96/97採番承認
+(3)canon Study76基準器実施承認 (4)旧正典Phase2-5凍結承認（例外並行候補Study80/83）
+(5)strategy_review両版の凍結参考値格下げ承認。**次の一手=Study95**。
+
+---
+
+---
+
+## ★★★★★★★★★ 2026-07-13 FUJIKO-R2 Research Roadmap Reconstruction完了（v1・v2で上書き済み）
+
+**性格**: Study74-77（Study75D/E/F暫定名称含む）で判明した事実を統合し、静的RSR42のhindsight
+選定バイアス前提を完全に外した次世代研究ロードマップを再構築（新規BTなし・統合作業のみ）。
+成果物: `reports/fujiko_r2_research_roadmap.md`（新規正典候補）/
+`reports/complete_execution_roadmap_2026-07-04.md`（実行ログ追記済み）。コミット未実施。
+
+**★Study番号衝突を発見・提案**: 本セッションで使用した「Study76/76D/77」はcanon予約済み
+Study76(Clenow純正)・Study77(Exit構造)と別内容。**Study75D/E/Fへの改名を提案・ユーザー決裁待ち**。
+canon Study76/77は未実行のまま予約継続。
+
+**Part A（既存研究分類）**: 再利用可能=データ基盤・PIT手法・WF/Bootstrap統計手法・容量診断計装・
+情報天井等の構造的発見。要再検証=Study74資本スケーリング・M1公式値・Study78 RoR数値・Exit上界
+pp値等（全てRSR42基準で測定）。廃棄候補=Dynamic42 v1（Production不適格・確定）・旧正典
+Phase2-5全体（RSR42基準「素の実力10-12%」前提の上に組まれたため一時凍結提案）。
+
+**Part B設計**: Market(既存TOPIX>MA200)→Sector(★新規TOPIX17/33モメンタム選抜)→Stock(既存ランキング
+ロジック流用)の3層アーキテクチャ「FUJIKO-R2」。
+
+**Part C/D（新規Study87-94・依存グラフ付き）**: Study87(warm-up修正版ユニバース生成器)・
+Study88(セクターモメンタム持続性・純データ分析・H1)・Study89(セクター→銘柄伝播・H2)・
+Study90(ユニバース構築代替案ベンチマーク・TOPIX100/500/Prime/17ベース/Hybrid診断)・
+Study91(クリーンDynamic42 v2 fresh run)・Study92(FUJIKO-R2プロトタイプ)・Study93(全ベースライン
+比較)・Study94(静的RSR42終了可否の最終決定)。情報価値/コスト比を維持する順序
+（純データ分析→診断→fresh run）・各StudyにKill基準あり。
+
+**未決（ユーザー決裁待ち）**: (1)Study75D/E/F改番 (2)旧正典Phase2-5凍結の是非
+(3)Study87以降の起案承認。次ステップ候補=Study87またはStudy88（並行可）。
+
+---
+
+---
+
+## ★★★★★★★★ 2026-07-13 Study77 — Dynamic RSR42 Path Decomposition完了
+
+**性格**: 純粋診断（新規BTなし・RunBと完全同一の既存確定結果を再抽出して分析）。コミット未実施。
+成果物: `reports/study77_dynamic42_path_decomposition.md` /
+`src/scripts/study77_dynamic42_path_decomposition.py` / `backtests/study77_dynamic42_diagnostics.json`
+
+**主要発見**:
+1. **2025 OOS+61.29%は数銘柄集中（判定A）**: 単一銘柄(23340)が2トレードで総利益の79.04%、
+   単月(8月)が81.63%を占める。黒字銘柄は38銘柄中14銘柄(37%)のみ。Top5銘柄シェア182.07%
+   （一部銘柄の損失を大幅に上回る少数銘柄の利益で相殺）。**偶然・一過性の可能性が高い**。
+2. **セクターローテーション仮説: 根拠なし**。corr(top_sector_share_t, return_t+1)=-0.252、
+   corr(sector_hhi_t, return_t+1)=-0.257（いずれも弱い負・n=96）——集中が有利という
+   仮説を支持しない。TOPIX17 ETFプロキシは未実施（データ未取得）。
+3. **IS崩壊の主因はposition-level cap（sector/cluster cap）ではなく候補枯渇+breadth連動停止**。
+   sector_capは2018-2019の計4日のみ拘束。breadth_stop_daysは2018年35日・2019年47日・
+   2020年44日・2022年67日と損失年に集中。avg_candidatesは全期間0.27〜0.55と恒常的に低い。
+4. 銘柄在籍: median 3.0ヶ月・mean 4.08ヶ月だが、一部銘柄（38250など）は2017-2025の9年間で
+   延べ34ヶ月断続的に再選抜される「常連」も存在——完全ランダムな入れ替わりではない。
+
+**Q1-Q4回答**: Q1(セクターローテーション捕捉)=根拠不十分（否定的寄り）。Q2(2025 OOSは偶然か)=
+**偶然・一過性の要素が強い**。Q3(市場→セクター→銘柄アーキテクチャへの根拠)=NO（Q1が弱いため）。
+Q4(Static RSR42完全終了の根拠)=**NO・時期尚早**（Dynamic42・Static RSR42いずれもクリーンな
+状態に至っておらず、両者とも研究途上）。
+
+**次アクション（未実施）**: Study76Dで提起した「ウォームアップ処理付きクリーン版Dynamic42」
+でのfresh run再測定、セクター予測力単体の専用検証、静的RSR42との同等条件下比較。
+
+---
+
+---
+
+## ★★★★★★★★ 2026-07-13 Study76D — Dynamic RSR42 ffill contamination ablation完了
+
+**性格**: 純粋ablation（fresh run 4本・パラメータ探索なし）。コミット未実施（ユーザー指示）。
+成果物: `reports/study76d_contamination_ablation.md` / `src/scripts/study76d_contamination_ablation.py` /
+`backtests/study76d_results.json`
+
+**驚くべき結果**: 前段の病理診断（2026-07-13先述）で確定した「FujikoStrategy内RSRのffill汚染
+（最大99%）」を0埋めで除去した`RunB_fixed`は、**元の`RunB`(contaminated)より成績が悪化した**。
+
+| | RunB(contaminated) IS/OOS | RunB_fixed IS/OOS | Δ_bug IS/OOS |
+|---|---|---|---|
+| CAGR | -16.46% / +61.29% | **-24.98% / +42.71%** | **-8.52pp / -18.58pp** |
+| MaxDD | -85.02% / -39.59% | **-91.76% / -48.21%** | -6.74pp / -8.62pp |
+
+事前仮説（ffill汚染が偽の好調シグナルを作り成績を実力以上に見せている）は**反証された**。
+最有力な説明: 0埋めという「修正」自体が、非在籍(RSR=0)→在籍(RSR≥75)遷移時の**不連続な
+モメンタム急上昇**という別のアーティファクトを新たに生んでいる（`mom_arr = rsr_arr -
+roll(rsr_arr,21)`が在籍開始直後に人為的に跳ね上がる）。**RunB・RunB_fixedいずれも
+クリーンな測定ではない**——真に信頼できる数値には、在籍開始直後のウォームアップ期間で
+シグナル生成を抑制する再設計が必要（未実施・次アクション）。
+
+**含意**: 機械的判定（|Δ_bug CAGR|≥5pp閾値）は「A: 大きい」だが、実質的には「B: Dynamic
+Universe自体に構造的弱さがある」という解釈の証拠がむしろ強まった——バグ修正が救済にならな
+かったため。月次汚染率（RSR>0の緩い定義）は平均54.87%だが2017年0%→2026年99.9%と単調増加
+（在籍履歴蓄積の自然な帰結・実害の強い指標ではない）。
+
+**次アクション（未実施）**: (1)ウォームアップ処理を入れた真にクリーンな第3版でのfresh run
+(2)RSR≥75を誤通過しうる狭義の汚染率再集計 (3)Clenowスコア等トレイリングリターン以外の
+ランキングルールでの感度確認。
+
+---
+
+---
+
+## ★★★★★★★★ 2026-07-13 Dynamic RSR42（RunB）病理診断完了 — MaxDD-85%の原因調査
+
+**性格**: 純粋診断（パラメータ変更・最適化なし・RunBと完全同一構成の決定論的再実行）。
+成果物: `reports/study76_dynamic_rsr42_pathology_diagnostics.md` /
+`src/scripts/study76_dynamic_rsr42_pathology_diagnostics.py` /
+`backtests/study76_dynamic_rsr42_pathology_diagnostics_2026-07-13.json`
+
+**確定**: (1) RSR≥75とTop30/Bear20は直列funnelではなく並列独立ゲート。(2) IS期間の64.4%の日が
+候補ゼロ（バースト的分布）。(3) rolling_rsr/dynamic_membershipの月境界整合性・1ヶ月ラグは
+問題なし（mismatch=0）。(4) **★新規発見: `fujiko_strategy.py`内部のRSR系列がffill()により
+最大99%汚染される**（`build_monthly_rolling_rsr()`が非在籍月にNaNを返す設計だが、
+FujikoStrategy.precompute_signals()がそれをforward-fillし、退席済み銘柄の古いRSR値がSEPA/
+momentum判定に漏れ込む。エンジン本体のバグではなく本Study新規コードの設計欠陥）。
+(5) 損失最大20トレードは全件が正規在籍銘柄への通常エントリー（幽霊エントリー仮説は否定）・
+Exitも正常発火（ATR_TRAILING/RSR_MOMENTUM_EXIT/RSR_EXIT）だが単発損失が資本の最大13%と極端。
+(6) 実現損益は2018-2020年に集中（-¥110万/-¥46万/-¥58万）、2022年以降黒字転換
+（+¥8万/+¥5万/+¥20万）——ffill汚染と2018/2020地合い要因の分離は未検証。
+
+**結論（未確定のまま）**: 「Dynamic Universeにエッジがない」「フジコ法が死んでいる」は
+**いずれも本診断では確定していない**。幽霊エントリーとラグバグは否定されたため、Δ_dynamic
+IS-25.17ppの一部はffill汚染由来の可能性が高いが、定量的な寄与分は未測定
+（ablation study要・次アクション）。
+
+**推奨次アクション**: `build_monthly_rolling_rsr()`の非在籍月を明示的に0埋め（ffill依存を断つ）
+した上で同一条件で再測定し、ffill汚染の寄与分を分離するablation study。
+
+---
+
+## ★★★★★★★★ 2026-07-13 D_ATR_EQ Study75-Universe再ベースライン（Study76前提工程）完了
+
+**位置づけ**: `reports/study76_execution_plan.md`が定義する「Study76」（Clenow純正ベンチマーク・
+D_ATR_EQ全面簡略化・複雑性の対価測定）とは別物。本Studyは、Study76が比較対象として必要とする
+前提工程「D_ATR_EQをStudy75 Universe上でfresh run再測定する」（同canon §3/§5「Hard Block」項目）を
+実装・実行した。canon 3文書（execution_plan/checklist/dependency_matrix）は上書き改定していない。
+Clenow純正ベンチマーク（canon本来のStudy76）は本Study完了後の別決裁事項として残置。
+
+**成果物**: `src/backtest/study76_datr_eq_universe_c_rebaseline.py` /
+`backtests/study76_datr_eq_universe_c_rebaseline_2026-07-13.json` /
+`backtests/dynamic_rsr42_membership_2026-07-13.json` / `reports/study76_datr_eq_universe_c_rebaseline.md`
+
+**設計**: hindsight静的RSR42を、Study75AのUniverse C（PIT・rule-based月次再適用）から各月T-1時点の
+トレイリング・コンポジットリターン上位42銘柄を機械選抜する「**Dynamic RSR42**」（月次固定42名
+ローテーション）に置換。選抜後の42名プール内でのみRSR%ile・min_rsr≥75・dyn_rsr42_bear_rs0の
+Top30/Bear20を計算するため本番と同一解像度でゲートが動作（**エンジンコード無改変**）。
+実セクターは本日稼働の`database/market/master/companies.parquet`を使用（E1の疑似セクター回避策は
+不要になった）。RunA（Universe C全体へ直接RSR適用）は実行せず、既存のStudy75B U3
+（既知の二重汚染: パーセンタイル歪み+セクターキャップ崩壊バグ）をNegative Control参照専用に
+引用（ユーザー決裁: 主結論・selection bias推定には不使用）。
+
+**最重要指標**: **Δ_dynamic = RunB(Dynamic RSR42) − U0(静的hindsight RSR42) = IS -25.17pp / OOS +62.27pp**
+
+| | RunB IS (2018-2024) | RunB OOS (2025) | U0参考(静的RSR42) IS/OOS |
+|---|---|---|---|
+| CAGR | -16.46% | **+61.29%** | 8.71% / -0.98% |
+| Sharpe/Calmar | -0.175/-0.194 | 1.172/1.548 | 0.677/0.421・-0.027/-0.097 |
+| MaxDD | **-85.02%** | -39.59% | -20.72% / -10.07% |
+| WF5fold | 2/5 PASS（2023+25.07%・2024+96.22%のみ正、2020〜2022大幅負） | — | — |
+
+**解釈**: IS期間はhindsight-RSR42が圧倒的優位（RSR42自体が`selection_period:
+2018-2024_backtest_universe`としてこの期間の成績を見て選ばれているため予想通りの方向）。
+**OOS期間は逆転**——Dynamic RSR42がU0を+62.27pp上回る。Study75C E1のOOSパーセンタイル退行
+（95%→70%）と整合的な追加証拠であり「hindsight選定の優位性は選定窓の外では消滅・反転する」
+仮説を強く支持。月次membership turnover平均**44.57%**・銘柄別在籍月数中央値**3.0ヶ月**——
+RSR42の静的性質と対照的に極めて回転が速い。
+
+**未解決の所見（バグと断定せず・次アクションで検証予定）**: `avg_candidates=0.45`（候補層が
+非常に薄い）・`max_dd=-85.02%`（IS）は、本Study定義の異常判定基準（avg_simultaneous_holdings≈1・
+exposure≈0・trade_count極小・membership件数異常・lookahead）には抵触しないため結果を採用したが、
+production/U0/E1のいずれとも比較にならない極端値。trailing-return-onlyランキングの質的フィルタ
+欠如＋高回転の組み合わせが原因の可能性が高いが未確定。
+
+**判定（E節）**: (1)Dynamic universeの正準基盤化=**現時点でNO**（WF分散が極端・IS単独では不採用
+水準・ただしOOSは優位で時期尚早の判断）。(2)Study74 BLACK=**維持**（変数独立・むしろCore期待値の
+不確実性拡大を補強）。(3)アーキテクチャ生存性=**部分的判定不能**（エンジン自体は無改変で正常動作
+確認・ranking ruleの質とアーキテクチャの寄与は本Studyだけでは分離不可）。
+
+**推奨次アクション（ユーザー決裁待ち）**: (1) avg_candidates/max_dd異常の原因診断 (2) Dynamic RSR42
+選抜ルールをcanon本来のClenowスコア（slope×R²）に差し替えた感度確認 (3) RunA汚染除去版の
+fresh run再構築 (4) canon本来のStudy76（Clenow純正ベンチマーク）の実施。
+
+---
+
+## ★★★★★★★★ 2026-07-12 Study75C E1 妥当性監査完了
+
+**成果物**: `reports/study75c_e1_validity_audit.md` / `src/scripts/study75c_e1_validity_audit.py` /
+`backtests/study75c_e1_validity_audit_2026-07-12.json`。バックテストエンジン非呼び出し
+（P&Lシミュレーション再実行なし）・E1のRNGドロー構成のみをseed=42で再現（dead_codes完全一致・
+bit-exact再現確認済み）。
+
+**判定**: **E1 PARTIALLY CONTAMINATED**（妥当性スコア70/100・確信度: 定性的結論=中〜高／
+精密数値=中）。
+
+**主要発見**:
+1. RSR42はADV20（流動性/規模プロキシ・時価総額データ自体は未取得のため代替）で20ドロー全本を
+   上回る（100パーセンタイル・stock-level MWU p=2.9×10⁻⁸）。**新規発見**: E1の「同一流動性帯」は
+   RSR42のADV20の**min-maxエンベロープ**でフィルタしただけで**分布（中央値）はマッチしていない**
+   ため、比較可能性の主張は技術的に正しいが実質的には弱い。ドロー内部でもADV20中央値とCAGRに
+   有意な正相関（Spearman ρ=0.493, p=0.027）。
+2. モメンタム・ボラティリティ・出来高CVはRSR42側がやや異なるが、ドロー内部でこれらとCAGRの
+   相関はいずれも非有意（モメンタムはp=0.35で符号すら逆）→ 「事前の質の高さ」による説明は
+   本データでは支持されない。
+3. K=20のサンプルサイズ妥当性: 「95パーセンタイル」の点推定はClopper-Pearson 95%CIで
+   [75.1%, 99.9%]、「中央値-2.48%」はbootstrap-of-bootstrap 95%CIで[-4.26%, +1.27%]（上限が正値）
+   — 定性的結論は頑健だが点推定の精密さは過信禁物。
+4. セクターキャップバグの中和は код読解で確認済み（U0'とStudy75B U0の差0.11ppのみ・副作用無視可能）。
+5. **新規発見**: RSR42の凍結バックテストCSV（E1が使用・42銘柄）と現行ライブ運用ユニバース
+   （`rsr42_trading.json`・44銘柄）の重複は**25/42（59.5%）のみ**。E1の内部測定は自己整合的で
+   無効化されないが、+11〜12pp選定バイアスを現行ライブユニバースにそのまま適用してよいかは未検証。
+
+**結論への影響**: Study75Cの定性的結論（選定バイアスが支配的・Study74 BLACK維持・Core期待値
+再アンカー要）は**変更不要**。ただし「+12.26pp」は「大きく正・おそらく+7〜+12pp程度・上限に
+近い可能性」とトーン変更して引用すべき（補正方向はいずれも当初推定を弱める方向）。
+
+**推奨リラン（未実施・ユーザー決裁待ち）**: (1) ADV20分布マッチング版E1' (2) K=20→50-100拡張
+(3) セクター層化ブートストラップ (4) 現行ライブRSR42（44銘柄）に対する同一監査。
+
+---
+
+## ★★★★★★★★ 2026-07-12 database/market 日本株分析データベース構築完了（インフラ）
+
+**目的**: セクター/ETF/RS/ファクター分析・バックテスト・MLが共通参照する分析データベースを
+`database/market/` として新設（`data/`＝バックテスト生成物・`cache/`＝売買システム専用キャッシュ・
+`data/jquants/`＝取り込みLegacyとは完全分離。`database/market` をSingle Source of Truthとする）。
+
+**実装**: `src/database/`（新パッケージ・14ファイル）。既存の成熟したJ-Quants取り込みエンジン
+（`src/jquants/`・95/95テスト・2016-07-11〜現在10年分1.2GB）は破棄・重複せず、`sources/`層
+（`jquants_source.py`・`jpx_official.py`）経由で再利用。移行完了後、`database/market`の更新経路
+（`sync.py`）は`data/jquants/`に一切書き込まない設計（`data/jquants/processed`はmigrate.py実行時の
+一回限りの読み取り専用ソースとしてのみ使用・以後は完全独立稼働）。
+
+**構成**: `ohlcv/{2016..2026}.parquet`（年次・dtype最適化済み）/ `master/{companies,classifications,
+universe,indices}.parquet` / `metadata/{dataset_info.json,schema.json,update_history.parquet}` /
+`cache/`（分析専用） / `fundamentals,etf,index,factor,macro,margin,shortselling/`（README.mdのみ・
+設計プレースホルダー）。消費側は`src/database/repository.py:MarketDataRepository`経由のみでアクセスし、
+物理パスを直接知らない設計（既存バックテストの将来移行を容易にする）。テスト: `tests/database/`
+59件新規・既存`tests/jquants/`95件と合わせ155/155 pass。
+
+**実データ移行結果（2026-07-12実行・data/jquants/processedは変更なし確認済み）**:
+| テーブル | 件数 |
+|---|---|
+| ohlcv 合計 | 10,084,970行（2016-07-11〜2026-07-09・11年分） |
+| companies | 5,377銘柄 |
+| classifications | 4,439銘柄（現在上場中のみ） |
+| universe（TSE_ALL区間） | 5,382区間 |
+| indices | 1件（TOPIXのみ・v1最小実装） |
+
+**指数構成銘柄フラグ調査結果（ユーザー指示Priority 1→2→3を実施）**:
+- IsTOPIXCore30/Large70/Mid400/Small: J-Quants `ScaleCategory`から導出・取得元="jquants_api"
+  （31/68/394/1144銘柄・非TOPIX対象2,802銘柄はNULL＝「不明」であり「非採用」ではない）
+- IsJPXPrime150: JPX公式automation CSV（`jpx.co.jp/automation/.../jpxprime150weight_j.csv`・
+  安定URL）から取得・149銘柄True・残り4,290銘柄はFalse（構成銘柄リスト全件把握のため確定的に判定可能）
+- IsJPX400: JPX公式サイトに構成銘柄CSVは存在するが添付URLが定期見直しごとに可変のためv1未実装。
+  列・source/last_updated列は用意済みでNULL（次段階でHTML再発見ロジックを追加し昇格予定）
+- IsNikkei225: 安定した公式機械取得手段が本調査時点で未確認。NULL固定（将来データソース確定時に
+  列追加不要で埋められる設計）
+
+**既知の留意点**: companies.parquetの`Date`列（listed_infoスナップショットの情報基準日）が
+翌営業日日付になる場合がある（J-Quants API仕様・バグではない）。fundamentals/etf/index/factor/
+macro/margin/shortsellingは設計のみでデータ未取得（README.md参照）。
 
 ---
 

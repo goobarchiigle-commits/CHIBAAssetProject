@@ -741,4 +741,116 @@ Study74 BLACK維持（a fortiori）。実行中に発覚・修正: エンジン�
 集約でE1初回実行を1ポジション戦略に退化させていた問題（擬似固有セクターで解消・初回結果は破棄）。
 未決（ユーザー決裁）: Core期待値・CP1目標体系の再アンカー。次ステップ=Study76。
 
+---
+
+## 実行ログ追記（2026-07-13・Sonnet 5実行）— Study75D/E/F（暫定命名）+ FUJIKO-R2ロードマップ再構築
+
+**★番号衝突の注記**: 本セッションはユーザー指示で「Study76」「Study76D」「Study77」の名称を
+使用したが、canon（本ファイル）が予約する Study76=Clenow純正ベンチマークWF・Study77=Exit構造
+置換WFとは**別内容**。`reports/fujiko_r2_research_roadmap.md`にて**Study75D/E/Fへの改名を提案・
+ユーザー決裁待ち**。canon Study76/77は未実行のまま予約継続。以下、提案名称で記録する。
+
+**Study75D（暫定・D_ATR_EQ Study75-Universe再ベースライン）**: D_ATR_EQ本体（Exit/リスク/breadth/
+dyn_rsr42_bear_rs0）を無改変のまま、Study75AのUniverse C月次プールから各月T-1トレイリング
+composite return上位42名を機械選抜する「Dynamic RSR42」に静的RSR42を置換して測定。
+**Δ_dynamic = RunB − U0 = IS -25.17pp / OOS +62.27pp**（IS CAGR-16.46%・MaxDD-85.02%／
+OOS CAGR+61.29%）。月次turnover平均44.57%・在籍月数中央値3.0ヶ月。成果物:
+`reports/study76_datr_eq_universe_c_rebaseline.md`（ファイル名は当時のまま）。
+
+**Study75E（暫定・contamination ablation）**: Study75D病理診断で確定した「FujikoStrategy内RSRの
+ffill汚染（実測99%）」を0埋めで除去したRunB_fixedをfresh run。**修正すると成績が悪化**
+（IS CAGR -24.98%・OOS CAGR+42.71%・Δ_bug IS-8.52pp/OOS-18.58pp）——事前仮説（汚染が偽の好調
+シグナルを作っている）は反証された。0埋め自体が別の不連続アーティファクト（在籍開始時の
+モメンタム急上昇）を生んでいる可能性が高く、**RunB・RunB_fixedいずれもクリーンな測定ではない**。
+成果物: `reports/study76d_contamination_ablation.md`。
+
+**Study75F（暫定・Dynamic42 Path Decomposition）**: 2025 OOS+61.29%を分解 →
+**単一銘柄(23340)が総利益の79.04%・単月(8月)が81.63%**（判定=数銘柄集中・偶然性大）。
+セクターローテーション仮説の相関は弱い負（corr=-0.252、n=96・根拠なし）。IS崩壊の主因は
+position-level cap（sector/cluster cap）ではなく候補枯渇+breadth連動停止。
+成果物: `reports/study77_dynamic42_path_decomposition.md`（ファイル名は当時のまま）。
+
+**統合作業**: 上記3件+Study75C（E1監査）を統合し、静的RSR42前提を完全に外した次世代研究
+ロードマップ`reports/fujiko_r2_research_roadmap.md`を新規作成。既存研究を
+再利用可能/要再検証/廃棄候補へ分類（Part A）。Market→Sector→Stock階層モメンタム仮説を設計
+（Part B）。Study87-94（純データ分析2本→診断1本→fresh run4本の順で情報価値/コスト比を
+維持する依存構造）を新規起案。**旧正典Phase2-5（Study79/82-86）は本ロードマップ完了まで
+一時凍結を提案**（RSR42基準の「素の実力10-12%」前提が崩れたため）。
+
+**未決（ユーザー決裁待ち）**: (1) Study75D/E/Fへの正式改番 (2) Phase2-5凍結の是非 (3) Study87
+以降の起案承認。次ステップ=Study87（Warm-up修正版ユニバース生成器）またはStudy88
+（セクターモメンタム持続性、Study87と並行可）。
+
+---
+
+## 実行ログ追記（2026-07-14・Fable 5実行）— FUJIKO 2.0 Ground Truth Reconstruction（fujiko_r2 v2）完了記録
+
+**性格**: 文書統合作業のみ（新規BT・コード変更・実弾変更なし）。
+`reports/fujiko_r2_research_roadmap.md`を**v2へ全面改定済み（2026-07-13・Fable 5）**。
+本メモはそのSAVE伝播（research_state.md / 本ファイル）の追記（2026-07-14）。
+ユーザー指示「FUJIKO 2.0 Ground Truth Reconstruction」Part1-5に完全準拠:
+
+- **Part1**: Study01-77を**Study単位**でA（高信頼再利用: 75系バイアス実測・インフラ検証・
+  エンジンforensics・WF/統計手法）/ B（条件付き: 構造的発見のみ・絶対値再較正必須）/
+  C（再検証必須: 全Production採用判定・D_ATR_EQ系譜・**strategy_review_2026-06-28**・
+  M1後Official値）/ D（廃棄候補・凍結保持: Dynamic42 v1・Study75B Delta_A・
+  **strategy_review_2026-04-13**・Study52キャッシュ旧数値）へ分類。
+- **Part2**: 6仮説の事前確率評価——CS momentum有効=0.45 / Market→Sector→Stock階層=0.35 /
+  セクター持続性=0.40 / **RSR定義無効=0.75**（プールサイズ従属セマンティクス＝移植不能）/
+  Entry/Exitエッジ残存=0.30 / Dynamic universe必須=二分割（PIT必須6a≈0.95・
+  月次ローテーション形態6b≈0.25）。全仮説に検証Studyを割当。
+- **Part3/4**: Candidate A（Market→Stock Clenow）/ B（Market→Sector→Stock）/
+  C（Sector ETF Rotation）/ D（Dynamic Top500）/ E（Hybrid）をエッジ源泉・失敗モード・
+  必要データ・計算コスト・実装複雑性・期待頑健性の6軸で評価。
+  **検証優先順位 A→D→B→C・Eは原則起案しない**（アーキテクチャ選択自体のselection bias防止）。
+- **Part5**: Phase R0-R4の新roadmap。**Study95（CSモメンタムfactor-level ground truth・H0・
+  最優先・即時着手可）/ Study96（Entry/Exit帰属分解・H5）/ Study97（Sector ETFデータ実現性・
+  条件付き）を新設**。統治原則: factor-first・honestベースライン3基準（Universe Cランダム
+  median / TOPIX B&H / バイアス補正後RSR42推定）・パーセンタイル型パラメータ新規採用禁止・
+  現行実弾との分離（Study94まで実弾変更を派生させない）。プログラムレベルKill条件を定義
+  （H0失敗→旧正典ARCH系PEAD/TSMOMへ転進提起）。
+
+**RSRランク付けへの対処**: FUJIKO 2.0ランキングはプールサイズ非依存の絶対スコア
+（Clenow slope×R²等）を第一候補とし、min_rsr等パーセンタイル型の新規採用を禁止（仮説4）。
+**strategy_review両版**: 2026-04-13=D（凍結参考）・2026-06-28=C（ゼロベース再検証・
+Study94完了後に新版起草）——以降の意思決定根拠としての使用禁止。
+
+**未決（ユーザー決裁待ち5点）**: (1) Study75D/E/F改番 (2) Study95/96/97採番・起案承認
+(3) canon Study76をPhase R2基準器として実施する承認 (4) 旧正典Phase2-5凍結の正式承認
+（例外並行候補: Study80/83） (5) strategy_review両版の凍結参考値格下げの正式承認。
+**次の一手=Study95**（純データ分析・BTエンジン不要・1日規模・依存はStudy75Aのみ）。
+
+---
+
+## 実行ログ追記（2026-07-14・Fable 5実行）— Study95 完了（H0・CS Momentum Factor-Level Ground Truth）
+
+**性格**: 新規fresh run（純粋クロスセクション統計・フジコ法/RSR/percentile型トレーディング
+パラメータ/BTエンジン一切不使用・タスク仕様の禁止事項を厳守）。成果物:
+`reports/study95_cs_momentum_factor_level.md` / `backtests/study95_cs_momentum_factor_level.json` /
+`reports/study95_decile_chart.png` / `src/backtest/study95_cs_momentum_factor_level.py`。
+コミット未実施。
+
+**データ**: Study75A Universe C（PIT月次・119ヶ月）・panel=108,895行（rebalance×code）・
+価格ファイル欠落=0銘柄。2ファクター: 12-1モメンタム（P[t-21]/P[t-252]-1）・
+Clenow slope90d×R²（canon Study76と同一定義）。1M/3M/6M/12M forward return・IC・
+Q10-Q1スプレッド（Newey-West t + block bootstrap 95%CI）・monotonicity（Spearman）・
+regime分解（TOPIX>MA200）・sector分解（TOPIX17 IC + sector-neutral demean版）・
+容量診断（ADV20/turnover）・factor persistence（rank自己相関）を実装。
+
+**判定（ユーザー指定基準を機械適用）**: **両ファクターともFAIL・Kill基準機械発動=True**。
+- 12-1モメンタム: 12M年率spread=-1.83%（NW-t=-0.368）。ただし3M/6M/12M ICのt統計量が
+  有意に負（-2.77/-3.46/-2.83）——「ゼロ」というより**弱い逆転**（Decile10=過去勝者が
+  6M/12Mで明確に最下位）。Study61 FalseHero率67.8%等の既存知見とfactor-levelで整合。
+- Clenow: 1M/3M/6M horizonで有意な正の単調性（Spearman ρ=0.818 p=0.004等）・正スプレッド
+  （1M=+7.02%等）を示すが12Mで反転（-1.79%）し合格基準「複数期間で一貫」未達。
+  Bear regimeで-7.64%（t=-2.681・有意）と顕著悪化。
+- Sector-neutral・容量診断で交絡（sector bet・流動性アーティファクト）は否定。
+
+**未決（ユーザー決裁）**: プログラムレベルKill条件（fujiko_r2_research_roadmap.md v2）が
+形式上発動——「Candidate A-E全凍結・旧正典ARCH系(PEAD/TSMOM)へ転進提起」が既定の帰結。
+ただしClenowの短期(1-6M)regime依存シグナルは完全なゼロではないため、
+(a) Kill基準通り全面凍結してPEAD/TSMOM転進 (b) Clenow短期シグナルをregime-gated型で
+限定継続検証、のいずれをとるかはユーザー判断が必要。**全凍結の実行（Study87以降着手停止）は
+自動実行しない**（ユーザー承認後に着手）。
+
 *作成: CRO/Chief Architect, 2026-07-04。新規バックテスト実行なし。本書の全タスクは実行前にASK_FIRST該当有無を0.3で確認すること。正典（final_research_roadmap_2026-07-04.md）と矛盾する場合は正典が優先。*
