@@ -353,6 +353,37 @@ def _add_trading_days(start: pd.Timestamp, n: int) -> pd.Timestamp:
     return cal.add_trading_days(start, n)
 
 
+def _compute_data_as_of(universe_raw: dict) -> str:
+    """
+    universe_raw 全銘柄の最終取得日のうち最も古い日付を data_as_of として返す。
+
+    2026-07-08 RCA: 旧実装は next(iter(universe_raw)) で辞書挿入順の先頭銘柄
+    (実質ランダム)のみを見ており、その銘柄がキャッシュ・フォールバック等で
+    他銘柄より古いデータのままだと data_as_of が実態と無関係に古く／新しく
+    表示され得た。最古日を採用することで「その日実際に使われた最も古い
+    データ」を正直に表示する（＝真の鮮度下限）。
+    """
+    dates = [
+        info["df"].index[-1].date()
+        for info in universe_raw.values()
+        if info.get("df") is not None and not info["df"].empty
+    ]
+    if not dates:
+        return str(datetime.now(JST).date())
+    return str(min(dates))
+
+
+def _capacity_check(effective_max_pos: int, held_count: int, pending_buy_count: int = 0) -> int:
+    """
+    残りエントリー可能スロット数を返す（0以下ならこれ以上の新規BUYは禁止）。
+
+    通常BUY・Shadow候補・Fallback・TrendFollowなど、発注経路が異なっても
+    必ずこの一本の関数で残スロットを計算すること（2026-07-07 4銘柄同時保有
+    インシデント: Shadow経路だけがこの計算を経由せず max_positions を突破した）。
+    """
+    return effective_max_pos - held_count - pending_buy_count
+
+
 def _load_order_lock() -> dict:
     if not ORDER_LOCK_FILE.exists():
         return {}
@@ -639,6 +670,10 @@ class StockSignal:
     trailing_stop_price:  float = 0.0        # ギャップダウン検出用（0 = 未保有 or 未計算）
     entry_price:          float = 0.0        # BUY時参考単価（未保有は 0）
     unrealized_pnl_pct:   float = 0.0        # 含み損益率（未保有は 0）
+    entry_date_known:     bool  = True       # False = entry_date欠損（2026-07-15追加）。
+                                              # hold_days=0との区別用。表示層は entry_date_known=False
+                                              # かつ currently_holding=True の場合 "Unknown" を表示すること
+                                              # （0dへのフォールバック表示は禁止 — 保有日数SSOT方針）。
 
 
 # セクター別採用戦略（dynamic_selection.py の結果に基づく）
@@ -892,6 +927,8 @@ class SignalBridge:
         # execution metrics: signal generation timestamp (set in run())
         self._last_signal_time: datetime | None = None
         self._last_universe_raw: dict = {}
+        # EVS統合用: 直近runのステージ監査（CAPACITY/CAPITAL/RISK/...）
+        self._last_stage_audit: list = []
 
         # min_rsr はエントリー専用（変更禁止）。exit 閾値は rsr_exit で分離。
         # rsr_exit は FujikoStrategy の引数ではないため _fujiko_params_live から除外する。
@@ -1410,7 +1447,11 @@ class SignalBridge:
                 group_by="ticker",
             )
 
-        # ── Step1: snapshot / cache 優先 → 足りない分だけネットワーク ─────────
+        # ── Step1: snapshot → 当日バッチ(yfinance) → キャッシュはフォールバックのみ ──
+        # 2026-07-08 RCA: 旧実装はキャッシュ(最大5日以内なら有効)をバッチ取得結果より
+        # 先に採用しており、当日既に取得済みの新鮮なbatchデータを毎回捨てていた
+        # (docstring自体が「1.バッチ 2.個別リトライ 3.キャッシュ」の優先順を明記しており矛盾)。
+        # data_as_of がT-1のはずが数日分古く表示・使用され続けたのはこれが原因。
         all_universe = {
             **self.rsr_universe_tickers,
             **self.universe_tickers,
@@ -1428,12 +1469,6 @@ class SignalBridge:
                     universe_raw[sym] = {"df": df, "sector": sector}
                     continue
                 logger.info("%s snapshot陳腐化（%d日前）→ ネットワーク/キャッシュ優先", sym, snap_age)
-
-            df = self._load_from_cache(sym, start_date)
-            if not df.empty and len(df) >= 252:
-                cache_fallbacks.append(sym)
-                universe_raw[sym] = {"df": df, "sector": sector}
-                continue
 
             df = pd.DataFrame()
             from_batch = False
@@ -1455,6 +1490,10 @@ class SignalBridge:
             if from_batch:
                 self._save_to_cache(sym, df)
                 universe_raw[sym] = {"df": df, "sector": sector}
+            # from_batch=False の銘柄は batch_failed に積まれ済み。
+            # キャッシュへのフォールバックは Step3 の個別リトライ後に一本化する
+            # （ここで先にフォールバックすると Step3 のリトライが常に上書きするだけの
+            #  無駄な二重キャッシュ読みになるため行わない）。
 
         # ── Step3: バッチ失敗分を個別リトライ → それでも駄目ならキャッシュ ──
         if batch_failed and ALLOW_YFINANCE_NETWORK:
@@ -1630,6 +1669,30 @@ class SignalBridge:
             len(positions), len(raw_positions),
         )
         return positions
+
+    def _recover_entry_price_from_broker(self, symbol: str) -> float:
+        """
+        send_result に estimated_price が無い場合の最終リカバリ（fail-closed用）。
+
+        Broker の実際のポジション平均取得単価(avg_price)を1回だけ問い合わせる。
+        取得できない場合は 0.0 を返す（呼び出し側が entry_metadata_missing として
+        監査ログに記録し、0.0を実価格としてportfolio_stateへ書き込むことはしない）。
+        例外は握りつぶす — update_state_after_execution() 全体を失敗させない。
+        """
+        if self._client is None:
+            return 0.0
+        try:
+            positions = self._get_current_positions()
+            pos = positions.get(symbol)
+            if pos and float(pos.get("avg_price", 0.0)) > 0:
+                logger.info(
+                    "[ENTRY_PRICE_RECOVERY] %s: broker avg_price=%.2f で復元",
+                    symbol, float(pos["avg_price"]),
+                )
+                return float(pos["avg_price"])
+        except Exception as exc:
+            logger.warning("[ENTRY_PRICE_RECOVERY] %s: broker avg_price取得失敗: %s", symbol, exc)
+        return 0.0
 
     # ------------------------------------------------------------------ #
     # 資金確認
@@ -2101,6 +2164,9 @@ class SignalBridge:
             rsr_rank = rsr_rank_map.get(sym, 99)
 
             currently_holding = sym in current_positions
+            # entry_date_known=False は「未保有」ではなく「保有中だがentry_date欠損」を示す。
+            # 2026-07-15 entry metadata SSOT修正: 表示層が0dへ誤フォールバックしないための判別フラグ。
+            entry_date_known = (not currently_holding) or (sym in pos_entry_dates)
 
             # ── 保有営業日数チェック ─────────────────────────────────
             hold_td      = 0
@@ -2419,6 +2485,7 @@ class SignalBridge:
                 trailing_stop_price  = _ts_stop_price,
                 entry_price          = _ep_now,
                 unrealized_pnl_pct   = _pnl_pct_now,
+                entry_date_known     = entry_date_known,
             ))
 
         # highest_close の更新内容を portfolio_state に書き戻す（_save_portfolio_state で永続化）
@@ -2927,24 +2994,36 @@ class SignalBridge:
         live_orders:             list,
         shadow_virtual_positions: dict,   # {sym: {"entry_price": float, "entry_date": str, "virtual": True}}
         today_str:               str,
+        effective_max_pos:       int,
+        above_ma200:             "bool | None" = None,
         shadow_slots:            int   = 1,
         shadow_rsr_min:          float = 70.0,
         shadow_rsr_pass_min:     int   = 8,
     ) -> tuple[list, dict, dict, list]:
         """
-        Shadow Universe から条件付きBUY注文を生成する（Phase1）。
+        Shadow Universe から条件付き"観測専用"エントリーを生成する（Phase1）。
 
         条件（すべて満たす場合のみ発動）:
           1. CB NORMAL かつ shadow_rsr_pass >= shadow_rsr_pass_min (=8)
-          2. shadow_rsr62 >= shadow_rsr_min (=70.0)
-          3. shadow_rsr62 > live_top10_median
-          4. 価格フィルター: price * 100 <= max_alloc_cap
-          5. 未保有 かつ live注文と重複なし
+          2. remaining_slots = max_positions - (実保有 + 通常BUY件数) > 0
+          3. shadow_rsr62 >= shadow_rsr_min (=70.0)
+          4. shadow_rsr62 > live_top10_median
+          5. pre_trade_risk_check() 通過（symbol_cap/sector_cap/cluster_cap 等、通常BUYと同一基準）
+          6. 価格フィルター: price * 100 <= max_alloc_cap
+          7. 未保有 かつ live注文と重複なし
 
-        blocked_by_alloc でも仮想エントリーを記録し、研究データを生成する。
-        仮想エントリーの決済: RSR < shadow_rsr_min に低下した時点で自動計算。
+        SAFETY FIX (2026-07-07 4銘柄同時保有インシデント):
+          このパスは Broker への実発注を一切行わない（observation_only固定）。
+          以前は price/cash 条件を満たすと side="SHADOW_BUY" の実発注可能な
+          OrderInstruction を生成し、_send_orders() が Side.BUY として実際に
+          kabu API へ送信していた（max_positions / pre_trade_risk_check を
+          一切経由しないバイパス経路になっていた）。
+          将来 Shadow候補を実発注へ昇格する場合は、必ず通常 BUY パイプライン
+          （_build_orders → pre_trade_risk_check → capacity_check → _send_orders）
+          へ候補として合流させること。Shadow専用の発注経路は禁止。
 
         Returns: (orders, shadow_metrics, new_virtual_positions, closed_virtual_syms)
+                 orders は常に空リスト（観測専用のため）。
         """
         shadow_metrics = {
             "shadow_signal_count":       0,
@@ -2996,6 +3075,22 @@ class SignalBridge:
         if cb_active or _srsr_pass < shadow_rsr_pass_min:
             return orders, shadow_metrics, new_virtual, closed_syms
 
+        # ── capacity_check（max_positions ガード）──────────────────────────
+        # 2026-07-07 インシデント: このガードが無かったため実保有2+通常BUY1=3で
+        # 満枠にもかかわらず Shadow が4件目を独自に発注してしまった。
+        _pending_buy_count = sum(1 for o in live_orders if o.side == "BUY")
+        _remaining_slots   = _capacity_check(
+            effective_max_pos, len(current_positions), _pending_buy_count,
+        )
+        shadow_metrics["shadow_remaining_slots"] = _remaining_slots
+        if _remaining_slots <= 0:
+            logger.info(
+                "[SHADOW_CAPACITY_GUARD] remaining_slots=%d (max_positions=%d held=%d pending_buy=%d)"
+                " → Shadow候補生成スキップ",
+                _remaining_slots, effective_max_pos, len(current_positions), _pending_buy_count,
+            )
+            return orders, shadow_metrics, new_virtual, closed_syms
+
         # ── live Top10 RSR 中央値 ──────────────────────────────────────────
         _top10_rsrs = [e["rsr"] for e in diag.get("rsr_distribution", [])[:10]]
         if not _top10_rsrs:
@@ -3020,9 +3115,13 @@ class SignalBridge:
         _candidates.sort(reverse=True)
         shadow_metrics["shadow_signal_count"] = len(_candidates)
 
-        # ── 価格フィルター + 注文生成（最大 shadow_slots 件）─────────────
+        # ── 価格フィルター + risk_check + 仮想エントリー記録（最大 shadow_slots 件）
+        # SAFETY FIX: ここでは OrderInstruction を作っても `orders` には絶対に
+        # append しない。Shadow は観測専用。実発注は通常BUYパイプラインへの
+        # 昇格でのみ行う（Shadow専用の発注経路は禁止）。
+        _shadow_slot_used = 0
         for rsr62, sym in _candidates:
-            if len(orders) >= shadow_slots:
+            if _shadow_slot_used >= shadow_slots:
                 break
             if sym not in universe_raw:
                 continue
@@ -3030,37 +3129,21 @@ class SignalBridge:
             _df    = universe_raw[sym]["df"]
             _price = float(_df["Close"].iloc[-1])
             _cost  = _price * 100   # 1単元
-
-            # 価格フィルター
-            if _cost > _max_alloc_cap:
+            _blocked_by_alloc = _cost > _max_alloc_cap
+            if _blocked_by_alloc:
                 shadow_metrics["shadow_blocked_by_alloc"] += 1
                 logger.info(
                     "SHADOW blocked_by_alloc: %s ¥%.0f/単元 > 上限¥%.0f",
                     sym, _cost, _max_alloc_cap,
                 )
-                # 仮想エントリー記録（blockedでも研究データとして記録）
-                if sym not in shadow_virtual_positions and sym not in _held_syms:
-                    new_virtual[sym] = {
-                        "entry_price": round(_price, 0),
-                        "entry_date":  today_str,
-                        "virtual":     True,
-                        "rsr62":       round(rsr62, 1),
-                    }
-                    logger.info(
-                        "SHADOW_VIRTUAL_ENTRY: %s @ ¥%.0f RSR62=%.1f (blocked_by_alloc)",
-                        sym, _price, rsr62,
-                    )
-                    shadow_metrics["shadow_virtual_entries"].append({
-                        "symbol": sym, "entry_price": round(_price, 0), "rsr62": round(rsr62, 1),
-                    })
-                continue
 
-            # 余力チェック
-            if available_cash < _cost:
+            # 余力チェック（送信は行わないため資金拘束はしないが、研究データの
+            # 現実性のため affordability は引き続き評価する）
+            if not _blocked_by_alloc and available_cash < _cost:
                 logger.info("SHADOW 余力不足: %s ¥%.0f > 余力¥%.0f", sym, _cost, available_cash)
                 continue
 
-            # ATRベースのロットサイズ（1.25%リスク）
+            # ATRベースのロットサイズ（1.25%リスク）— risk_check 評価用の想定数量
             _risk_yen = self.capital * 0.0125
             try:
                 _atr = float(_df["Close"].diff().abs().rolling(20).mean().iloc[-1])
@@ -3068,32 +3151,53 @@ class SignalBridge:
                 _qty     = max(100, (_qty_raw // 100) * 100)
             except Exception:
                 _qty = 100
-
             _qty = min(_qty, int(_max_alloc_cap / _price / 100) * 100)
             _qty = max(100, _qty)
 
-            orders.append(OrderInstruction(
+            # pre_trade_risk_check: 通常BUYと同一の symbol_cap/sector_cap/cluster_cap
+            # 判定を Shadow候補にも適用する（side="BUY" として評価。実発注はしない）。
+            _hypothetical_order = OrderInstruction(
                 symbol           = sym,
                 symbol_4digit    = sym.replace(".T", ""),
                 sector           = self.shadow_universe_tickers.get(sym, "不明"),
-                side             = "SHADOW_BUY",
+                side             = "BUY",
                 qty              = _qty,
                 order_type       = "MARKET_OPEN",
                 estimated_price  = _price,
                 estimated_amount = _qty * _price,
                 reason           = (
-                    f"SHADOW_BUY: RSR62={rsr62:.1f} "
+                    f"SHADOW_CANDIDATE: RSR62={rsr62:.1f} "
                     f"(>{_live_top10_median:.1f}=live_top10_median) "
                     f"shadow_rsr_pass={_srsr_pass}"
                 ),
                 atr20            = 0.0,
-            ))
+            )
+            if not self.pre_trade_risk_check(_hypothetical_order, current_positions, universe_raw, above_ma200):
+                logger.info("SHADOW risk_check不合格のため候補除外: %s", sym)
+                continue
 
-        shadow_metrics["shadow_entry_count"] = len(orders)
-        if orders:
+            _shadow_slot_used += 1
+            if sym not in shadow_virtual_positions and sym not in _held_syms:
+                new_virtual[sym] = {
+                    "entry_price": round(_price, 0),
+                    "entry_date":  today_str,
+                    "virtual":     True,
+                    "rsr62":       round(rsr62, 1),
+                }
+                logger.info(
+                    "SHADOW_VIRTUAL_ENTRY: %s @ ¥%.0f RSR62=%.1f (observation_only%s)",
+                    sym, _price, rsr62, "・blocked_by_alloc" if _blocked_by_alloc else "",
+                )
+                shadow_metrics["shadow_virtual_entries"].append({
+                    "symbol": sym, "entry_price": round(_price, 0), "rsr62": round(rsr62, 1),
+                })
+
+        shadow_metrics["shadow_entry_count"] = 0   # 実発注は常にゼロ（observation_only固定）
+        if shadow_metrics["shadow_virtual_entries"]:
             logger.info(
-                "SHADOW Phase1: %d件 → %s (rsr62条件: >%.1f AND >%.1f)",
-                len(orders), [o.symbol for o in orders],
+                "SHADOW Phase1 (observation_only): %d件 → %s (rsr62条件: >%.1f AND >%.1f)",
+                len(shadow_metrics["shadow_virtual_entries"]),
+                [e["symbol"] for e in shadow_metrics["shadow_virtual_entries"]],
                 shadow_rsr_min, _live_top10_median,
             )
         return orders, shadow_metrics, new_virtual, closed_syms
@@ -3307,6 +3411,7 @@ class SignalBridge:
         today_new_buys:       int = 0,
         effective_max_pos:    int | None = None,
         above_ma200:          bool | None = None,
+        audit_sink:           "list | None" = None,
     ) -> tuple[list[OrderInstruction], list[str], int, int]:
         """
         シグナルリストからポートフォリオルールを適用して注文を生成する。
@@ -3314,11 +3419,21 @@ class SignalBridge:
         Args:
             cb_active:      True のとき新規 BUY を全停止
             today_new_buys: 本日すでに実行済みの新規 BUY 件数（スクリプト再実行時に使用）
+            audit_sink:     None以外の場合、各BUY候補についてステージごとの
+                            PASS/FAIL判定を .append() する（観測専用・戻り値の
+                            形は一切変更しない。2026-06-29 EVS RCA follow-up）。
 
         Returns:
             (orders, order_warnings, blocked_alloc_cap_count, lot_rounded_up_count)
             常に 4 要素タプル。CB 早期リターンも含め全パスが同じ形を返す。
         """
+        def _audit(symbol: str, stage: str, passed: bool, reason: str, **extra) -> None:
+            if audit_sink is None:
+                return
+            audit_sink.append({
+                "symbol": symbol, "stage": stage, "passed": passed, "reason": reason,
+                **extra,
+            })
         orders:                    list[OrderInstruction] = []
         warnings:                  list[str]              = []
         blocked_by_alloc_cap_count: int                   = 0
@@ -3504,12 +3619,18 @@ class SignalBridge:
         )
 
         for i, sig in enumerate(buy_candidates):
-            open_slots = _eff_max_pos - n_held_after_sells
+            open_slots = _capacity_check(_eff_max_pos, n_held_after_sells)
             if open_slots <= 0:
                 warnings.append(
                     f"最大ポジション数({_eff_max_pos})に達したため"
                     f" {sig.symbol} の BUY をスキップ"
                 )
+                # break以降このcandidate以下は個別評価されないため、
+                # 監査上は残り全候補を capacity 不足として記録しておく。
+                for _rem in buy_candidates[i:]:
+                    _audit(_rem.symbol, "CAPACITY", False, "position_full",
+                           rsr=_rem.rsr, rsr_rank=_rem.rsr_rank,
+                           held=n_held_after_sells, max_positions=_eff_max_pos)
                 break
 
             # max_new_positions_per_day チェック
@@ -3518,7 +3639,15 @@ class SignalBridge:
                     f"本日の新規 BUY 上限({self.max_new_positions_per_day}件)に達しました。"
                     f" {sig.symbol} をスキップ"
                 )
+                for _rem in buy_candidates[i:]:
+                    _audit(_rem.symbol, "DAILY_LIMIT", False, "max_new_positions_per_day",
+                           rsr=_rem.rsr, rsr_rank=_rem.rsr_rank,
+                           new_buys_this_run=new_buys_this_run,
+                           max_new_positions_per_day=self.max_new_positions_per_day)
                 break
+            _audit(sig.symbol, "CAPACITY", True, "slot_available",
+                   rsr=sig.rsr, rsr_rank=sig.rsr_rank,
+                   held=n_held_after_sells, max_positions=_eff_max_pos)
 
             _df_buy   = universe_raw[sig.symbol]["df"]
             ref_price = float(_df_buy["Close"].iloc[-1])
@@ -3561,7 +3690,13 @@ class SignalBridge:
                     f" required={lot_cost:,} cap={int(_effective_alloc_cap):,}"
                     f" rank={sig.rsr_rank} score={sig.rsr:.2f}"
                 )
+                _audit(sig.symbol, "CAPITAL", False, "alloc_cap_exceeded",
+                       rsr=sig.rsr, rsr_rank=sig.rsr_rank,
+                       lot_cost=lot_cost, alloc_cap=_effective_alloc_cap)
                 continue
+            _audit(sig.symbol, "CAPITAL", True, "within_alloc_cap",
+                   rsr=sig.rsr, rsr_rank=sig.rsr_rank,
+                   lot_cost=lot_cost, alloc_cap=_effective_alloc_cap)
 
             qty = min(qty_risk, qty_cap)
 
@@ -3571,6 +3706,8 @@ class SignalBridge:
                     f" (alloc=¥{_fallback_alloc:,.0f} price=¥{ref_price:,.0f})"
                     f" → BUY スキップ"
                 )
+                _audit(sig.symbol, "SIZING", False, "zero_qty",
+                       rsr=sig.rsr, rsr_rank=sig.rsr_rank)
                 continue
 
             # ── Adaptive sector degradation (v2) ─────────────────────────────
@@ -3586,6 +3723,9 @@ class SignalBridge:
                 )
                 risk_rejected_count += 1
                 _allocator.record_rejected()
+                _audit(sig.symbol, "SECTOR_CONCENTRATION", False, "sector_concentration_adaptive",
+                       rsr=sig.rsr, rsr_rank=sig.rsr_rank, sector=sig.sector,
+                       multiplier=_degrade.multiplier)
                 continue
             if _degrade.reason == "degraded":
                 qty = _degrade.degraded_qty
@@ -3626,8 +3766,15 @@ class SignalBridge:
                     f" → BUY スキップ"
                 )
                 risk_rejected_count += 1
+                _audit(sig.symbol, "RISK", False, "pre_trade_risk_check_reject",
+                       rsr=sig.rsr, rsr_rank=sig.rsr_rank, qty=qty)
                 continue
+            _audit(sig.symbol, "RISK", True, "risk_check_pass",
+                   rsr=sig.rsr, rsr_rank=sig.rsr_rank, qty=qty)
             orders.append(_new_order)
+            _audit(sig.symbol, "ORDER_BUILT", True, "order_constructed",
+                   rsr=sig.rsr, rsr_rank=sig.rsr_rank, qty=qty,
+                   estimated_price=ref_price, estimated_amount=qty * ref_price)
             _allocator.commit(sig.sector, qty, ref_price)
 
             n_held_after_sells       += 1
@@ -3733,7 +3880,40 @@ class SignalBridge:
 
         results = []
         for idx, o in enumerate(orders):
-            side_code = Side.BUY if o.side in ("BUY", "SHADOW_BUY") else Side.SELL
+            # SAFETY FIX (2026-07-07 incident): side は "BUY"/"SELL" のみ許可。
+            # 以前は SHADOW_BUY も Side.BUY にマッピングしており、観測専用のはずの
+            # Shadow候補が実際に kabu API へ送信されてしまっていた。
+            # 未知の side は fail-closed でこの注文だけスキップする。
+            if o.side == "BUY":
+                side_code = Side.BUY
+            elif o.side == "SELL":
+                side_code = Side.SELL
+            else:
+                logger.error(
+                    "[ORDER_SIDE_GUARD] unknown side=%s symbol=%s → 発注スキップ（fail-closed）",
+                    o.side, o.symbol,
+                )
+                results.append({
+                    "symbol":              o.symbol,
+                    "side":                o.side,
+                    "qty":                 o.qty,
+                    "estimated_price":     o.estimated_price,
+                    "planned_entry_price": o.estimated_price,
+                    "actual_entry_price":  None,
+                    "slippage_pct":        None,
+                    "gap_pct":             None,
+                    "fill_status":         "rejected_unknown_side",
+                    "order_submit_time":   None,
+                    "fill_time":           None,
+                    "atr20":               o.atr20,
+                    "sector":              o.sector,
+                    "reason":              o.reason,
+                    "strategy_type":       o.strategy_type,
+                    "success":             False,
+                    "order_id":            None,
+                    "result_code":         None,
+                })
+                continue
 
             # レート制限: 2件目以降にインターバルを挿入
             if idx > 0:
@@ -3742,14 +3922,14 @@ class SignalBridge:
             order_submit_time = datetime.now(JST)
             order_submit_iso  = order_submit_time.strftime("%Y-%m-%dT%H:%M:%S%z")
 
-            # ── GAP SKIP FILTER (BUY/SHADOW_BUY only) ────────────────────────
+            # ── GAP SKIP FILTER (BUY only) ────────────────────────
             # Fetch board price and skip entry if open gap > GAP_SKIP_THRESHOLD.
             # No board call for SELL: never skip exits due to gap.
             # Does NOT change signal generation; only prevents execution when price
             # has already gapped up beyond acceptable entry price.
             gap_pct      = None
             board_price  = None
-            _is_buy      = o.side in ("BUY", "SHADOW_BUY")
+            _is_buy      = (o.side == "BUY")
 
             if _is_buy and self._client is not None and o.estimated_price > 0:
                 try:
@@ -4120,14 +4300,43 @@ class SignalBridge:
             sector = r.get("sector", "不明")
             amount = qty * price
 
-            if side in ("BUY", "SHADOW_BUY"):
+            if side == "BUY":
                 atr20 = float(r.get("atr20", 0.0))
                 pos_entry_dates[sym]      = today_str
-                pos_entry_prices[sym]     = price
-                pos_highest_closes[sym]   = price   # トレーリングストップ: 初期 highest_close = エントリー価格
                 pos_qtys[sym]             = int(qty)  # CB_GUARD_COMP SOURCE1用: T+2決済ラグ補償
-                if atr20 > 0:
-                    pos_entry_atrs[sym] = atr20
+
+                # SAFETY FIX (entry-metadata-loss incident): price==0.0 must never
+                # be silently written as if it were a real fill price — that is
+                # exactly what corrupted 5301.T's entry_price/highest_close and
+                # left it with no ATR (no send_result carried estimated_price
+                # through the process-isolated path). Fail closed instead:
+                # try one authoritative recovery (broker's real avg cost), and
+                # if that also fails, record the gap in an audit trail instead
+                # of fabricating 0.0.
+                if price <= 0:
+                    price  = self._recover_entry_price_from_broker(sym)
+                    amount = qty * price   # 復元後のprice基準にavail_cash計算をやり直す
+                if price <= 0:
+                    _missing = state.setdefault("entry_metadata_missing", {})
+                    _missing[sym] = {
+                        "detected_at": today_str,
+                        "qty":         int(qty),
+                        "reason":      "estimated_price missing/zero in send_result "
+                                       "and broker avg_price recovery failed",
+                    }
+                    logger.error(
+                        "[ENTRY_METADATA_MISSING] %s: BUY成立したがentry_price復元不可。"
+                        "position_entry_prices/highest_closes/entry_atrsへの0.0書き込みを"
+                        "抑止し、ATR Trailing対象外として監査ログに記録した。手動確認が必要。",
+                        sym,
+                    )
+                else:
+                    pos_entry_prices[sym]     = price
+                    pos_highest_closes[sym]   = price   # トレーリングストップ: 初期 highest_close = エントリー価格
+                    if atr20 > 0:
+                        pos_entry_atrs[sym] = atr20
+                    state.get("entry_metadata_missing", {}).pop(sym, None)
+
                 # Quality Replacement Engine — entry RSR for rsr_delta computation (Study57/58A)
                 _e_rsr = float((signal_rsr_map or {}).get(sym, 0.0))
                 if _e_rsr > 0:
@@ -4137,19 +4346,13 @@ class SignalBridge:
                 _order_strategy = r.get("strategy_type", "")
                 if _order_strategy:
                     pos_strategy_types[sym] = _order_strategy
-                # shadow由来ポジションを記録（SELL時に shadow_realized_return を計算するため）
-                if side == "SHADOW_BUY":
-                    shadow_positions[sym] = price
-                    logger.info("SHADOW entry_date 記録: %s → %s @ ¥%.0f", sym, today_str, price)
-                else:
-                    # SHADOW_BUY は仮想ポジションのため実 cash には影響させない。
-                    avail_cash -= amount
-                    logger.info("entry_date 記録: %s → %s @ ¥%.0f ATR20=%.0f", sym, today_str, price, atr20)
+                avail_cash -= amount
+                logger.info("entry_date 記録: %s → %s @ ¥%.0f ATR20=%.0f", sym, today_str, price, atr20)
                 _trade = {
                     "date":         today_str,
                     "symbol":       sym,
                     "sector":       sector,
-                    "side":         side,   # "BUY" or "SHADOW_BUY"
+                    "side":         side,   # "BUY"
                     "qty":          qty,
                     "price":        price,
                     "amount":       amount,
@@ -4193,15 +4396,20 @@ class SignalBridge:
                     except Exception:
                         pass
 
-                if "時間ストップ" in reason:
-                    today_ts      = pd.Timestamp(today_str)
-                    block_end     = _add_trading_days(today_ts, REENTRY_COOLDOWN_TRADING_DAYS)
-                    block_end_str = block_end.strftime("%Y-%m-%d")
-                    reentry_blocked[sym] = block_end_str
-                    logger.info(
-                        "再エントリー禁止: %s 〜 %s（時間ストップ後%d営業日）",
-                        sym, block_end_str, REENTRY_COOLDOWN_TRADING_DAYS,
-                    )
+                # SAFETY FIX (2026-07-07): 以前は「時間ストップ」理由のSELLのみ
+                # cooldown対象だった。RSR_EXIT/トレーリングストップ/緊急exit等
+                # 損切り全般が対象外だったため、損切り直後の即日再エントリーが
+                # 発生していた（5301.T / 6506.T）。全SELL理由を対象にする。
+                _risk_cfg = getattr(self._cfg, "risk", None) if getattr(self, "_cfg", None) else None
+                _cooldown_days = int(getattr(_risk_cfg, "reentry_cooldown_days", REENTRY_COOLDOWN_TRADING_DAYS))
+                today_ts      = pd.Timestamp(today_str)
+                block_end     = _add_trading_days(today_ts, _cooldown_days)
+                block_end_str = block_end.strftime("%Y-%m-%d")
+                reentry_blocked[sym] = block_end_str
+                logger.info(
+                    "再エントリー禁止: %s 〜 %s（SELL理由=%s / cooldown%d営業日）",
+                    sym, block_end_str, reason, _cooldown_days,
+                )
 
                 _trade = {
                     "date":                   today_str,
@@ -4332,8 +4540,7 @@ class SignalBridge:
         logger.info("フィーチャー計算中...")
         self._enrich_universe_df(universe_raw)
 
-        sample_sym = next(iter(universe_raw))
-        data_as_of = str(universe_raw[sample_sym]["df"].index[-1].date())
+        data_as_of = _compute_data_as_of(universe_raw)
 
         # 3. ポジション・余力取得
         current_positions = self._get_current_positions()
@@ -4676,14 +4883,42 @@ class SignalBridge:
             except Exception:
                 pass
 
+        _stage_audit_sink: list = []
         _build_result = self._build_orders(
             signals, universe_raw, current_positions, calc_available_cash,
             cb_active=cb_active,
             effective_max_pos=_effective_max_pos,
             above_ma200=_above_ma200_live,
+            audit_sink=_stage_audit_sink,
         )
         _validate_build_orders_contract(_build_result)
         orders, order_warnings, _blocked_alloc_cap, _lot_rounded_up, _risk_rejected = _build_result
+
+        # ── LIVE_STAGE_AUDIT: 恒久的なステージ別 PASS/FAIL 監査ログ ─────────
+        # 2026-06-29 EVS RCA follow-up: どこでBUY候補が落ちたかを毎run記録する。
+        # RSR上位カットオフで top_k に入らなかった候補も RANKING stage として残す。
+        try:
+            from src.analytics.live_stage_audit import append_stage_audit
+            _rank_audit: list = []
+            _topk_set = set(top_k_syms)
+            for _rsig in signals:
+                if _rsig.signal == 1 and not _rsig.currently_holding and _rsig.symbol not in _topk_set:
+                    _rank_audit.append({
+                        "symbol": _rsig.symbol, "stage": "RANKING", "passed": False,
+                        "reason": "below_top_k_cutoff",
+                        "rsr": _rsig.rsr, "rsr_rank": _rsig.rsr_rank, "top_k": self.top_k,
+                    })
+            _full_stage_audit = _rank_audit + _stage_audit_sink
+            append_stage_audit(
+                today_str=today_str,
+                decisions=_full_stage_audit,
+            )
+            # EVS統合用: run_live_signal.py / run_morning_signal.py がファイル再読込
+            # なしで直接参照できるようインスタンス属性にも保持する（観測専用）。
+            self._last_stage_audit = _full_stage_audit
+        except Exception as _sa_err:
+            logger.warning("[LIVE_STAGE_AUDIT] append failed (%s) — continuing", _sa_err)
+            self._last_stage_audit = list(_stage_audit_sink)
 
         # ── [UNIVERSE] structured log ──────────────────────────────────────────
         _n_live        = len(self.universe_tickers)
@@ -4708,9 +4943,10 @@ class SignalBridge:
             _sector_exposure, _blocked_alloc_cap, _risk_rejected, _missed_entries,
         )
 
-        # 6b. Shadow Phase1 注文生成（live orders に追加・既存ロジック不変）
-        # 条件: CB NORMAL AND shadow_rsr_pass>=8 AND rsr62>=70 AND rsr62>live_top10_median
-        # blocked_by_alloc でも仮想エントリーを記録して研究データを生成する
+        # 6b. Shadow Phase1 — observation_only（実発注しない。SAFETY FIX 2026-07-07）
+        # 条件: CB NORMAL AND remaining_slots>0 AND shadow_rsr_pass>=8
+        #       AND rsr62>=70 AND rsr62>live_top10_median AND pre_trade_risk_check通過
+        # shadow_orders は常に [] を返す（+= は将来の昇格経路のための構造維持のみ）。
         _cash_after_live_buys = (
             calc_available_cash
             - sum(o.estimated_amount for o in orders if o.side == "BUY")
@@ -4725,6 +4961,8 @@ class SignalBridge:
             live_orders              = orders,
             shadow_virtual_positions = _shadow_virtual_positions,
             today_str                = today_str,
+            effective_max_pos        = _effective_max_pos,
+            above_ma200              = _above_ma200_live,
         )
         # 仮想ポジション状態を portfolio_state に反映（決済→削除、新規→追加）
         for sym in _closed_virtual:
@@ -4734,7 +4972,7 @@ class SignalBridge:
         orders = orders + shadow_orders
 
         # 6c. LIVE_STATE サマリーログ（戦略停止 / 市場悪化 / フィルター過剰 の切り分け用）
-        _entries   = [o for o in orders if o.side in ("BUY", "SHADOW_BUY")]
+        _entries   = [o for o in orders if o.side == "BUY"]
         _missed_breakout_count = max(0, _buy_cands_count - len(_entries))
         _exposure  = 1.0 - calc_available_cash / max(1.0, current_equity)
         logger.info(
@@ -5120,6 +5358,7 @@ class SignalBridge:
                     "sepa_score":        s.sepa_score,
                     "rsr_momentum":      round(s.rsr_mom, 2),
                     "hold_days":          s.hold_days,
+                    "entry_date_known":   s.entry_date_known,
                     "currently_holding":  s.currently_holding,
                     "reason":             s.reason,
                     "stop_price":         round(s.trailing_stop_price, 0) if s.trailing_stop_price > 0 else 0,

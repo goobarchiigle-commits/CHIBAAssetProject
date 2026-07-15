@@ -640,6 +640,16 @@ def _submit_orders_process_isolated(
         return []
 
     orders_dicts: list = []
+    # SAFETY FIX (2026-07-07 follow-up incident): broker_worker.py's result
+    # schema only carries {symbol, side, qty, client_order_id, success,
+    # order_id, result_code, error} — it has no estimated_price/atr20/reason/
+    # sector/strategy_type. Those fields were silently lost between here and
+    # update_state_after_execution(), which then fell back to 0.0 and wrote
+    # corrupted entry_price/highest_close/missing ATR into portfolio_state
+    # (found on 5301.T). The parent process already holds the full order
+    # object, so keep a coi→order lookup and restore these fields onto the
+    # child's result below, instead of round-tripping them through the worker.
+    _coi_to_order: dict[str, object] = {}
     for o in orders_objs:
         coi = make_client_order_id(
             strategy    = getattr(o, "strategy_type", "unknown"),
@@ -656,6 +666,7 @@ def _submit_orders_process_isolated(
             continue
         od = serialize_order(o, fot, coi)
         orders_dicts.append(od)
+        _coi_to_order[coi] = o
         if registry is not None:
             try:
                 registry.register(
@@ -683,6 +694,17 @@ def _submit_orders_process_isolated(
             )
 
     raw_results = proc_supervisor.submit_orders(orders_dicts, timeout_sec=timeout_sec, run_id=run_id)
+
+    # ── entry metadata restoration (SAFETY FIX) ──────────────────────────
+    for r in raw_results:
+        _src_order = _coi_to_order.get(r.get("client_order_id", ""))
+        if _src_order is None:
+            continue
+        r.setdefault("estimated_price", float(getattr(_src_order, "estimated_price", 0.0)))
+        r.setdefault("atr20",           float(getattr(_src_order, "atr20", 0.0)))
+        r.setdefault("reason",          getattr(_src_order, "reason", ""))
+        r.setdefault("sector",          getattr(_src_order, "sector", "不明"))
+        r.setdefault("strategy_type",   getattr(_src_order, "strategy_type", ""))
 
     # Update registry state from results
     if registry is not None:
@@ -895,6 +917,19 @@ def print_banner(
     print("=" * 64)
 
 
+def _format_hold_days(s: dict) -> str:
+    """
+    保有日数の表示文字列を返す（2026-07-15 entry metadata SSOT修正）。
+
+    entry_date_known=False（position_entry_dates欠損）の場合は"0d"へ
+    フォールバック表示しない — "Unknown"を返す。当日新規建ての真の0dとの
+    誤認を防ぐ（signal_bridge.py::StockSignal.entry_date_known参照）。
+    """
+    if not s.get("entry_date_known", True):
+        return "Unknown"
+    return f"{s.get('hold_days', 0):>4}d"
+
+
 def print_signals(result) -> None:
     orders = result.orders
 
@@ -947,11 +982,11 @@ def print_signals(result) -> None:
         print("  " + "-" * 65)
         for s in sorted(hold_continue_sigs, key=lambda x: x.get("rsr_rank", 99)):
             stop_str = f"¥{s['stop_price']:,.0f}" if s.get("stop_price", 0) > 0 else "   —"
-            hold_d   = s.get("hold_days", 0)
+            hold_str = _format_hold_days(s)
             print(
                 f"  {s['symbol']:<10} {s['sector']:<10} "
                 f"{s.get('rsr_rank', 0):>5} {s['rsr']:>6.1f} "
-                f"{hold_d:>5}d {stop_str:>14}"
+                f"{hold_str:>6} {stop_str:>14}"
             )
 
     # ── 新規BUY候補（発注可能・未保有）──────────────────────────────────
@@ -986,7 +1021,7 @@ def print_signals(result) -> None:
         else:
             sig_str = "  -   "
         strat_str = "MR" if s.get("strategy_type") == "mean_rev" else "FJ"
-        hold_str  = f"{s.get('hold_days', 0):>5}d" if s.get("currently_holding") else "     -"
+        hold_str  = _format_hold_days(s) if s.get("currently_holding") else "     -"
         print(
             f"  {s['symbol']:<10} {s['sector']:<10} {strat_str:<4} "
             f"{s.get('rsr_rank', 0):>5} {s['rsr']:>6.1f} {s['sepa_score']:>5}"
@@ -1135,6 +1170,46 @@ def main() -> int:
                 _rot(_rp, archive_dir=OUTCOMES_ARCHIVE_DIR, now=_rot_now)
             except Exception:
                 pass
+
+        # entry_price/entry_atr/highest_close 欠落リカバリ（2026-07-07 follow-up incident）
+        # process-isolated経路のsend_resultにprice/ATRが乗らず0.0で書き込まれた
+        # 既存ポジションを、当日の注文ログ(logs/live/*_orders.json)から復元する。
+        # 復元できない銘柄は自動売買を止めず entry_metadata_missing に記録するのみ。
+        try:
+            from src.live.entry_metadata_recovery import (
+                recover_missing_entry_metadata, recover_missing_entry_rsr,
+            )
+            from src.portfolio.state_store import load_portfolio_state, save_portfolio_state
+            from src.paths import SIGNALS_DIR as _pmr_signals_dir
+            _pmr_state_file = RUNTIME_DIR / "portfolio_state.json"
+            _pmr_state, _pmr_vr = load_portfolio_state(_pmr_state_file)
+            _pmr_result = recover_missing_entry_metadata(
+                _pmr_state,
+                logs_live_dir=LOGS_DIR / "live",
+                audit_log_path=LOGS_DIR / "entry_metadata_recovery_audit.jsonl",
+            )
+            # entry_rsr 欠落リカバリ（2026-07-08 RCA）: signal_rsr_map が
+            # update_state_after_execution() に渡らなかった経路(run_morning_signal.py 等)
+            # のBUYで position_entry_rsrs が欠落し、Quality Replacement Engine が
+            # current RSR を proxy 使用し続けていた既存ポジションを日次シグナルJSONから復元する。
+            _rsr_result = recover_missing_entry_rsr(
+                _pmr_state,
+                signals_dir=_pmr_signals_dir,
+                audit_log_path=LOGS_DIR / "entry_rsr_recovery_audit.jsonl",
+            )
+            if _pmr_result["recovered"] or _pmr_result["unrecoverable"] or _rsr_result["recovered"]:
+                save_portfolio_state(_pmr_state, path=_pmr_state_file, data_source="internal")
+                logger.warning(
+                    "[ENTRY_METADATA_RECOVERY] recovered=%d unrecoverable=%d",
+                    len(_pmr_result["recovered"]), len(_pmr_result["unrecoverable"]),
+                )
+            if _rsr_result["recovered"] or _rsr_result["unrecoverable"]:
+                logger.warning(
+                    "[ENTRY_RSR_RECOVERY] recovered=%d unrecoverable=%d",
+                    len(_rsr_result["recovered"]), len(_rsr_result["unrecoverable"]),
+                )
+        except Exception as _pmr_err:
+            logger.warning("[ENTRY_METADATA_RECOVERY] startup recovery failed (%s) — continuing", _pmr_err)
 
         logger.info(
             "[RECOVERY] bootstrap=%s supervisor_healthy=%s disk_ok=%s",
@@ -1305,13 +1380,17 @@ def main() -> int:
             _eff_capital = int(_cap_state.risk_adjusted_capital)
         _cap_state_loaded = True
         if _cap_state is not None:
-            # NOTE: this is the pre-sync, disk-loaded snapshot (prior run's saved
-            # state) — NOT the current actual_equity. [CAPITAL_SYNC] below carries
-            # the live-equity-reconciled values actually used for sizing.
+            # actual= は Step 2 で取得済みの broker 実資産(_live_snap)を表示する
+            # （disk-loaded _cap_state.actual_equity は前回run終了時点の値で1日ずれるため）。
+            # effective/risk_adj は意図的に pre-sync（今回のrate-limit適用前）の値のまま
+            # ロードした状態を監査する行として残す。sync後の確定値は [CAPITAL_SYNC] を参照。
+            _loaded_actual_display = (
+                _live_snap.actual_equity if _live_snap is not None else _cap_state.actual_equity
+            )
             logger.info(
                 "[CAPITAL_LOADED] actual=¥%s effective=¥%s risk_adj=¥%s "
                 "ramp=%s freeze=%s deploy=%s aggression_ema=%.3f edge=%.3f",
-                f"{_cap_state.actual_equity:,.0f}", f"{_cap_state.effective_capital:,.0f}",
+                f"{_loaded_actual_display:,.0f}", f"{_cap_state.effective_capital:,.0f}",
                 f"{_cap_state.risk_adjusted_capital:,.0f}",
                 _ramp_state.mode if _ramp_state else "N/A",
                 _freeze_state.is_frozen if _freeze_state else "N/A",
@@ -3772,71 +3851,119 @@ def main() -> int:
             except Exception as _oc_hook_err:
                 logger.warning("[OC] opportunity_cost hook failed (%s) — continuing", _oc_hook_err)
 
-            # ── ETP: Executed vs Skipped Expectancy (DRY + LIVE) ─────────────────
-            # Append-only JSONL. Observation-only. Fail-open.
+            # ── Opportunity Capture: forward-return enrichment (2026-07-08 fix) ──
+            # enrich_forward_returns() existed but was never invoked anywhere —
+            # every skipped_opportunities.jsonl record stayed enrichment_status
+            # ="pending" forever, so missed_alpha_score/forward_return in the
+            # weekly report could never be computed from real data.
             try:
-                from src.analytics.executed_vs_skipped_expectancy import (
-                    TradeOpportunityRecord as _EVS_Rec,
-                    append_opportunity     as _evs_append,
-                    DEFAULT_STORE_PATH     as _evs_path,
-                )
-                _evs_today  = datetime.now(JST).strftime("%Y-%m-%d")
-                _evs_ps     = result.portfolio_summary or {}
-                _evs_cash   = float(_evs_ps.get("available_cash") or 0)
-                _evs_cap    = float(_eff_capital) if _eff_capital else 1.0
-                _evs_n_held = sum(1 for _s in result.signals if _s.get("currently_holding", False))
-                _evs_slot   = _evs_n_held / max(int(MAX_POS), 1)
-                _evs_heat   = float(_evs_ps.get("portfolio_heat", 0.0))
-                try:
-                    _evs_regime = _regime_info_eo.get("regime", "unknown")
-                except NameError:
-                    _evs_regime = "unknown"
-                _evs_executed_syms = {
-                    str(_eo.get("symbol", _eo.get("Symbol", "")))
-                    for _eo in (result.orders or [])
-                    if str(_eo.get("side", _eo.get("Side", ""))).upper() == "BUY"
-                }
-                _evs_buy_sigs = [
-                    _s for _s in result.signals
-                    if _s.get("signal") == 1 and not _s.get("currently_holding", False)
-                ]
-                _evs_count = 0
-                for _evs_s in _evs_buy_sigs:
-                    _evs_sym      = str(_evs_s.get("symbol", ""))
-                    _evs_executed = _evs_sym in _evs_executed_syms
-                    _evs_skip_r   = None if _evs_executed else (
-                        "capital_constraint" if _evs_cash < _evs_cap * 0.05
-                        else "slot_full"
-                    )
-                    _evs_rec = _EVS_Rec.create(
-                        eval_date                    = _evs_today,
-                        symbol                       = _evs_sym,
-                        executed                     = _evs_executed,
-                        skip_reason                  = _evs_skip_r,
-                        capital_available_pct        = _evs_cash / _evs_cap if _evs_cap > 0 else 0.0,
-                        portfolio_heat               = _evs_heat,
-                        slot_utilization             = _evs_slot,
-                        sector                       = str(_evs_s.get("sector") or "不明"),
-                        market_regime                = _evs_regime,
-                        atr_pct                      = float(_evs_s.get("atr_pct") or 0.02),
-                        rs_rank                      = int(_evs_s.get("rsr_rank") or 50),
-                        entry_score                  = float(_evs_s.get("rsr") or 50) / 100.0,
-                        liquidity_score              = 0.5,
-                        position_lifecycle_available = False,
-                    )
-                    _evs_append(_evs_rec, _evs_path)
-                    _evs_count += 1
-                if _evs_count:
-                    logger.info(
-                        "[EVS] recorded %d opportunity records (executed=%d skipped=%d)",
-                        _evs_count,
-                        sum(1 for _s in _evs_buy_sigs if _s.get("symbol") in _evs_executed_syms),
-                        _evs_count - sum(1 for _s in _evs_buy_sigs if _s.get("symbol") in _evs_executed_syms),
-                    )
-            except Exception as _evs_err:
-                logger.warning("[EVS] append_opportunity hook failed (%s) — continuing", _evs_err)
+                import pandas as _pd_sor
+                from src.analytics.skipped_opportunity_analytics import enrich_and_rewrite_store as _sor_enrich_rw
+
+                def _sor_price_fetcher(sym: str, iso_date: str) -> "list[float] | None":
+                    _p = CACHE_DIR / "ohlcv" / f"{sym}.parquet"
+                    if not _p.exists():
+                        return None
+                    try:
+                        _df = _pd_sor.read_parquet(_p)
+                        _df.index = _pd_sor.to_datetime(_df.index)
+                        _mask = _df.index >= _pd_sor.Timestamp(iso_date)
+                        if not _mask.any():
+                            return None
+                        return _df.loc[_mask, "Close"].tolist()[:6]
+                    except Exception:
+                        return None
+
+                _sor_n_enriched = _sor_enrich_rw(SKIPPED_OPPORTUNITY_FILE, _sor_price_fetcher)
+                if _sor_n_enriched:
+                    logger.info("[SKIPPED_OPP] enriched %d record(s)", _sor_n_enriched)
+            except Exception as _sor_enrich_err:
+                logger.warning("[SKIPPED_OPP] enrichment hook failed (%s) — continuing", _sor_enrich_err)
+
+            # ── EVS: Executed vs Skipped Expectancy — context (DRY + LIVE) ───────
+            # SCHEMA_VERSION 2 (2026-07-08 integrity fix). The old inline hook
+            # here determined "executed" from result.orders (the pre-send
+            # candidate list) — architecturally incapable of ever being True
+            # for a LIVE run, since real order confirmation doesn't exist yet
+            # at this point in the pipeline. DRY-mode records are written
+            # immediately below (DRY never sends, so send_results=[] is
+            # correct). LIVE-mode records are written later, after real
+            # send_results are available (see "[EVS] LIVE record" below).
+            _evs_today       = datetime.now(JST).strftime("%Y-%m-%d")
+            _evs_run_ts      = datetime.now(JST).strftime("%Y-%m-%dT%H:%M:%S%z")
+            _evs_ps          = result.portfolio_summary or {}
+            _evs_cash        = float(_evs_ps.get("available_cash") or 0)
+            _evs_cap         = float(_eff_capital) if _eff_capital else 1.0
+            _evs_cap_avail_pct = _evs_cash / _evs_cap if _evs_cap > 0 else 0.0
+            _evs_heat        = float(_evs_ps.get("portfolio_heat", 0.0))
+            try:
+                _evs_regime = _regime_info_eo.get("regime", "unknown")
+            except NameError:
+                _evs_regime = "unknown"
+
+            # ── CE Shadow Mode（2026-07-15 SSOT統合） — DRY/LIVE共通で記録 ──
+            try:
+                from src.live.ce_shadow_tracking import run_ce_shadow_tracking as _run_ce_shadow
+                _run_ce_shadow(result.signals, order_objects)
+            except Exception as _ce_import_err:
+                logger.warning("[CE_SHADOW] module unavailable (FAIL_OPEN): %s", _ce_import_err)
 
             if not args.live:
+                try:
+                    from src.analytics.executed_vs_skipped_expectancy import (
+                        build_opportunity_records as _evs_build,
+                        append_opportunity        as _evs_append,
+                        DEFAULT_STORE_PATH        as _evs_path,
+                    )
+                    _evs_recs = _evs_build(
+                        signals=result.signals,
+                        stage_audit=getattr(bridge, "_last_stage_audit", []),
+                        send_results=[],
+                        run_id=run_id,
+                        run_timestamp=_evs_run_ts,
+                        mode="DRY",
+                        source_script="run_live_signal.py",
+                        capital_available_pct=_evs_cap_avail_pct,
+                        portfolio_heat=_evs_heat,
+                        market_regime=_evs_regime,
+                        max_positions=int(MAX_POS),
+                    )
+                    for _evs_rec in _evs_recs:
+                        _evs_append(_evs_rec, _evs_path)
+                    if _evs_recs:
+                        logger.info(
+                            "[EVS] DRY recorded %d opportunity records (executed=%d skipped=%d)",
+                            len(_evs_recs),
+                            sum(1 for r in _evs_recs if r.executed),
+                            sum(1 for r in _evs_recs if not r.executed),
+                        )
+                except Exception as _evs_err:
+                    logger.warning("[EVS] DRY build_opportunity_records failed (%s) — continuing", _evs_err)
+
+                # ── Opportunity Capture integrity fix (2026-07-08) ────────────
+                # Same run_id/run_timestamp as the EVS block above so
+                # Stage Audit / EVS / Opportunity Capture join cleanly.
+                try:
+                    from src.analytics.skipped_opportunity_analytics import (
+                        build_skipped_opportunity_records as _sor_build,
+                        append_skipped_opportunity         as _sor_append,
+                    )
+                    _sor_recs = _sor_build(
+                        signals=result.signals,
+                        stage_audit=getattr(bridge, "_last_stage_audit", []),
+                        send_results=[],
+                        run_id=run_id,
+                        run_timestamp=_evs_run_ts,
+                        mode="DRY",
+                        source_script="run_live_signal.py",
+                        available_cash=_evs_cash,
+                    )
+                    for _sor_rec in _sor_recs:
+                        _sor_append(_sor_rec, SKIPPED_OPPORTUNITY_FILE)
+                    if _sor_recs:
+                        logger.info("[SKIPPED_OPP] DRY recorded %d record(s)", len(_sor_recs))
+                except Exception as _sor_err:
+                    logger.warning("[SKIPPED_OPP] DRY build failed (%s) — continuing", _sor_err)
                 try:
                     print_live_preview(result, order_objects)
                 except Exception as _prev_err:
@@ -6637,6 +6764,42 @@ def main() -> int:
                 logger.warning("[WER] LIVE weekly_executive_review hook failed: %s", _wer_lv_err)
                 print("[WEEKLY_REVIEW] LIVE skipped")
 
+            # ── 層0: MAX_POSITION_GUARD (fail-closed) ──────────────────────────
+            # 2026-07-07 4銘柄同時保有インシデント対応: signal生成側の全ガード
+            # （max_positions判定 / Shadow経路 / 4th-slot gate 等）をすり抜けた
+            # 場合の最終防波堤。送信直前に Broker 実保有数を再取得し、
+            # 実保有 + 送信予定BUY件数 が max_positions を超えるなら RUN 全体を
+            # 停止する。broker reality is authoritative（Autonomous Runtime Rules）。
+            try:
+                from src.kabusapi.signal_bridge import _capacity_check as _guard_capacity_check
+                _guard_positions    = bridge._get_current_positions()
+                _guard_pending_buys = sum(1 for _o in order_objects if _o.side == "BUY")
+                _guard_remaining    = _guard_capacity_check(
+                    bridge.max_positions, len(_guard_positions), _guard_pending_buys,
+                )
+                if _guard_remaining < 0:
+                    _guard_projected = len(_guard_positions) + _guard_pending_buys
+                    logger.error(
+                        "[MAX_POSITION_GUARD] projected=%d (held=%d + pending_buy=%d) > "
+                        "max_positions=%d → 発注中止（fail-closed）",
+                        _guard_projected, len(_guard_positions), _guard_pending_buys,
+                        bridge.max_positions,
+                    )
+                    print(
+                        f"\n[FATAL][MAX_POSITION_GUARD] 実保有{len(_guard_positions)}件 + "
+                        f"送信予定BUY{_guard_pending_buys}件 = {_guard_projected}件 > "
+                        f"max_positions={bridge.max_positions} → 発注を全停止します。",
+                        file=sys.stderr,
+                    )
+                    return 1
+            except Exception as _guard_err:
+                logger.error(
+                    "[MAX_POSITION_GUARD] Broker実保有数取得失敗のため安全側で発注中止: %s",
+                    _guard_err,
+                )
+                print(f"\n[FATAL][MAX_POSITION_GUARD] {_guard_err}", file=sys.stderr)
+                return 1
+
             # ── Stage: order_execution (process-isolated via BrokerProcessSupervisor) ──
             _intent_journal = IntentJournal()
             _emit_phase("execution", "start", run_id=run_id)
@@ -6811,6 +6974,63 @@ def main() -> int:
                     _rec_e,
                 )
             _emit_phase("reconciliation", "complete", run_id=run_id)
+
+            # ── EVS: Executed vs Skipped Expectancy — LIVE record ─────────────
+            # Runs AFTER real send_results are known, so "executed" reflects an
+            # actual broker success=True fill, not a pre-send candidate guess.
+            try:
+                from src.analytics.executed_vs_skipped_expectancy import (
+                    build_opportunity_records as _evs_build_lv,
+                    append_opportunity        as _evs_append_lv,
+                    DEFAULT_STORE_PATH        as _evs_path_lv,
+                )
+                _evs_recs_lv = _evs_build_lv(
+                    signals=result.signals,
+                    stage_audit=getattr(bridge, "_last_stage_audit", []),
+                    send_results=send_results,
+                    run_id=run_id,
+                    run_timestamp=_evs_run_ts,
+                    mode="LIVE",
+                    source_script="run_live_signal.py",
+                    capital_available_pct=_evs_cap_avail_pct,
+                    portfolio_heat=_evs_heat,
+                    market_regime=_evs_regime,
+                    max_positions=int(MAX_POS),
+                )
+                for _evs_rec_lv in _evs_recs_lv:
+                    _evs_append_lv(_evs_rec_lv, _evs_path_lv)
+                if _evs_recs_lv:
+                    logger.info(
+                        "[EVS] LIVE recorded %d opportunity records (executed=%d skipped=%d)",
+                        len(_evs_recs_lv),
+                        sum(1 for r in _evs_recs_lv if r.executed),
+                        sum(1 for r in _evs_recs_lv if not r.executed),
+                    )
+            except Exception as _evs_err_lv:
+                logger.warning("[EVS] LIVE build_opportunity_records failed (%s) — continuing", _evs_err_lv)
+
+            # ── Opportunity Capture integrity fix (2026-07-08) — LIVE record ──
+            try:
+                from src.analytics.skipped_opportunity_analytics import (
+                    build_skipped_opportunity_records as _sor_build_lv,
+                    append_skipped_opportunity         as _sor_append_lv,
+                )
+                _sor_recs_lv = _sor_build_lv(
+                    signals=result.signals,
+                    stage_audit=getattr(bridge, "_last_stage_audit", []),
+                    send_results=send_results,
+                    run_id=run_id,
+                    run_timestamp=_evs_run_ts,
+                    mode="LIVE",
+                    source_script="run_live_signal.py",
+                    available_cash=_evs_cash,
+                )
+                for _sor_rec_lv in _sor_recs_lv:
+                    _sor_append_lv(_sor_rec_lv, SKIPPED_OPPORTUNITY_FILE)
+                if _sor_recs_lv:
+                    logger.info("[SKIPPED_OPP] LIVE recorded %d record(s)", len(_sor_recs_lv))
+            except Exception as _sor_err_lv:
+                logger.warning("[SKIPPED_OPP] LIVE build failed (%s) — continuing", _sor_err_lv)
 
             # ── Stage: capital state update (adaptive growth) ────────────────
             if _cap_state_loaded:
