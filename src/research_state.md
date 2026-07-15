@@ -1,7 +1,54 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-15（★★★実発注経路SSOT統合完了: run_morning_signal.py廃止・run_live_signal.py一本化・snapshot_hash自動再計算・Health Check broker snapshot優先化・CE Shadow Mode移植・Legacyタスク4件削除★★★）
-# ※研究(Study)系列は2026-07-14 Study95が最新（下記参照）。本セクションは運用インフラ変更の記録。
+# Single Source of Truth / 最終更新: 2026-07-16（Study99 Sector×Fujiko filter factor-level完了）
+# ※研究(Study)系列は2026-07-16 Study99が最新（下記参照）。
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
+
+---
+
+## ★★★★★★★★★★★★★ 2026-07-16 Study99 — Sector × Fujiko filter 存在確認（factor-level）完了
+
+**性格**: 新規fresh run（factor-level統計のみ・戦略BT/BTエンジン不使用）。Study98の銘柄レベル拡張・
+FUJIKO 2.0仮説2（Market→Sector→Stock階層）検証。成果物: `backtests/study99_sector_fujiko_filter.json` /
+`reports/study99_sector_fujiko_filter.md` / `reports/study99_interaction_chart.png` /
+`src/backtest/study99_sector_fujiko_filter.py`。
+
+**データ**: Universe C（PIT・105ヶ月・2017-08〜2026-04）・panel=84,206行・価格欠落0銘柄。
+セクター条件=公式TOPIX-17指数3M trailing excess（Study98と同一）。RS=IBD式12M複合リターンの
+当月Universe C内パーセンタイル（canon calc_cross_sectional_rsr同一定義・pool≈1100・仮説4注記）。
+forward=3M。主指標=月次クラスタt（FM型・クロスセクション相関補正）。
+
+**結果**:
+- **A（Sector>TOPIX単独）**: hit 43.0% vs base 42.9%・FM t=1.35 → セクター条件は銘柄レベルへ伝播せず
+- **RS単独**: 閾値60/70/75/80で単調悪化（RS≥80: hit 40.4%・pooled z=-5.9）→ Study95の弱い逆転と整合
+- **交互作用（B）**: Sector>TOPIX∧RS≥60でhit 44.0%・FM t=2.31（RS単独の負をセクター条件が正へ反転）。
+  ただし閾値上昇で減衰（RS75: t=1.52・RS80: t=0.72）→ ユーザー仮説の方向はRS60-70帯でのみ微弱に存在
+- **C（25MA乖離）**: 乖離20%+はhit 34.5%（pooled z=-6.4）と顕著に劣後——ただしFM t=-0.36・
+  平均excessは非対称（lottery型右スキュー）。除外フィルタ候補としてのみ興味
+- **D（top3∧RS75∧乖離0-10%）**: hit 45.8%・z=2.49・FM t=1.90（最良セルだが有意水準未達）
+- **サブ期間で符号反転（致命的）**: 2016-2020は全組合せ負（top3: hit 39.1%・FM t=-3.1）、
+  2021-2025のみ正（top3∧RS75: hit 45.7%・FM t=2.89）→ stability_check不合格
+- **Regime**: bullで微弱正（FM t≈1.8-1.9）・bearでゼロ
+
+**判定**: 頑健なfactor-levelエッジの存在は**未確認**。効果量+1〜1.5pp・サブ期間符号反転・
+多重比較（40+セル・最大FM t=2.31は補正後不成立）。2021-2025限定の正は事後的era選択の疑い。
+戦略BTへの昇格根拠なし。Study95のKill文脈（CS momentum FAIL）と整合的な追認結果。
+
+**未検証の変種**: セクター内パーセンタイルRS（本StudyのRSはユニバース全体ランク）・
+乖離20%+除外フィルタの独立検証。着手はユーザー決裁待ち。
+
+---
+
+## ★★★★★★★★★★★★ 2026-07-15 Study98 — TOPIX17セクターモメンタム持続性（factor-level）完了
+
+**性格**: 新規fresh run（factor-level統計のみ・戦略BT不使用）。公式TOPIX-17指数を新規取得
+（`src/database/index_prices.py`・J-Quants /v2/indices/bars/daily・Study77のETFデータギャップ解消）。
+成果物: `backtests/study98_sector_momentum_persistence.json` / `reports/study98_sector_momentum_persistence.md` /
+`reports/study98_transition_chart.png` / `src/backtest/study98_sector_momentum_persistence.py`。
+
+**結果**: P(sector excess forward>0 | excess trailing>0)を月次・horizon 1M/3Mで測定（panel=3,944行・
+2016-09〜2026-06）。**上位3限定・3Mのみ有意**（遷移確率50.9% vs base 43.0%・z=3.23・t=2.74）。
+全量1M/3M・上位3 1Mは非有意。regime別=bull 1MとBear 3Mで弱い正。サブ期間では単独有意セルなし。
+8区分中1つのみ有意=多重比較リスクあり。Study99（銘柄レベル拡張）で追検証→伝播せず（上記）。
 
 ---
 

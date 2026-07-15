@@ -1,0 +1,993 @@
+{
+  "study": "Study98",
+  "title": "TOPIX17 Sector Momentum Persistence (Factor-Level)",
+  "generated_at": "2026-07-15T21:18:20+0900",
+  "data_source": "J-Quants official TOPIX-17 sub-indices (database/market/index/prices/)",
+  "prohibited_confirmed": {
+    "bt_engine_used": false,
+    "strategy_backtest": false
+  },
+  "params": {
+    "horizons_trading_days": {
+      "1M": 21,
+      "3M": 63
+    },
+    "top_n": 3,
+    "regime_ma_period": 200
+  },
+  "results": {
+    "n_panel_rows": 3944,
+    "primary_all_qualifying": {
+      "1M": {
+        "n_condition_true": 920,
+        "n_condition_false": 1086,
+        "transition_prob_given_condition_true": 0.47282608695652173,
+        "transition_prob_given_condition_false": 0.43830570902394106,
+        "unconditional_prob": 0.4541375872382851,
+        "z_stat_proportion_diff": 1.547332274932827,
+        "z_pvalue": 0.12178314292380299,
+        "mean_excess_forward_given_condition_true": -7.588620173641478e-05,
+        "mean_excess_forward_given_condition_false": -0.003874798261325514,
+        "t_stat_excess_forward_diff": 1.7186934324647516,
+        "t_pvalue": 0.08583607385466636,
+        "confusion_matrix": {
+          "condition_true_outcome_true": 435,
+          "condition_true_outcome_false": 485,
+          "condition_false_outcome_true": 476,
+          "condition_false_outcome_false": 610
+        },
+        "n_total": 2006
+      },
+      "3M": {
+        "n_condition_true": 848,
+        "n_condition_false": 1090,
+        "transition_prob_given_condition_true": 0.4386792452830189,
+        "transition_prob_given_condition_false": 0.42385321100917434,
+        "unconditional_prob": 0.43034055727554177,
+        "z_stat_proportion_diff": 0.6539514381493565,
+        "z_pvalue": 0.5131430926803333,
+        "mean_excess_forward_given_condition_true": -0.0035571022084999364,
+        "mean_excess_forward_given_condition_false": -0.007491171104018111,
+        "t_stat_excess_forward_diff": 0.9241478285759932,
+        "t_pvalue": 0.35555241195922743,
+        "confusion_matrix": {
+          "condition_true_outcome_true": 372,
+          "condition_true_outcome_false": 476,
+          "condition_false_outcome_true": 462,
+          "condition_false_outcome_false": 628
+        },
+        "n_total": 1938
+      }
+    },
+    "top3_only": {
+      "1M": {
+        "n_condition_true": 354,
+        "n_condition_false": 1652,
+        "transition_prob_given_condition_true": 0.4745762711864407,
+        "transition_prob_given_condition_false": 0.44975786924939465,
+        "unconditional_prob": 0.4541375872382851,
+        "z_stat_proportion_diff": 0.8510982205522939,
+        "z_pvalue": 0.3947147938322164,
+        "mean_excess_forward_given_condition_true": 0.002869082107337433,
+        "mean_excess_forward_given_condition_false": -0.003204298597696405,
+        "t_stat_excess_forward_diff": 1.7191567233114606,
+        "t_pvalue": 0.08629876836561039,
+        "confusion_matrix": {
+          "condition_true_outcome_true": 168,
+          "condition_true_outcome_false": 186,
+          "condition_false_outcome_true": 743,
+          "condition_false_outcome_false": 909
+        },
+        "n_total": 2006
+      },
+      "3M": {
+        "n_condition_true": 342,
+        "n_condition_false": 1596,
+        "transition_prob_given_condition_true": 0.5087719298245614,
+        "transition_prob_given_condition_false": 0.41353383458646614,
+        "unconditional_prob": 0.43034055727554177,
+        "z_stat_proportion_diff": 3.2281188945699926,
+        "z_pvalue": 0.0012460717195823534,
+        "mean_excess_forward_given_condition_true": 0.01086990478131767,
+        "mean_excess_forward_given_condition_false": -0.009335405144986422,
+        "t_stat_excess_forward_diff": 2.736295657215099,
+        "t_pvalue": 0.0064948731721840855,
+        "confusion_matrix": {
+          "condition_true_outcome_true": 174,
+          "condition_true_outcome_false": 168,
+          "condition_false_outcome_true": 660,
+          "condition_false_outcome_false": 936
+        },
+        "n_total": 1938
+      }
+    },
+    "per_sector": {
+      "食品": {
+        "1M": {
+          "n_condition_true": 53,
+          "n_condition_false": 65,
+          "transition_prob_given_condition_true": 0.41509433962264153,
+          "transition_prob_given_condition_false": 0.4461538461538462,
+          "unconditional_prob": 0.4322033898305085,
+          "z_stat_proportion_diff": -0.33877213319189864,
+          "z_pvalue": 0.734781395702657,
+          "mean_excess_forward_given_condition_true": -0.006348759827543347,
+          "mean_excess_forward_given_condition_false": -0.0037175178924771673,
+          "t_stat_excess_forward_diff": -0.3535278269025324,
+          "t_pvalue": 0.7243539559563577,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 22,
+            "condition_true_outcome_false": 31,
+            "condition_false_outcome_true": 29,
+            "condition_false_outcome_false": 36
+          },
+          "n_total": 118
+        },
+        "3M": {
+          "n_condition_true": 49,
+          "n_condition_false": 65,
+          "transition_prob_given_condition_true": 0.3673469387755102,
+          "transition_prob_given_condition_false": 0.4307692307692308,
+          "unconditional_prob": 0.40350877192982454,
+          "z_stat_proportion_diff": -0.6833067400758283,
+          "z_pvalue": 0.49441303606208864,
+          "mean_excess_forward_given_condition_true": -0.01936830486672203,
+          "mean_excess_forward_given_condition_false": -0.010937276269712946,
+          "t_stat_excess_forward_diff": -0.6463197851006088,
+          "t_pvalue": 0.519689069909577,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 18,
+            "condition_true_outcome_false": 31,
+            "condition_false_outcome_true": 28,
+            "condition_false_outcome_false": 37
+          },
+          "n_total": 114
+        }
+      },
+      "エネルギー資源": {
+        "1M": {
+          "n_condition_true": 61,
+          "n_condition_false": 57,
+          "transition_prob_given_condition_true": 0.5245901639344263,
+          "transition_prob_given_condition_false": 0.42105263157894735,
+          "unconditional_prob": 0.4745762711864407,
+          "z_stat_proportion_diff": 1.1255150350069574,
+          "z_pvalue": 0.26037084971954116,
+          "mean_excess_forward_given_condition_true": 0.019044902820452306,
+          "mean_excess_forward_given_condition_false": -0.002400138119030196,
+          "t_stat_excess_forward_diff": 1.4560401479707836,
+          "t_pvalue": 0.1481511455472022,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 32,
+            "condition_true_outcome_false": 29,
+            "condition_false_outcome_true": 24,
+            "condition_false_outcome_false": 33
+          },
+          "n_total": 118
+        },
+        "3M": {
+          "n_condition_true": 63,
+          "n_condition_false": 51,
+          "transition_prob_given_condition_true": 0.49206349206349204,
+          "transition_prob_given_condition_false": 0.47058823529411764,
+          "unconditional_prob": 0.4824561403508772,
+          "z_stat_proportion_diff": 0.22815962956512928,
+          "z_pvalue": 0.8195221446585856,
+          "mean_excess_forward_given_condition_true": 0.02547610479506432,
+          "mean_excess_forward_given_condition_false": 0.012069067449894394,
+          "t_stat_excess_forward_diff": 0.4980517218425874,
+          "t_pvalue": 0.6194316386442217,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 31,
+            "condition_true_outcome_false": 32,
+            "condition_false_outcome_true": 24,
+            "condition_false_outcome_false": 27
+          },
+          "n_total": 114
+        }
+      },
+      "建設・資材": {
+        "1M": {
+          "n_condition_true": 62,
+          "n_condition_false": 56,
+          "transition_prob_given_condition_true": 0.5483870967741935,
+          "transition_prob_given_condition_false": 0.5,
+          "unconditional_prob": 0.5254237288135594,
+          "z_stat_proportion_diff": 0.5256184108645261,
+          "z_pvalue": 0.5991533622099579,
+          "mean_excess_forward_given_condition_true": -0.003312230533133412,
+          "mean_excess_forward_given_condition_false": 0.00012182992439575229,
+          "t_stat_excess_forward_diff": -0.5804510792627923,
+          "t_pvalue": 0.5628242872686067,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 34,
+            "condition_true_outcome_false": 28,
+            "condition_false_outcome_true": 28,
+            "condition_false_outcome_false": 28
+          },
+          "n_total": 118
+        },
+        "3M": {
+          "n_condition_true": 56,
+          "n_condition_false": 58,
+          "transition_prob_given_condition_true": 0.5357142857142857,
+          "transition_prob_given_condition_false": 0.5,
+          "unconditional_prob": 0.5175438596491229,
+          "z_stat_proportion_diff": 0.3815004495413079,
+          "z_pvalue": 0.7028319376998038,
+          "mean_excess_forward_given_condition_true": 0.00032182466505951767,
+          "mean_excess_forward_given_condition_false": -0.0006737966504029867,
+          "t_stat_excess_forward_diff": 0.09693336853866398,
+          "t_pvalue": 0.9229624316963292,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 30,
+            "condition_true_outcome_false": 26,
+            "condition_false_outcome_true": 29,
+            "condition_false_outcome_false": 29
+          },
+          "n_total": 114
+        }
+      },
+      "素材・化学": {
+        "1M": {
+          "n_condition_true": 47,
+          "n_condition_false": 71,
+          "transition_prob_given_condition_true": 0.5319148936170213,
+          "transition_prob_given_condition_false": 0.323943661971831,
+          "unconditional_prob": 0.4067796610169492,
+          "z_stat_proportion_diff": 2.251400364606961,
+          "z_pvalue": 0.024360191066750136,
+          "mean_excess_forward_given_condition_true": -0.0032225246336529713,
+          "mean_excess_forward_given_condition_false": -0.008310528276324457,
+          "t_stat_excess_forward_diff": 0.8223982515990829,
+          "t_pvalue": 0.4128662467992356,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 25,
+            "condition_true_outcome_false": 22,
+            "condition_false_outcome_true": 23,
+            "condition_false_outcome_false": 48
+          },
+          "n_total": 118
+        },
+        "3M": {
+          "n_condition_true": 39,
+          "n_condition_false": 75,
+          "transition_prob_given_condition_true": 0.20512820512820512,
+          "transition_prob_given_condition_false": 0.5066666666666667,
+          "unconditional_prob": 0.40350877192982454,
+          "z_stat_proportion_diff": -3.1133267516472047,
+          "z_pvalue": 0.0018499108411889065,
+          "mean_excess_forward_given_condition_true": -0.0369546141652853,
+          "mean_excess_forward_given_condition_false": -0.0037519420396003866,
+          "t_stat_excess_forward_diff": -3.64327568769381,
+          "t_pvalue": 0.000433682897713938,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 8,
+            "condition_true_outcome_false": 31,
+            "condition_false_outcome_true": 38,
+            "condition_false_outcome_false": 37
+          },
+          "n_total": 114
+        }
+      },
+      "医薬品": {
+        "1M": {
+          "n_condition_true": 52,
+          "n_condition_false": 66,
+          "transition_prob_given_condition_true": 0.4423076923076923,
+          "transition_prob_given_condition_false": 0.42424242424242425,
+          "unconditional_prob": 0.4322033898305085,
+          "z_stat_proportion_diff": 0.1966692964453924,
+          "z_pvalue": 0.8440863386906265,
+          "mean_excess_forward_given_condition_true": -0.004382064478753686,
+          "mean_excess_forward_given_condition_false": -0.007557551772386805,
+          "t_stat_excess_forward_diff": 0.527899667291054,
+          "t_pvalue": 0.5985774498865264,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 23,
+            "condition_true_outcome_false": 29,
+            "condition_false_outcome_true": 28,
+            "condition_false_outcome_false": 38
+          },
+          "n_total": 118
+        },
+        "3M": {
+          "n_condition_true": 38,
+          "n_condition_false": 76,
+          "transition_prob_given_condition_true": 0.39473684210526316,
+          "transition_prob_given_condition_false": 0.35526315789473684,
+          "unconditional_prob": 0.3684210526315789,
+          "z_stat_proportion_diff": 0.41187723552395716,
+          "z_pvalue": 0.6804294070273245,
+          "mean_excess_forward_given_condition_true": -0.023310162162843196,
+          "mean_excess_forward_given_condition_false": -0.014113524034221054,
+          "t_stat_excess_forward_diff": -0.7593651804986771,
+          "t_pvalue": 0.45034161510507464,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 15,
+            "condition_true_outcome_false": 23,
+            "condition_false_outcome_true": 27,
+            "condition_false_outcome_false": 49
+          },
+          "n_total": 114
+        }
+      },
+      "自動車・輸送機": {
+        "1M": {
+          "n_condition_true": 53,
+          "n_condition_false": 65,
+          "transition_prob_given_condition_true": 0.39622641509433965,
+          "transition_prob_given_condition_false": 0.49230769230769234,
+          "unconditional_prob": 0.4491525423728814,
+          "z_stat_proportion_diff": -1.0437098236828075,
+          "z_pvalue": 0.29661966341027757,
+          "mean_excess_forward_given_condition_true": -0.01384909627195333,
+          "mean_excess_forward_given_condition_false": 0.0011598357239644137,
+          "t_stat_excess_forward_diff": -1.782451913127179,
+          "t_pvalue": 0.07748224609720245,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 21,
+            "condition_true_outcome_false": 32,
+            "condition_false_outcome_true": 32,
+            "condition_false_outcome_false": 33
+          },
+          "n_total": 118
+        },
+        "3M": {
+          "n_condition_true": 45,
+          "n_condition_false": 69,
+          "transition_prob_given_condition_true": 0.24444444444444444,
+          "transition_prob_given_condition_false": 0.4782608695652174,
+          "unconditional_prob": 0.38596491228070173,
+          "z_stat_proportion_diff": -2.50658759401295,
+          "z_pvalue": 0.012190284912566574,
+          "mean_excess_forward_given_condition_true": -0.047407028160448436,
+          "mean_excess_forward_given_condition_false": 0.0026662933343902843,
+          "t_stat_excess_forward_diff": -3.943046293829465,
+          "t_pvalue": 0.00016030728436639935,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 11,
+            "condition_true_outcome_false": 34,
+            "condition_false_outcome_true": 33,
+            "condition_false_outcome_false": 36
+          },
+          "n_total": 114
+        }
+      },
+      "鉄鋼・非鉄": {
+        "1M": {
+          "n_condition_true": 57,
+          "n_condition_false": 61,
+          "transition_prob_given_condition_true": 0.38596491228070173,
+          "transition_prob_given_condition_false": 0.4426229508196721,
+          "unconditional_prob": 0.4152542372881356,
+          "z_stat_proportion_diff": -0.6241404059507796,
+          "z_pvalue": 0.5325353800357764,
+          "mean_excess_forward_given_condition_true": -0.004732149503923744,
+          "mean_excess_forward_given_condition_false": -0.001050840044838418,
+          "t_stat_excess_forward_diff": -0.9320587316751758,
+          "t_pvalue": 0.3534240776470459,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 22,
+            "condition_true_outcome_false": 35,
+            "condition_false_outcome_true": 27,
+            "condition_false_outcome_false": 34
+          },
+          "n_total": 118
+        },
+        "3M": {
+          "n_condition_true": 44,
+          "n_condition_false": 70,
+          "transition_prob_given_condition_true": 0.4318181818181818,
+          "transition_prob_given_condition_false": 0.35714285714285715,
+          "unconditional_prob": 0.38596491228070173,
+          "z_stat_proportion_diff": 0.7973142850542861,
+          "z_pvalue": 0.42526852600792875,
+          "mean_excess_forward_given_condition_true": -0.008857041271786008,
+          "mean_excess_forward_given_condition_false": -0.00639094960913935,
+          "t_stat_excess_forward_diff": -0.355812744762116,
+          "t_pvalue": 0.7227574526978969,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 19,
+            "condition_true_outcome_false": 25,
+            "condition_false_outcome_true": 25,
+            "condition_false_outcome_false": 45
+          },
+          "n_total": 114
+        }
+      },
+      "機械": {
+        "1M": {
+          "n_condition_true": 50,
+          "n_condition_false": 68,
+          "transition_prob_given_condition_true": 0.44,
+          "transition_prob_given_condition_false": 0.4264705882352941,
+          "unconditional_prob": 0.4322033898305085,
+          "z_stat_proportion_diff": 0.14660098469963648,
+          "z_pvalue": 0.8834469764039021,
+          "mean_excess_forward_given_condition_true": -0.006062560194138997,
+          "mean_excess_forward_given_condition_false": -0.006515380787267704,
+          "t_stat_excess_forward_diff": 0.059892441822204275,
+          "t_pvalue": 0.9523472355702555,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 22,
+            "condition_true_outcome_false": 28,
+            "condition_false_outcome_true": 29,
+            "condition_false_outcome_false": 39
+          },
+          "n_total": 118
+        },
+        "3M": {
+          "n_condition_true": 47,
+          "n_condition_false": 67,
+          "transition_prob_given_condition_true": 0.44680851063829785,
+          "transition_prob_given_condition_false": 0.3283582089552239,
+          "unconditional_prob": 0.37719298245614036,
+          "z_stat_proportion_diff": 1.2844332069085536,
+          "z_pvalue": 0.19899042021565005,
+          "mean_excess_forward_given_condition_true": -0.012383728941931208,
+          "mean_excess_forward_given_condition_false": -0.02039260232822708,
+          "t_stat_excess_forward_diff": 0.5657533821893482,
+          "t_pvalue": 0.5730612169696786,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 21,
+            "condition_true_outcome_false": 26,
+            "condition_false_outcome_true": 22,
+            "condition_false_outcome_false": 45
+          },
+          "n_total": 114
+        }
+      },
+      "電機・精密": {
+        "1M": {
+          "n_condition_true": 61,
+          "n_condition_false": 57,
+          "transition_prob_given_condition_true": 0.5901639344262295,
+          "transition_prob_given_condition_false": 0.43859649122807015,
+          "unconditional_prob": 0.5169491525423728,
+          "z_stat_proportion_diff": 1.6464438650740623,
+          "z_pvalue": 0.0996724083129501,
+          "mean_excess_forward_given_condition_true": 0.011081288755196855,
+          "mean_excess_forward_given_condition_false": -0.00396788034849897,
+          "t_stat_excess_forward_diff": 1.4164739749212185,
+          "t_pvalue": 0.15932787052035635,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 36,
+            "condition_true_outcome_false": 25,
+            "condition_false_outcome_true": 25,
+            "condition_false_outcome_false": 32
+          },
+          "n_total": 118
+        },
+        "3M": {
+          "n_condition_true": 59,
+          "n_condition_false": 55,
+          "transition_prob_given_condition_true": 0.6101694915254238,
+          "transition_prob_given_condition_false": 0.34545454545454546,
+          "unconditional_prob": 0.4824561403508772,
+          "z_stat_proportion_diff": 2.8263821936810163,
+          "z_pvalue": 0.004707705694047215,
+          "mean_excess_forward_given_condition_true": 0.03182939996681821,
+          "mean_excess_forward_given_condition_false": -0.015394849298023141,
+          "t_stat_excess_forward_diff": 2.2181786422652507,
+          "t_pvalue": 0.02859420682781009,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 36,
+            "condition_true_outcome_false": 23,
+            "condition_false_outcome_true": 19,
+            "condition_false_outcome_false": 36
+          },
+          "n_total": 114
+        }
+      },
+      "情報通信・サービスその他": {
+        "1M": {
+          "n_condition_true": 53,
+          "n_condition_false": 65,
+          "transition_prob_given_condition_true": 0.5094339622641509,
+          "transition_prob_given_condition_false": 0.4461538461538462,
+          "unconditional_prob": 0.4745762711864407,
+          "z_stat_proportion_diff": 0.6847200197313739,
+          "z_pvalue": 0.4935206135127852,
+          "mean_excess_forward_given_condition_true": 0.0002078904118092941,
+          "mean_excess_forward_given_condition_false": -0.0037429990263241394,
+          "t_stat_excess_forward_diff": 0.5271804565809409,
+          "t_pvalue": 0.5991064948855243,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 27,
+            "condition_true_outcome_false": 26,
+            "condition_false_outcome_true": 29,
+            "condition_false_outcome_false": 36
+          },
+          "n_total": 118
+        },
+        "3M": {
+          "n_condition_true": 43,
+          "n_condition_false": 71,
+          "transition_prob_given_condition_true": 0.27906976744186046,
+          "transition_prob_given_condition_false": 0.38028169014084506,
+          "unconditional_prob": 0.34210526315789475,
+          "z_stat_proportion_diff": -1.1040393881544204,
+          "z_pvalue": 0.2695760519526189,
+          "mean_excess_forward_given_condition_true": -0.020309609888500203,
+          "mean_excess_forward_given_condition_false": -0.0031874696861435925,
+          "t_stat_excess_forward_diff": -1.302130179884753,
+          "t_pvalue": 0.1960942524938011,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 12,
+            "condition_true_outcome_false": 31,
+            "condition_false_outcome_true": 27,
+            "condition_false_outcome_false": 44
+          },
+          "n_total": 114
+        }
+      },
+      "電気・ガス": {
+        "1M": {
+          "n_condition_true": 57,
+          "n_condition_false": 61,
+          "transition_prob_given_condition_true": 0.3684210526315789,
+          "transition_prob_given_condition_false": 0.5245901639344263,
+          "unconditional_prob": 0.4491525423728814,
+          "z_stat_proportion_diff": -1.704291487366413,
+          "z_pvalue": 0.08832664453027617,
+          "mean_excess_forward_given_condition_true": -0.007390080351325821,
+          "mean_excess_forward_given_condition_false": 0.0001014885499658736,
+          "t_stat_excess_forward_diff": -1.1066807834062722,
+          "t_pvalue": 0.27072226911567,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 21,
+            "condition_true_outcome_false": 36,
+            "condition_false_outcome_true": 32,
+            "condition_false_outcome_false": 29
+          },
+          "n_total": 118
+        },
+        "3M": {
+          "n_condition_true": 43,
+          "n_condition_false": 71,
+          "transition_prob_given_condition_true": 0.3488372093023256,
+          "transition_prob_given_condition_false": 0.38028169014084506,
+          "unconditional_prob": 0.3684210526315789,
+          "z_stat_proportion_diff": -0.337341182648713,
+          "z_pvalue": 0.735859717950222,
+          "mean_excess_forward_given_condition_true": -0.016900865988560557,
+          "mean_excess_forward_given_condition_false": -0.007172161337485002,
+          "t_stat_excess_forward_diff": -0.7552656486721997,
+          "t_pvalue": 0.45207536173591517,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 15,
+            "condition_true_outcome_false": 28,
+            "condition_false_outcome_true": 27,
+            "condition_false_outcome_false": 44
+          },
+          "n_total": 114
+        }
+      },
+      "運輸・物流": {
+        "1M": {
+          "n_condition_true": 60,
+          "n_condition_false": 58,
+          "transition_prob_given_condition_true": 0.55,
+          "transition_prob_given_condition_false": 0.5344827586206896,
+          "unconditional_prob": 0.5423728813559322,
+          "z_stat_proportion_diff": 0.16914465345704477,
+          "z_pvalue": 0.865682862526457,
+          "mean_excess_forward_given_condition_true": -0.000884376954133161,
+          "mean_excess_forward_given_condition_false": 0.002922977826629779,
+          "t_stat_excess_forward_diff": -0.6210590266186723,
+          "t_pvalue": 0.5357946724508318,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 33,
+            "condition_true_outcome_false": 27,
+            "condition_false_outcome_true": 31,
+            "condition_false_outcome_false": 27
+          },
+          "n_total": 118
+        },
+        "3M": {
+          "n_condition_true": 71,
+          "n_condition_false": 43,
+          "transition_prob_given_condition_true": 0.5774647887323944,
+          "transition_prob_given_condition_false": 0.5813953488372093,
+          "unconditional_prob": 0.5789473684210527,
+          "z_stat_proportion_diff": -0.04119814702129563,
+          "z_pvalue": 0.9671379308830654,
+          "mean_excess_forward_given_condition_true": -0.00046820808120873815,
+          "mean_excess_forward_given_condition_false": 0.010961628542495027,
+          "t_stat_excess_forward_diff": -0.8861131900610815,
+          "t_pvalue": 0.3780174055904514,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 41,
+            "condition_true_outcome_false": 30,
+            "condition_false_outcome_true": 25,
+            "condition_false_outcome_false": 18
+          },
+          "n_total": 114
+        }
+      },
+      "商社・卸売": {
+        "1M": {
+          "n_condition_true": 52,
+          "n_condition_false": 66,
+          "transition_prob_given_condition_true": 0.5384615384615384,
+          "transition_prob_given_condition_false": 0.3939393939393939,
+          "unconditional_prob": 0.4576271186440678,
+          "z_stat_proportion_diff": 1.5644517508835527,
+          "z_pvalue": 0.11771151549555814,
+          "mean_excess_forward_given_condition_true": 0.006081219278358348,
+          "mean_excess_forward_given_condition_false": -0.007619227214080418,
+          "t_stat_excess_forward_diff": 1.6187731796425187,
+          "t_pvalue": 0.10823003759574072,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 28,
+            "condition_true_outcome_false": 24,
+            "condition_false_outcome_true": 26,
+            "condition_false_outcome_false": 40
+          },
+          "n_total": 118
+        },
+        "3M": {
+          "n_condition_true": 65,
+          "n_condition_false": 49,
+          "transition_prob_given_condition_true": 0.5076923076923077,
+          "transition_prob_given_condition_false": 0.5306122448979592,
+          "unconditional_prob": 0.5175438596491229,
+          "z_stat_proportion_diff": -0.24244499156913768,
+          "z_pvalue": 0.8084353757910225,
+          "mean_excess_forward_given_condition_true": 0.00375983347453566,
+          "mean_excess_forward_given_condition_false": -0.009930915819270856,
+          "t_stat_excess_forward_diff": 0.7749496193602948,
+          "t_pvalue": 0.4405692628092791,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 33,
+            "condition_true_outcome_false": 32,
+            "condition_false_outcome_true": 26,
+            "condition_false_outcome_false": 23
+          },
+          "n_total": 114
+        }
+      },
+      "小売": {
+        "1M": {
+          "n_condition_true": 53,
+          "n_condition_false": 65,
+          "transition_prob_given_condition_true": 0.4339622641509434,
+          "transition_prob_given_condition_false": 0.4153846153846154,
+          "unconditional_prob": 0.423728813559322,
+          "z_stat_proportion_diff": 0.203136004486207,
+          "z_pvalue": 0.8390287308377355,
+          "mean_excess_forward_given_condition_true": -0.0036038092386983553,
+          "mean_excess_forward_given_condition_false": -0.007396261090649177,
+          "t_stat_excess_forward_diff": 0.38231606404286306,
+          "t_pvalue": 0.7030635027541409,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 23,
+            "condition_true_outcome_false": 30,
+            "condition_false_outcome_true": 27,
+            "condition_false_outcome_false": 38
+          },
+          "n_total": 118
+        },
+        "3M": {
+          "n_condition_true": 48,
+          "n_condition_false": 66,
+          "transition_prob_given_condition_true": 0.4583333333333333,
+          "transition_prob_given_condition_false": 0.3939393939393939,
+          "unconditional_prob": 0.42105263157894735,
+          "z_stat_proportion_diff": 0.6875391298656526,
+          "z_pvalue": 0.4917430513478367,
+          "mean_excess_forward_given_condition_true": -0.017841648855254463,
+          "mean_excess_forward_given_condition_false": -0.008583684521002744,
+          "t_stat_excess_forward_diff": -0.5545182434511403,
+          "t_pvalue": 0.5804816275308706,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 22,
+            "condition_true_outcome_false": 26,
+            "condition_false_outcome_true": 26,
+            "condition_false_outcome_false": 40
+          },
+          "n_total": 114
+        }
+      },
+      "銀行": {
+        "1M": {
+          "n_condition_true": 46,
+          "n_condition_false": 72,
+          "transition_prob_given_condition_true": 0.34782608695652173,
+          "transition_prob_given_condition_false": 0.4166666666666667,
+          "unconditional_prob": 0.3898305084745763,
+          "z_stat_proportion_diff": -0.7478001062782761,
+          "z_pvalue": 0.4545807380011271,
+          "mean_excess_forward_given_condition_true": -0.013594114754358688,
+          "mean_excess_forward_given_condition_false": -0.005534546944885897,
+          "t_stat_excess_forward_diff": -1.1189193122558627,
+          "t_pvalue": 0.2658672432084924,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 16,
+            "condition_true_outcome_false": 30,
+            "condition_false_outcome_true": 30,
+            "condition_false_outcome_false": 42
+          },
+          "n_total": 118
+        },
+        "3M": {
+          "n_condition_true": 34,
+          "n_condition_false": 80,
+          "transition_prob_given_condition_true": 0.23529411764705882,
+          "transition_prob_given_condition_false": 0.4,
+          "unconditional_prob": 0.3508771929824561,
+          "z_stat_proportion_diff": -1.6857770306711135,
+          "z_pvalue": 0.09183875349063353,
+          "mean_excess_forward_given_condition_true": -0.02897597094459946,
+          "mean_excess_forward_given_condition_false": -0.01963143931257646,
+          "t_stat_excess_forward_diff": -0.7890612932950026,
+          "t_pvalue": 0.4324994163086563,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 8,
+            "condition_true_outcome_false": 26,
+            "condition_false_outcome_true": 32,
+            "condition_false_outcome_false": 48
+          },
+          "n_total": 114
+        }
+      },
+      "金融（除く銀行）": {
+        "1M": {
+          "n_condition_true": 57,
+          "n_condition_false": 61,
+          "transition_prob_given_condition_true": 0.543859649122807,
+          "transition_prob_given_condition_false": 0.47540983606557374,
+          "unconditional_prob": 0.5084745762711864,
+          "z_stat_proportion_diff": 0.7432347268302776,
+          "z_pvalue": 0.45733958209138503,
+          "mean_excess_forward_given_condition_true": 0.030090336534094354,
+          "mean_excess_forward_given_condition_false": 0.003922886254384503,
+          "t_stat_excess_forward_diff": 1.5791962894610823,
+          "t_pvalue": 0.11725984892554306,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 31,
+            "condition_true_outcome_false": 26,
+            "condition_false_outcome_true": 29,
+            "condition_false_outcome_false": 32
+          },
+          "n_total": 118
+        },
+        "3M": {
+          "n_condition_true": 61,
+          "n_condition_false": 53,
+          "transition_prob_given_condition_true": 0.5573770491803278,
+          "transition_prob_given_condition_false": 0.5094339622641509,
+          "unconditional_prob": 0.5350877192982456,
+          "z_stat_proportion_diff": 0.511892090647959,
+          "z_pvalue": 0.6087265339688153,
+          "mean_excess_forward_given_condition_true": 0.05907582603213266,
+          "mean_excess_forward_given_condition_false": 0.026706837451916755,
+          "t_stat_excess_forward_diff": 0.947123953741712,
+          "t_pvalue": 0.3457078866198243,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 34,
+            "condition_true_outcome_false": 27,
+            "condition_false_outcome_true": 27,
+            "condition_false_outcome_false": 26
+          },
+          "n_total": 114
+        }
+      },
+      "不動産": {
+        "1M": {
+          "n_condition_true": 46,
+          "n_condition_false": 72,
+          "transition_prob_given_condition_true": 0.41304347826086957,
+          "transition_prob_given_condition_false": 0.375,
+          "unconditional_prob": 0.3898305084745763,
+          "z_stat_proportion_diff": 0.41325795346957345,
+          "z_pvalue": 0.6794176320560275,
+          "mean_excess_forward_given_condition_true": -0.00937487379121416,
+          "mean_excess_forward_given_condition_false": -0.012211739254761227,
+          "t_stat_excess_forward_diff": 0.30057434371786645,
+          "t_pvalue": 0.7643041042095605,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 19,
+            "condition_true_outcome_false": 27,
+            "condition_false_outcome_true": 27,
+            "condition_false_outcome_false": 45
+          },
+          "n_total": 118
+        },
+        "3M": {
+          "n_condition_true": 43,
+          "n_condition_false": 71,
+          "transition_prob_given_condition_true": 0.4186046511627907,
+          "transition_prob_given_condition_false": 0.38028169014084506,
+          "unconditional_prob": 0.39473684210526316,
+          "z_stat_proportion_diff": 0.40573650418061447,
+          "z_pvalue": 0.6849362173451123,
+          "mean_excess_forward_given_condition_true": -0.011846251808986236,
+          "mean_excess_forward_given_condition_false": -0.038423724107241916,
+          "t_stat_excess_forward_diff": 1.8155171197493092,
+          "t_pvalue": 0.07238037463473047,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 18,
+            "condition_true_outcome_false": 25,
+            "condition_false_outcome_true": 27,
+            "condition_false_outcome_false": 44
+          },
+          "n_total": 114
+        }
+      }
+    },
+    "regime": {
+      "bull": {
+        "1M": {
+          "n_condition_true": 570,
+          "n_condition_false": 722,
+          "transition_prob_given_condition_true": 0.4789473684210526,
+          "transition_prob_given_condition_false": 0.42382271468144045,
+          "unconditional_prob": 0.4481424148606811,
+          "z_stat_proportion_diff": 1.9783317052495175,
+          "z_pvalue": 0.04789129862972219,
+          "mean_excess_forward_given_condition_true": 0.0017574866910041443,
+          "mean_excess_forward_given_condition_false": -0.005636754887270197,
+          "t_stat_excess_forward_diff": 2.620708844314725,
+          "t_pvalue": 0.00889447626760213,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 273,
+            "condition_true_outcome_false": 297,
+            "condition_false_outcome_true": 306,
+            "condition_false_outcome_false": 416
+          },
+          "n_total": 1292
+        },
+        "3M": {
+          "n_condition_true": 534,
+          "n_condition_false": 724,
+          "transition_prob_given_condition_true": 0.41385767790262173,
+          "transition_prob_given_condition_false": 0.44337016574585636,
+          "unconditional_prob": 0.43084260731319557,
+          "z_stat_proportion_diff": -1.0447921452995872,
+          "z_pvalue": 0.29611904595326477,
+          "mean_excess_forward_given_condition_true": -0.005883878252136018,
+          "mean_excess_forward_given_condition_false": -0.0065707475394910795,
+          "t_stat_excess_forward_diff": 0.12096694160134625,
+          "t_pvalue": 0.9037434599141722,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 221,
+            "condition_true_outcome_false": 313,
+            "condition_false_outcome_true": 321,
+            "condition_false_outcome_false": 403
+          },
+          "n_total": 1258
+        }
+      },
+      "bear": {
+        "1M": {
+          "n_condition_true": 350,
+          "n_condition_false": 364,
+          "transition_prob_given_condition_true": 0.46285714285714286,
+          "transition_prob_given_condition_false": 0.46703296703296704,
+          "unconditional_prob": 0.4649859943977591,
+          "z_stat_proportion_diff": -0.11183437136713421,
+          "z_pvalue": 0.9109547340511635,
+          "mean_excess_forward_given_condition_true": -0.0030616649127710393,
+          "mean_excess_forward_given_condition_false": -0.0003799282505231508,
+          "t_stat_excess_forward_diff": -0.7475579109160394,
+          "t_pvalue": 0.454973927330835,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 162,
+            "condition_true_outcome_false": 188,
+            "condition_false_outcome_true": 170,
+            "condition_false_outcome_false": 194
+          },
+          "n_total": 714
+        },
+        "3M": {
+          "n_condition_true": 314,
+          "n_condition_false": 366,
+          "transition_prob_given_condition_true": 0.48089171974522293,
+          "transition_prob_given_condition_false": 0.38524590163934425,
+          "unconditional_prob": 0.4294117647058823,
+          "z_stat_proportion_diff": 2.511993555072024,
+          "z_pvalue": 0.01200512811386778,
+          "mean_excess_forward_given_condition_true": 0.0003998990886391333,
+          "mean_excess_forward_given_condition_false": -0.009311899685213666,
+          "t_stat_excess_forward_diff": 1.558693850161324,
+          "t_pvalue": 0.11956795376822868,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 151,
+            "condition_true_outcome_false": 163,
+            "condition_false_outcome_true": 141,
+            "condition_false_outcome_false": 225
+          },
+          "n_total": 680
+        }
+      }
+    },
+    "subperiod": {
+      "2016-2020": {
+        "1M": {
+          "n_condition_true": 408,
+          "n_condition_false": 476,
+          "transition_prob_given_condition_true": 0.47549019607843135,
+          "transition_prob_given_condition_false": 0.43067226890756305,
+          "unconditional_prob": 0.4513574660633484,
+          "z_stat_proportion_diff": 1.3349166189457116,
+          "z_pvalue": 0.1819036378856067,
+          "mean_excess_forward_given_condition_true": -0.002126181435284809,
+          "mean_excess_forward_given_condition_false": -0.004509100101871591,
+          "t_stat_excess_forward_diff": 0.8426265487251952,
+          "t_pvalue": 0.39966950004348456,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 194,
+            "condition_true_outcome_false": 214,
+            "condition_false_outcome_true": 205,
+            "condition_false_outcome_false": 271
+          },
+          "n_total": 884
+        },
+        "3M": {
+          "n_condition_true": 360,
+          "n_condition_false": 490,
+          "transition_prob_given_condition_true": 0.46111111111111114,
+          "transition_prob_given_condition_false": 0.39591836734693875,
+          "unconditional_prob": 0.4235294117647059,
+          "z_stat_proportion_diff": 1.9006787639093254,
+          "z_pvalue": 0.057344101758292965,
+          "mean_excess_forward_given_condition_true": -0.006606233481554997,
+          "mean_excess_forward_given_condition_false": -0.011839258858641087,
+          "t_stat_excess_forward_diff": 0.9968056736076892,
+          "t_pvalue": 0.31917872757744353,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 166,
+            "condition_true_outcome_false": 194,
+            "condition_false_outcome_true": 194,
+            "condition_false_outcome_false": 296
+          },
+          "n_total": 850
+        }
+      },
+      "2021-2025": {
+        "1M": {
+          "n_condition_true": 475,
+          "n_condition_false": 545,
+          "transition_prob_given_condition_true": 0.4673684210526316,
+          "transition_prob_given_condition_false": 0.46605504587155966,
+          "unconditional_prob": 0.4666666666666667,
+          "z_stat_proportion_diff": 0.04194025056562081,
+          "z_pvalue": 0.9665463293002332,
+          "mean_excess_forward_given_condition_true": 0.0017430973349504787,
+          "mean_excess_forward_given_condition_false": 0.00014904338234945013,
+          "t_stat_excess_forward_diff": 0.485609252801075,
+          "t_pvalue": 0.6273592603771078,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 222,
+            "condition_true_outcome_false": 253,
+            "condition_false_outcome_true": 254,
+            "condition_false_outcome_false": 291
+          },
+          "n_total": 1020
+        },
+        "3M": {
+          "n_condition_true": 454,
+          "n_condition_false": 566,
+          "transition_prob_given_condition_true": 0.43832599118942733,
+          "transition_prob_given_condition_false": 0.4558303886925795,
+          "unconditional_prob": 0.44803921568627453,
+          "z_stat_proportion_diff": -0.558690256656557,
+          "z_pvalue": 0.5763731300475914,
+          "mean_excess_forward_given_condition_true": 0.006241784264237567,
+          "mean_excess_forward_given_condition_false": 0.0004684733670454006,
+          "t_stat_excess_forward_diff": 0.9172964118073057,
+          "t_pvalue": 0.35926596791698057,
+          "confusion_matrix": {
+            "condition_true_outcome_true": 199,
+            "condition_true_outcome_false": 255,
+            "condition_false_outcome_true": 258,
+            "condition_false_outcome_false": 308
+          },
+          "n_total": 1020
+        }
+      }
+    }
+  }
+}
