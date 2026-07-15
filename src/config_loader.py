@@ -44,6 +44,7 @@ class RiskConfig:
     max_hold_days: int
     emergency_exit_pct: float
     rebalance_interval: int
+    reentry_cooldown_days: int = 5   # SELL後の同銘柄再エントリー禁止（営業日）。全SELL理由に適用。
 
 
 @dataclass(frozen=True)
@@ -334,6 +335,7 @@ def load_strategy_config() -> StrategyConfig:
             max_hold_days=int(_require(risk, "max_hold_days")),
             emergency_exit_pct=float(_require(risk, "emergency_exit_pct")),
             rebalance_interval=int(_require(risk, "rebalance_interval")),
+            reentry_cooldown_days=int(risk.get("reentry_cooldown_days", 5)),
         ),
         risk_controls=_parse_risk_controls(risk_controls_raw, data=data),
         live_execution=live_execution,

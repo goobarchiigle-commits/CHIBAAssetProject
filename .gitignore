@@ -13,15 +13,23 @@ build/
 src/.env
 
 # ランタイム・ログ
-runtime/
+# 先頭 / でリポジトリ直下の runtime/ のみに限定する。
+# 無印 runtime/ は src/runtime/・tests/runtime/（ソースコード/テスト）まで
+# 誤って無視してしまうため使用しない（2026-07-08 RCA で発覚・修正）。
+/runtime/
 *.jsonl
 *.log
 
 # データ・バックテスト結果（大容量）
-data/
+# 先頭 / でリポジトリ直下の data/ のみに限定する（src/data/・tests/data/ のソースコードを保護）。
+/data/
 *.pkl
 *.parquet
 *.csv
+
+# 日本株分析データベース（大容量・Single Source of Truth生成物）
+# 先頭 / でリポジトリ直下の database/ のみに限定する（src/database/ のソースコードを保護）。
+/database/
 
 # IDE
 .vscode/

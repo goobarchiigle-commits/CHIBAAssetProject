@@ -1298,3 +1298,243 @@ finalized: False
 --- Data ---
 issues: ['EMPTY_DATA']
 
+
+[CE Evaluation]
+
+time: 2026-07-04T08:43:03.032323
+days: 44
+
+--- Quality ---
+cum_delta: 0.0000
+sign_match: 0.000
+trade_sign: 0.000
+corr: 0.000
+tstat: 0.00
+
+--- Decision ---
+decision: HOLD
+finalized: False
+
+--- Data ---
+issues: ['EMPTY_DATA']
+
+
+[CE Evaluation]
+
+time: 2026-07-05T08:43:03.578320
+days: 44
+
+--- Quality ---
+cum_delta: 0.0000
+sign_match: 0.000
+trade_sign: 0.000
+corr: 0.000
+tstat: 0.00
+
+--- Decision ---
+decision: HOLD
+finalized: False
+
+--- Data ---
+issues: ['EMPTY_DATA']
+
+
+[CE Evaluation]
+
+time: 2026-07-06T08:43:03.042860
+days: 44
+
+--- Quality ---
+cum_delta: 0.0000
+sign_match: 0.000
+trade_sign: 0.000
+corr: 0.000
+tstat: 0.00
+
+--- Decision ---
+decision: HOLD
+finalized: False
+
+--- Data ---
+issues: ['EMPTY_DATA']
+
+
+[CE Evaluation]
+
+time: 2026-07-07T08:43:03.615213
+days: 45
+
+--- Quality ---
+cum_delta: 0.0000
+sign_match: 0.000
+trade_sign: 0.000
+corr: 0.000
+tstat: 0.00
+
+--- Decision ---
+decision: HOLD
+finalized: False
+
+--- Data ---
+issues: ['EMPTY_DATA']
+
+
+[CE Evaluation]
+
+time: 2026-07-08T08:43:03.133432
+days: 46
+
+--- Quality ---
+cum_delta: 0.0000
+sign_match: 0.000
+trade_sign: 0.000
+corr: 0.000
+tstat: 0.00
+
+--- Decision ---
+decision: HOLD
+finalized: False
+
+--- Data ---
+issues: ['EMPTY_DATA']
+
+
+[CE Evaluation]
+
+time: 2026-07-09T08:43:02.900998
+days: 47
+
+--- Quality ---
+cum_delta: 0.0000
+sign_match: 0.000
+trade_sign: 0.000
+corr: 0.000
+tstat: 0.00
+
+--- Decision ---
+decision: HOLD
+finalized: False
+
+--- Data ---
+issues: ['EMPTY_DATA']
+
+
+[CE Evaluation]
+
+time: 2026-07-10T08:43:02.580117
+days: 48
+
+--- Quality ---
+cum_delta: 0.0000
+sign_match: 0.000
+trade_sign: 0.000
+corr: 0.000
+tstat: 0.00
+
+--- Decision ---
+decision: HOLD
+finalized: False
+
+--- Data ---
+issues: ['EMPTY_DATA']
+
+
+[CE Evaluation]
+
+time: 2026-07-11T08:43:02.858945
+days: 48
+
+--- Quality ---
+cum_delta: 0.0000
+sign_match: 0.000
+trade_sign: 0.000
+corr: 0.000
+tstat: 0.00
+
+--- Decision ---
+decision: HOLD
+finalized: False
+
+--- Data ---
+issues: ['EMPTY_DATA']
+
+
+[CE Evaluation]
+
+time: 2026-07-12T15:02:02.830809
+days: 48
+
+--- Quality ---
+cum_delta: 0.0000
+sign_match: 0.000
+trade_sign: 0.000
+corr: 0.000
+tstat: 0.00
+
+--- Decision ---
+decision: HOLD
+finalized: False
+
+--- Data ---
+issues: ['EMPTY_DATA']
+
+
+[CE Evaluation]
+
+time: 2026-07-13T08:43:02.612706
+days: 48
+
+--- Quality ---
+cum_delta: 0.0000
+sign_match: 0.000
+trade_sign: 0.000
+corr: 0.000
+tstat: 0.00
+
+--- Decision ---
+decision: HOLD
+finalized: False
+
+--- Data ---
+issues: ['EMPTY_DATA']
+
+
+[CE Evaluation]
+
+time: 2026-07-14T08:43:02.649966
+days: 48
+
+--- Quality ---
+cum_delta: 0.0000
+sign_match: 0.000
+trade_sign: 0.000
+corr: 0.000
+tstat: 0.00
+
+--- Decision ---
+decision: HOLD
+finalized: False
+
+--- Data ---
+issues: ['EMPTY_DATA']
+
+
+[CE Evaluation]
+
+time: 2026-07-15T08:43:07.220547
+days: 48
+
+--- Quality ---
+cum_delta: 0.0000
+sign_match: 0.000
+trade_sign: 0.000
+corr: 0.000
+tstat: 0.00
+
+--- Decision ---
+decision: HOLD
+finalized: False
+
+--- Data ---
+issues: ['EMPTY_DATA']
+

@@ -122,8 +122,6 @@ def _submit_single_order(client, order: dict, front_order_type: int) -> dict:
     # otherwise fall back to the real-time calculation
     fot = int(order.get("front_order_type", front_order_type))
 
-    side_code = Side.BUY if side_str in ("BUY", "SHADOW_BUY") else Side.SELL
-
     base_result = {
         "symbol":          order.get("symbol", symbol_4digit),
         "symbol_4digit":   symbol_4digit,
@@ -134,7 +132,29 @@ def _submit_single_order(client, order: dict, front_order_type: int) -> dict:
         "order_id":        None,
         "result_code":     None,
         "error":           None,
+        # SAFETY FIX (entry-metadata-loss follow-up): forward through whatever
+        # the parent already put into the input `order` dict (serialize_order()
+        # includes estimated_price/strategy_type). This is defense-in-depth —
+        # the parent (_submit_orders_process_isolated) also restores these
+        # directly from its own order objects, which is the authoritative fix.
+        "estimated_price": float(order.get("estimated_price", 0.0)),
+        "strategy_type":   order.get("strategy_type", ""),
     }
+
+    # SAFETY FIX (2026-07-07 incident): this is the actual broker-facing
+    # order path (process-isolated live execution). It previously mapped
+    # side="SHADOW_BUY" (meant to be observation_only) to Side.BUY, which is
+    # exactly what sent the unauthorized 5301.T order to kabu API. Only
+    # "BUY"/"SELL" are ever sent; anything else fails closed with no API call.
+    if side_str == "BUY":
+        side_code = Side.BUY
+    elif side_str == "SELL":
+        side_code = Side.SELL
+    else:
+        base_result["error"] = f"rejected_unknown_side: {side_str}"
+        logger.error("[ORDER_SIDE_GUARD] unknown side=%s symbol=%s → 発注スキップ（fail-closed）",
+                     side_str, symbol_4digit)
+        return base_result
 
     try:
         result = client.send_order(

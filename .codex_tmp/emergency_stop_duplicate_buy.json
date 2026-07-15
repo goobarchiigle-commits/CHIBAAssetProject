@@ -1,12 +1,12 @@
 {
-  "date": "2026-07-03",
+  "date": "2026-07-09",
   "orders": {
-    "2026-07-03_7203.T_BUY": {
+    "2026-07-09_7203.T_BUY": {
       "symbol": "7203.T",
       "side": "BUY",
       "qty": 100,
       "price": 0.0,
-      "recorded_at": "2026-07-03",
+      "recorded_at": "2026-07-09",
       "execution_status": "pending"
     }
   },

@@ -90,6 +90,10 @@ class OpportunityCapture:
     weekly_candidates_executed: int
     weekly_candidates_signaled: int
     insufficiency_markers: List[str] = field(default_factory=list)
+    # 2026-07-08 Opportunity Capture 完全稼働化: skipped_opportunities.jsonl
+    # (enrichment済み)から実測するforward_return。Noneはenrichment未到達。
+    mean_forward_return_5d: Optional[float] = None
+    n_enriched_skipped: int = 0
 
 
 @dataclass
@@ -371,37 +375,74 @@ def analyze_opportunity_capture(
     week_end: date,
     window_days: int = 30,
 ) -> OpportunityCapture:
+    """
+    2026-07-08 修正: 従来 signals_blocked_rsr/signals_blocked_breakout/
+    buy_candidates というキーで logs/diagnostics/metrics.jsonl を読んでいたが、
+    実際に書き込まれているキーは blocked_by_rsr/blocked_by_breakout/
+    raw_buy_count であり、常に .get(key, 0)==0 となって capture_ratio 等が
+    無意味な値になっていた（実測: metrics.jsonl の実キー一覧で確認済み）。
+    また skipped（skipped_opportunities.jsonl, enrichment済みなら
+    forward_return_5d/estimated_missed_pnl を保持）を使った
+    missed_alpha_score / forward_return の計算パスがそもそも存在しなかった
+    （"if not skipped" のフォールバックのみでelse節が無かった）。両方を修正。
+    """
     window_end = week_end
     window_start = window_end - timedelta(days=window_days)
     recent = _filter_to_window(metrics, window_start, window_end)
     insufficiency: List[str] = []
 
-    rsr_blocked = sum(r.get("signals_blocked_rsr", 0) for r in recent)
-    bp_blocked = sum(r.get("signals_blocked_breakout", 0) for r in recent)
-    candidates_exec = sum(r.get("candidate_count", 0) for r in recent)
-    candidates_sig = sum(r.get("buy_candidates", 0) for r in recent)
-
+    # blocked_by_rsr/blocked_by_breakout はユニバース全体（42銘柄前後）に対する
+    # RSR/ブレイクアウト screening 段階のブロック件数、candidate_count は
+    # その screening を通過した最終BUY候補数（実測: blocked_by_rsr mean=36.6,
+    # candidate_count mean=0.05 — 桁が全く異なり別集団であることを確認済み）。
+    # raw_buy_count は既にscreening通過後の "signal==1" 件数なので二重計上しない。
+    rsr_blocked = sum(r.get("blocked_by_rsr", 0) for r in recent)
+    bp_blocked = sum(r.get("blocked_by_breakout", 0) for r in recent)
+    candidates_sig = sum(r.get("candidate_count", 0) for r in recent)
+    candidates_exec = candidates_sig
     total_signaled = candidates_sig + rsr_blocked + bp_blocked
+
     capture_ratio: Optional[float] = None
     fnr: Optional[float] = None
     missed_alpha: Optional[float] = None
+    mean_fwd5d: Optional[float] = None
 
     if total_signaled > 0:
         capture_ratio = candidates_exec / total_signaled
         fnr = (rsr_blocked + bp_blocked) / total_signaled
 
-    if not skipped:
+    skip_dist: Dict[str, int] = {
+        "rsr_filter": rsr_blocked,
+        "breakout_filter": bp_blocked,
+    }
+
+    enriched = [
+        r for r in skipped
+        if r.get("enrichment_status") == "enriched" and r.get("forward_return_5d") is not None
+    ]
+    # skipped の rejection_reason 分布も反映する（rsr/breakout以外の実原因も見える化）
+    for r in skipped:
+        reason = r.get("rejection_reason") or "unknown"
+        skip_dist[reason] = skip_dist.get(reason, 0) + 1
+
+    if enriched:
+        fwd5d_vals = [float(r["forward_return_5d"]) for r in enriched]
+        mean_fwd5d = round(sum(fwd5d_vals) / len(fwd5d_vals), 6)
+        # missed_alpha_score: 実測forward_returnベース（0-1に丸める。
+        # 平均forward_return_5dが大きいほど「見送った機会の質」が高かったことを示す）。
+        missed_alpha = round(max(0.0, min(1.0, mean_fwd5d * 10)), 4)
+    elif skipped:
+        insufficiency.append(
+            "skipped_opportunities.jsonl はあるが enrichment 未完了"
+            "（forward_return_5d が pending） — missed_alpha_score は次回enrichmentサイクル後に確定"
+        )
+    else:
         insufficiency.append(
             "skipped_opportunities.jsonl missing — forward return attribution unavailable; "
             "missed_alpha_score estimated from RSR/breakout block counts only"
         )
         if rsr_blocked + bp_blocked > 0 and candidates_exec >= 0:
             missed_alpha = min(1.0, (rsr_blocked + bp_blocked) / max(candidates_exec, 1) * 0.05)
-
-    skip_dist: Dict[str, int] = {
-        "rsr_filter": rsr_blocked,
-        "breakout_filter": bp_blocked,
-    }
 
     return OpportunityCapture(
         available=len(recent) > 0,
@@ -414,6 +455,8 @@ def analyze_opportunity_capture(
         weekly_candidates_executed=candidates_exec,
         weekly_candidates_signaled=candidates_sig,
         insufficiency_markers=insufficiency,
+        mean_forward_return_5d=mean_fwd5d,
+        n_enriched_skipped=len(enriched),
     )
 
 
@@ -718,8 +761,12 @@ def analyze_capital_efficiency(
     slot_7 = (_mean_field(recent_7, "positions") / MAX_POSITIONS) if recent_7 else 0.0
     slot_30 = (_mean_field(recent_30, "positions") / MAX_POSITIONS) if recent_30 else 0.0
     peak_pos = max(pos_30) if pos_30 else 0
-    rsr_blocked = sum(r.get("signals_blocked_rsr", 0) for r in recent_30)
-    bp_blocked = sum(r.get("signals_blocked_breakout", 0) for r in recent_30)
+    # 2026-07-08 修正: signals_blocked_rsr/signals_blocked_breakout は
+    # logs/diagnostics/metrics.jsonl の実キーと不一致（実キーは blocked_by_rsr/
+    # blocked_by_breakout — signal_bridge.py の書き込み側で確認済み）。
+    # 常に0扱いになりtotal_rsr_blocked_30d等が機能していなかった。
+    rsr_blocked = sum(r.get("blocked_by_rsr", 0) for r in recent_30)
+    bp_blocked = sum(r.get("blocked_by_breakout", 0) for r in recent_30)
 
     # Capital fragmentation: high cash + many blocked signals = capital is the constraint
     idle_cash = cash_30
@@ -1207,7 +1254,8 @@ def _generate_charts(
     if metrics:
         m_sorted = sorted(metrics, key=lambda r: r.get("date", ""))
         dates = [datetime.strptime(r["date"][:10], "%Y-%m-%d") for r in m_sorted if "date" in r]
-        rsr_bl = [r.get("signals_blocked_rsr", 0) for r in m_sorted if "date" in r]
+        # 2026-07-08 修正: signals_blocked_rsr → blocked_by_rsr（実キー名）
+        rsr_bl = [r.get("blocked_by_rsr", 0) for r in m_sorted if "date" in r]
         cands = [r.get("candidate_count", 0) for r in m_sorted if "date" in r]
         if len(dates) >= 2:
             fig, ax = plt.subplots(figsize=(10, 3))
@@ -1305,6 +1353,8 @@ def generate_markdown(report: WeeklyIntelligenceReport) -> str:
     a(f"- 機会捕捉率 (capture_ratio): {_fmt_opt(opp.opportunity_capture_ratio, '.3f')}")
     a(f"- 偽陰性率 (false_negative_rate): {_fmt_opt(opp.false_negative_rate, '.3f')}")
     a(f"- ミスアルファスコア (missed_alpha_score): {_fmt_opt(opp.missed_alpha_score, '.4f')}")
+    a(f"- 平均forward_return_5d (enriched skipped, n={opp.n_enriched_skipped}): "
+      f"{_fmt_opt(opp.mean_forward_return_5d, '.4f')}")
     a(f"- 30日間 RSRフィルターブロック: {opp.weekly_rsr_blocked}件")
     a(f"- 30日間 ブレイクアウトフィルターブロック: {opp.weekly_breakout_blocked}件")
     a(f"- 30日間 実行シグナル数: {opp.weekly_candidates_executed}件")

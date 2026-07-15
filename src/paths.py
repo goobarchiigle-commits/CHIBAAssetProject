@@ -622,6 +622,33 @@ def ensure_jquants_dirs() -> None:
         path.mkdir(parents=True, exist_ok=True)
 
 
+# ── 日本株分析データベース（database/market・Single Source of Truth） ────────
+# data/（バックテスト生成物）・cache/（売買システム専用）・data/jquants/（取り込みLegacy）とは
+# 完全独立。将来のセクター/ETF/RS/ファクター/ML分析はこの配下のみを参照する（src/database/参照）。
+DATABASE_MARKET_DIR:       Path = BASE_DIR / "database" / "market"
+DATABASE_OHLCV_DIR:        Path = DATABASE_MARKET_DIR / "ohlcv"
+DATABASE_MASTER_DIR:       Path = DATABASE_MARKET_DIR / "master"
+DATABASE_FUNDAMENTALS_DIR: Path = DATABASE_MARKET_DIR / "fundamentals"
+DATABASE_ETF_DIR:          Path = DATABASE_MARKET_DIR / "etf"
+DATABASE_INDEX_DIR:        Path = DATABASE_MARKET_DIR / "index"
+DATABASE_FACTOR_DIR:       Path = DATABASE_MARKET_DIR / "factor"
+DATABASE_MACRO_DIR:        Path = DATABASE_MARKET_DIR / "macro"
+DATABASE_MARGIN_DIR:       Path = DATABASE_MARKET_DIR / "margin"
+DATABASE_SHORTSELLING_DIR: Path = DATABASE_MARKET_DIR / "shortselling"
+DATABASE_METADATA_DIR:     Path = DATABASE_MARKET_DIR / "metadata"
+DATABASE_CACHE_DIR:        Path = DATABASE_MARKET_DIR / "cache"
+
+
+def ensure_database_market_dirs() -> None:
+    """database/market/ 配下の標準ディレクトリ群を事前作成する。"""
+    for path in (
+        DATABASE_OHLCV_DIR, DATABASE_MASTER_DIR, DATABASE_FUNDAMENTALS_DIR, DATABASE_ETF_DIR,
+        DATABASE_INDEX_DIR, DATABASE_FACTOR_DIR, DATABASE_MACRO_DIR, DATABASE_MARGIN_DIR,
+        DATABASE_SHORTSELLING_DIR, DATABASE_METADATA_DIR, DATABASE_CACHE_DIR,
+    ):
+        path.mkdir(parents=True, exist_ok=True)
+
+
 # ── Study75/76 research pipeline ─────────────────────────────────────────────
 # Study75 完了後に生成される規則ユニバース（月次再適用・survivorship-free）ファイル。
 # スキーマ: {"monthly_universe": {"YYYY-MM-DD": ["1301.T", ...], ...}, "meta": {...}}

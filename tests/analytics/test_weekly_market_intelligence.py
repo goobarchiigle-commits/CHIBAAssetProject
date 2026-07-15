@@ -96,6 +96,13 @@ def _make_metric(date_str="2026-05-12", cash_ratio=0.7, exposure=0.3,
         "signals_blocked_breakout": signals_blocked_breakout,
         "buy_candidates": buy_candidates,
         "universe_size": 42,
+        # 実際に logs/diagnostics/metrics.jsonl に書き込まれるキー名
+        # （2026-07-08 Opportunity Capture修正で analyze_opportunity_capture()
+        #  が参照するようになった。signals_blocked_rsr等は他関数
+        #  analyze_capital_efficiency 用に残す — 別の既知の未修正ギャップ）。
+        "blocked_by_rsr": signals_blocked_rsr,
+        "blocked_by_breakout": signals_blocked_breakout,
+        "raw_buy_count": buy_candidates + signals_blocked_rsr + signals_blocked_breakout,
     }
 
 

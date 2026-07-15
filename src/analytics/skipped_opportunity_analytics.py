@@ -41,7 +41,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Sequence
 
 logger = logging.getLogger(__name__)
-SCHEMA_VERSION: int = 1
+SCHEMA_VERSION: int = 2
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Rejection reasons
@@ -57,6 +57,33 @@ REJECTION_TRUTH_CONFIDENCE        = "truth_confidence"
 REJECTION_RATE_LIMIT              = "rate_limit"
 REJECTION_DUPLICATE               = "duplicate"
 REJECTION_EPOCH_BLOCKED           = "epoch_blocked"
+# SCHEMA_VERSION 2 (2026-07-08 Opportunity Capture integrity fix): the only
+# writer of this file was the Phase5A exposure-aware-sizing block in
+# run_live_signal.py, reachable ONLY in LIVE mode AND only for candidates
+# that already survived SignalBridge._build_orders() in full. The dominant
+# real-world rejection causes (position capacity, allocation cap inside
+# _build_orders(), sector concentration, pre_trade_risk_check, top_k ranking
+# cutoff) never reached this writer at all, which is why
+# runtime/analytics/skipped_opportunities.jsonl never got created. These
+# reasons mirror src.analytics.executed_vs_skipped_expectancy.SKIP_* so both
+# stores describe the same underlying stage_audit taxonomy.
+REJECTION_POSITION_FULL           = "position_full"
+REJECTION_RANKING_CUTOFF          = "ranking_cutoff"
+REJECTION_SIZING_ZERO             = "sizing_zero_qty"
+REJECTION_RISK_CHECK              = "risk_check_reject"
+REJECTION_DAILY_LIMIT             = "daily_new_buy_limit"
+
+# stage (src.analytics.live_stage_audit の stage名) → REJECTION_* taxonomy。
+STAGE_TO_REJECTION_REASON: Dict[str, str] = {
+    "RANKING":              REJECTION_RANKING_CUTOFF,
+    "CAPACITY":             REJECTION_POSITION_FULL,
+    "DAILY_LIMIT":          REJECTION_DAILY_LIMIT,
+    "CAPITAL":              REJECTION_HIGH_PRICE,
+    "SIZING":               REJECTION_SIZING_ZERO,
+    "SECTOR_CONCENTRATION": REJECTION_SECTOR_SUPPRESSION,
+    "RISK":                 REJECTION_RISK_CHECK,
+    "ORDER_SEND_FAILED":    REJECTION_RATE_LIMIT,  # send-time failure; closest existing bucket
+}
 
 ENRICHMENT_PENDING  = "pending"
 ENRICHMENT_ENRICHED = "enriched"
@@ -109,6 +136,12 @@ class SkippedOpportunityRecord:
     estimated_missed_pnl: Optional[float] = None      # intended_size × price × hypothetical_return
     enrichment_status: str = ENRICHMENT_PENDING
     schema_version: int = SCHEMA_VERSION
+    # SCHEMA_VERSION 2 fields — shared run_id/mode/source_script with
+    # executed_vs_skipped_expectancy.TradeOpportunityRecord and
+    # live_stage_audit so all three stores line up on the same run.
+    mode: str = "unknown"          # "DRY" | "LIVE"
+    final_stage: str = ""          # stage name from live_stage_audit
+    source_script: str = ""        # "run_live_signal.py" | "run_morning_signal.py"
 
     @staticmethod
     def create(
@@ -125,6 +158,9 @@ class SkippedOpportunityRecord:
         sector_state: str,
         concentration_state: float,
         price_at_signal: float,
+        mode: str = "unknown",
+        final_stage: str = "",
+        source_script: str = "",
     ) -> "SkippedOpportunityRecord":
         record_id = _sha256(_canonical_json({
             "rejection_reason": rejection_reason,
@@ -147,7 +183,82 @@ class SkippedOpportunityRecord:
             sector_state=sector_state,
             concentration_state=concentration_state,
             price_at_signal=price_at_signal,
+            mode=mode,
+            final_stage=final_stage,
+            source_script=source_script,
         )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 1b. build_skipped_opportunity_records — the ONE correct way to build these
+# ─────────────────────────────────────────────────────────────────────────────
+# SCHEMA_VERSION 2 (2026-07-08 Opportunity Capture integrity fix). Derives
+# SkippedOpportunityRecord for EVERY skipped BUY candidate — not just the
+# narrow Phase5A exposure-layer subset the old sole call site covered.
+# Uses the SAME (signals, stage_audit, run_id, run_timestamp, mode,
+# source_script) inputs as
+# executed_vs_skipped_expectancy.build_opportunity_records(), so both stores
+# — plus src.analytics.live_stage_audit — describe the identical run and can
+# be joined on run_id (Phase3 requirement).
+
+def build_skipped_opportunity_records(
+    signals: List[dict],
+    stage_audit: List[dict],
+    send_results: List[dict],
+    run_id: str,
+    run_timestamp: str,
+    mode: str,
+    source_script: str,
+    available_cash: float,
+    strategy_id: str = "fujiko_v2",
+) -> List["SkippedOpportunityRecord"]:
+    from src.analytics.executed_vs_skipped_expectancy import build_opportunity_records
+
+    opp_records = build_opportunity_records(
+        signals=signals,
+        stage_audit=stage_audit,
+        send_results=send_results,
+        run_id=run_id,
+        run_timestamp=run_timestamp,
+        mode=mode,
+        source_script=source_script,
+        capital_available_pct=0.0,
+        portfolio_heat=0.0,
+        market_regime="unknown",
+        max_positions=3,
+    )
+    # StockSignal dicts don't carry price/qty directly; recover them from the
+    # matching signal entry (entry_price is 0 for non-held candidates in this
+    # codebase's schema, so use distance_25ma_pct-adjacent fields where
+    # present; otherwise leave 0 — never fabricate a price).
+    sig_by_symbol = {str(s.get("symbol", "")): s for s in signals}
+
+    records: List[SkippedOpportunityRecord] = []
+    for opp in opp_records:
+        if opp.executed:
+            continue
+        sig = sig_by_symbol.get(opp.symbol, {})
+        rejection_reason = STAGE_TO_REJECTION_REASON.get(opp.final_stage, REJECTION_STALE_SIGNAL)
+        rec = SkippedOpportunityRecord.create(
+            run_id=run_id,
+            timestamp=run_timestamp,
+            symbol=opp.symbol,
+            strategy_id=strategy_id,
+            signal_strength=opp.entry_score * 100.0,
+            predicted_rank=opp.rs_rank,
+            rejection_reason=rejection_reason,
+            available_cash=available_cash,
+            alloc_cap=0,
+            intended_position_size=0,
+            sector_state=opp.sector,
+            concentration_state=0.0,
+            price_at_signal=float(sig.get("entry_price") or 0.0),
+            mode=mode,
+            final_stage=opp.final_stage,
+            source_script=source_script,
+        )
+        records.append(rec)
+    return records
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -272,6 +383,58 @@ def deduplicate_records(
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Enrichment pipeline entry point (2026-07-08 Opportunity Capture fix)
+# ─────────────────────────────────────────────────────────────────────────────
+# enrich_forward_returns() above is a pure function and was never actually
+# invoked anywhere in the live pipeline (confirmed by grep — same class of
+# gap as executed_vs_skipped_expectancy's own enrichment, and the reason
+# every record ever written stayed enrichment_status="pending" forever, and
+# analyze_opportunity_capture() could never compute missed_alpha_score /
+# forward_return from real data). This wraps load → enrich → atomic rewrite
+# into one call so run_live_signal.py / run_morning_signal.py only need a
+# price_fetcher callback (usually backed by the OHLCV parquet cache).
+
+def enrich_and_rewrite_store(
+    path: Path,
+    price_fetcher,  # Callable[[str, str], Optional[List[float]]] — symbol, iso_date -> [t0..t+5] closes
+    now_ts: Optional[str] = None,
+) -> int:
+    """
+    Loads all records, enriches pending ones via price_fetcher, deduplicates
+    (preferring enriched), and atomically rewrites the store.
+    Returns the number of records newly enriched this call. Never raises.
+    """
+    try:
+        records = load_skipped_opportunities(path)
+        if not records:
+            return 0
+        price_history: Dict[str, List[float]] = {}
+        for rec in records:
+            if rec.enrichment_status != ENRICHMENT_PENDING or rec.symbol in price_history:
+                continue
+            prices = price_fetcher(rec.symbol, rec.timestamp[:10])
+            if prices:
+                price_history[rec.symbol] = prices
+
+        enriched = enrich_forward_returns(records, price_history, now_ts=now_ts)
+        final = deduplicate_records(enriched)
+
+        tmp = path.with_suffix(".tmp")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with tmp.open("w", encoding="utf-8") as f:
+            for rec in final:
+                f.write(json.dumps(asdict(rec), ensure_ascii=False, sort_keys=True) + "\n")
+        tmp.replace(path)
+
+        before_ids = {r.record_id for r in records if r.enrichment_status == ENRICHMENT_ENRICHED}
+        after_ids = {r.record_id for r in final if r.enrichment_status == ENRICHMENT_ENRICHED}
+        return len(after_ids - before_ids)
+    except Exception as exc:
+        logger.warning("[SKIPPED_OPP] enrich_and_rewrite_store failed (%s) — analytics continues", exc)
+        return 0
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Persistence
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -321,6 +484,9 @@ def load_skipped_opportunities(path: Path) -> List[SkippedOpportunityRecord]:
                 estimated_missed_pnl=_opt_float(d.get("estimated_missed_pnl")),
                 enrichment_status=d.get("enrichment_status", ENRICHMENT_PENDING),
                 schema_version=int(d.get("schema_version", SCHEMA_VERSION)),
+                mode=d.get("mode", "unknown"),
+                final_stage=d.get("final_stage", ""),
+                source_script=d.get("source_script", ""),
             ))
         except Exception as exc:
             logger.warning("[SKIPPED_OPP] parse error: %s", exc)

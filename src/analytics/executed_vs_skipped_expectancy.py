@@ -34,7 +34,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
-SCHEMA_VERSION: int = 1
+SCHEMA_VERSION: int = 2
 
 # ── ATR buckets ───────────────────────────────────────────────────────────────
 ATR_BUCKETS: List[Tuple[str, float, float]] = [
@@ -62,6 +62,10 @@ SKIP_DUPLICATE_SIGNAL     = "duplicate_signal"
 SKIP_COOLDOWN             = "cooldown"
 SKIP_EXECUTION_FAILURE    = "execution_failure"
 SKIP_MANUAL_OVERRIDE      = "manual_override"
+SKIP_POSITION_FULL        = "position_full"        # SCHEMA_VERSION 2
+SKIP_RANKING_CUTOFF       = "ranking_cutoff"        # SCHEMA_VERSION 2 (below top_k)
+SKIP_SIZING_ZERO          = "sizing_zero_qty"       # SCHEMA_VERSION 2
+SKIP_RISK_CHECK           = "risk_check_reject"     # SCHEMA_VERSION 2 (symbol/sector/cluster cap)
 SKIP_UNKNOWN              = "unknown"
 
 ALL_SKIP_REASONS = (
@@ -75,8 +79,27 @@ ALL_SKIP_REASONS = (
     SKIP_COOLDOWN,
     SKIP_EXECUTION_FAILURE,
     SKIP_MANUAL_OVERRIDE,
+    SKIP_POSITION_FULL,
+    SKIP_RANKING_CUTOFF,
+    SKIP_SIZING_ZERO,
+    SKIP_RISK_CHECK,
     SKIP_UNKNOWN,
 )
+
+# stage (src.analytics.live_stage_audit の stage名) → canonical skip_reason。
+# 2026-06-29 RCA follow-up: 従来の capital_available_pct 二値ヒューリスティック
+# ("capital_constraint" else "slot_full") を廃止し、_build_orders() の
+# audit_sink が実際に記録した stage から一意に決定する（推測ゼロ）。
+STAGE_TO_SKIP_REASON: dict[str, str] = {
+    "RANKING":              SKIP_RANKING_CUTOFF,
+    "CAPACITY":              SKIP_POSITION_FULL,
+    "DAILY_LIMIT":           SKIP_COOLDOWN,
+    "CAPITAL":               SKIP_CAPITAL_CONSTRAINT,
+    "SIZING":                SKIP_SIZING_ZERO,
+    "SECTOR_CONCENTRATION":  SKIP_SECTOR_EXPOSURE,
+    "RISK":                  SKIP_RISK_CHECK,   # symbol/sector/cluster cap — pre_trade_risk_check
+    "ORDER_SEND_FAILED":     SKIP_EXECUTION_FAILURE,
+}
 
 
 def _sha256(payload: str) -> str:
@@ -119,8 +142,15 @@ class TradeOpportunityRecord:
     """
     Immutable record for a single evaluated trade opportunity (executed or skipped).
     Written once at evaluation time; forward returns populated by enrichment.
+
+    SCHEMA_VERSION 2 (2026-07-08 EVS integrity fix): added run_id/run_timestamp/
+    mode/final_stage/client_order_id/source_script. opportunity_id now includes
+    run_id so the SAME (date, symbol, executed, skip_reason) tuple from two
+    DIFFERENT runs the same day is never silently collapsed into one record —
+    eval_date alone could not distinguish "skipped in the 08:41 run, bought in
+    the 08:44 run" from a genuine single-run outcome (2026-06-23 2802.T incident).
     """
-    opportunity_id: str          # sha256 dedup key
+    opportunity_id: str          # sha256 dedup key (includes run_id — see above)
     schema_version: int
     eval_date: str               # YYYY-MM-DD
     symbol: str
@@ -140,6 +170,15 @@ class TradeOpportunityRecord:
     forward_5d_return: Optional[float] = None
     forward_20d_return: Optional[float] = None
     enrichment_status: str = "pending"
+    # SCHEMA_VERSION 2 fields (default "" for backward compat with v1 records)
+    run_id: str = ""              # run_id shared with order_lock/journal/inflight registry
+    run_timestamp: str = ""       # ISO8601, when this evaluation actually happened
+    mode: str = "unknown"         # "DRY" | "LIVE"
+    final_stage: str = ""         # authoritative stage from live_stage_audit
+                                   # (CAPACITY/CAPITAL/SIZING/SECTOR_CONCENTRATION/
+                                   #  RISK/RANKING/ORDER_BUILT/ORDER_SENT/ORDER_FAILED)
+    client_order_id: str = ""     # populated when a real order was actually submitted
+    source_script: str = ""       # "run_live_signal.py" | "run_morning_signal.py"
 
     @staticmethod
     def create(
@@ -160,12 +199,22 @@ class TradeOpportunityRecord:
         forward_5d_return: Optional[float] = None,
         forward_20d_return: Optional[float] = None,
         enrichment_status: str = "pending",
+        run_id: str = "",
+        run_timestamp: str = "",
+        mode: str = "unknown",
+        final_stage: str = "",
+        client_order_id: str = "",
+        source_script: str = "",
     ) -> "TradeOpportunityRecord":
+        # run_id を含めることで「同日複数run」で同じ(symbol,executed,skip_reason)に
+        # なった別イベントが同一opportunity_idへ収束してしまう事故を防ぐ
+        # （2026-06-23 2802.T: 08:41 skip / 08:44 別symbol群 が本来別イベント）。
         opp_id = _sha256(_canonical_json({
             "eval_date": eval_date,
             "executed": executed,
             "skip_reason": skip_reason,
             "symbol": symbol,
+            "run_id": run_id,
         }))
         return TradeOpportunityRecord(
             opportunity_id=opp_id,
@@ -187,6 +236,12 @@ class TradeOpportunityRecord:
             forward_5d_return=forward_5d_return,
             forward_20d_return=forward_20d_return,
             enrichment_status=enrichment_status,
+            run_id=run_id,
+            run_timestamp=run_timestamp,
+            mode=mode,
+            final_stage=final_stage,
+            client_order_id=client_order_id,
+            source_script=source_script,
         )
 
     def to_dict(self) -> dict:
@@ -214,7 +269,112 @@ class TradeOpportunityRecord:
             forward_5d_return=_opt_float(d.get("forward_5d_return")),
             forward_20d_return=_opt_float(d.get("forward_20d_return")),
             enrichment_status=d.get("enrichment_status", "pending"),
+            run_id=d.get("run_id", ""),
+            run_timestamp=d.get("run_timestamp", ""),
+            mode=d.get("mode", "unknown"),
+            final_stage=d.get("final_stage", ""),
+            client_order_id=d.get("client_order_id", ""),
+            source_script=d.get("source_script", ""),
         )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 1b. build_opportunity_records — the ONE correct way to build EVS records
+# ─────────────────────────────────────────────────────────────────────────────
+# SCHEMA_VERSION 2 (2026-07-08 EVS integrity fix). Replaces the old per-script
+# inline hooks that (a) determined "executed" from the pre-send candidate list
+# (result.orders) instead of actual send_results, (b) classified skip_reason
+# with a 2-bucket capital-only heuristic that mislabeled almost everything
+# "slot_full" regardless of true cause, and (c) had no run_id, so multiple
+# runs per day could not be told apart (2026-06-23 2802.T: recorded skipped
+# in an 08:41 run, then actually bought in a later run the same day — the
+# aggregate store made this look like "never executed").
+#
+# Both src/run_live_signal.py and src/run_morning_signal.py MUST call this
+# single function so that any BUY placed by either entry point is captured
+# identically (src/run_morning_signal.py previously had no EVS hook at all).
+
+def build_opportunity_records(
+    signals: List[dict],
+    stage_audit: List[dict],
+    send_results: List[dict],
+    run_id: str,
+    run_timestamp: str,
+    mode: str,
+    source_script: str,
+    capital_available_pct: float,
+    portfolio_heat: float,
+    market_regime: str,
+    max_positions: int,
+) -> List["TradeOpportunityRecord"]:
+    """
+    signals:      result.signals（dict形式）
+    stage_audit:  SignalBridge._last_stage_audit（_build_orders()のaudit_sink +
+                  RANKING段のtop_kカットオフ記録。symbolごとに複数stageの
+                  順序付きPASS/FAILリストになっている）
+    send_results: 実際のBroker送信結果（DRYモードでは常に[]）
+    mode:         "DRY" | "LIVE"
+    """
+    executed_syms = {
+        str(r.get("symbol", "")) for r in send_results
+        if str(r.get("side", "")).upper() == "BUY" and r.get("success")
+    }
+
+    # symbolごとに stage を評価順で保持し、最初に passed=False になった
+    # stageを「真の原因」として採用する（それ以降のstageは未到達のため無関係）。
+    stages_by_symbol: Dict[str, List[dict]] = {}
+    for dec in stage_audit:
+        stages_by_symbol.setdefault(dec.get("symbol", ""), []).append(dec)
+
+    def _final_stage_and_reason(symbol: str) -> Tuple[str, str]:
+        for dec in stages_by_symbol.get(symbol, []):
+            if not dec.get("passed", True):
+                stage = dec.get("stage", "")
+                return stage, STAGE_TO_SKIP_REASON.get(stage, SKIP_UNKNOWN)
+        if stages_by_symbol.get(symbol):
+            return "ORDER_BUILT", SKIP_UNKNOWN  # 全stage通過したが未送信(異常系)
+        return "UNTRACKED", SKIP_UNKNOWN  # stage_auditに記録が無い（要調査対象）
+
+    n_held = sum(1 for s in signals if s.get("currently_holding"))
+    slot_utilization = n_held / max(1, max_positions)
+
+    buy_sigs = [
+        s for s in signals
+        if s.get("signal") == 1 and not s.get("currently_holding")
+    ]
+
+    records: List[TradeOpportunityRecord] = []
+    for s in buy_sigs:
+        sym = str(s.get("symbol", ""))
+        executed = mode == "LIVE" and sym in executed_syms
+        if executed:
+            final_stage, skip_reason = "ORDER_SENT", None
+        else:
+            final_stage, skip_reason = _final_stage_and_reason(sym)
+
+        rec = TradeOpportunityRecord.create(
+            eval_date=run_timestamp[:10] if run_timestamp else "",
+            symbol=sym,
+            executed=executed,
+            skip_reason=skip_reason,
+            capital_available_pct=capital_available_pct,
+            portfolio_heat=portfolio_heat,
+            slot_utilization=slot_utilization,
+            sector=str(s.get("sector") or "不明"),
+            market_regime=market_regime,
+            atr_pct=float(s.get("atr_pct") or 0.02),
+            rs_rank=int(s.get("rsr_rank") or 50),
+            entry_score=float(s.get("rsr") or 50) / 100.0,
+            liquidity_score=0.5,
+            position_lifecycle_available=False,
+            run_id=run_id,
+            run_timestamp=run_timestamp,
+            mode=mode,
+            final_stage=final_stage,
+            source_script=source_script,
+        )
+        records.append(rec)
+    return records
 
 
 # ─────────────────────────────────────────────────────────────────────────────

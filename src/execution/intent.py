@@ -77,7 +77,7 @@ class ExecutionIntent:
     run_id:               str
     signal_ts:            str
     symbol:               str
-    side:                 str          # "BUY" | "SELL" | "SHADOW_BUY"
+    side:                 str          # "BUY" | "SELL"（Shadow候補は observation_only・発注経路には乗らない）
     qty:                  int
     strategy:             str
     expected_price:       float

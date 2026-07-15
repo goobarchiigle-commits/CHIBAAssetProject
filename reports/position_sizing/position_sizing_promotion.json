@@ -3,7 +3,7 @@
   "current_blend_factor": 0.0,
   "recommended_weight_mode": "equal_weight",
   "tier_start_date": "2026-06-03",
-  "last_evaluated": "2026-07-03",
+  "last_evaluated": "2026-07-15",
   "promotion_recommendation": "SAFETY_DEMOTE",
   "safety_triggered": true,
   "safety_reasons": [
@@ -14,7 +14,7 @@
   "windows": {
     "30": {
       "window_days": 30,
-      "sample_count": 41,
+      "sample_count": 59,
       "enriched_count": 0,
       "conviction_monotonicity": 0.0,
       "top_quintile_expectancy": null,
@@ -23,8 +23,8 @@
       "quintile_stats": [
         {
           "quintile": 1,
-          "sample_count": 22,
-          "avg_conviction": 55.96,
+          "sample_count": 28,
+          "avg_conviction": 55.86,
           "win_rate": null,
           "expectancy": null,
           "sharpe_proxy": null
@@ -39,8 +39,8 @@
         },
         {
           "quintile": 3,
-          "sample_count": 9,
-          "avg_conviction": 56.37,
+          "sample_count": 18,
+          "avg_conviction": 56.36,
           "win_rate": null,
           "expectancy": null,
           "sharpe_proxy": null
@@ -55,8 +55,8 @@
         },
         {
           "quintile": 5,
-          "sample_count": 6,
-          "avg_conviction": 60.79,
+          "sample_count": 9,
+          "avg_conviction": 67.17,
           "win_rate": null,
           "expectancy": null,
           "sharpe_proxy": null
@@ -77,7 +77,7 @@
     },
     "60": {
       "window_days": 60,
-      "sample_count": 41,
+      "sample_count": 59,
       "enriched_count": 0,
       "conviction_monotonicity": 0.0,
       "top_quintile_expectancy": null,
@@ -86,8 +86,8 @@
       "quintile_stats": [
         {
           "quintile": 1,
-          "sample_count": 22,
-          "avg_conviction": 55.96,
+          "sample_count": 28,
+          "avg_conviction": 55.86,
           "win_rate": null,
           "expectancy": null,
           "sharpe_proxy": null
@@ -102,8 +102,8 @@
         },
         {
           "quintile": 3,
-          "sample_count": 9,
-          "avg_conviction": 56.37,
+          "sample_count": 18,
+          "avg_conviction": 56.36,
           "win_rate": null,
           "expectancy": null,
           "sharpe_proxy": null
@@ -118,8 +118,8 @@
         },
         {
           "quintile": 5,
-          "sample_count": 6,
-          "avg_conviction": 60.79,
+          "sample_count": 9,
+          "avg_conviction": 67.17,
           "win_rate": null,
           "expectancy": null,
           "sharpe_proxy": null
@@ -140,7 +140,7 @@
     },
     "90": {
       "window_days": 90,
-      "sample_count": 41,
+      "sample_count": 59,
       "enriched_count": 0,
       "conviction_monotonicity": 0.0,
       "top_quintile_expectancy": null,
@@ -149,8 +149,8 @@
       "quintile_stats": [
         {
           "quintile": 1,
-          "sample_count": 22,
-          "avg_conviction": 55.96,
+          "sample_count": 28,
+          "avg_conviction": 55.86,
           "win_rate": null,
           "expectancy": null,
           "sharpe_proxy": null
@@ -165,8 +165,8 @@
         },
         {
           "quintile": 3,
-          "sample_count": 9,
-          "avg_conviction": 56.37,
+          "sample_count": 18,
+          "avg_conviction": 56.36,
           "win_rate": null,
           "expectancy": null,
           "sharpe_proxy": null
@@ -181,8 +181,8 @@
         },
         {
           "quintile": 5,
-          "sample_count": 6,
-          "avg_conviction": 60.79,
+          "sample_count": 9,
+          "avg_conviction": 67.17,
           "win_rate": null,
           "expectancy": null,
           "sharpe_proxy": null

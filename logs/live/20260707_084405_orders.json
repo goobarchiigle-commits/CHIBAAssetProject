@@ -1,0 +1,40 @@
+[
+  {
+    "run_at": "2026-07-07T09:00:09+0900",
+    "orders": [
+      {
+        "symbol": "5301.T",
+        "sector": "化学",
+        "side": "SHADOW_BUY",
+        "qty": 300,
+        "order_type": "MARKET_OPEN",
+        "estimated_price": 1758.5,
+        "estimated_amount": 527550.0,
+        "reason": "SHADOW_BUY: RSR62=90.3 (>87.5=live_top10_median) shadow_rsr_pass=8"
+      }
+    ],
+    "send_results": [
+      {
+        "symbol": "5301.T",
+        "symbol_4digit": "5301",
+        "side": "SHADOW_BUY",
+        "qty": 300,
+        "client_order_id": "COI-3A64697DCBA1FFF7",
+        "success": true,
+        "order_id": "20260707A02N25556056",
+        "result_code": 0,
+        "error": null,
+        "planned_entry_price": null,
+        "actual_entry_price": null,
+        "slippage_pct": null,
+        "gap_pct": null,
+        "fill_status": null,
+        "order_submit_time": null,
+        "fill_time": null,
+        "rsr_pct_raw": 0.9032,
+        "rsr_pct_smooth": 0.8955,
+        "entry_signal_time": "2026-07-07T08:44:10+0900"
+      }
+    ]
+  }
+]

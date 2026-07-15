@@ -27,6 +27,9 @@ risk:
   max_hold_days: 60
   emergency_exit_pct: -0.08
   rebalance_interval: 1
+  reentry_cooldown_days: 5   # SELL後の同銘柄再エントリー禁止（営業日）
+                             # 2026-07-07 SAFETY FIX: 従来「時間ストップ」のみ対象だったが
+                             # 全SELL理由（RSR_EXIT/トレーリングストップ/緊急exit等）に拡張
 
 # セクター別戦略割り当て
 # sector_strategy:

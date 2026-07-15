@@ -22,14 +22,11 @@ venv/
 env/
 ENV/
 
-# === データファイル（CLAUDE.md: data/ 以下はすべてコミット禁止）===
-data/
-
-# === 実運用ランタイム（order_lock.json など。再起動後に再生成）===
-runtime/
-
-# === ライブ運用ログ（ローカルのみ保管）===
-logs/
+# === データ/ランタイム/ログ ===
+# リポジトリ直下の data/・runtime/・logs/ はルート .gitignore（/data/ /runtime/ /logs/ 相当）で除外済み。
+# ここで無印パターン（data/ runtime/ logs/）を書くと src/data/・src/runtime/・src/logs/ 配下の
+# ソースコード/テストまで無視してしまうため使用しない（2026-07-08 RCA: src/runtime/ 全47ファイルが
+# 一度もgit追跡されていなかった不具合の原因）。
 
 # === Jupyter ===
 .ipynb_checkpoints/

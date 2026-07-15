@@ -30,8 +30,7 @@
 - Study設計・実験計画を立てるとき
 - バックテストスクリプトを実行・解釈するとき
 - IS/OOS・Walk Forward結果を評価するとき
-- Production採用・Reject判断をするとき
-- Study結果をsrc/research_state.mdへ記録するとき
+- Production採用・Reject判断をするとき（ADOPT/REJECTの判定そのもの）
 
 ---
 
@@ -39,6 +38,8 @@
 
 - run_live_signal.py 実行・注文発注・ポジション管理 → `/live-signal` を使う
 - 朝ルーティン・API接続確認 → `/live-signal` を使う
+- Study成果物Markdownの体裁化・Executive Summary/Method/Results作成 → `/report-generator` を使う
+- Research State/Roadmap/Decision Record/Open Questions/Closed Researchへの反映・Study採番管理 → `/roadmap-governance` を使う
 
 ---
 
@@ -297,45 +298,114 @@ Step 3: 失敗分析（REJECTの場合）
   - 失敗の主因（CAGR劣化 / DD増加 / N不足）
   - 次Studyへの示唆
 
-Step 4: 研究ログ保存（Section 10のフォーマット）
-  - src/research_state.mdを更新
-  - backtests/に結果JSONを保存
-  - docs/research/YYYY-MM-DD.mdに日次ログを記録
-
-Step 5: PARAMS_LOCKEDへの影響確認（ADOPTの場合）
+Step 4: PARAMS_LOCKEDへの影響確認（ADOPTの場合）
   - パラメータ変更を伴う場合→ASK_FIRST（ユーザー確認必須）
-  - 変更なし採用の場合→コミット後に報告
+  - 変更なし採用の場合はStep 5へ
+
+Step 5: Output引き渡し（Section 10）
+  - Study Decision / Study Metrics / Study Evidence を `/report-generator` へ渡す
+  - 本Skillはここで終了する。research_state.md更新・roadmap反映・日次ログ記録・レポートMarkdown作成は一切行わない（それぞれ `/roadmap-governance` / `/report-generator` の責務）
 ```
 
 ---
 
-## 10. Research Log Format
+## 10. Output（Study Decision / Study Metrics / Study Evidence）
 
-**src/research_state.md 更新フォーマット:**
+**backtest-researchの最終責務はこの3点を確定させ、`/report-generator`へ渡すことで終わる。** research_state.md更新・レポート体裁化・roadmap反映は行わない。
 
-```markdown
-## StudyNN: [Study名] — YYYY-MM-DD
+```
+Study Decision:
+  - 判定: ADOPT / REJECT
+  - 根拠ゲート番号（Section 7 ADOPT基準 or Section 8 REJECT基準の該当項目）
+  - REJECT理由（該当する場合、失敗したFold・主因を含む）
+  - PARAMS_LOCKED影響有無・ASK_FIRST該当有無
 
-**仮説:** [1文で記述]
-**変更内容:** [何を変えたか]
+Study Metrics:
+  - IS/OOS: CAGR・Calmar・Sharpe・MaxDD・N・oos_is_ratio
+  - WF: Fold別ΔCAGR・PASS/FAIL・合計pass数
+  - Bootstrap（実施した場合）: median・CI・P(>0)
+  - 感度分析結果（実施した場合）: 崖の有無
 
-| 指標 | IS | OOS | WF |
-|------|----|-----|----|
-| CAGR | xx% | xx% | x/5 |
-| Calmar | x.xx | x.xx | — |
-| Sharpe | x.xx | x.xx | — |
-| Max DD | xx% | xx% | — |
-| N | xx | xx | — |
-| OOS/IS ratio | — | x.xx | — |
+Study Evidence:
+  - 結果JSONの保存パス（backtests/studyNN_*_YYYY-MM-DD.json）
+  - 使用したスクリプトパス・fresh run実施日時
+  - Parity Check結果（該当する場合）
+```
 
-**WF Fold結果:**
-- Fold1 (2021): ΔCAGR=+x.xxpp [PASS/FAIL]
-- Fold2 (2022): ΔCAGR=+x.xxpp [PASS/FAIL]
-- Fold3 (2023): ΔCAGR=+x.xxpp [PASS/FAIL]
-- Fold4 (2024): ΔCAGR=+x.xxpp [PASS/FAIL]
-- Fold5 (2025): ΔCAGR=+x.xxpp [PASS/FAIL]
+引き渡し後の扱い（本Skillの管轄外）:
+```
+研究ログ・レポート作成    → /report-generator
+research_state.md反映    → /roadmap-governance
+roadmap/Decision Record反映 → /roadmap-governance
+```
 
-**判定:** ADOPT / REJECT
-**REJECT理由:** [該当する場合]
-**次Study示唆:** [次に試すべきこと]
+---
+
+## 11. Research Assets利用ルール
+
+**責務**: 既存Studyの成果物（backtests/*.json, reports/*.md等）を再利用する際の運用ルールのみを規定する。データ取得・解析の実装コードは本Skill内に持たない。
+
+```
+共通データ取得APIを利用する（実装はSkill外・Pythonライブラリ側に委譲）:
+  - データ取得・universe構築・価格ロードは、既存の共通ライブラリ（例: composite_alpha_bt.pyのローダー群、将来のJ-Quants取得ライブラリ等）を必ず経由する
+  - 本Skill内にAPI呼び出しコード・取得ロジックを実装・保持しない（実装場所は src/ 配下の該当ライブラリ）
+
+既存Research Assets再利用の判断:
+  - Production判定にキャッシュ値・過去JSON流用は禁止（CLAUDE.md OVERFIT_GUARD: fresh_run_required=true）
+  - 「参照値」としての引用（例: 過去Studyの比較対象数値を凍結値として転記）は許可。ただし「今回の判定の根拠数値」としての流用は禁止
+  - 新規Study開始時は既存Assetsの棚卸しを実施し、以下を区別する:
+    [ ] 再利用可能（fresh run不要・参照値としてのみ使用）
+    [ ] 新規収集・再測定が必要（fresh run必須）
+  - Universe変更（例: survivorship-free化）を伴う研究では、旧Universeの既存Assetsは「旧Universe参考値」として明示的に区別し、新旧比較は禁止する（Universe差とArchitecture差の交絡防止）
+```
+
+---
+
+## 12. Statistical Analysis
+
+**責務**: 統計解析の手順のみを規定する。実装コードは含めない（実装は既存の解析スクリプト、または新規スクリプトとしてASK_FIRST後に作成）。
+
+```
+Bootstrap（信頼区間・破産確率相当の分布推定）:
+  - N=500・seed=42を既定値とする（既存Study方式踏襲）。変更する場合は理由を明記
+  - トレード順リサンプリングによりCAGR/MaxDD分布・CI[5%,95%]・P(>0)を算出
+  - 手順のみ規定し、実装は既存のBootstrapスクリプト方式に委譲する
+
+感度分析（パラメータ頑健性チェック）:
+  - 事前固定グリッドのみ使用（CLAUDE.md: param_sweep_limit=bounded）
+  - 主要パラメータを±5/10/20%変化させ、ΔCAGR>3ppとなる崖の有無を確認する
+  - 崖を検出した場合は「非頑健フラグ」を付与し、過学習疑いとしてSection 6の判定に反映する
+  - グリッド外の探索的スイープ（新しい値域への拡張）は禁止 — 0.4ゲート・恒久閉鎖領域抵触のリスクがあるため、実施前に必ずユーザー確認を取る
+
+適用順序:
+  1. WF/IS-OOS判定（Section 3-4）を先に完了する
+  2. WF/IS-OOS基準を通過した場合のみBootstrap・感度分析を実施する（不合格が確定している場合に追加解析へ進まない）
+```
+
+---
+
+## 13. Parity Check
+
+**責務**: エンジン変更前後・BT/Live間で、同一条件下の結果が一致することを確認する手順のみを規定する。
+
+```
+目的:
+  - エンジン変更（新規計装追加・バグ修正等）が意図しない挙動変化を生んでいないかを検証する
+  - BTとLiveの実行条件差異（執行価格タイミング等）を検出する
+
+手順:
+  1. 変更前エンジンでの基準値（CAGR/Trades/Sharpe/MaxDD/Calmar等）を固定・記録する
+  2. 変更後エンジンで同一設定・同一期間をfresh run実行する
+  3. 全指標のΔ=0.00pp（または明示的に許容した誤差範囲内）であることを確認する
+  4. 不一致があれば変更内容の副作用（意図しないロジック変更）を疑い、原因（RCA）特定まで採用しない
+
+適用場面:
+  - 新規スクリプト作成後のロールバック検証
+  - 観測専用の計装追加後（既存事例: Study80A observation infrastructureのparity_report.md方式）
+  - Live実装とBTエンジンの整合確認（既存事例: M1 Addon執行価格PATCHでのBT/Live乖離発見・RCA実施）
+
+判定:
+  - PASS: 全指標Δ=0.00pp（計装追加のみ・ロジック変更なしの場合の期待値）
+  - FAIL: いずれかの指標に不一致 → ロールバックしRCA実施。RCA完了・原因説明可能になるまでProduction適用しない
+```
 ```
