@@ -1,0 +1,152 @@
+{
+ "study": "study101_legacy_fujiko_true_expectancy",
+ "generated_at": "2026-07-16T21:19:16.113514+09:00",
+ "universe": {
+  "method": "monthly PIT: all-JP eligible (diagnostics excluded_reason=='') -> ADV20 top500 -> composite top200 (T-1 EOM)",
+  "months": 108,
+  "union": 1541,
+  "median_members": 200
+ },
+ "strategy": "legacy fujiko unchanged (Study75B run_bt production-parity flags, PARAMS_LOCKED)",
+ "variants": {
+  "A": "min_rsr=75 percentile, context=monthly ADV500 insertion-rank (continuous series)",
+  "B": "absolute score rsr_abs=clip(50.0+100.0*composite,0,100); entry75<=>+25% / exit70<=>+20% 12M weighted return (pre-fixed, no sweep)",
+  "filters": [
+   "none",
+   "25MA deviation < 20.0% (t-1)"
+  ]
+ },
+ "windows": {
+  "IS": [
+   "2018-01-01",
+   "2024-12-31"
+  ],
+  "OOS": [
+   "2025-01-01",
+   "2025-12-31"
+  ]
+ },
+ "topix_cagr": {
+  "IS": 5.92,
+  "OOS": 24.21
+ },
+ "results": {
+  "A_pct75_none": {
+   "IS": {
+    "cagr": -6.6,
+    "sharpe": -0.058,
+    "calmar": -0.1,
+    "max_dd": -65.97,
+    "n_trades": 364,
+    "avg_exposure": 62.5,
+    "bootstrap_cagr_ci95": {
+     "ci_lo": -25.53,
+     "ci_hi": 12.24,
+     "n_months": 83
+    }
+   },
+   "OOS": {
+    "cagr": 3.45,
+    "sharpe": 0.305,
+    "calmar": 0.09,
+    "max_dd": -38.19,
+    "n_trades": 53,
+    "avg_exposure": 68.3,
+    "bootstrap_cagr_ci95": {
+     "ci_lo": -52.64,
+     "ci_hi": 153.37,
+     "n_months": 11
+    }
+   },
+   "decision": "RED"
+  },
+  "A_pct75_ma20": {
+   "IS": {
+    "cagr": -0.51,
+    "sharpe": 0.138,
+    "calmar": -0.011,
+    "max_dd": -46.65,
+    "n_trades": 398,
+    "avg_exposure": 65.0,
+    "bootstrap_cagr_ci95": {
+     "ci_lo": -22.47,
+     "ci_hi": 28.8,
+     "n_months": 83
+    }
+   },
+   "OOS": {
+    "cagr": -0.03,
+    "sharpe": 0.197,
+    "calmar": -0.001,
+    "max_dd": -32.14,
+    "n_trades": 54,
+    "avg_exposure": 68.5,
+    "bootstrap_cagr_ci95": {
+     "ci_lo": -43.68,
+     "ci_hi": 125.3,
+     "n_months": 11
+    }
+   },
+   "decision": "RED"
+  },
+  "B_abs_none": {
+   "IS": {
+    "cagr": 5.95,
+    "sharpe": 0.341,
+    "calmar": 0.098,
+    "max_dd": -60.65,
+    "n_trades": 363,
+    "avg_exposure": 58.8,
+    "bootstrap_cagr_ci95": {
+     "ci_lo": -19.59,
+     "ci_hi": 36.68,
+     "n_months": 83
+    }
+   },
+   "OOS": {
+    "cagr": -45.03,
+    "sharpe": -1.008,
+    "calmar": -0.81,
+    "max_dd": -55.6,
+    "n_trades": 55,
+    "avg_exposure": 63.2,
+    "bootstrap_cagr_ci95": {
+     "ci_lo": -77.64,
+     "ci_hi": 34.64,
+     "n_months": 11
+    }
+   },
+   "decision": "RED"
+  },
+  "B_abs_ma20": {
+   "IS": {
+    "cagr": -9.13,
+    "sharpe": -0.158,
+    "calmar": -0.145,
+    "max_dd": -62.9,
+    "n_trades": 373,
+    "avg_exposure": 60.9,
+    "bootstrap_cagr_ci95": {
+     "ci_lo": -26.13,
+     "ci_hi": 9.68,
+     "n_months": 83
+    }
+   },
+   "OOS": {
+    "cagr": 7.32,
+    "sharpe": 0.376,
+    "calmar": 0.361,
+    "max_dd": -20.28,
+    "n_trades": 53,
+    "avg_exposure": 66.3,
+    "bootstrap_cagr_ci95": {
+     "ci_lo": -40.15,
+     "ci_hi": 79.59,
+     "n_months": 11
+    }
+   },
+   "decision": "RED"
+  }
+ },
+ "runtime_min": 1.8
+}

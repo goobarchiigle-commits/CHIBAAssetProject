@@ -1,7 +1,49 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-16（Study100 Phase1 Universe監査完了・FATAL判定→Phase2 BT非続行）
-# ※研究(Study)系列は2026-07-16 Study100が最新（下記参照）。
+# Single Source of Truth / 最終更新: 2026-07-16（Study101 True Expectancy Audit完了・全構成RED・ベンチマーク据え置き不可）
+# ※研究(Study)系列は2026-07-16 Study101が最新（下記参照）。
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
+
+---
+
+## ★★★★★★★★★★★★★★★ 2026-07-16 Study101 — Legacy Fujiko True Expectancy Audit完了・全構成RED
+
+**性格**: 戦略BT（ユーザー明示指示・Study100 FATALの帰結としてのユニバース修正版fresh run）。
+成果物: `backtests/study101_legacy_fujiko_true_expectancy.json` /
+`reports/study101_legacy_fujiko_true_expectancy.md` / `src/backtest/study101_legacy_fujiko_true_expectancy.py`。
+
+**設計**: ユニバース=月次PIT（全上場適格5,357→ADV20 Top500→月末T-1複合リターンTop200・
+hindsight選定ゼロ）・union=1,541銘柄・108ヶ月。戦略=旧フジコ法完全固定（Study75B run_bt
+production parityフラグ・PARAMS_LOCKED無変更）。バリアントA=min_rsr75パーセンタイル
+（RSR文脈=月次ADV500挿入ランク・全系列連続→Study76D warm-upアーティファクト構造排除）/
+B=絶対スコアclip(50+100*composite)（entry75⇔12M+25%・事前固定スイープなし）×
+フィルタ{none, 25MA乖離<20%}。IS=2018-2024/OOS=2025。
+
+**結果（全4構成RED）**: TOPIX比較 IS +5.92% / OOS +24.21%
+
+| 構成 | IS CAGR/MaxDD | OOS CAGR/MaxDD | 判定 |
+|---|---|---|---|
+| A_pct75_none | -6.60% / -65.97% | +3.45% / -38.19% | RED |
+| A_pct75_ma20 | -0.51% / -46.65% | -0.03% / -32.14% | RED |
+| B_abs_none | +5.95% / -60.65% | -45.03% / -55.60% | RED |
+| B_abs_ma20 | -9.13% / -62.90% | +7.32% / -20.28% | RED |
+
+**解釈**:
+1. selection alpha除去後の旧フジコ法=TOPIX未満+壊滅的DD。Study75C（PIT無作為IS -2.5%）と
+   同方向でさらに悪い（momentum Top200プールは無作為帯より攻撃的）。「RSR42名目実績の
+   エッジはほぼ全てユニバース選定バイアス」が戦略BTレベルで確定。
+2. 25MA乖離<20%フィルタはA系ISで+6.1pp改善（Study99の過熱除外知見と整合）だが救済に遠い。
+3. B絶対スコア版OOS -45%は2025-04ショック（高モメンタム銘柄直撃）。符号がフィルタ・窓で
+   反転し安定性ゼロ。
+4. **注意**: MaxDDがVALIDATION dd_max=0.5を超える構成あり（-66%等）→絶対値は保守的に扱う。
+   ただし方向（全構成RED・TOPIX劣後）は4構成×2窓で一貫し頑健。
+
+**判定（タスク設問への回答）**: 旧フジコ法は**CAGR5-8%ベンチマークとして据え置き不可（RED）**。
+今後の新手法比較ベンチマークは**TOPIX B&H**（IS 5.92%/OOS 24.21%）に一本化推奨。
+フジコ法の残存価値=エンジン・Exit群・BT/Live parity・執行安全機構（インフラ層のみ）。
+
+**含意**: Study100の運用判断（条件付きYES・¥3M限定・増資禁止）は維持可能だが、
+本結果により「現行Live名目実績を将来判断の根拠に使う道」は完全消滅。
+研究の合理的経路はPEAD/TSMOM転進のみ（Study95 Kill帰結と合流）。
 
 ---
 
