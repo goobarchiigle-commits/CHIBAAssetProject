@@ -1,7 +1,37 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-16（Study99 Sector×Fujiko filter factor-level完了）
-# ※研究(Study)系列は2026-07-16 Study99が最新（下記参照）。
+# Single Source of Truth / 最終更新: 2026-07-16（Study100 Phase1 Universe監査完了・FATAL判定→Phase2 BT非続行）
+# ※研究(Study)系列は2026-07-16 Study100が最新（下記参照）。
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
+
+---
+
+## ★★★★★★★★★★★★★★ 2026-07-16 Study100 — Legacy Fujiko + Dynamic Universe Audit（Phase1）完了・FATAL
+
+**性格**: コード・文書監査+既測値引用のみ（新規BTゼロ）。成果物:
+`reports/study100_legacy_fujiko_universe_audit.md` / `backtests/study100_universe_audit.json`。
+
+**構造確定**: 「動的ユニバース」は4系統——U-1静的RSR42名簿(本番プール)・U-2名簿内動的選抜
+dyn_rsr42_bear_rs0(本番)・U-3 Dynamic RSR42 v1(研究・不適格確定済み)・U-4 Universe C(PIT・クリーン)。
+
+**監査判定**:
+- U-2選抜層=SAFE（月T選択=月T-1末データ・`build_sym_active_df`）
+- 執行層=SAFE（`alpha_df.shift(1)`・翌日寄付執行・BT/Live parity）
+- U-3=SAFE(タイミング・mismatch=0)/QUESTIONABLE(測定warm-upアーティファクト)
+- **U-1名簿形成=FATAL**: G27+15=2018-2024 BT成績(Sharpe>0.3∧MaxDD<30%)スクリーニング＝
+  形成窓=評価窓のhindsight選定（「勝った銘柄だけ残る構造」該当）。コード内future leakageはゼロ。
+
+**Selection alpha定量**（Study75C E1既測を引用・CaseB−CaseC再実行は重複のため省略）:
+選定バイアス+12.26pp・survivorship≈0・PIT無作為同帯IS -2.5%・OOS %ile 95→70退行。
+
+**ゲート帰結**: ユーザー指定プロトコル（FATAL→Universe修正が先）によりPhase2 BT非続行。
+
+**最終結論(Phase1時点)**: (1)旧フジコ法単体=選定アルファ未証明・補正後CAGR 0-5%・エンジン/Exit/
+parityはA級資産 (2)U-2ロジック健全だがプール汚染・U-4のみクリーン基盤 (3)組み合わせ名目値
+IS12.22/OOS11.42は意思決定使用禁止 (4)**運用継続=条件付きYES**（即時停止不要・CIRCUIT独立・
+¥3M限定・増資/拡大禁止） (5)優先順位=①Phase2'(CaseA'=Universe C流動性上位500 PIT上で
+旧フジコ法固定・意味論警告付き2本立て) ②PEAD/TSMOM ③テーマ研究凍結。
+
+**未決（ユーザー決裁待ち）**: Phase2'実施可否（ASK_FIRST・工数1-2週）。
 
 ---
 

@@ -1,0 +1,55 @@
+{
+ "study": "study100_legacy_fujiko_universe_audit",
+ "phase": "phase1_audit_only",
+ "generated_at": "2026-07-16",
+ "gate_verdict": "FATAL",
+ "gate_layer": "U-1 static_rsr42_membership (hindsight in-sample selection 2018-2024)",
+ "phase2_bt_executed": false,
+ "phase2_skip_reason": "user protocol: FATAL -> universe fix first; CaseB-CaseC already quantified by Study75C E1",
+ "layers": {
+  "U1_static_rsr42": {
+   "promotion": "2018-2024 BT Sharpe>0.3 & MaxDD<30% + 15 discretionary",
+   "future_return_used": true,
+   "verdict": "FATAL(research)/QUESTIONABLE(live-forward-frozen)"
+  },
+  "U2_dyn_rsr42_bear_rs0": {
+   "promotion": "monthly score top30/20, month T uses T-1 EOM data",
+   "future_return_used": false,
+   "verdict": "SAFE"
+  },
+  "U3_dynamic_rsr42_v1": {
+   "promotion": "trailing 12M composite top42, lag verified mismatch=0",
+   "future_return_used": false,
+   "verdict": "SAFE(timing)/QUESTIONABLE(measurement warm-up artifact, Study76D)"
+  },
+  "U4_universe_c": {
+   "promotion": "liquidity rules only, PIT",
+   "future_return_used": false,
+   "verdict": "SAFE"
+  }
+ },
+ "execution_layer": {
+  "signal": "alpha_df.shift(1) t-1",
+  "fill": "next-day open (2026-07 M1, BT/Live parity)",
+  "verdict": "SAFE"
+ },
+ "selection_alpha": {
+  "source": "Study75C E1 (2026-07-11 fresh, PIT twin bootstrap)",
+  "selection_bias_pp": 12.26,
+  "composite_bias_pp": 11.3,
+  "survivorship_pp": 0.0,
+  "pit_random_is_cagr": -2.5,
+  "oos_percentile_regression": "95->70"
+ },
+ "final_conclusions": {
+  "legacy_fujiko_standalone": "selection alpha unproven; bias-corrected CAGR ~0-5%; engine/exit/parity = A-grade assets",
+  "dynamic_universe_value": "U2 logic SAFE but pool contaminated; U3 disqualified; U4 only clean base",
+  "combined_value": "nominal IS12.22/OOS11.42 unusable for decisions; true value unknown until Phase2-prime",
+  "operation_continue": "CONDITIONAL_YES (no immediate stop; CIRCUIT/DD independent; no scaling/capital-increase based on performance)",
+  "research_priority": [
+   "Phase2-prime CaseA-prime (Universe C liquid top500 PIT, legacy fujiko fixed)",
+   "PEAD/TSMOM factor-level",
+   "theme/leader research frozen"
+  ]
+ }
+}
