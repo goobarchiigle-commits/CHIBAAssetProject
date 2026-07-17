@@ -1,7 +1,36 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-17（★Entry Freeze Mode実装完了: 新規BUY全面停止・SELL/研究データ収集は無停止★）
+# Single Source of Truth / 最終更新: 2026-07-17（★Entry Freeze Final Audit完了: 全経路探索+sendorder直前最終ガード2箇所追加・commit f707f4a★）
 # ※研究(Study)系列は2026-07-16 Study101が最新（下記参照）。本セクション先頭は運用インフラ変更の記録。
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
+
+---
+
+## ★★★★★★★★★★★★★★★★★ 2026-07-17 Entry Freeze Final Audit完了（commit f707f4a）
+
+**性格**: 前回commit（16e8b67・Entry Freeze Mode初期実装）の続き。全実行可能エントリーポイント
+（Windows Task Scheduler実機確認・.bat/.ps1・subprocess呼び出し・/sendorder直接参照）を
+網羅探索し、defense-in-depthとしてsendorder直前の最終ガードを追加。詳細:
+`reports/entry_freeze_final_audit_2026-07-17.md`。
+
+**探索結果**: 稼働中スケジュールタスクは`CHIBATrading_DryRun`/`CHIBATrading_Live`のみ
+（`watchdog_runner.py`→`run_live_signal.py`）。他登録タスク全件のActions網羅走査で発注コード
+参照ゼロを確認。`pipeline.py`（無引数実行・独立発注経路・前回commitでfix済み）以外に新規経路なし。
+`diagnose_sell.py`は全payload`Side="1"`固定でBUY不可能な構造と確認。`FujikoWeeklyAgents`タスク・
+`src/morning_*.bat`等はプロジェクト移行前の旧パス（存在しない）を参照し実行不能（情報共有のみ・
+No refactor制約のため未対応）。
+
+**追加実装（GATE-2/GATE-4・最終防波堤）**:
+- `src/kabusapi/client.py::KabuClient.send_order()`: 全BUY経路の唯一の収束点。
+  BUY×entry_freeze.enabledならHTTP送信前に`OrderResult(success=False)`を返却
+- `src/execution/live_pipeline.py::execute_orders()`: 独立経路専用。POST直前でcontinue
+- 起動時freezeログ4箇所（run_live_signal.py/run_morning_signal.py/broker_worker.py子プロセス/
+  live_pipeline.py::run_live_pipeline）
+
+**検証**: 新規テスト8件（HTTP層への到達有無をモック検証・BUY×frozen=未到達/SELL=到達を対で確認）。
+既存含め193件全合格・回帰なし。
+
+**結論**: `entry_freeze.enabled=True`である限り、リポジトリ内のいかなる実行可能コード経路からも
+sendorderへBUY注文が到達しないことを確認・多層防御化。
 
 ---
 
