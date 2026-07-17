@@ -21,6 +21,14 @@ _ROOT = Path(__file__).resolve().parents[2]
 if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
+# signal_bridge.py を1プロセス内で一度だけimportしてキャッシュする（2026-07-17追記）。
+# Windows環境でこのimportを複数回再実行するとnumpyのdelvewheel DLL登録が失敗する
+# 既知の環境問題があるため、以降 _make_bridge() を複数テストから呼んでもキャッシュヒットにする。
+try:
+    from src.kabusapi.signal_bridge import SignalBridge as _SignalBridge_preload  # noqa: F401
+except Exception:
+    pass  # 失敗時は各テストのtry/exceptでskipTestされる（既存挙動のまま）
+
 
 # ── テスト用スタブ ──────────────────────────────────────────────────────────────
 def _make_signal(symbol: str, signal: int, holding: bool = False, rsr: float = 80.0):
@@ -55,6 +63,8 @@ def _make_bridge():
     bridge.bear_scale              = 0.5
     bridge.max_new_positions_per_day = 2
     bridge.universe_tickers        = {}
+    bridge.entry_freeze_enabled    = False   # 2026-07-17 Entry Freeze Mode追加分（既定=無効）
+    bridge.entry_freeze_reason     = "Research Freeze"
     bridge.pre_trade_risk_check    = MagicMock(return_value=True)
     # 実メソッドを束縛
     bridge._build_orders = SignalBridge._build_orders.__get__(bridge, type(bridge))

@@ -893,6 +893,8 @@ class SignalBridge:
         bear_scale:                float = 1.0,
         cfg=None,
         deployable_capital:        float = 0.0,
+        entry_freeze_enabled:      bool  = False,
+        entry_freeze_reason:       str   = "Research Freeze",
     ) -> None:
         self.universe_tickers          = universe_tickers
         self.shadow_universe_tickers   = shadow_universe_tickers or {}
@@ -920,6 +922,10 @@ class SignalBridge:
         self.bear_scale                = bear_scale         # TOPIX MA200下のサイズ係数
         self._cfg                      = cfg                # StrategyConfig（cap feature flag 参照用）
         self.deployable_capital        = deployable_capital  # from cap_state.deployable_capital (Phase 5B.1)
+        # Entry Freeze Mode（資産保全・2026-07-17 Study100/101帰結）: True で新規BUY全面停止。
+        # SELL/exit・signal generationには一切影響しない。CBとは独立フラグ（_build_ordersでOR結合）。
+        self.entry_freeze_enabled       = bool(entry_freeze_enabled)
+        self.entry_freeze_reason        = str(entry_freeze_reason)
         self._positions_api_status     = {"ok": False, "source": "virtual", "error": None}
         self._wallet_api_status        = {"ok": False, "source": "virtual", "error": None}
         # pre_trade_risk_check 用キャッシュ（run() 後に execution layer で再利用）
@@ -3440,11 +3446,23 @@ class SignalBridge:
         lot_rounded_up_count:       int                   = 0
         risk_rejected_count:        int                   = 0
 
+        # Entry Freeze Mode（資産保全・2026-07-17）: CBとは独立フラグ。OR結合で
+        # 新規BUYを全停止する。SELL処理・シグナル生成には一切影響しない。
+        entry_frozen  = self.entry_freeze_enabled
+        block_new_buy = cb_active or entry_frozen
+
         if cb_active:
             warnings.append("サーキットブレーカー発動中: 新規 BUY を全停止（SELL のみ実行）")
             logger.warning(
                 "ENTRY BLOCKED BY CB: BUY 全停止中。"
                 " BUY シグナルが出ても発注しません。SELL のみ実行します。"
+            )
+        if entry_frozen:
+            warnings.append(f"ENTRY FREEZE MODE 発動中: 新規 BUY を全停止（reason={self.entry_freeze_reason}）")
+            logger.warning(
+                "ENTRY_FROZEN: 新規BUY全面停止中 reason=%s。"
+                " BUY シグナルが出ても発注しません。SELL のみ実行します。",
+                self.entry_freeze_reason,
             )
 
         # --- 1. 売り注文（保有中 かつ -1 シグナル） ---
@@ -3465,16 +3483,20 @@ class SignalBridge:
                     reason           = sig.reason,
                 ))
 
-        if cb_active:
+        if block_new_buy:
             blocked_buys = [s.symbol for s in signals if s.signal == 1 and not s.currently_holding]
-            if blocked_buys:
+            if blocked_buys and cb_active:
                 logger.warning(
                     "ENTRY BLOCKED BY CB: 以下 %d 銘柄の BUY をスキップ → %s",
                     len(blocked_buys), blocked_buys,
                 )
+            if blocked_buys and entry_frozen:
+                for _sym in blocked_buys:
+                    logger.warning("ENTRY_FROZEN: symbol=%s reason=%s", _sym, self.entry_freeze_reason)
+                    _audit(_sym, "ENTRY_FREEZE", False, self.entry_freeze_reason)
             _result = (orders, warnings, blocked_by_alloc_cap_count, lot_rounded_up_count, risk_rejected_count)
-            assert len(_result) == 5, f"CB-path return shape broken: {len(_result)}"
-            return _result  # CB 中は SELL のみ。BUY カウンターは 0 のまま
+            assert len(_result) == 5, f"CB/Freeze-path return shape broken: {len(_result)}"
+            return _result  # CB/Freeze 中は SELL のみ。BUY カウンターは 0 のまま
 
         # 売り後の回収資金を加算
         sell_proceeds  = sum(o.estimated_amount for o in orders if o.side == "SELL")

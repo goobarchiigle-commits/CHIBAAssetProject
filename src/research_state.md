@@ -1,7 +1,57 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-16（Study101 True Expectancy Audit完了・全構成RED・ベンチマーク据え置き不可）
-# ※研究(Study)系列は2026-07-16 Study101が最新（下記参照）。
+# Single Source of Truth / 最終更新: 2026-07-17（★Entry Freeze Mode実装完了: 新規BUY全面停止・SELL/研究データ収集は無停止★）
+# ※研究(Study)系列は2026-07-16 Study101が最新（下記参照）。本セクション先頭は運用インフラ変更の記録。
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
+
+---
+
+## ★★★★★★★★★★★★★★★★ 2026-07-17 Entry Freeze Mode（資産保全）実装完了
+
+**発端**: Study100（U-1静的RSR42名簿=FATAL・hindsight選定+11-12pp）/ Study101（PITユニバース上の
+旧フジコ法=全4構成RED・TOPIX全面劣後）により、現行Live戦略の期待アルファが正当化根拠を失った。
+研究継続中の資産保全のため、新規BUY発注のみを全面停止（SELL/exit・signal generation・
+diagnostics・promotion logsは無停止）するEntry Freeze Modeを実装。詳細:
+`reports/entry_freeze_mode_2026-07-17.md`。
+
+**実装**:
+1. `src/configs/strategy.yaml` に `entry_freeze: {enabled: true, reason: "Research Freeze"}`
+   追加。**本commit時点でEntry Freeze Modeは有効化済み**（ユーザー確認の上「今すぐ有効化」を
+   選択・新規BUYは既に全面停止中）。緊急上書き=環境変数`ENTRY_FREEZE_ENABLED`（yaml値より優先）。
+2. `src/config_loader.py`: `EntryFreezeConfig` dataclass・`resolve_entry_freeze()`・
+   `StrategyConfig.entry_freeze` フィールド追加。
+3. `src/kabusapi/signal_bridge.py::_build_orders()`: 既存Circuit Breaker早期return機構
+   （`cb_active`）と独立フラグ `self.entry_freeze_enabled` をOR結合（`block_new_buy`）。
+   SELL処理はfreeze判定より前に生成・signal生成自体は無関係に実行されるため無停止。
+   ログ: `ENTRY_FROZEN: symbol=xxxx reason=Research Freeze`（per-symbol）。
+4. `run_live_signal.py`・`run_morning_signal.py`（2026-07-15 SSOT統合でスケジュール登録は
+   解除済みだがファイル自体は現存し手動実行可能）の両`SignalBridge(...)`生成箇所へ
+   `entry_freeze_enabled/reason`配線。
+5. **独立発見（残存経路）**: `src/execution/live_pipeline.py`（`pipeline.py`無引数実行時の
+   デフォルト分岐）が SignalBridge を一切経由しない完全に独立した決定論的リバランサー
+   （`requests.post`で直接sendorder）を持つと判明。`KABU_API_KEY`未設定のため現状は
+   到達時に`KeyError`で停止し実質デッドだが、将来同変数が設定されれば無条件で実発注し得る
+   構造上の穴だったため、`generate_orders()`に同一freezeゲートを追加。
+6. 全BUY経路を全探索（`_send_orders_with_retry`・`KabusApiAdapter.submit_order`は
+   呼び出し元ゼロのデッドコードと確認・manual_order.py/recovery scripts/scheduler jobsは
+   send_order参照なしと確認）。
+
+**検証**: 新規テスト18件（`test_entry_freeze.py`8・`test_config_loader_entry_freeze.py`7・
+`test_live_pipeline_entry_freeze.py`3）全合格。DRY/LIVE完全一致確認済み
+（`entry_freeze_enabled=True`時、`self.live`の値に関わらず`orders`内容が同一）。
+副次的に発見した既存テスト2件（`test_build_orders_contract.py`・`test_live_stage_audit.py`）の
+`MagicMock(spec=SignalBridge)`未対応による回帰を修正（テストファイルのみ・本番コード無関係）。
+`src/kabusapi/`全58件・`src/live/`+`src/execution/`全123件、回帰なし。
+
+**現状**: `entry_freeze.enabled=true`（**新規BUYは既に全面停止中**）。SELL/exit/signal
+generation/diagnosticsは通常稼働。解除にはユーザーの明示操作（yaml編集commit または
+`ENTRY_FREEZE_ENABLED=0`）が必要。
+
+**Rollback**: 環境変数`ENTRY_FREEZE_ENABLED=0`で即時強制解除、またはyaml値を戻すのみ。
+新規dataclass/パラメータは全てdefault値を持つ後方互換設計。
+
+**未実施**: git push（明示的指示待ち・ASK_FIRST）。
+
+---
 
 ---
 

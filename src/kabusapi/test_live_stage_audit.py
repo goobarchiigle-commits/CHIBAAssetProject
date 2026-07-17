@@ -47,6 +47,8 @@ def _make_bridge(SignalBridge):
     bridge.max_new_positions_per_day  = 2
     bridge.top_k                      = 3
     bridge.universe_tickers            = {}
+    bridge.entry_freeze_enabled         = False   # 2026-07-17 Entry Freeze Mode追加分（既定=無効）
+    bridge.entry_freeze_reason          = "Research Freeze"
     bridge.pre_trade_risk_check        = MagicMock(return_value=True)
     bridge._build_orders = SignalBridge._build_orders.__get__(bridge, type(bridge))
     return bridge

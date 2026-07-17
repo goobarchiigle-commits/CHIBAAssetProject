@@ -303,7 +303,21 @@ def generate_orders(
 
     No partial logic, no optimization, no VWAP, no slicing.
     Symbols sorted for deterministic output order.
+
+    Entry Freeze Mode（資産保全・2026-07-17）: cfg.entry_freeze.enabled=True の間、
+    新規BUY方向のrebalance（現在ゼロ保有からの買い、または買い増し）は生成しない。
+    保有縮小・手仕舞い方向（SELL）は無停止（signal_bridge.py::_build_ordersと同じ設計）。
     """
+    from src.config_loader import load_strategy_config
+    entry_frozen = False
+    freeze_reason = ""
+    try:
+        _cfg = load_strategy_config()
+        entry_frozen  = bool(_cfg.entry_freeze.enabled)
+        freeze_reason = _cfg.entry_freeze.reason
+    except Exception:
+        pass  # 設定読込失敗時はfreeze適用なし（既存挙動を維持・fail-open）
+
     decision  = allocation_result["decision"]
     base_mult = _DECISION_MULT[decision]
     kill_mult = _KILL_MULT[kill_state]
@@ -321,9 +335,14 @@ def generate_orders(
         if rebalance == 0:
             continue
 
+        side = "BUY" if rebalance > 0 else "SELL"
+        if entry_frozen and side == "BUY":
+            print(f"ENTRY_FROZEN: symbol={symbol} reason={freeze_reason}")
+            continue
+
         orders.append({
             "symbol":  symbol,
-            "side":    "BUY" if rebalance > 0 else "SELL",
+            "side":    side,
             "qty":     abs(rebalance),
             "target":  target,
         })

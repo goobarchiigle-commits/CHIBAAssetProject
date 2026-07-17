@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass, field
 from functools import lru_cache
 
@@ -87,6 +88,28 @@ class RiskControlsConfig:
 
 
 @dataclass(frozen=True)
+class EntryFreezeConfig:
+    """資産保全モード（2026-07-17 Study100/101帰結・Entry Freeze Mode）。
+    enabled=True で新規BUYを全面停止（SELL/exit/signal generationは無停止）。
+    環境変数 ENTRY_FREEZE_ENABLED（"1"/"true"→True, "0"/"false"→False）が
+    yaml設定より優先される（rollback含む緊急上書き用）。
+    """
+    enabled: bool = False
+    reason: str = "Research Freeze"
+
+
+def resolve_entry_freeze(cfg_enabled: bool, cfg_reason: str) -> tuple[bool, str]:
+    """env var ENTRY_FREEZE_ENABLED があればyaml設定より優先して返す（緊急上書き用）。"""
+    raw = os.environ.get("ENTRY_FREEZE_ENABLED")
+    if raw is None:
+        return cfg_enabled, cfg_reason
+    enabled = raw.strip().lower() in ("1", "true", "yes", "on")
+    if enabled and not cfg_enabled:
+        return True, "Research Freeze (env override)"
+    return enabled, cfg_reason
+
+
+@dataclass(frozen=True)
 class LiveExecutionConfig:
     shadow_mode: bool = True
     shadow_mode_reason: str = "Initial live validation: signal→universe→risk→execution pipeline check"
@@ -153,6 +176,7 @@ class StrategyConfig:
     live_execution: LiveExecutionConfig = field(default_factory=LiveExecutionConfig)
     capital_scaling: CapitalScalingConfig = field(default_factory=CapitalScalingConfig)
     adaptive_growth: AdaptiveGrowthConfig = field(default_factory=AdaptiveGrowthConfig)
+    entry_freeze: EntryFreezeConfig = field(default_factory=EntryFreezeConfig)
 
 
 def _load_yaml() -> dict:
@@ -242,6 +266,14 @@ def load_strategy_config() -> StrategyConfig:
         raise RuntimeError("strategy.yaml の risk セクションが不正です。")
 
     risk_controls_raw = data.get("risk_controls", {})
+
+    ef_raw = data.get("entry_freeze", {})
+    if not isinstance(ef_raw, dict):
+        ef_raw = {}
+    _ef_enabled, _ef_reason = resolve_entry_freeze(
+        bool(ef_raw.get("enabled", False)), str(ef_raw.get("reason", "Research Freeze")),
+    )
+    entry_freeze = EntryFreezeConfig(enabled=_ef_enabled, reason=_ef_reason)
 
     le_raw = data.get("live_execution", {})
     if not isinstance(le_raw, dict):
@@ -341,4 +373,5 @@ def load_strategy_config() -> StrategyConfig:
         live_execution=live_execution,
         capital_scaling=capital_scaling,
         adaptive_growth=adaptive_growth,
+        entry_freeze=entry_freeze,
     )

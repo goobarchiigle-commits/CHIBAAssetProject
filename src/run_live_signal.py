@@ -2523,6 +2523,8 @@ def main() -> int:
             regime_sizing             = cfg.risk_controls.regime_sizing,
             bear_scale                = cfg.risk_controls.bear_scale,
             deployable_capital        = _cdos_deployable,
+            entry_freeze_enabled      = cfg.entry_freeze.enabled,
+            entry_freeze_reason       = cfg.entry_freeze.reason,
         )
     except Exception as exc:
         print(f"[FATAL] SignalBridge 初期化失敗: {exc}", file=sys.stderr)

@@ -58,6 +58,14 @@ fraction:
                # ⚠ DISCARD候補 (design_philosophy_review 2026-07-03): OOS選定バイアス疑い。Stage1では変更しない（Study76/77決着後に判断）
   bear: 0.02   # xs_ret5d <= 0 の日: 資本の2%を配置
 
+# Entry Freeze（資産保全モード・2026-07-17 Study100/101帰結により有効化）
+# enabled: true で新規BUYを全面停止。SELL/exit・signal generation・diagnosticsは無停止。
+# 緊急上書き: 環境変数 ENTRY_FREEZE_ENABLED=1/0 がここの値より優先される。
+# 解除にはユーザーの明示指示が必要（ASK_FIRST）。
+entry_freeze:
+  enabled: true
+  reason: "Research Freeze"
+
 # リスク制御フラグ（feature flag で切替可能）
 # 変更時は必ず WF再検証 → CLAUDE.md ルールに従い確認を取ること
 risk_controls:

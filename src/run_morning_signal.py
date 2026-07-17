@@ -713,6 +713,8 @@ def main() -> int:
                 min_hold_days      = cfg.risk.min_hold_days,
                 emergency_exit_pct = cfg.risk.emergency_exit_pct,
                 cfg                = cfg,
+                entry_freeze_enabled = cfg.entry_freeze.enabled,
+                entry_freeze_reason  = cfg.entry_freeze.reason,
             )
         except AbortError:
             raise
