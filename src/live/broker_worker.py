@@ -184,6 +184,18 @@ def _submit_single_order(client, order: dict, front_order_type: int) -> dict:
 
 def run(input_path: Path, output_path: Path) -> int:
     """Main worker logic. Returns exit code."""
+    # ── ENTRY FREEZE 起動時ログ（資産保全・2026-07-17・defense-in-depth）──
+    # 子プロセスは親とメモリ状態を共有しないため、ここで自前に設定を読み直してログする。
+    try:
+        from src.config_loader import load_strategy_config
+        _ef = load_strategy_config().entry_freeze
+        logger.warning(
+            "[ENTRY_FREEZE_STATE] entry_freeze_enabled=%s reason=%s pid=%d",
+            _ef.enabled, _ef.reason, os.getpid(),
+        )
+    except Exception as _ef_err:
+        logger.warning("[ENTRY_FREEZE_STATE] config読込失敗・freeze状態不明: %s", _ef_err)
+
     # Load orders
     try:
         payload = json.loads(input_path.read_text(encoding="utf-8"))

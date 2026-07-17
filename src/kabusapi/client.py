@@ -418,6 +418,30 @@ class KabuClient:
         if not self._token:
             raise RuntimeError("fetch_token() を先に呼び出してください。")
 
+        # ── ENTRY FREEZE 最終ガード（資産保全・2026-07-17・defense-in-depth）──
+        # 全BUY発注経路（signal_bridge._send_orders / broker_worker.py 子プロセス /
+        # run_morning_signal.py）が最終的に収束するこの関数の先頭で、payload構築・
+        # HTTP送信の一切手前でBUYを遮断する。上流ゲート（_build_orders等）が
+        # 万一バイパスされても、ここが最後の砦として機能する。
+        if side == Side.BUY:
+            try:
+                from src.config_loader import load_strategy_config
+                _ef = load_strategy_config().entry_freeze
+            except Exception as _ef_err:
+                _ef = None
+                logger.warning("[ENTRY_FREEZE_GUARD] config読込失敗・freeze判定不能: %s", _ef_err)
+            if _ef is not None and _ef.enabled:
+                logger.critical(
+                    "[ENTRY_FREEZE_GUARD] BUY blocked at sendorder boundary: "
+                    "symbol=%s qty=%s reason=%s — API call NOT made",
+                    symbol, qty, _ef.reason,
+                )
+                return OrderResult(
+                    order_id="", result_code=-1,
+                    raw={"rejected": "entry_freeze", "reason": _ef.reason,
+                         "symbol": symbol, "qty": qty},
+                )
+
         is_sell = (side == Side.SELL)
 
         # ------------------------------------------------------------------

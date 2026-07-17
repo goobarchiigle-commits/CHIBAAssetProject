@@ -1061,6 +1061,14 @@ def main() -> int:
     # run_id をメイン冒頭で確定（lock / supervisor / journal で共有）
     run_id = datetime.now(JST).strftime("%Y%m%d_%H%M%S")
 
+    # ── ENTRY FREEZE 起動時ログ（資産保全・2026-07-17・defense-in-depth）──
+    _ef_startup = cfg.entry_freeze
+    logger.warning(
+        "[ENTRY_FREEZE_STATE] entry_freeze_enabled=%s reason=%s mode=%s run_id=%s",
+        _ef_startup.enabled, _ef_startup.reason,
+        "LIVE" if args.live else "DRY", run_id,
+    )
+
     # ── Step2: 二重起動防止（最初に取得・atexit で自動解放）──────────────────
     _lock_instance = None
     _heartbeat    = None

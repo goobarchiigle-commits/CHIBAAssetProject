@@ -398,6 +398,19 @@ def execute_orders(
         if idem_key in sent_keys:
             continue  # duplicate prevention before API call
 
+        # ── ENTRY FREEZE 最終ガード（資産保全・2026-07-17・defense-in-depth）──
+        # generate_orders() で既にBUYは除去されているはずだが、この関数が
+        # 別経路から直接呼ばれた場合に備え、payload構築・POST送信の手前で再チェックする。
+        if order["side"] == "BUY":
+            try:
+                from src.config_loader import load_strategy_config
+                _ef = load_strategy_config().entry_freeze
+            except Exception:
+                _ef = None
+            if _ef is not None and _ef.enabled:
+                print(f"ENTRY_FROZEN: symbol={symbol} reason={_ef.reason} (execute_orders final guard)")
+                continue
+
         payload = {
             "Symbol":             symbol,
             "Exchange":           1,       # 東証
@@ -594,6 +607,13 @@ def run_live_pipeline(
     }
     """
     print("[DEBUG] run_live_pipeline entered")
+    # ── ENTRY FREEZE 起動時ログ（資産保全・2026-07-17・defense-in-depth）──
+    try:
+        from src.config_loader import load_strategy_config
+        _ef = load_strategy_config().entry_freeze
+        print(f"[ENTRY_FREEZE_STATE] entry_freeze_enabled={_ef.enabled} reason={_ef.reason}")
+    except Exception as _ef_err:
+        print(f"[ENTRY_FREEZE_STATE] config読込失敗・freeze状態不明: {_ef_err}")
     log_event("pipeline_start", {"n_strategies": len(strategies)})
     # ── State defaults for new fields ─────────────────────────────────────────
     state.setdefault("positions",       {})

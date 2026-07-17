@@ -655,6 +655,13 @@ def main() -> int:
             return _reconcile_uncertain_orders()
         print_banner(args.live)
 
+        # ── ENTRY FREEZE 起動時ログ（資産保全・2026-07-17・defense-in-depth）──
+        logger.warning(
+            "[ENTRY_FREEZE_STATE] entry_freeze_enabled=%s reason=%s mode=%s",
+            cfg.entry_freeze.enabled, cfg.entry_freeze.reason,
+            "LIVE" if args.live else "DRY",
+        )
+
         import warnings
         warnings.filterwarnings("ignore")
 

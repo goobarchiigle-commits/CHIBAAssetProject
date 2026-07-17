@@ -24,8 +24,11 @@ _ROOT = Path(__file__).resolve().parents[2]
 if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
+import pandas as pd
+from unittest.mock import patch
+
 from src.config_loader import load_strategy_config
-from src.execution.live_pipeline import generate_orders
+from src.execution.live_pipeline import generate_orders, execute_orders
 
 
 class TestLivePipelineEntryFreeze(unittest.TestCase):
@@ -71,6 +74,47 @@ class TestLivePipelineEntryFreeze(unittest.TestCase):
         orders = generate_orders(alloc, kill_state, targets, positions)
         sides = sorted(o["side"] for o in orders)
         self.assertIn("BUY", sides, "freeze無効時は従来通りBUYが生成されること（回帰guard）")
+
+
+class TestExecuteOrdersFinalGuard(unittest.TestCase):
+    """execute_orders() 自体の最終防波堤（generate_orders()を経由せず直接
+    呼ばれた場合でもPOST直前でBUYを遮断できること）を検証する。"""
+
+    def setUp(self):
+        os.environ.pop("ENTRY_FREEZE_ENABLED", None)
+        os.environ["KABU_API_KEY"] = "dummy-test-key"
+        load_strategy_config.cache_clear()
+
+    def tearDown(self):
+        os.environ.pop("ENTRY_FREEZE_ENABLED", None)
+        os.environ.pop("KABU_API_KEY", None)
+        load_strategy_config.cache_clear()
+
+    def test_buy_blocked_before_post_when_frozen(self):
+        os.environ["ENTRY_FREEZE_ENABLED"] = "1"
+        orders = [{"symbol": "1234.T", "side": "BUY", "qty": 100, "target": 100}]
+        market_data = pd.DataFrame({"symbol": ["1234.T"], "open": [1000.0]})
+
+        with patch("src.execution.live_pipeline.requests.post",
+                   side_effect=AssertionError("requests.post must NOT be called when frozen")):
+            executed = execute_orders(
+                orders, "2026-07-17", market_data, set(),
+                decision="ALLOCATE", kill_state="KEEP", strategy_id="test",
+            )
+        self.assertEqual(executed, [], "frozen中はexecuted結果も空であること")
+
+    def test_sell_still_reaches_post_when_frozen(self):
+        os.environ["ENTRY_FREEZE_ENABLED"] = "1"
+        orders = [{"symbol": "5678.T", "side": "SELL", "qty": 50, "target": 0}]
+        market_data = pd.DataFrame({"symbol": ["5678.T"], "open": [1000.0]})
+
+        with patch("src.execution.live_pipeline.requests.post",
+                   side_effect=RuntimeError("stop here — POST was reached as expected")):
+            with self.assertRaises(RuntimeError):
+                execute_orders(
+                    orders, "2026-07-17", market_data, set(),
+                    decision="ALLOCATE", kill_state="KEEP", strategy_id="test",
+                )
 
 
 if __name__ == "__main__":
