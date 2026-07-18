@@ -22,6 +22,30 @@ if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
 from src.startup_check import _compute_startup_equity
+import src.portfolio.equity as _equity_mod
+
+
+class _IsolatedSnapshotMixin:
+    """_compute_startup_equity() は内部で compute_live_equity(persist_snapshot=True)
+    を呼び出し、src.portfolio.equity._SNAPSHOT_FILE（logs/equity_snapshots.jsonl の
+    実ファイル）へ書き込む。src.startup_check._BASE_DIR のパッチだけでは
+    equity.py 側の独立した _SNAPSHOT_FILE 定数までは差し替わらず、本番ログを
+    汚染していた（2026-07-17〜18に実際に混入が確認された）。全テストクラス共通で
+    _SNAPSHOT_FILE を一時ファイルへリダイレクトし、本番ログへの書き込みを防ぐ。"""
+
+    def setUp(self):
+        super().setUp()
+        import tempfile
+        self._snap_tmpdir = tempfile.TemporaryDirectory()
+        self._snap_patcher = patch.object(
+            _equity_mod, "_SNAPSHOT_FILE", Path(self._snap_tmpdir.name) / "equity_snapshots.jsonl",
+        )
+        self._snap_patcher.start()
+
+    def tearDown(self):
+        self._snap_patcher.stop()
+        self._snap_tmpdir.cleanup()
+        super().tearDown()
 
 
 def _base_state(**overrides) -> dict:
@@ -37,7 +61,7 @@ def _base_state(**overrides) -> dict:
     return state
 
 
-class TestComputeStartupEquityBrokerAvailable(unittest.TestCase):
+class TestComputeStartupEquityBrokerAvailable(_IsolatedSnapshotMixin, unittest.TestCase):
     """
     broker snapshot取得成功時: state file の stale available_cash を無視すること。
 
@@ -48,6 +72,7 @@ class TestComputeStartupEquityBrokerAvailable(unittest.TestCase):
     """
 
     def setUp(self):
+        super().setUp()
         import tempfile
         self._tmpdir = tempfile.TemporaryDirectory()
         self._patcher = patch("src.startup_check._BASE_DIR", Path(self._tmpdir.name))
@@ -56,6 +81,7 @@ class TestComputeStartupEquityBrokerAvailable(unittest.TestCase):
     def tearDown(self):
         self._patcher.stop()
         self._tmpdir.cleanup()
+        super().tearDown()
 
     @patch("src.kabusapi.client.KabuClient")
     def test_uses_broker_cash_not_stale_state_cash(self, mock_client_cls):
@@ -112,7 +138,7 @@ class TestComputeStartupEquityBrokerAvailable(unittest.TestCase):
         self.assertAlmostEqual(result["current_equity"], 1_734_900.0, delta=1.0)
 
 
-class TestComputeStartupEquityFailOpen(unittest.TestCase):
+class TestComputeStartupEquityFailOpen(_IsolatedSnapshotMixin, unittest.TestCase):
     """broker snapshot取得失敗時: 旧来の state ファイル依存ロジックへ FAIL_OPEN すること。"""
 
     @patch("src.kabusapi.client.KabuClient")
@@ -149,7 +175,7 @@ class TestComputeStartupEquityFailOpen(unittest.TestCase):
         self.assertEqual(result["current_equity"], 3_000_000.0)
 
 
-class TestDDBreachAndPeakAnomalyWarnings(unittest.TestCase):
+class TestDDBreachAndPeakAnomalyWarnings(_IsolatedSnapshotMixin, unittest.TestCase):
 
     @patch("src.kabusapi.client.KabuClient")
     def test_dd_breach_warning_present_when_below_threshold(self, mock_client_cls):
