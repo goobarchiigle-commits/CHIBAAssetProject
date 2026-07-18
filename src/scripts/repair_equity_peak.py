@@ -76,6 +76,12 @@ def _compute_new_peak(
     entries: list[tuple[str, float]], last_equity: float, method: str,
     n_entries: int, snapshot_file: Path,
 ) -> float:
+    if method == "current":
+        # Study96 EquityPeak SSOT Root Cause Audit (2026-07-18): 過去履歴を一切
+        # 信用せず、直近のsnapshot（=直近runのbroker equity）のみを新しい
+        # equity_peakとする「本日をDay0」リセット専用。median/maxのような
+        # 過去の汚染された高値の影響を一切受けない。
+        return last_equity
     if method == "max":
         return max(eq for _, eq in entries) if entries else last_equity
     # method == "median" — 既存 rebuild_equity_peak() のロジックを再利用
@@ -91,7 +97,7 @@ def main() -> int:
     parser.add_argument("--state-file",    type=Path, default=DEFAULT_STATE_FILE)
     parser.add_argument("--snapshot-file", type=Path, default=DEFAULT_SNAPSHOT_FILE)
     parser.add_argument("--n-entries", type=int, default=0, help="0 = 全件使用（既定）")
-    parser.add_argument("--method", choices=["median", "max"], default="median")
+    parser.add_argument("--method", choices=["median", "max", "current"], default="median")
     parser.add_argument("--apply", action="store_true", help="実際に書き込む（既定は dry-run）")
     parser.add_argument("--force", action="store_true", help="--apply 時の確認プロンプトを省略")
     parser.add_argument("--json", action="store_true", help="機械可読なJSONサマリも出力する")

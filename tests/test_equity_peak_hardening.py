@@ -163,8 +163,14 @@ class TestCandidateStaging(unittest.TestCase):
         self.assertIsNotNone(state["candidate_peak"])
         self.assertEqual(state["candidate_peak"]["value"], 3_400_000.0)
 
-    def test_next_trading_day_confirmation_applies_candidate(self):
-        """翌営業日、equityが候補値の許容下限以上なら確定してequity_peakへ反映される。"""
+    def test_next_trading_day_confirmation_holds_not_applies(self):
+        """翌営業日、equityが候補値の許容下限以上でも1回の再確認だけでは
+        まだequity_peakへ反映されない（Study96, 2026-07-17: 2026-07-15実インシデントで
+        1回の再確認だけでCONFIRMEDされてしまったことを受け、
+        CANDIDATE_PEAK_RECONFIRM_COUNT回連続の持続確認を要求するよう強化）。
+        HOLDING状態でconfirm_count=1として候補が保持され続けることを確認する。
+        規定回数到達での最終確定は test_equity_peak_ssot_study96.py::
+        TestPeakJumpReconfirmation::test_confirms_after_required_consecutive_days を参照。"""
         bridge = _make_bridge_stub()
         staged_date = "2026-07-03"
         next_td     = _next_trading_day(staged_date)
@@ -177,8 +183,10 @@ class TestCandidateStaging(unittest.TestCase):
             state, current_equity=3_400_000.0, today_str=next_td,
             raw_equity=3_400_000.0, broker_snapshot=None,
         )
-        self.assertEqual(state["equity_peak"], 3_400_000.0)
-        self.assertIsNone(state["candidate_peak"])
+        self.assertEqual(state["equity_peak"], 3_000_000.0, "1回の再確認だけでは確定しないこと")
+        self.assertIsNotNone(state["candidate_peak"], "候補はHOLDING中で保持され続けること")
+        self.assertEqual(state["candidate_peak"]["confirm_count"], 1)
+        self.assertEqual(state["candidate_peak"]["value"], 3_400_000.0)
 
     def test_next_trading_day_reconfirm_failure_discards_candidate(self):
         """翌営業日、equityが許容下限を下回ると候補は破棄されpeakは元のまま。"""

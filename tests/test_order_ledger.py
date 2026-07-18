@@ -364,6 +364,14 @@ class TestMarketOrderPriceExclusion(unittest.TestCase):
         self.Side = Side
         self.Exchange = Exchange
         self.OrderType = OrderType
+        # Entry Freeze Mode（2026-07-17〜既定enabled）はpayload構築ロジック自体の
+        # テストとは無関係のため、本クラスの間だけ明示的に無効化する。
+        from src.config_loader import load_strategy_config
+        self._ef_patch = _patch.dict("os.environ", {"ENTRY_FREEZE_ENABLED": "0"})
+        self._ef_patch.start()
+        load_strategy_config.cache_clear()
+        self.addCleanup(self._ef_patch.stop)
+        self.addCleanup(load_strategy_config.cache_clear)
 
     def _payload(self, order_type, side=None) -> dict:
         from unittest.mock import MagicMock, patch

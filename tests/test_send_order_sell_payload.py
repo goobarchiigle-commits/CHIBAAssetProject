@@ -44,6 +44,29 @@ from src.kabusapi.client import (
 # テスト共通ヘルパ
 # ------------------------------------------------------------------ #
 
+_entry_freeze_env_patch = None
+
+
+def setUpModule() -> None:
+    """Entry Freeze Mode（2026-07-17〜既定enabled）は本テストの対象外なので、
+    モジュール全体で明示的に無効化する（send_order()のpayload構築ロジック自体を
+    検証するテストであり、freezeゲートの挙動検証はtest_send_order_entry_freeze_guard.py
+    が別途担当する）。load_strategy_config()はlru_cache済みのため、他モジュールで
+    既にキャッシュされていた場合に備えcache_clear()も併用する。"""
+    global _entry_freeze_env_patch
+    from src.config_loader import load_strategy_config
+    _entry_freeze_env_patch = patch.dict("os.environ", {"ENTRY_FREEZE_ENABLED": "0"})
+    _entry_freeze_env_patch.start()
+    load_strategy_config.cache_clear()
+
+
+def tearDownModule() -> None:
+    from src.config_loader import load_strategy_config
+    if _entry_freeze_env_patch is not None:
+        _entry_freeze_env_patch.stop()
+    load_strategy_config.cache_clear()
+
+
 def _reset_cache() -> None:
     _CACHE._token = ""
     _CACHE._fetched_at = 0.0

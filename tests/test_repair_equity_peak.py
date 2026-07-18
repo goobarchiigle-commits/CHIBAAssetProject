@@ -106,6 +106,32 @@ class TestApply(RepairEquityPeakTestBase):
         state = self._load_state()
         self.assertEqual(state["equity_peak"], 4_000_000.0)
 
+    def test_method_current_uses_only_latest_snapshot(self):
+        """Study96 (2026-07-18): --method current は過去履歴（median/max）を無視し、
+        直近snapshotのequityのみを新peakとする「本日をDay0」リセット専用モード。"""
+        rc = self._run(["--apply", "--force", "--method", "current"])
+        self.assertEqual(rc, 0)
+        state = self._load_state()
+        # snapshotの最後のエントリ=4,000,000.0（max方式と偶然一致する値だが、
+        # median方式なら3,150,000.0付近になるはずの構成でcurrentが最新値のみを
+        # 見ていることを確認する）
+        self.assertEqual(state["equity_peak"], 4_000_000.0)
+        self.assertIsNone(state["candidate_peak"])
+        record = json.loads(self.audit_file.read_text(encoding="utf-8").strip().splitlines()[-1])
+        self.assertIn("method=current", record["diagnostic"])
+
+    def test_method_current_ignores_historical_spike(self):
+        """過去に異常な高値（汚染peak相当）があっても、method=currentは
+        直近snapshotのみを見るため、その汚染値の影響を一切受けないこと。"""
+        _write_snapshot(self.snapshot_file, [3_000_000.0, 9_999_999.0, 3_150_000.0])
+        rc = self._run(["--apply", "--force", "--method", "current"])
+        self.assertEqual(rc, 0)
+        state = self._load_state()
+        self.assertEqual(
+            state["equity_peak"], 3_150_000.0,
+            "過去の異常値(9,999,999)ではなく直近値のみが採用されること",
+        )
+
 
 class TestMissingSnapshot(unittest.TestCase):
     def test_missing_snapshot_file_returns_1(self):

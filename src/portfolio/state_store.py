@@ -578,8 +578,24 @@ def _self_heal(state: dict, validation: ValidationResult) -> tuple[dict, list[st
         healed.append("available_cash: 負値 → 0.0")
 
     if _is_nan_or_inf(state.get("equity_peak", 0)) or float(state.get("equity_peak", 0)) <= 0:
+        _old_peak_for_audit = state.get("equity_peak", 0)
         state["equity_peak"] = INITIAL_CAPITAL
         healed.append(f"equity_peak: 非正値 → {INITIAL_CAPITAL}")
+        # Study96 EquityPeak SSOT Root Cause Audit (2026-07-17): この経路は
+        # _commit_equity_peak() のSSOT外だが破損値修復として正当な例外的書込み。
+        # 監査の完全性のため equity_peak_audit.jsonl にも記録する（durable trace）。
+        try:
+            from src.portfolio.equity import append_peak_audit as _append_peak_audit
+            _append_peak_audit(
+                action="SELF_HEAL", old_peak=float(_old_peak_for_audit) if not _is_nan_or_inf(_old_peak_for_audit) else -1.0,
+                new_peak=INITIAL_CAPITAL, current_equity=float(state.get("last_equity", 0) or 0),
+                broker_equity=None, caller="state_store._self_heal", reason="corrupted_peak_repair",
+                diag=f"raw equity_peak was NaN/Inf/non-positive: {_old_peak_for_audit!r}",
+                trading_date=datetime.now(JST).strftime("%Y-%m-%d"), mode="self_heal",
+                pid=os.getpid(), run_id="N/A",
+            )
+        except Exception as _audit_err:
+            logger.warning("[EQUITY_PEAK_AUDIT] self_heal audit記録失敗 (非致命的): %s", _audit_err)
 
     _cand = state.get("candidate_peak")
     if _cand is not None and (

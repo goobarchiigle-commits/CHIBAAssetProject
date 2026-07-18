@@ -54,6 +54,11 @@ def _log_equity_peak_update(
     )
 
 
+class EquityPeakInvariantError(RuntimeError):
+    """equity_peak 更新が不変条件（Study96 Phase5）に違反した場合に送出する。
+    保存前に検知して run() を中断させ、破損値の永続化を防ぐ（fail-closed）。"""
+
+
 def _commit_equity_peak(
     state:                 dict,
     candidate_value:       float,
@@ -67,7 +72,10 @@ def _commit_equity_peak(
     bypass_candidate_gate: bool = False,
 ) -> float:
     """
-    equity_peak の唯一の書き込み経路（EQUITY_PEAK_HARDENING, 2026-07-03）。
+    equity_peak の唯一の書き込み経路（EQUITY_PEAK_HARDENING, 2026-07-03 /
+    Study96 EquityPeak SSOT Root Cause Audit, 2026-07-17 で不変条件assert +
+    多段階再確認を追加。原因推定（入出金等）ロジックは持ち込まない — 現在の
+    証券口座equityのみをSSOTとし、異常値は理由を問わず一律に拒否/保留する）。
 
     _update_cb_state() 以外からの呼び出しは RuntimeError で拒否する
     （sync_positions.py 等の迂回書込みによる無検証 peak 混入事故の再発防止）。
@@ -75,9 +83,10 @@ def _commit_equity_peak(
     処理順:
       1. check_broker_consistency() で broker 生値との乖離を検証。
          不整合なら EQUITY_PEAK_REJECT（state は不変）。
-      2. bypass_candidate_gate=False かつ 前回peak比 +10% 以上のジャンプなら
+      2. 書込み直前の不変条件assert（peak >= equity・new_highはold_peak超のみ）。
+      3. bypass_candidate_gate=False かつ 前回peak比 +10% 以上のジャンプなら
          state["candidate_peak"] へステージングし、即時採用しない。
-      3. それ以外は state["equity_peak"] を確定書き込みする。
+      4. それ以外は state["equity_peak"] を確定書き込みする。
 
     全分岐で _log_equity_peak_update()（logger監査）と append_peak_audit()
     （durable JSONL監査）を必ず呼ぶ。
@@ -85,6 +94,12 @@ def _commit_equity_peak(
     Returns:
         float: この呼び出し後に有効な equity_peak
                （REJECTED/STAGED 時は変更前の値のまま）
+
+    Raises:
+        EquityPeakInvariantError: 書込み直前に candidate_value < current_equity
+            （peak は定義上 equity 以上でなければならない）が成立した場合。
+            state は一切変更されず、呼び出し元（run()）まで伝播して該当run全体を
+            中断させることで、不正値の save_portfolio_state() 永続化を防ぐ。
     """
     _frame = sys._getframe(1)
     if _frame.f_code.co_name != "_update_cb_state":
@@ -95,6 +110,7 @@ def _commit_equity_peak(
         )
 
     old_peak = float(state.get("equity_peak", 0.0))
+
     _audit_common = dict(
         old_peak       = old_peak,
         new_peak       = candidate_value,
@@ -116,6 +132,16 @@ def _commit_equity_peak(
         append_peak_audit(action="REJECTED", broker_equity=broker_equity, diag=diag, **_audit_common)
         return old_peak
 
+    # ── Study96 Phase5: 書込み直前の不変条件assert（fail-closed） ──────────
+    # peak は定義上 equity 以上でなければならない。違反時は state を一切変更せず
+    # 例外を送出し、run() 全体を中断させて save_portfolio_state() への到達を防ぐ。
+    if candidate_value < current_equity - 1.0:
+        raise EquityPeakInvariantError(
+            f"EQUITY_PEAK_INVARIANT_VIOLATION: candidate_value=¥{candidate_value:,.0f} "
+            f"< current_equity=¥{current_equity:,.0f} (peak must be >= equity at commit time). "
+            f"caller={caller} reason={reason} old_peak=¥{old_peak:,.0f}"
+        )
+
     if bypass_candidate_gate:
         state["equity_peak"] = round(candidate_value, 0)
         _log_equity_peak_update(old_peak, candidate_value, current_equity, caller=caller, reason=reason)
@@ -136,6 +162,14 @@ def _commit_equity_peak(
         )
         append_peak_audit(action="STAGED", broker_equity=broker_equity, diag=diag, **_audit_common)
         return old_peak
+
+    # ── Study96 Phase5: "new_high" は old_peak を上回る場合のみ許可 ────────
+    if reason == "new_high" and candidate_value <= old_peak:
+        raise EquityPeakInvariantError(
+            f"EQUITY_PEAK_INVARIANT_VIOLATION: reason=new_high なのに "
+            f"candidate_value=¥{candidate_value:,.0f} <= old_peak=¥{old_peak:,.0f} "
+            f"(new_high は old_peak を上回る場合のみ呼び出されるべき)。caller={caller}"
+        )
 
     state["equity_peak"] = round(candidate_value, 0)
     _log_equity_peak_update(old_peak, candidate_value, current_equity, caller=caller, reason=reason)
@@ -288,7 +322,13 @@ ORDER_RATE_LIMIT_PER_MIN      = 3             # kabu API 発注レート（件/�
 
 # ── equity_peak ハードニング (EQUITY_PEAK_HARDENING, 2026-07-03) ──────────
 CANDIDATE_PEAK_JUMP_THRESHOLD = 0.10   # 前回peak比+10%以上はcandidate_peakへステージング
-CANDIDATE_RECONFIRM_TOLERANCE = 0.02   # 翌営業日再確認時の許容下振れ（2%）
+CANDIDATE_RECONFIRM_TOLERANCE = 0.02   # 各営業日再確認時の許容下振れ（2%）
+# Study96 EquityPeak SSOT Root Cause Audit (2026-07-17): 2026-07-15の実インシデントで
+# +35.9%ジャンプが「翌営業日1回のみの再確認」でCONFIRMEDされてしまったことが判明。
+# SAFE_WARN機構が既に採用している「N連続確認」パターン（SAFE_WARN_CONFIRM_REQUIRED=3）を
+# candidate_peak確定にも適用し、単発の持続だけでは確定させない（原因推定なし・
+# 純粋に営業日をまたいだ持続回数のみで判定する）。
+CANDIDATE_PEAK_RECONFIRM_COUNT = 3     # 確定に必要な連続営業日再確認回数
 
 # ── 幽霊ポジション対策 (GHOST_POSITION_FIX, 2026-07-03) ───────────────────
 # 2026-07-03 実インシデント: 5301.T が実ブローカーで売却済みにも関わらず、
@@ -1034,6 +1074,11 @@ class SignalBridge:
         equity_peak の書込みは全て _commit_equity_peak() 経由（EQUITY_PEAK_HARDENING）。
         REJECTED/STAGED になっても、本メソッド内の CB 状態遷移判定（drawdown/分岐/
         _save_cb_event）は変更しない — peak の永続化可否と当該run内のCB判定は分離する。
+
+        equity_peakの唯一の真実は現在の証券口座equityであり、原因推定（入出金等）は
+        一切行わない（Study96 EquityPeak SSOT Root Cause Audit, 2026-07-17）。異常な
+        ジャンプは理由を問わず一律にcandidate_peakへ保留し、N連続営業日の持続が
+        確認されて初めて確定する（下記candidate_peak再確認ロジック参照）。
         """
         cb_state_before  = state.get("cb_state", "NORMAL")
         cb_state         = cb_state_before
@@ -1041,25 +1086,84 @@ class SignalBridge:
         _original_peak   = equity_peak  # anomaly チェック用に保存
         mode             = "live" if self.live else "dry"
 
-        # ── candidate_peak 再確認 (EQUITY_PEAK_HARDENING) ──────────────────
+        # ── candidate_peak 多段階再確認 (EQUITY_PEAK_HARDENING 2026-07-03 /
+        #    Study96 2026-07-17でN連続確認化) ─────────────────────────────
         # 前回runで+10%以上のジャンプとしてステージングされた候補があれば、
         # 翌営業日以降の最初のrunで再確認する。同日中は何もしない。
+        # 2026-07-15実インシデント（+35.9%ジャンプが1回の翌営業日確認だけで
+        # CONFIRMEDされてしまった）を受け、CANDIDATE_PEAK_RECONFIRM_COUNT回
+        # （既定3）連続で基準を満たすまでは確定しない。原因（入出金等）の
+        # 推定は行わず、単に「営業日をまたいで何度も持続したか」だけを見る。
+        _candidate_holding_this_call = False
         candidate = state.get("candidate_peak")
         if candidate is not None:
-            _cand_value  = float(candidate.get("value", 0))
-            _staged_date = candidate.get("staged_date")
+            _cand_value    = float(candidate.get("value", 0))
+            _staged_date   = candidate.get("staged_date")
+            _confirm_count = int(candidate.get("confirm_count", 0))
             _expected_next_td = (
                 _add_trading_days(pd.Timestamp(_staged_date), 1).strftime("%Y-%m-%d")
                 if _staged_date else None
             )
             if _expected_next_td and today_str >= _expected_next_td:
                 if current_equity >= _cand_value * (1 - CANDIDATE_RECONFIRM_TOLERANCE):
-                    equity_peak = _commit_equity_peak(
-                        state, _cand_value, current_equity,
-                        caller="_update_cb_state", reason="candidate_peak_confirmed",
-                        broker_snapshot=broker_snapshot, today_str=today_str, mode=mode,
-                        bypass_candidate_gate=True,
-                    )
+                    _confirm_count += 1
+                    if _confirm_count >= CANDIDATE_PEAK_RECONFIRM_COUNT:
+                        # Study96追記: N回連続確認に到達しても、確定直前に
+                        # check_broker_consistency() が改めて実行される
+                        # （_commit_equity_peak()内で無条件に先頭実行）。
+                        # そこで不整合と判定されればREJECTEDでold_peakが
+                        # 返るため、その場合はconfirm_countを維持したまま
+                        # 候補を残し、次回runで再度最終確認を試みる
+                        # （持続回数の実績を無駄に失わないため）。
+                        _pre_call_peak = equity_peak
+                        equity_peak = _commit_equity_peak(
+                            state, _cand_value, current_equity,
+                            caller="_update_cb_state", reason="candidate_peak_confirmed",
+                            broker_snapshot=broker_snapshot, today_str=today_str, mode=mode,
+                            bypass_candidate_gate=True,
+                        )
+                        if equity_peak != _pre_call_peak:
+                            state["candidate_peak"] = None
+                        else:
+                            # 最終整合性チェックで見送り。同一current_equityでの
+                            # new_high再ステージングを防ぐため holding 扱いにする。
+                            _candidate_holding_this_call = True
+                            logger.warning(
+                                "[EQUITY_PEAK_FINAL_CONSISTENCY_REJECT] confirm_count=%d/%d "
+                                "到達も、確定直前のbroker整合性チェックで不整合と判定され見送り。"
+                                "confirm_countは維持し次回runで再試行する。",
+                                _confirm_count, CANDIDATE_PEAK_RECONFIRM_COUNT,
+                            )
+                            state["candidate_peak"] = {
+                                **candidate,
+                                "confirm_count": _confirm_count,
+                                "staged_date":   today_str,
+                            }
+                    else:
+                        # まだ規定回数に達していない → 保留を継続（次回チェックは
+                        # 今日から数えて翌営業日）。confirm_countのみ進める。
+                        # _candidate_holding_this_call=True にして、直後の
+                        # new_high フォールスルーが同一equityで即座に別候補を
+                        # 再ステージングし confirm_count を上書きしないようにする。
+                        _candidate_holding_this_call = True
+                        state["candidate_peak"] = {
+                            **candidate,
+                            "confirm_count": _confirm_count,
+                            "staged_date":   today_str,
+                        }
+                        logger.info(
+                            "[EQUITY_PEAK_CANDIDATE_HOLDING] staged=¥%s current=¥%s "
+                            "confirm=%d/%d — 保留継続（原因推定なし・持続回数のみで判定）",
+                            f"{_cand_value:,.0f}", f"{current_equity:,.0f}",
+                            _confirm_count, CANDIDATE_PEAK_RECONFIRM_COUNT,
+                        )
+                        append_peak_audit(
+                            action="HOLDING", old_peak=equity_peak, new_peak=_cand_value,
+                            current_equity=current_equity, broker_equity=None,
+                            caller="_update_cb_state", reason="candidate_reconfirm_holding",
+                            diag=f"confirm_count={_confirm_count}/{CANDIDATE_PEAK_RECONFIRM_COUNT}",
+                            trading_date=today_str, mode=mode, pid=os.getpid(), run_id=_RUN_ID,
+                        )
                 else:
                     logger.warning(
                         "[EQUITY_PEAK_CANDIDATE_DISCARDED] staged=¥%s current=¥%s "
@@ -1076,11 +1180,14 @@ class SignalBridge:
                         ),
                         trading_date=today_str, mode=mode, pid=os.getpid(), run_id=_RUN_ID,
                     )
-                state["candidate_peak"] = None
+                    state["candidate_peak"] = None
             # today_str < _expected_next_td（ステージング当日）→ 候補は据え置き、no-op
 
-        # equity_peak 更新（現在 equity が peak を超えた場合のみ上方修正）
-        if current_equity > equity_peak:
+        # equity_peak 更新（現在 equity が peak を超えた場合のみ上方修正）。
+        # HOLDING中（今回confirm_countを進めただけ）の場合はスキップする —
+        # 同一のcurrent_equityで即座に別のSTAGED候補が生成され、進めたばかりの
+        # confirm_countが上書きされてしまうのを防ぐ。
+        if not _candidate_holding_this_call and current_equity > equity_peak:
             equity_peak = _commit_equity_peak(
                 state, current_equity, current_equity,
                 caller="_update_cb_state", reason="new_high",
@@ -4711,6 +4818,9 @@ class SignalBridge:
         # wallet 値（available_cash）のみを使用し、prev は commit 前 portfolio_state
         # から読む（commit_broker_snapshot() がこの後 available_cash を上書きするため
         # ここで読まないと旧値が失われる）。
+        # 観測・監査ログ専用（[EQUITY_CASH_RESIDUAL]）。equity_peak判定には使わない
+        # （Study96 EquityPeak SSOT Root Cause Audit, 2026-07-17: 原因推定ロジックを
+        # peak確定判断へ持ち込まない方針）。
         if _broker_wallet_ok and available_cash is not None:
             _new_cash = float(available_cash)
             _new_mv   = current_equity - _new_cash
