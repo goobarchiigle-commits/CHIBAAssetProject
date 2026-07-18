@@ -95,15 +95,17 @@ def main() -> int:
         print("  3. src/.env の KABU_API_PASSWORD を正しい値に更新")
         return 1
 
-    # 2. ポジション取得
+    # 2. ポジション・余力取得（Broker-as-Sole-SSOT: fetch_broker_snapshot()の唯一経路）
+    from src.portfolio.broker_source import fetch_broker_snapshot, BrokerSnapshotUnavailable
+    from src.portfolio.equity import compute_live_equity
     try:
-        raw_positions = client.get_positions()
-    except Exception as e:
-        print(f"\n❌ ポジション取得失敗: {e}")
+        snap = fetch_broker_snapshot(client)
+    except BrokerSnapshotUnavailable as e:
+        print(f"\n❌ broker snapshot取得失敗: {e}")
         return 1
 
-    print(f"\n✅ API 接続成功 | ポジション数: {len(raw_positions)}")
-    if not raw_positions:
+    print(f"\n✅ API 接続成功 | ポジション数: {len(snap.positions)}")
+    if not snap.positions:
         print("  現在保有ポジションなし")
         # ポジションなしで state をクリア
         if not args.force:
@@ -120,54 +122,28 @@ def main() -> int:
         print("  portfolio_state.json をクリアしました。")
         return 0
 
-    # 3. パース・表示（qty <= 0 は除外）
-    from src.common.position_normalizer import filter_live_positions
-    live_raw = filter_live_positions(raw_positions)
-    zero_qty_syms = [
-        f"{p.get('Symbol','')}.T" for p in raw_positions
-        if p not in live_raw
-    ]
-
-    print(f"\n{'銘柄':<10} {'保有株数':>8} {'平均単価':>10} {'評価額':>12}")
-    print("-" * 46)
+    # 3. 表示（snap.positions は broker応答からqty>0のみ既に正規化済み）
+    print(f"\n{'銘柄':<10} {'保有株数':>8} {'平均単価':>10} {'現在値':>10} {'評価額':>12}")
+    print("-" * 58)
     total_value   = 0.0
     api_positions = []
 
-    if zero_qty_syms:
-        for sym in zero_qty_syms:
-            print(f"  {sym:<10} {'0':>8}株  (保有なし — スキップ)")
-
-    for p in live_raw:
-        code  = p.get("Symbol", "")
-        sym   = f"{code}.T" if not code.endswith(".T") else code
-        qty   = p.get("LeavesQty") or 0
-        price = p.get("Price", 0.0) or 0.0
-
-        value = qty * price
+    for sym, qty in snap.positions.items():
+        avg_price = snap.avg_costs.get(sym, 0.0)
+        cur_price = snap.market_values.get(sym, avg_price)
+        value = qty * cur_price
         total_value += value
-        api_positions.append({"symbol": sym, "qty": qty, "avg_price": price, "value": value})
-        print(f"  {sym:<10} {qty:>8}株  ¥{price:>9,.0f}  ¥{value:>11,.0f}")
+        api_positions.append({"symbol": sym, "qty": qty, "avg_price": avg_price, "value": value})
+        print(f"  {sym:<10} {qty:>8}株  ¥{avg_price:>9,.0f}  ¥{cur_price:>9,.0f}  ¥{value:>11,.0f}")
 
-    if zero_qty_syms:
-        print(f"\n  ⚠ qty=0 として除外: {zero_qty_syms}")
+    print("-" * 58)
+    print(f"  {'合計評価額':>34}  ¥{total_value:>11,.0f}")
 
-    print("-" * 46)
-    print(f"  {'合計評価額':>30}  ¥{total_value:>11,.0f}")
-
-    # 4. 余力取得
-    available_cash = None
-    try:
-        wallet = client.get_wallet_cash()
-        available_cash = float(wallet.get("StockAccountWallet", 0))
-        print(f"  {'現物余力':>30}  ¥{available_cash:>11,.0f}")
-        from src.portfolio.equity import compute_live_equity as _cle
-        _disp_pos = {p["symbol"]: {"qty": p["qty"], "avg_price": p["avg_price"]}
-                     for p in api_positions}
-        estimated_equity = _cle(available_cash, _disp_pos, mode="display",
-                                persist_snapshot=False)
-        print(f"  {'推定総資産':>30}  ¥{estimated_equity:>11,.0f}")
-    except Exception as e:
-        logger.warning("余力取得失敗: %s", e)
+    # 4. 余力・推定総資産表示
+    available_cash = snap.cash
+    print(f"  {'現物余力':>34}  ¥{available_cash:>11,.0f}")
+    estimated_equity = compute_live_equity(snapshot=snap, mode="display", persist_snapshot=False)
+    print(f"  {'推定総資産':>34}  ¥{estimated_equity:>11,.0f}")
 
     # 5. 確認
     if not args.force:
@@ -181,7 +157,7 @@ def main() -> int:
     # 6. state 更新
     state = load_state()
 
-    # ── 6a. qty=0 銘柄をすべての state キーから削除 ──────────────────
+    # ── 6a. broker に存在しない銘柄を state から削除 ──────────────────
     # GHOST_POSITION_FIX (2026-07-03): 判定元を position_entry_dates だけでなく
     # position_qtys とも突き合わせる（2026-07-03 実例: 5301.T は position_qtys に
     # qty=300 で残留していたが position_entry_dates には既に存在せず、旧ロジックの
@@ -189,15 +165,14 @@ def main() -> int:
     # position_current_prices / position_unrealized_pnl / position_unrealized_pct /
     # position_missing_streak を追加し、equity 計算に効く数量系フィールドを
     # 確実に一掃する。
-    _all_zero = set(zero_qty_syms)
-    # API に存在しない既存保有もゼロ扱いでクリーンアップ
+    # snap.positions は broker応答からqty>0のみ既に正規化済み（qty=0銘柄は
+    # fetch_broker_snapshot() の時点で除外されている）。
     _api_syms = {p["symbol"] for p in api_positions}
     _known_syms = (
         set(state.get("position_entry_dates", {}).keys())
         | set(state.get("position_qtys", {}).keys())
     )
-    _stale = _known_syms - _api_syms
-    _to_remove = _all_zero | _stale
+    _to_remove = _known_syms - _api_syms
     if _to_remove:
         for _key in (
             "position_entry_dates", "position_entry_prices",
@@ -238,32 +213,29 @@ def main() -> int:
                 sym, p["avg_price"], existing_hc,
             )
 
-    # last_equity のみ更新（正規計算路を経由）。
+    # cash/positions/last_equity は commit_broker_snapshot() 経由の一括commitのみ。
     # equity_peak は _update_cb_state() 以外からの書き込みを禁止する
     # (EQUITY_PEAK_HARDENING, 2026-07-03)。sync_positions.py は観測ログのみ出力し、
     # 実際の peak 更新（broker整合性チェック + candidate_peak ステージング込み）は
     # 次回 bridge.run() の _update_cb_state() に委ねる。
-    if available_cash is not None:
-        from src.portfolio.equity import compute_live_equity
-        _pos_for_equity = {
-            p["symbol"]: {"qty": p["qty"], "avg_price": p["avg_price"]}
-            for p in api_positions
-        }
-        estimated_equity = compute_live_equity(
-            live_cash    = available_cash,
-            positions    = _pos_for_equity,
-            universe_raw = None,   # avg_price = API current price を使用
-            mode         = "reconcile",
-            equity_peak  = float(state.get("equity_peak", 0)),
+    from src.portfolio.state_store import commit_broker_snapshot, SnapshotValidationError
+    estimated_equity = compute_live_equity(
+        snapshot=snap, mode="reconcile", equity_peak=float(state.get("equity_peak", 0)),
+        persist_snapshot=False,
+    )
+    snap.equity = estimated_equity
+    _old_peak = float(state.get("equity_peak", 0))
+    if estimated_equity > _old_peak:
+        logger.warning(
+            "[EQUITY_PEAK_OBSERVED_HIGHER] estimated_equity=¥%s > persisted_peak=¥%s "
+            "— sync_positions は peak を更新しません（次回 bridge 実行で反映）。",
+            f"{estimated_equity:,.0f}", f"{_old_peak:,.0f}",
         )
-        _old_peak = float(state.get("equity_peak", 0))
-        if estimated_equity > _old_peak:
-            logger.warning(
-                "[EQUITY_PEAK_OBSERVED_HIGHER] estimated_equity=¥%s > persisted_peak=¥%s "
-                "— sync_positions は peak を更新しません（次回 bridge 実行で反映）。",
-                f"{estimated_equity:,.0f}", f"{_old_peak:,.0f}",
-            )
-        state["last_equity"] = round(estimated_equity, 0)
+    try:
+        commit_broker_snapshot(state, snap)
+    except SnapshotValidationError as e:
+        logger.error("broker snapshot commit失敗（state未変更）: %s", e)
+        return 1
 
     save_state(state)
 

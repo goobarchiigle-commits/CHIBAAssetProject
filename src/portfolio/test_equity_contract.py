@@ -48,42 +48,29 @@ _POSITIONS = {
 # equity       = 1,500,000 + 490,000 = 1,990,000
 _EXPECTED_EQUITY = 1_990_000.0
 
-_UNIVERSE_RAW = {
-    "7203.T": {"df": MagicMock(**{"__getitem__.return_value": MagicMock(
-        iloc=MagicMock(**{"__getitem__": lambda s, i: 2500.0})
-    )})},
-    "6758.T": {"df": MagicMock(**{"__getitem__.return_value": MagicMock(
-        iloc=MagicMock(**{"__getitem__": lambda s, i: 1200.0})
-    )})},
-}
-
-
-def _make_universe_df(price: float) -> MagicMock:
-    df = MagicMock()
-    df.__getitem__ = lambda s, key: MagicMock(
-        iloc=MagicMock(**{"__getitem__": lambda ss, i: price})
+def _snapshot_from_positions(cash: float, positions: dict[str, dict]) -> BrokerSnapshot:
+    """テスト用: {sym: {"qty","avg_price"}} 形式から BrokerSnapshot を組み立てる。
+    market_values は avg_price と同値にする（broker CurrentPrice ≒ 取得単価の単純ケース）。"""
+    return BrokerSnapshot(
+        cash=cash,
+        positions={s: int(p["qty"]) for s, p in positions.items()},
+        avg_costs={s: float(p["avg_price"]) for s, p in positions.items()},
+        market_values={s: float(p["avg_price"]) for s, p in positions.items()},
+        equity=0.0, ts="2026-07-18T08:44:00+0900", source="broker",
+        api_health={"positions_ok": True, "wallet_ok": True},
     )
-    return df
-
-
-def _universe(prices: dict[str, float]) -> dict:
-    return {sym: {"df": _make_universe_df(p)} for sym, p in prices.items()}
 
 
 class TestEquityInvariance(unittest.TestCase):
     """
-    同一ポートフォリオ状態に対して全パスが同一 equity を返すこと。
+    同一ポートフォリオ状態に対して全パスが同一 equity を返すこと
+    （Broker-as-Sole-SSOT: 入力が BrokerSnapshot のみになったため、
+    パス間の drift はそもそも構造的に発生し得ない）。
     """
 
-    def _compute(self, mode: str, with_universe: bool = True) -> float:
-        universe = _universe({"7203.T": 2500.0, "6758.T": 1200.0}) if with_universe else None
-        return compute_live_equity(
-            live_cash    = _CASH,
-            positions    = _POSITIONS,
-            universe_raw = universe,
-            mode         = mode,
-            persist_snapshot = False,
-        )
+    def _compute(self, mode: str) -> float:
+        snap = _snapshot_from_positions(_CASH, _POSITIONS)
+        return compute_live_equity(snapshot=snap, mode=mode, persist_snapshot=False)
 
     def test_live_equity(self):
         eq = self._compute("live")
@@ -116,29 +103,20 @@ class TestEquityInvariance(unittest.TestCase):
                     msg=f"{m} path returned {v} != expected {_EXPECTED_EQUITY}",
                 )
 
-    def test_fallback_to_avg_price_when_no_universe(self):
-        """universe_raw=None でも avg_price フォールバックで同値を返すこと。"""
-        eq_with    = self._compute("live",  with_universe=True)
-        eq_without = self._compute("live",  with_universe=False)
-        self.assertAlmostEqual(eq_with, eq_without, places=0)
-
     def test_zero_cash(self):
-        eq = compute_live_equity(
-            live_cash=0.0, positions=_POSITIONS, persist_snapshot=False
-        )
+        snap = _snapshot_from_positions(0.0, _POSITIONS)
+        eq = compute_live_equity(snapshot=snap, persist_snapshot=False)
         self.assertAlmostEqual(eq, 490_000.0, places=0)
 
     def test_empty_positions(self):
-        eq = compute_live_equity(
-            live_cash=_CASH, positions={}, persist_snapshot=False
-        )
+        snap = _snapshot_from_positions(_CASH, {})
+        eq = compute_live_equity(snapshot=snap, persist_snapshot=False)
         self.assertAlmostEqual(eq, _CASH, places=0)
 
     def test_zero_qty_excluded(self):
         positions_with_zero = {**_POSITIONS, "0000.T": {"qty": 0, "avg_price": 999.0}}
-        eq = compute_live_equity(
-            live_cash=_CASH, positions=positions_with_zero, persist_snapshot=False
-        )
+        snap = _snapshot_from_positions(_CASH, positions_with_zero)
+        eq = compute_live_equity(snapshot=snap, persist_snapshot=False)
         self.assertAlmostEqual(eq, _EXPECTED_EQUITY, places=0)
 
 

@@ -177,128 +177,6 @@ def _commit_equity_peak(
     return candidate_value
 
 
-def _apply_full_empty_fallback_gate(
-    current_positions:   dict,
-    *,
-    broker_positions_ok: bool,
-    saved_qtys:          dict,
-    saved_prices:        dict,
-) -> dict:
-    """
-    STATE_SYNC_INTEGRITY (2026-07-19): current_positions が完全に空の場合、
-    stateへフォールバックしてよいのは broker API呼び出し自体が失敗/未接続
-    （broker_positions_ok=False）の場合のみ。
-
-    従来は current_positions が空である理由を一切区別せず、broker が
-    get_positions() に成功した上で「本当に保有0件」を返した場合でも無条件に
-    state["position_qtys"]（前回runで永続化された値）を復元していた。
-    これは _apply_position_missing_streak_gate() が持つ連続欠落回数の
-    decay保護（MAX_POSITION_MISSING_STREAK）が一切適用されない別経路であり、
-    brokerが繰り返し「保有0」を正しく返し続ける限り、無期限にstateの
-    古いpositionsで上書きされ続ける（decay無しの無制限フォールバック）。
-
-    broker_positions_ok=True（API呼び出し自体は成功）の場合はbrokerの
-    応答（空なら空）をそのまま信頼し、一切補完しない。
-    broker_positions_ok=False（API失敗・DRY未接続等）の場合のみ、
-    直前に永続化されたstateの値を暫定的に使う（従来通りのFAIL_OPEN）。
-
-    純粋関数。current_positionsは破壊的に変更しない。
-    """
-    if current_positions:
-        return current_positions
-    if broker_positions_ok:
-        # broker成功時の「真の保有0」はSSOTとして信頼する。フォールバックしない。
-        if saved_qtys:
-            logger.warning(
-                "[STATE_SYNC] broker が保有0件を正常応答（state記録%d件を破棄): %s "
-                "— brokerをSSOTとして信頼しフォールバックしない",
-                len(saved_qtys), list(saved_qtys.keys()),
-            )
-        return current_positions
-    if not saved_qtys:
-        return current_positions
-
-    restored = {
-        sym: {"qty": int(qty), "avg_price": float(saved_prices.get(sym, 0.0))}
-        for sym, qty in saved_qtys.items()
-        if int(qty) > 0
-    }
-    logger.info(
-        "positions フォールバック: state から %d 銘柄を復元 %s "
-        "(broker API失敗/未接続のため。broker成功時のゼロ件はこの分岐に入らない)",
-        len(restored), list(restored.keys()),
-    )
-    return restored
-
-
-def _apply_position_missing_streak_gate(
-    current_positions:    dict,
-    saved_qtys:           dict,
-    saved_prices:         dict,
-    missing_streak:       dict,
-    *,
-    broker_positions_ok:  bool,
-    max_streak:           int | None = None,
-) -> tuple[dict, dict]:
-    """
-    「部分補完」ロジック本体（GHOST_POSITION_FIX, 2026-07-03）。純粋関数として
-    run() から切り出し、単体テスト可能にする。current_positions を破壊的に更新する。
-
-    broker が今回返却しなかった銘柄（saved_qtys にあり current_positions に無い）を
-    missing_streak がしきい値未満の間だけ補完し、しきい値到達後は「実際に売却済み」
-    と判断して補完を停止する。broker_positions_ok=False の場合は一切補完しない
-    （broker 自体が失敗した run で誤って売却済みと判断しないため）。
-
-    Returns:
-        (updated_current_positions, updated_missing_streak)
-    """
-    if max_streak is None:
-        max_streak = MAX_POSITION_MISSING_STREAK
-    fresh_syms = set(current_positions.keys())
-    streak     = dict(missing_streak)
-
-    if broker_positions_ok and saved_qtys:
-        supplement: dict = {}
-        expired:    list = []
-        for sup_sym, sup_qty in saved_qtys.items():
-            try:
-                if int(sup_qty) <= 0 or sup_sym in fresh_syms:
-                    continue
-                sym_streak = int(streak.get(sup_sym, 0))
-                if sym_streak >= max_streak:
-                    expired.append(sup_sym)
-                    continue
-                supplement[sup_sym] = {
-                    "qty":       int(sup_qty),
-                    "avg_price": float(saved_prices.get(sup_sym, 0.0)),
-                }
-                streak[sup_sym] = sym_streak + 1
-            except (TypeError, ValueError):
-                pass
-        if supplement:
-            current_positions.update(supplement)
-            logger.info(
-                "positions 部分補完: broker API 未返却の %d 銘柄を state から追加 (streak更新後) %s",
-                len(supplement), {k: streak[k] for k in sorted(supplement)},
-            )
-        if expired:
-            logger.warning(
-                "[GHOST_POSITION_EXPIRED] %d 銘柄が連続%d回以上broker未返却 → "
-                "売却済みと判断し補完を停止（次回 commit_broker_snapshot で state からも除去）: %s",
-                len(expired), max_streak, sorted(expired),
-            )
-            for exp_sym in expired:
-                streak.pop(exp_sym, None)
-
-    # broker が今回実際に返却した銘柄は streak をリセット（連続欠落のみカウント）
-    if broker_positions_ok:
-        for sym_in_streak in list(streak.keys()):
-            if sym_in_streak in fresh_syms:
-                streak.pop(sym_in_streak, None)
-
-    return current_positions, streak
-
-
 def _export_rsr_snapshot(date_str: str, rsr_scores: dict) -> None:
     """
     Write daily RSR snapshot to runtime/rsr/YYYY-MM-DD.json (atomic write).
@@ -358,6 +236,10 @@ from src.portfolio.state_store import (
     update_portfolio_state_from_broker,
     write_reconciliation_log,
 )
+from src.portfolio.broker_source import (
+    BrokerSnapshotUnavailable,
+    fetch_broker_snapshot,
+)
 
 # ------------------------------------------------------------------ #
 # ポートフォリオ状態・CB 管理定数
@@ -384,14 +266,13 @@ CANDIDATE_RECONFIRM_TOLERANCE = 0.02   # 各営業日再確認時の許容下振
 # 純粋に営業日をまたいだ持続回数のみで判定する）。
 CANDIDATE_PEAK_RECONFIRM_COUNT = 3     # 確定に必要な連続営業日再確認回数
 
-# ── 幽霊ポジション対策 (GHOST_POSITION_FIX, 2026-07-03) ───────────────────
+# ── 幽霊ポジション対策 (GHOST_POSITION_FIX, 2026-07-03 → 2026-07-18廃止) ───
 # 2026-07-03 実インシデント: 5301.T が実ブローカーで売却済みにも関わらず、
 # 「部分補完」ロジックが毎run無条件に portfolio_state から復活させ続け、
 # compute_live_equity() の market_value を ¥595,550 過大評価 → 誤 equity_peak
-# (¥4,706,291、実際は一度も到達していない) を発生させた。
-# broker 側が連続で当該銘柄を返却しない場合、MAX_POSITION_MISSING_STREAK 回を
-# 超えたら「実際に売却済み」と判断し補完を停止する（broker reality is authoritative）。
-MAX_POSITION_MISSING_STREAK = 2
+# (¥4,706,291、実際は一度も到達していない) を発生させた。当時はstreak counterで
+# 緩和したが、Broker-as-Sole-SSOTリファクタ(2026-07-18)によりstateからの部分補完
+# 自体を全廃した（broker応答は失敗/未接続時を除き常に無条件に信頼する）。
 
 # ── mean_rev 反発未発生検出 ──────────────────────────────────────
 # エントリー後 MEANREV_FAIL_DAYS 営業日以内に High が
@@ -989,7 +870,13 @@ class SignalBridge:
         deployable_capital:        float = 0.0,
         entry_freeze_enabled:      bool  = False,
         entry_freeze_reason:       str   = "Research Freeze",
+        require_broker:            bool  = True,
     ) -> None:
+        # Broker-as-Sole-SSOT (2026-07-18): True の場合、run() は broker snapshot
+        # 取得に失敗すると AbortError で即座に停止する（state/OHLCVへのフォールバック
+        # を行わない）。DRY/LIVE共通でTrueが既定。False は手動検証・研究用途の
+        # 明示的な省略モードのみに使う想定（--allow-no-broker 経由）。
+        self.require_broker            = require_broker
         self.universe_tickers          = universe_tickers
         self.shadow_universe_tickers   = shadow_universe_tickers or {}
         self.rsr_universe_tickers      = (
@@ -1077,30 +964,6 @@ class SignalBridge:
         """
         _src = "broker_api" if self._positions_api_status.get("source") == "broker" else "internal"
         save_portfolio_state(state, path=self._state_file, data_source=_src)
-
-    def _compute_current_equity(
-        self,
-        current_positions: dict,
-        universe_raw:      dict,
-        available_cash:    float,
-        mode:              str = "unknown",
-        equity_peak:       float = 0.0,
-        snapshot:          "BrokerSnapshot | None" = None,
-    ) -> float:
-        """
-        現在のポートフォリオ価値（現金 + 含み評価額）を推定する。
-
-        BrokerSnapshot が提供された場合はそちらを優先する (dict バラ渡し禁止)。
-        DRY モードなど snapshot が None の場合のみ loose params にフォールバックする。
-        """
-        return compute_live_equity(
-            live_cash    = available_cash,
-            positions    = current_positions,
-            universe_raw = universe_raw,
-            snapshot     = snapshot,
-            mode         = mode,
-            equity_peak  = equity_peak,
-        )
 
     def _update_cb_state(
         self,
@@ -4725,96 +4588,38 @@ class SignalBridge:
 
         data_as_of = _compute_data_as_of(universe_raw)
 
-        # 3. ポジション・余力取得
-        current_positions = self._get_current_positions()
-        available_cash    = self._get_available_cash(current_positions)
-        calc_available_cash = available_cash if available_cash is not None else 0.0
-
-        # ── ブローカー API 成否フラグ ────────────────────────────────────────
-        _broker_positions_ok = self._positions_api_status.get("source") == "broker"
-        _broker_wallet_ok    = self._wallet_api_status.get("source")    == "broker"
-
-        # ── DRY / API 障害時のみ: state の既知 qty でフォールバック ──────────
-        # STATE_SYNC_INTEGRITY (2026-07-19): _apply_full_empty_fallback_gate() 参照。
-        # broker成功時の「真の保有0」とAPI失敗/未接続を区別せず無条件にstateから
-        # 復元していた欠陥を修正（brokerが真のSSOTであるべき場面でstateが
-        # 優先されてしまうケースの是正）。
-        current_positions = _apply_full_empty_fallback_gate(
-            current_positions,
-            broker_positions_ok=_broker_positions_ok,
-            saved_qtys=portfolio_state.get("position_qtys", {}),
-            saved_prices=portfolio_state.get("position_entry_prices", {}),
-        )
-
-        # ── 部分補完: broker が一部銘柄を返さない場合に portfolio_state で補完 ──────
-        # broker 成功時でも kabu Station が一時的に一部銘柄を未返却にする場合がある。
-        # portfolio_state は直前ランで永続化された実績値。不足分のみ補完する。
-        #
-        # GHOST_POSITION_FIX (2026-07-03): 無条件補完は売却済み銘柄を永久に復活させ
-        # 続け equity を過大評価するバグの原因だった（実例: 5301.T が誤って永続化
-        # された equity_peak ¥4,706,291 の直接原因）。連続欠落回数を追跡し、
-        # MAX_POSITION_MISSING_STREAK 回を超えたら「実際に売却済み」と判断して
-        # 補完を停止する（_apply_position_missing_streak_gate() 参照）。
-        current_positions, _missing_streak = _apply_position_missing_streak_gate(
-            current_positions,
-            portfolio_state.get("position_qtys", {}),
-            portfolio_state.get("position_entry_prices", {}),
-            portfolio_state.get("position_missing_streak", {}),
-            broker_positions_ok=_broker_positions_ok,
-        )
-        portfolio_state["position_missing_streak"] = _missing_streak
-
-        # ── settlement lag 補完: execution_ledger の pending/submitted BUY を追加 ──
-        # API 障害時またはブローカー未反映の場合、execution_ledger から未着金ポジションを補完する。
-        # CB_GUARD V2 の補償ロジックと同じ lookback (2 日) を使用。
+        # 3. ポジション・余力取得（Broker-as-Sole-SSOT, 2026-07-18）
+        # fetch_broker_snapshot() を1回だけ呼び、cash/positions/market_valuesを
+        # 唯一の入力として使う。state/OHLCV/ledgerへのフォールバック・部分補完は
+        # 一切行わない — broker応答（保有0件を含む）を無条件に信頼する
+        # （2026-07-15〜17 equity_peak異常値インシデントの根本原因は複数の
+        # 独立フォールバック経路が食い違う値を生成していたことだった）。
         try:
-            from src.live.order_ledger import LEDGER_PATH as _FB_LEDGER_PATH
-            if _FB_LEDGER_PATH.exists():
-                _fb_ld   = json.loads(_FB_LEDGER_PATH.read_text(encoding="utf-8"))
-                _fb_date = _fb_ld.get("date", "")
-                _fb_ts   = pd.Timestamp(today_str)
-                try:
-                    _fb_diff = (_fb_ts - pd.Timestamp(_fb_date)).days
-                    _fb_ok   = 0 <= _fb_diff <= 2
-                except Exception:
-                    _fb_ok   = (_fb_date == today_str)
-                if _fb_ok:
-                    for _fb_entry in _fb_ld.get("orders", {}).values():
-                        _fb_sym    = _fb_entry.get("symbol", "")
-                        _fb_side   = _fb_entry.get("side", "")
-                        _fb_status = _fb_entry.get("execution_status", "")
-                        if (
-                            _fb_side == "BUY"
-                            and _fb_status not in ("failed", "shadow")
-                            and _fb_sym not in current_positions
-                        ):
-                            _fb_qty   = int(_fb_entry.get("qty",   0)   or 0)
-                            _fb_price = float(_fb_entry.get("price", 0.0) or 0.0)
-                            if _fb_qty > 0 and _fb_price > 0:
-                                current_positions[_fb_sym] = {
-                                    "qty":       _fb_qty,
-                                    "avg_price": _fb_price,
-                                }
-                                logger.warning(
-                                    "[POSITION_FALLBACK] ledger補完: %s qty=%d @¥%s (status=%s date=%s)",
-                                    _fb_sym, _fb_qty, f"{_fb_price:,.0f}", _fb_status, _fb_date,
-                                )
-        except Exception as _fb_exc:
-            logger.debug("[POSITION_FALLBACK] ledger補完スキップ (FAIL_OPEN): %s", _fb_exc)
-        # virtual cash → persisted broker cash を優先
-        # WHY: virtual formula (capital×n_free/max_pos) は API 不可時の粗い推定。
-        #      prior broker read から state["available_cash"] が設定済みなら正確な値を使う。
-        if (
-            self._wallet_api_status.get("source") == "virtual"
-            and portfolio_state.get("available_cash", 0) > 0
-        ):
-            _virtual_amount = calc_available_cash
-            calc_available_cash = float(portfolio_state["available_cash"])
-            logger.info(
-                "available_cash フォールバック (virtual ¥%s → state ¥%s)",
-                f"{_virtual_amount:,.0f}",
-                f"{calc_available_cash:,.0f}",
-            )
+            if self._client is None:
+                raise BrokerSnapshotUnavailable("KabuClient is None — broker への接続がありません")
+            _broker_snap = fetch_broker_snapshot(self._client)
+            self._positions_api_status = {"ok": True, "source": "broker", "error": None}
+            self._wallet_api_status    = {"ok": True, "source": "broker", "error": None}
+        except BrokerSnapshotUnavailable as _bsu:
+            self._positions_api_status = {"ok": False, "source": "broker_error", "error": str(_bsu)}
+            self._wallet_api_status    = {"ok": False, "source": "broker_error", "error": str(_bsu)}
+            if self.require_broker:
+                logger.error("[BROKER_UNAVAILABLE] %s", _bsu)
+                raise AbortError("broker_unavailable", str(_bsu)) from _bsu
+            logger.warning("API 未接続（require_broker=False の明示的省略モード）: %s", _bsu)
+            _broker_snap = None
+
+        if _broker_snap is not None:
+            current_positions = {
+                sym: {"qty": qty, "avg_price": _broker_snap.avg_costs.get(sym, 0.0)}
+                for sym, qty in _broker_snap.positions.items()
+                if sym in self.universe_tickers
+            }
+            available_cash = _broker_snap.cash
+        else:
+            current_positions = {}
+            available_cash    = self._virtual_available_cash({})
+        calc_available_cash = available_cash if available_cash is not None else 0.0
 
         # pre_trade_risk_check キャッシュ更新（execution layer で再利用）
         self._last_current_positions = current_positions
@@ -4822,29 +4627,13 @@ class SignalBridge:
 
         # 4. 現在 equity → CB 状態更新
         _run_mode = "live" if self.live else "dry"
+        _broker_positions_ok = _broker_snap is not None
+        _broker_wallet_ok    = _broker_snap is not None
 
-        # ── BrokerSnapshot 生成（両 API 成功時のみ） ──────────────────────
-        # partial commit 禁止: positions_ok AND wallet_ok の両方が揃った場合のみ。
-        _broker_snap: BrokerSnapshot | None = None
-        if _broker_positions_ok and _broker_wallet_ok and available_cash is not None:
-            _now_ts = datetime.now(JST).strftime("%Y-%m-%dT%H:%M:%S%z")
-            _broker_snap = BrokerSnapshot(
-                cash          = available_cash,
-                positions     = {sym: pos["qty"] for sym, pos in current_positions.items()},
-                avg_costs     = {sym: pos.get("avg_price", 0.0) for sym, pos in current_positions.items()},
-                market_values = {sym: pos.get("avg_price", 0.0) for sym, pos in current_positions.items()},
-                equity        = 0.0,  # filled after compute_live_equity
-                ts            = _now_ts,
-                source        = "broker",
-                api_health    = {"positions_ok": True, "wallet_ok": True},
-            )
-
-        current_equity = self._compute_current_equity(
-            current_positions, universe_raw, calc_available_cash,
-            mode     = _run_mode,
-            equity_peak = float(portfolio_state.get("equity_peak", self.capital)),
-            snapshot = _broker_snap,
-        )
+        current_equity = compute_live_equity(
+            snapshot=_broker_snap, mode=_run_mode,
+            equity_peak=float(portfolio_state.get("equity_peak", self.capital)),
+        ) if _broker_snap is not None else calc_available_cash
 
         # ── 乖離警告 (Phase 3A): last_equity vs current_equity ──────────────
         # 前回保存値と現在推定値の差が 5% 超 or ¥300,000 超なら WARN する。

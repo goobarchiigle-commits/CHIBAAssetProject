@@ -18,7 +18,7 @@ import tempfile
 import unittest
 from datetime import date, timedelta
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -218,12 +218,21 @@ class TestRunStartupCheckStaleData(unittest.TestCase):
                 "available_cash": 2_500_000.0,
                 "last_equity": 2_800_000.0,
             }
+            # Broker-as-Sole-SSOT (2026-07-18): _compute_startup_equity() が
+            # broker snapshot取得のためKabuClientへ接続する。このテストクラスは
+            # stale-data検知だけを検証対象とするため、broker接続自体は
+            # 常に成功させる（未mockだと実際にlocalhost:18080へ接続を試み、
+            # 401リトライ全滅で25秒前後かかった上にDRYでもok=Falseになってしまう）。
+            mock_equity_client = MagicMock()
+            mock_equity_client.get_wallet_cash.return_value = {"StockAccountWallet": 2_500_000.0}
+            mock_equity_client.get_positions.return_value = []
             with (
                 patch.object(sc, "_check_api_port",       return_value=(True, "OK")),
                 patch.object(sc, "_check_portfolio_state", return_value=(True, [], [], dummy_state)),
                 patch.object(sc, "_check_lock_file",       return_value=(True, "OK")),
                 patch.object(sc, "_RSR_SNAPSHOT_DIR",      rsr),
                 patch("src.startup_check.datetime") as mock_dt,
+                patch("src.kabusapi.client.KabuClient", return_value=mock_equity_client),
             ):
                 from datetime import timezone, timedelta as _td
                 mock_dt.now.return_value.strftime.return_value = "2026-06-04 08:43:00 JST"

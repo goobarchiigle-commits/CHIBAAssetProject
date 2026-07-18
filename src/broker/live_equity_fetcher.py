@@ -20,6 +20,7 @@ from datetime import datetime, timezone, timedelta
 from typing import Optional
 
 from src.portfolio.equity import compute_live_equity
+from src.portfolio.state_store import BrokerSnapshot
 
 logger = logging.getLogger(__name__)
 
@@ -113,11 +114,20 @@ def fetch_live_equity(client, *, timeout_s: float = 8.0) -> Optional[LiveEquityS
 
     # SSOT: cash + market_value はここで直接計算しない。
     # src/portfolio/equity.py compute_live_equity() のみが equity 計算を行う（Study26）。
+    # compute_live_equity() は BrokerSnapshot のみを受け付ける（2026-07-18
+    # Broker-as-Sole-SSOTリファクタ）。ここで組み立てた price（CurrentPrice優先・
+    # Price フォールバック済み）を avg_costs/market_values の両方に使う
+    # （この関数は取得単価と時価を区別しないため、両方に同じ値を渡すのが正しい）。
+    _snap_for_equity = BrokerSnapshot(
+        cash          = cash or 0.0,
+        positions     = {s: int(p["qty"]) for s, p in _positions_for_equity.items()},
+        avg_costs     = {s: float(p["avg_price"]) for s, p in _positions_for_equity.items()},
+        market_values = {s: float(p["avg_price"]) for s, p in _positions_for_equity.items()},
+        equity        = 0.0, ts=ts, source=source,
+        api_health    = {"positions_ok": positions_ok, "wallet_ok": wallet_ok},
+    )
     actual_equity = compute_live_equity(
-        live_cash        = cash or 0.0,
-        positions        = _positions_for_equity,
-        mode             = "live_equity_fetch",
-        persist_snapshot = False,
+        snapshot=_snap_for_equity, mode="live_equity_fetch", persist_snapshot=False,
     )
 
     snap = LiveEquitySnapshot(

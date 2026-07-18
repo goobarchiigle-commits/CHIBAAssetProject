@@ -178,8 +178,17 @@ class TestRunStartupCheckApiAuth(unittest.TestCase):
     # ── DRY + auth fail ────────────────────────────────────────────────────────
 
     def test_dry_auth_fail_keeps_ok_true(self):
+        """
+        Broker-as-Sole-SSOT (2026-07-18): [7]認証チェック自体は従来通りDRYでは
+        issueでなくwarning扱い（test_dry_auth_fail_no_issue参照）。ただし認証失敗時は
+        _compute_startup_equity()のbroker snapshot取得も同じ理由で失敗するため、
+        LIVE/DRY問わずok=Falseとなる（DRYが「エラーを警告に格下げして継続する」
+        設計は資産計算の欠落を許容しない）。
+        """
         result = _patched_run(is_live=False, auth_return=(False, "API認証失敗 (HTTP 401: kabu Station未ログイン)"))
-        assert result["ok"] is True, "DRY+auth失敗は ok=True であるべき（警告のみ）"
+        assert result["ok"] is False, "DRY+auth失敗はbroker snapshot取得も失敗するためok=False"
+        broker_issues = [i for i in result["issues"] if "BROKER_UNAVAILABLE" in i]
+        assert broker_issues, f"[BROKER_UNAVAILABLE] issue が必要: {result['issues']}"
 
     def test_dry_auth_fail_adds_api_auth_warning(self):
         result = _patched_run(is_live=False, auth_return=(False, "API認証失敗 (HTTP 401: kabu Station未ログイン)"))
@@ -270,13 +279,18 @@ class TestRunStartupCheckApiAuth(unittest.TestCase):
         assert auth_issues, "6/8再現: [API_AUTH] issue が生成されるべき"
 
     def test_6_8_incident_dry_would_continue(self):
-        # DRY run は 401 でも継続（既存の signal_bridge フォールバックと整合）
+        """
+        Broker-as-Sole-SSOT (2026-07-18): 旧実装はDRY+401でも継続していたが、
+        signal_bridgeフォールバック自体が廃止されたため、DRYもLIVEと同様broker
+        snapshot取得失敗でok=Falseとなる（fail-closed統一）。[7]認証チェック自体の
+        DRY warning扱いは変わらない。
+        """
         result = _patched_run(
             is_live=False,
             port_ok=True,
             auth_return=(False, "API認証失敗 (HTTP 401: kabu Station未ログインまたはAPIパスワード不一致)"),
         )
-        assert result["ok"] is True, "DRY+401: ok=True（警告継続）"
+        assert result["ok"] is False, "DRY+401: broker snapshot取得も失敗するためok=False"
         auth_warns = [w for w in result["warnings"] if "API_AUTH" in w]
         assert auth_warns
 
@@ -412,6 +426,13 @@ class TestCheckApiTokenWithRetry(unittest.TestCase):
         """
         LIVE run: _check_api_token が1回目401、2回目OK
         → run_startup_check は ok=True でなければならない。
+
+        Broker-as-Sole-SSOT (2026-07-18): [7]認証チェック（_check_api_token,
+        リトライ付き）とは別に、_compute_startup_equity()もbroker snapshot取得の
+        ためkabuステーションへ接続する（fetch_broker_snapshot() 経由）。この
+        テストは[7]の認証リトライだけでなく、equity計算用のKabuClient接続も
+        モックする必要がある（そうしないと実際にlocalhost:18080へ接続を試みて
+        失敗し、ok=Falseになる）。
         """
         import src.startup_check as sc
 
@@ -430,6 +451,10 @@ class TestCheckApiTokenWithRetry(unittest.TestCase):
                 return (False, "API認証失敗 (HTTP 401: ...)")
             return (True, "API token OK")
 
+        mock_equity_client = MagicMock()
+        mock_equity_client.get_wallet_cash.return_value = {"StockAccountWallet": 3_000_000.0}
+        mock_equity_client.get_positions.return_value = []
+
         with (
             patch.object(sc, "_check_api_port",        return_value=(True, "OK")),
             patch.object(sc, "_check_api_token",        side_effect=_flaky_token),
@@ -439,6 +464,7 @@ class TestCheckApiTokenWithRetry(unittest.TestCase):
             patch.object(sc, "_check_snapshot_date",
                          return_value=(False, "snapshot OK", "2026-06-06", "2026-06-05")),
             patch("src.startup_check.datetime") as mock_dt,
+            patch("src.kabusapi.client.KabuClient", return_value=mock_equity_client),
         ):
             mock_dt.now.return_value.strftime.return_value = "2026-06-09 08:43:00 JST"
             mock_dt.now.return_value.date.return_value = __import__("datetime").date(2026, 6, 9)

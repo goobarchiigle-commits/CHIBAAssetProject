@@ -609,26 +609,17 @@ class TestUnknownReconciliation(unittest.TestCase):
 
 class TestDryLiveParity(unittest.TestCase):
 
-    def test_equity_identical_snapshot_vs_dict_path(self):
+    def test_equity_single_snapshot_path_dry_and_live(self):
         """
-        BrokerSnapshot path and loose-dict path produce identical equity
-        when given same cash + positions.
+        Broker-as-Sole-SSOT (2026-07-18): DRY と LIVE は同じ BrokerSnapshot 入力を
+        使う限り必ず同一の equity を返す（唯一の入力・唯一の計算式のため、
+        パス間の drift は構造的に発生し得ない — 旧 loose-dict フォールバック
+        パスは廃止された）。
         """
         from src.portfolio.equity import compute_live_equity
         from src.portfolio.state_store import BrokerSnapshot
 
-        cash      = 1_799_309.0
-        positions = {"6981.T": {"qty": 100, "avg_price": 5648.0},
-                     "8015.T": {"qty": 100, "avg_price": 6840.0}}
-
-        # Loose-dict path (DRY mode fallback)
-        equity_dict = compute_live_equity(
-            live_cash=cash,
-            positions=positions,
-            persist_snapshot=False,
-        )
-
-        # BrokerSnapshot path (LIVE mode)
+        cash = 1_799_309.0
         snap = BrokerSnapshot(
             cash          = cash,
             positions     = {"6981.T": 100, "8015.T": 100},
@@ -639,10 +630,12 @@ class TestDryLiveParity(unittest.TestCase):
             source        = "broker",
             api_health    = {},
         )
-        equity_snap = compute_live_equity(snapshot=snap, persist_snapshot=False)
+        equity_dry  = compute_live_equity(snapshot=snap, mode="dry",  persist_snapshot=False)
+        equity_live = compute_live_equity(snapshot=snap, mode="live", persist_snapshot=False)
 
-        self.assertEqual(equity_dict, equity_snap,
-                         f"DRY equity {equity_dict} ≠ LIVE equity {equity_snap}")
+        self.assertEqual(equity_dry, equity_live,
+                         f"DRY equity {equity_dry} != LIVE equity {equity_live}")
+        self.assertAlmostEqual(equity_dry, cash + 100 * 5648.0 + 100 * 6840.0, places=0)
 
     def test_compute_drawdown_canonical_single_impl(self):
         """compute_drawdown is the single implementation — produces exact result."""

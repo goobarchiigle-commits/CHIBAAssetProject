@@ -73,71 +73,42 @@ class EquitySnapshot:
 
 
 def compute_live_equity(
-    live_cash: float = 0.0,
-    positions: dict[str, dict] | None = None,
-    universe_raw: dict | None = None,
     *,
-    snapshot: "BrokerSnapshot | None" = None,
+    snapshot: "BrokerSnapshot",
     mode: str = "unknown",
     equity_peak: float = 0.0,
     persist_snapshot: bool = True,
 ) -> float:
     """
-    ポートフォリオ時価総額の唯一の計算源。
+    ポートフォリオ時価総額の唯一の計算源（Broker-as-Sole-SSOT, 2026-07-18）。
+
+    入力は BrokerSnapshot のみ。price は snapshot.market_values
+    （broker `/positions` 応答の CurrentPrice、欠損時のみ同応答内の Price へ
+    フォールバック — いずれも broker 由来）を使う。
+    OHLCV キャッシュ・state・その他ローカル再計算には一切アクセスしない
+    （2026-07-15〜17 equity_peak異常値インシデントの根本原因: 複数の資産取得
+    経路が存在し、微妙に異なる値を返していたこと。単一入力・単一計算式に
+    統一することでこのバグクラス自体を排除する）。
 
     Args:
-        snapshot:         BrokerSnapshot (優先)。提供時は live_cash/positions を無視。
-        live_cash:        口座現金残高 (snapshot が None の場合に使用)
-        positions:        {symbol: {"qty": int, "avg_price": float}} (snapshot が None の場合)
-        universe_raw:     {symbol: {"df": DataFrame}} — Close.iloc[-1] を時価として使用
+        snapshot:         BrokerSnapshot（必須）
         mode:             ログ用コンテキスト ("live" / "dry" / "startup" / "reconcile" 等)
         equity_peak:      現在の peak 値（snapshot ログ用のみ）
         persist_snapshot: True なら logs/equity_snapshots.jsonl に追記
 
     Returns:
-        float: cash + sum(qty_i * price_i)
+        float: cash + sum(qty_i * market_value_i)
     """
-    if snapshot is not None:
-        # BrokerSnapshot 経由: universe_raw Close を優先、なければ market_values → avg_costs
-        _cash = snapshot.cash
-        market_value = 0.0
-        for sym, qty in snapshot.positions.items():
-            if int(qty) <= 0:
-                continue
-            if universe_raw and sym in universe_raw:
-                try:
-                    price = float(universe_raw[sym]["df"]["Close"].iloc[-1])
-                except Exception:
-                    price = float(snapshot.market_values.get(sym, snapshot.avg_costs.get(sym, 0.0)))
-            else:
-                price = float(snapshot.market_values.get(sym, snapshot.avg_costs.get(sym, 0.0)))
-            market_value += int(qty) * price
-        equity = _cash + market_value
-    else:
-        # DRY / fallback 経由: loose dict params
-        _positions = positions or {}
-        _cash = live_cash
-        market_value = 0.0
-        for sym, pos in _positions.items():
-            qty = int(pos.get("qty", 0))
-            if qty <= 0:
-                continue
-            price: float
-            if universe_raw and sym in universe_raw:
-                try:
-                    price = float(universe_raw[sym]["df"]["Close"].iloc[-1])
-                except Exception:
-                    price = float(pos.get("avg_price", 0.0))
-            else:
-                price = float(pos.get("avg_price", 0.0))
-            market_value += qty * price
-        equity = _cash + market_value
+    _cash = snapshot.cash
+    market_value = 0.0
+    for sym, qty in snapshot.positions.items():
+        if int(qty) <= 0:
+            continue
+        price = float(snapshot.market_values.get(sym, snapshot.avg_costs.get(sym, 0.0)))
+        market_value += int(qty) * price
+    equity = _cash + market_value
 
-    n_pos = (
-        sum(1 for q in snapshot.positions.values() if int(q) > 0)
-        if snapshot is not None
-        else sum(1 for p in (positions or {}).values() if int(p.get("qty", 0)) > 0)
-    )
+    n_pos = sum(1 for q in snapshot.positions.values() if int(q) > 0)
     snap  = EquitySnapshot(
         timestamp       = datetime.now(JST).strftime("%Y-%m-%dT%H:%M:%S%z"),
         equity_source   = EQUITY_SOURCE_TAG,

@@ -654,89 +654,49 @@ def _check_snapshot_date(
 
 def _compute_startup_equity(state: dict) -> dict[str, Any]:
     """
-    Health Check用のcurrent_equity/DD/PEAK_ANOMALYを計算する（2026-07-15 SSOT修正）。
+    Health Check用のcurrent_equity/DD/PEAK_ANOMALYを計算する
+    （Broker-as-Sole-SSOT, 2026-07-18）。
 
-    優先ソース: broker snapshot（kabuステーションAPI）+ OHLCVキャッシュ終値。
-    run_live_signal.py本体（SignalBridge._get_current_positions等）と同一ソース。
-    失敗時のみ state ファイルの available_cash/position_qtys へ FAIL_OPEN する
-    （旧実装。stale な場合がある——2026-07-14 08:41 incidentのRCAで
-    ¥483,150の乖離を実測し、DD -21.9%(誤) vs 実際-10.2% という誤警告を招いた）。
+    唯一のソース: fetch_broker_snapshot() + compute_live_equity()。
+    SignalBridge本体（run_live_signal.py）と完全に同一の関数を使う。
+    state ファイルの available_cash/position_qtys・OHLCVキャッシュへの
+    フォールバックは行わない（2026-07-15〜17 equity_peak異常値インシデントの
+    根本原因はまさにこの独自フォールバック経路が持つ食い違いだった。
+    旧実装は filter_live_positions() で正規化した後に LeavesQty キーのみで
+    qtyを再抽出しており、LeaveQty/Qty/HoldQty 応答の場合に全ポジションを
+    見失うバグを持っていた）。
+
+    broker接続失敗時は current_equity を計算できないため ok=False とし、
+    呼び出し側が startup check を失敗させる（LIVE/DRY問わずabort）。
 
     Returns:
         {equity_peak, current_equity, dd, cash_used, equity_fallback,
          equity_src, broker_available, dd_breach, warnings}
     """
     from src.portfolio.equity import compute_live_equity
+    from src.portfolio.broker_source import fetch_broker_snapshot, BrokerSnapshotUnavailable
 
     ep = float(state.get("equity_peak", 0))
-    ac = float(state.get("available_cash", 0))
-    _pos_qtys  = state.get("position_qtys", {})
-    _avg_costs = {**state.get("position_entry_prices", {}),
-                  **state.get("snapshot_avg_costs", {})}
 
-    _broker_cash: float | None = None
-    _broker_positions: dict[str, dict] | None = None
     _broker_fetch_error: str = ""
+    _broker_available = False
+    current_equity = 0.0
+    _cash_used = 0.0
     try:
         from src.kabusapi.client import KabuClient
         _kc = KabuClient()
-        _wallet = _kc.get_wallet_cash()
-        _raw_positions = _kc.get_positions()
-        _broker_cash = float(_wallet["StockAccountWallet"])
-
-        from src.common.position_normalizer import filter_live_positions
-        _live_positions = filter_live_positions(_raw_positions)
-        _broker_positions = {}
-        for _p in _live_positions:
-            _sym_code = _p.get("Symbol", "")
-            _sym = f"{_sym_code}.T" if not _sym_code.endswith(".T") else _sym_code
-            _qty = int(_p.get("LeavesQty", 0) or 0)
-            if _qty > 0:
-                _broker_positions[_sym] = {
-                    "qty": _qty, "avg_price": float(_p.get("Price", 0.0) or 0.0),
-                }
-    except Exception as _bf_exc:
+        _kc.fetch_token()
+        _snap = fetch_broker_snapshot(_kc)
+        current_equity = compute_live_equity(
+            snapshot=_snap, mode="startup", equity_peak=ep, persist_snapshot=False,
+        )
+        _cash_used = _snap.cash
+        _broker_available = True
+    except (BrokerSnapshotUnavailable, Exception) as _bf_exc:
         _broker_fetch_error = str(_bf_exc)
-        _logger.debug("[EQUITY_PEAK_DIAG] broker snapshot fetch failed (FAIL_OPEN): %s", _bf_exc)
+        _logger.warning("[EQUITY_PEAK_DIAG] broker snapshot fetch failed: %s", _bf_exc)
 
-    _broker_available = _broker_cash is not None and _broker_positions is not None
-    if _broker_available:
-        _cash_used = _broker_cash
-        _positions = _broker_positions
-    else:
-        _cash_used = ac
-        _positions = {
-            sym: {"qty": int(qty), "avg_price": float(_avg_costs.get(sym, 0.0))}
-            for sym, qty in _pos_qtys.items()
-            if int(qty) > 0
-        }
-
-    _universe_raw = None
-    _ohlcv_cache  = _BASE_DIR / "cache" / "ohlcv"
-    if _ohlcv_cache.exists() and _positions:
-        try:
-            import pandas as _pd_sc
-            _universe_raw = {}
-            for _sym in _positions:
-                _fp = _ohlcv_cache / f"{_sym}.parquet"
-                if _fp.exists():
-                    _universe_raw[_sym] = {"df": _pd_sc.read_parquet(_fp)}
-        except Exception:
-            _universe_raw = None   # FAIL_OPEN: avg_price fallback
-
-    current_equity = compute_live_equity(
-        live_cash        = _cash_used,
-        positions        = _positions,
-        universe_raw     = _universe_raw,
-        mode             = "startup",
-        equity_peak      = ep,
-        persist_snapshot = False,   # 副作用なし（読み取り専用モード）
-    )
-    dd = compute_drawdown(current_equity, ep) * 100 if ep > 0 else 0.0
-
-    _has_positions   = bool(_positions)
-    _ohlcv_ok        = bool(_universe_raw)
-    _equity_fallback = _has_positions and not _ohlcv_ok
+    dd = compute_drawdown(current_equity, ep) * 100 if (ep > 0 and _broker_available) else 0.0
 
     try:
         _state_mtime = datetime.fromtimestamp(
@@ -744,21 +704,17 @@ def _compute_startup_equity(state: dict) -> dict[str, Any]:
         ).strftime("%Y-%m-%dT%H:%M:%S%z")
     except OSError:
         _state_mtime = "unknown"
-    if _broker_available:
-        _equity_src = "broker_snapshot"
-    elif _equity_fallback:
-        _equity_src = "avg_price_fallback"
-    else:
-        _equity_src = "ohlcv_cache(stale_state_fallback)"
+    _equity_src = "broker_snapshot" if _broker_available else "unavailable"
+    _equity_fallback = not _broker_available
     _logger.info(
         "[EQUITY_PEAK_DIAG] equity_peak=%s current_equity=%s dd=%.2f%% source=%s mtime=%s"
         + (" broker_fetch_error=%s" % _broker_fetch_error if _broker_fetch_error else ""),
         f"{ep:,.0f}", f"{current_equity:,.0f}", dd, _equity_src, _state_mtime,
     )
-    if _equity_fallback:
+    if not _broker_available:
         _logger.warning(
-            "[DD_WARNING] live equity unavailable, fallback active"
-            " — broker snapshot failed AND OHLCV cache missing/empty, using avg_price"
+            "[DD_WARNING] live equity unavailable — broker snapshot取得失敗のため "
+            "current_equity/DDを計算できません。呼び出し側は ok=False として扱うこと。"
         )
 
     out_warnings: list[str] = []
@@ -878,10 +834,19 @@ def run_startup_check(is_live: bool = False) -> dict[str, Any]:
         _cash_used      = eq_result["cash_used"]
         warnings.extend(eq_result["warnings"])
 
-        _cb_now = str(state.get("cb_state", "NORMAL"))
-        if eq_result["dd_breach"] and _cb_now == "NORMAL":
-            warnings.append(f"cb_state=NORMAL だが DD={dd:.1f}% → 手動確認推奨")
+        # Broker-as-Sole-SSOT (2026-07-18): broker snapshot取得に失敗した場合、
+        # current_equity/DDを計算する手段が無い。LIVE/DRY問わずFAIL-CLOSEDとし、
+        # state ファイルへの FAIL_OPEN フォールバックは行わない
+        # （旧実装のフォールバックが2026-07-15〜17インシデントの一因だった）。
+        if not eq_result["broker_available"]:
+            issues.append("[BROKER_UNAVAILABLE] broker snapshot取得失敗 — current_equity/DD計算不可")
+            ok = False
+        else:
+            _cb_now = str(state.get("cb_state", "NORMAL"))
+            if eq_result["dd_breach"] and _cb_now == "NORMAL":
+                warnings.append(f"cb_state=NORMAL だが DD={dd:.1f}% → 手動確認推奨")
 
+    if ok:
         stale_suffix = f" [STALE_DATA: {snapshot_date}→{expected_date}]" if stale_detected else ""
         _dd_display = f"DD={dd:.1f}%" + (" (fallback)" if _equity_fallback else "")
         summary = f"OK — equity_peak={ep:,.0f}円, cash={_cash_used:,.0f}円, {_dd_display}{stale_suffix}"

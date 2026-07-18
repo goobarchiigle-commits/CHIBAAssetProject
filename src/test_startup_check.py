@@ -139,21 +139,29 @@ class TestComputeStartupEquityBrokerAvailable(_IsolatedSnapshotMixin, unittest.T
 
 
 class TestComputeStartupEquityFailOpen(_IsolatedSnapshotMixin, unittest.TestCase):
-    """broker snapshot取得失敗時: 旧来の state ファイル依存ロジックへ FAIL_OPEN すること。"""
+    """broker snapshot取得失敗時: FAIL-CLOSED（Broker-as-Sole-SSOT, 2026-07-18）。
+
+    旧実装は state ファイルの stale な available_cash/position_qtys へ FAIL_OPEN
+    していたが、これが2026-07-15〜17 equity_peak異常値インシデントの一因だった
+    （state実測より新しいbroker実態が食い違うケースを検知できなかった）。
+    broker取得失敗時は current_equity/cash_used を計算せず（0.0のまま）、
+    呼び出し側（run_startup_check）が ok=False として扱う。
+    """
 
     @patch("src.kabusapi.client.KabuClient")
-    def test_falls_back_to_state_cash_on_broker_exception(self, mock_client_cls):
+    def test_broker_exception_leaves_equity_unavailable(self, mock_client_cls):
         mock_client_cls.side_effect = ConnectionError("API unreachable")
 
         result = _compute_startup_equity(_base_state())
 
         self.assertFalse(result["broker_available"])
-        self.assertEqual(result["cash_used"], 3_210_391.0)  # state file の値へフォールバック
-        self.assertIn(result["equity_src"], ("avg_price_fallback", "ohlcv_cache(stale_state_fallback)"))
+        self.assertEqual(result["cash_used"], 0.0)   # state file へのフォールバックは行わない
+        self.assertEqual(result["current_equity"], 0.0)
+        self.assertEqual(result["equity_src"], "unavailable")
 
     @patch("src.kabusapi.client.KabuClient")
-    def test_falls_back_on_missing_wallet_field(self, mock_client_cls):
-        """StockAccountWallet キー欠損時も例外にせずFAIL_OPENすること。"""
+    def test_missing_wallet_field_leaves_equity_unavailable(self, mock_client_cls):
+        """StockAccountWallet キー欠損時もFAIL-CLOSEDすること（フォールバックしない）。"""
         mock_client = MagicMock()
         mock_client.get_wallet_cash.return_value = {"UnexpectedKey": 123}
         mock_client.get_positions.return_value = []
@@ -161,7 +169,7 @@ class TestComputeStartupEquityFailOpen(_IsolatedSnapshotMixin, unittest.TestCase
 
         result = _compute_startup_equity(_base_state())
         self.assertFalse(result["broker_available"])
-        self.assertEqual(result["cash_used"], 3_210_391.0)
+        self.assertEqual(result["cash_used"], 0.0)
 
     @patch("src.kabusapi.client.KabuClient")
     def test_no_crash_with_no_positions_and_broker_available(self, mock_client_cls):
