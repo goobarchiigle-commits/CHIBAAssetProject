@@ -28,7 +28,9 @@ from src.portfolio.equity import (
     PEAK_CONSISTENCY_ABS_THRESHOLD,
     PEAK_CONSISTENCY_PCT_THRESHOLD,
     SAFE_WARN_CONFIRM_REQUIRED,
+    BrokerEquityInvariantError,
     append_peak_audit,
+    assert_broker_equity_invariant,
     check_broker_consistency,
     check_peak_anomaly,
     compute_live_equity,
@@ -247,6 +249,36 @@ class TestBrokerConsistencyCheck(unittest.TestCase):
         # diff=400,000 (> ABS閾値) だが diff_pct = 400,000/50,000,000 = 0.8% (< PCT閾値)
         is_consistent, _, _ = check_broker_consistency(50_400_000.0, snap)
         self.assertTrue(is_consistent)
+
+
+class TestBrokerEquityInvariant(unittest.TestCase):
+    """assert_broker_equity_invariant() — 資産計算経路の再分岐検知（2026-07-19）。"""
+
+    def test_matching_equity_does_not_raise(self):
+        snap = _snapshot(cash=1_000_000.0, positions={"7203.T": 100}, prices={"7203.T": 2500.0})
+        assert_broker_equity_invariant(snap, 1_250_000.0)  # 例外を投げないことを確認
+
+    def test_mismatched_equity_raises(self):
+        snap = _snapshot(cash=1_000_000.0, positions={"7203.T": 100}, prices={"7203.T": 2500.0})
+        with self.assertRaises(BrokerEquityInvariantError):
+            assert_broker_equity_invariant(snap, 1_883_200.0)  # 実インシデントの過大値相当
+
+    def test_within_one_yen_rounding_tolerance_ok(self):
+        snap = _snapshot(cash=1_000_000.0, positions={"7203.T": 100}, prices={"7203.T": 2500.0})
+        assert_broker_equity_invariant(snap, 1_250_000.5)  # 丸め誤差の範囲内
+
+    def test_empty_positions_matches_cash_only(self):
+        snap = _snapshot(cash=3_642_786.0, positions={}, prices={})
+        assert_broker_equity_invariant(snap, 3_642_786.0)
+
+    def test_error_message_includes_both_values(self):
+        snap = _snapshot(cash=1_000_000.0, positions={}, prices={})
+        try:
+            assert_broker_equity_invariant(snap, 5_000_000.0)
+            self.fail("BrokerEquityInvariantError が発生しなかった")
+        except BrokerEquityInvariantError as e:
+            self.assertIn("1,000,000", str(e))
+            self.assertIn("5,000,000", str(e))
 
 
 class TestPeakAuditSink(unittest.TestCase):

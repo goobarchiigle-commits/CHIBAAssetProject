@@ -220,11 +220,13 @@ from src.execution.dd_engine import compute_drawdown
 from src.portfolio.equity import (
     SAFE_WARN_CONFIRM_REQUIRED,
     append_peak_audit,
+    assert_broker_equity_invariant,
     check_broker_consistency,
     check_peak_anomaly,
     compute_live_equity,
     detect_cash_event,
     rebuild_equity_peak,
+    BrokerEquityInvariantError,
 )
 from src.portfolio.state_store import (
     BrokerSnapshot,
@@ -4634,6 +4636,17 @@ class SignalBridge:
             snapshot=_broker_snap, mode=_run_mode,
             equity_peak=float(portfolio_state.get("equity_peak", self.capital)),
         ) if _broker_snap is not None else calc_available_cash
+
+        # ── 資産計算不変条件チェック (2026-07-19) ─────────────────────────
+        # compute_live_equity()の出力を、同一snapshotから独立に再計算した値と
+        # 突き合わせる。1円を超える乖離は資産計算経路の再分岐(SSOT違反)を示す
+        # 実装バグであり、フェイルクローズで即座に停止する。AbortErrorへ変換し、
+        # run_live_signal.py側のEMERGENCY_STOPハンドリングへ統一的に乗せる。
+        if _broker_snap is not None:
+            try:
+                assert_broker_equity_invariant(_broker_snap, current_equity)
+            except BrokerEquityInvariantError as _beie:
+                raise AbortError("broker_equity_invariant_violation", str(_beie)) from _beie
 
         # ── 乖離警告 (Phase 3A): last_equity vs current_equity ──────────────
         # 前回保存値と現在推定値の差が 5% 超 or ¥300,000 超なら WARN する。

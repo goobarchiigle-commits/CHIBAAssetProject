@@ -211,6 +211,46 @@ def check_broker_consistency(
     )
 
 
+class BrokerEquityInvariantError(RuntimeError):
+    """
+    BrokerSnapshotの生データから独立に再計算したequityと、compute_live_equity()の
+    出力が一致しない場合の致命的異常（2026-07-19、Broker-as-Sole-SSOTリファクタ）。
+
+    Broker-as-Sole-SSOT下では資産計算式は唯一のはずであり、同一snapshotから
+    導出したequityは常に一致する。1円を超える乖離は「資産計算経路が再び
+    複数化した」ことを示す実装バグの兆候であり、broker側の価格変動や
+    タイミングでは説明できない（同一snapshotオブジェクトからの再計算のため）。
+    フェイルクローズで即座に停止する。
+    """
+
+
+def assert_broker_equity_invariant(snapshot: "BrokerSnapshot", computed_equity: float) -> None:
+    """
+    compute_live_equity(snapshot=snapshot) の呼び出し直後に必ず実行する不変条件チェック。
+
+    snapshotから独立に（compute_live_equity()の内部実装を経由せず）再計算した
+    equityと、computed_equity（compute_live_equity()の戻り値）を突き合わせる。
+    2026-07-15〜17 equity_peak異常値インシデントのような「どこかで資産計算が
+    分岐して数値が食い違う」事象を、発生した run 内で即座に検知する。
+    """
+    independent_market_value = sum(
+        int(qty) * float(snapshot.market_values.get(sym, snapshot.avg_costs.get(sym, 0.0)))
+        for sym, qty in snapshot.positions.items() if int(qty) > 0
+    )
+    independent_equity = snapshot.cash + independent_market_value
+    diff = abs(independent_equity - computed_equity)
+    if diff > 1.0:  # 円未満の丸め誤差のみ許容
+        raise BrokerEquityInvariantError(
+            f"BrokerSnapshot再計算値(¥{independent_equity:,.0f}) != "
+            f"compute_live_equity()出力(¥{computed_equity:,.0f}) diff=¥{diff:,.0f} "
+            f"— 資産計算経路の再分岐を検知しました"
+        )
+    logger.debug(
+        "[EQUITY_INVARIANT_OK] independent=¥%.0f computed=¥%.0f diff=¥%.2f",
+        independent_equity, computed_equity, diff,
+    )
+
+
 def append_peak_audit(
     *,
     action:         str,

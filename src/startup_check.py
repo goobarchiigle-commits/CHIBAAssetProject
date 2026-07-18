@@ -673,7 +673,7 @@ def _compute_startup_equity(state: dict) -> dict[str, Any]:
         {equity_peak, current_equity, dd, cash_used, equity_fallback,
          equity_src, broker_available, dd_breach, warnings}
     """
-    from src.portfolio.equity import compute_live_equity
+    from src.portfolio.equity import compute_live_equity, assert_broker_equity_invariant
     from src.portfolio.broker_source import fetch_broker_snapshot, BrokerSnapshotUnavailable
 
     ep = float(state.get("equity_peak", 0))
@@ -690,6 +690,7 @@ def _compute_startup_equity(state: dict) -> dict[str, Any]:
         current_equity = compute_live_equity(
             snapshot=_snap, mode="startup", equity_peak=ep, persist_snapshot=False,
         )
+        assert_broker_equity_invariant(_snap, current_equity)
         _cash_used = _snap.cash
         _broker_available = True
     except (BrokerSnapshotUnavailable, Exception) as _bf_exc:
