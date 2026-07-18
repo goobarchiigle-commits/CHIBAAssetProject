@@ -177,6 +177,60 @@ def _commit_equity_peak(
     return candidate_value
 
 
+def _apply_full_empty_fallback_gate(
+    current_positions:   dict,
+    *,
+    broker_positions_ok: bool,
+    saved_qtys:          dict,
+    saved_prices:        dict,
+) -> dict:
+    """
+    STATE_SYNC_INTEGRITY (2026-07-19): current_positions が完全に空の場合、
+    stateへフォールバックしてよいのは broker API呼び出し自体が失敗/未接続
+    （broker_positions_ok=False）の場合のみ。
+
+    従来は current_positions が空である理由を一切区別せず、broker が
+    get_positions() に成功した上で「本当に保有0件」を返した場合でも無条件に
+    state["position_qtys"]（前回runで永続化された値）を復元していた。
+    これは _apply_position_missing_streak_gate() が持つ連続欠落回数の
+    decay保護（MAX_POSITION_MISSING_STREAK）が一切適用されない別経路であり、
+    brokerが繰り返し「保有0」を正しく返し続ける限り、無期限にstateの
+    古いpositionsで上書きされ続ける（decay無しの無制限フォールバック）。
+
+    broker_positions_ok=True（API呼び出し自体は成功）の場合はbrokerの
+    応答（空なら空）をそのまま信頼し、一切補完しない。
+    broker_positions_ok=False（API失敗・DRY未接続等）の場合のみ、
+    直前に永続化されたstateの値を暫定的に使う（従来通りのFAIL_OPEN）。
+
+    純粋関数。current_positionsは破壊的に変更しない。
+    """
+    if current_positions:
+        return current_positions
+    if broker_positions_ok:
+        # broker成功時の「真の保有0」はSSOTとして信頼する。フォールバックしない。
+        if saved_qtys:
+            logger.warning(
+                "[STATE_SYNC] broker が保有0件を正常応答（state記録%d件を破棄): %s "
+                "— brokerをSSOTとして信頼しフォールバックしない",
+                len(saved_qtys), list(saved_qtys.keys()),
+            )
+        return current_positions
+    if not saved_qtys:
+        return current_positions
+
+    restored = {
+        sym: {"qty": int(qty), "avg_price": float(saved_prices.get(sym, 0.0))}
+        for sym, qty in saved_qtys.items()
+        if int(qty) > 0
+    }
+    logger.info(
+        "positions フォールバック: state から %d 銘柄を復元 %s "
+        "(broker API失敗/未接続のため。broker成功時のゼロ件はこの分岐に入らない)",
+        len(restored), list(restored.keys()),
+    )
+    return restored
+
+
 def _apply_position_missing_streak_gate(
     current_positions:    dict,
     saved_qtys:           dict,
@@ -4680,22 +4734,17 @@ class SignalBridge:
         _broker_positions_ok = self._positions_api_status.get("source") == "broker"
         _broker_wallet_ok    = self._wallet_api_status.get("source")    == "broker"
 
-        # ── DRY / API 障害時: state の既知 qty でフォールバック ──────────
-        if not current_positions and portfolio_state.get("position_qtys"):
-            _saved_qtys   = portfolio_state["position_qtys"]
-            _saved_prices = portfolio_state.get("position_entry_prices", {})
-            current_positions = {
-                sym: {
-                    "qty":       int(qty),
-                    "avg_price": float(_saved_prices.get(sym, 0.0)),
-                }
-                for sym, qty in _saved_qtys.items()
-                if int(qty) > 0
-            }
-            logger.info(
-                "positions フォールバック: state から %d 銘柄を復元 %s",
-                len(current_positions), list(current_positions.keys()),
-            )
+        # ── DRY / API 障害時のみ: state の既知 qty でフォールバック ──────────
+        # STATE_SYNC_INTEGRITY (2026-07-19): _apply_full_empty_fallback_gate() 参照。
+        # broker成功時の「真の保有0」とAPI失敗/未接続を区別せず無条件にstateから
+        # 復元していた欠陥を修正（brokerが真のSSOTであるべき場面でstateが
+        # 優先されてしまうケースの是正）。
+        current_positions = _apply_full_empty_fallback_gate(
+            current_positions,
+            broker_positions_ok=_broker_positions_ok,
+            saved_qtys=portfolio_state.get("position_qtys", {}),
+            saved_prices=portfolio_state.get("position_entry_prices", {}),
+        )
 
         # ── 部分補完: broker が一部銘柄を返さない場合に portfolio_state で補完 ──────
         # broker 成功時でも kabu Station が一時的に一部銘柄を未返却にする場合がある。
