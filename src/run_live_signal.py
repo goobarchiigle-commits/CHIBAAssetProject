@@ -857,6 +857,11 @@ def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="フジコ法 最適化済み朝のシグナル生成スクリプト")
     p.add_argument("--live",   action="store_true", help="kabuステーション API に実際に発注する")
     p.add_argument("--dry-run", dest="live", action="store_false", help="ドライランを明示する")
+    p.add_argument(
+        "--allow-no-broker", action="store_true", default=False,
+        help="broker snapshot取得失敗時にAbortErrorで停止せず、明示的に省略モードで続行する"
+        "（手動検証・研究用途専用。watchdog_runner.py からは絶対に付与しない）。",
+    )
     p.add_argument("--yes","-y", action="store_true", help="発注確認プロンプトをスキップ")
     p.add_argument("--no-save", action="store_true", help="JSON シグナルファイルを保存しない")
     p.add_argument("--output-dir", default=str(SIGNALS_DIR), help="シグナルJSONの保存先")
@@ -2533,6 +2538,7 @@ def main() -> int:
             deployable_capital        = _cdos_deployable,
             entry_freeze_enabled      = cfg.entry_freeze.enabled,
             entry_freeze_reason       = cfg.entry_freeze.reason,
+            require_broker            = not args.allow_no_broker,
         )
     except Exception as exc:
         print(f"[FATAL] SignalBridge 初期化失敗: {exc}", file=sys.stderr)
@@ -2568,7 +2574,19 @@ def main() -> int:
                 _supervisor.emit_terminal("abort", reason=str(_ste))
                 return _exit_code
             except StageError as _se:
-                print(f"\n[FATAL] シグナル生成失敗: {_se}", file=sys.stderr)
+                from src.kabusapi.signal_bridge import AbortError as _AbortError
+                if isinstance(_se.cause, _AbortError):
+                    # Broker-as-Sole-SSOT (2026-07-18): bridge.run() が broker
+                    # snapshot取得失敗等でAbortErrorをraiseした場合、
+                    # run_morning_signal.py（廃止済み）が持っていたEMERGENCY_STOP
+                    # パターンと同じ構造化ログ+exit 1で停止する。
+                    logger.critical(
+                        "EMERGENCY_STOP: reason=%s detail=%s",
+                        _se.cause.reason, _se.cause,
+                    )
+                    print(f"\n[EMERGENCY_STOP] reason={_se.cause.reason}: {_se.cause}", file=sys.stderr)
+                else:
+                    print(f"\n[FATAL] シグナル生成失敗: {_se}", file=sys.stderr)
                 _exit_code = 1
                 return _exit_code
 
