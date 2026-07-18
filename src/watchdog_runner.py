@@ -228,49 +228,25 @@ def main() -> int:
     else:
         logging.error("[API_AUTH] ok=False msg=%s mode=%s", _auth_msg, mode.upper())
 
-    if not check_result["ok"] and is_live:
-        # API認証失敗のみ（ポート到達OK・他に致命的問題なし）→ LIVE→DRY 降格
-        _port_ok   = check_result.get("api_port_ok", False)
-        _auth_fail = check_result.get("api_auth_ok") is False
-        _auth_only = (
-            _port_ok
-            and _auth_fail
-            and bool(check_result["issues"])
-            and all("[API_AUTH]" in iss for iss in check_result["issues"])
-        )
-        if _auth_only:
-            logging.warning(
-                "[LIVE→DRY] API認証失敗（ポート到達OK・ブローカーログイン未完了の可能性）。"
-                "DRY モードに降格してシグナルを保全します。"
+    if not check_result["ok"]:
+        # Broker-as-Sole-SSOT (2026-07-18): LIVE→DRY への黙示的な降格は廃止。
+        # 旧実装はAPI認証失敗のみ（ポート到達OK・他に致命的問題なし）の場合、
+        # LIVEをDRYへ降格して実行を継続していたが、これは「brokerが本来疎通
+        # すべきなのに疎通していない」異常を隠蔽する経路になり得た。
+        # LIVE/DRY問わず、startup_checkが失敗した場合は即座に実行をブロックする
+        # （fail-closed統一）。
+        logging.error("スタートアップチェック失敗 → 実行をブロックします (mode=%s)", mode.upper())
+        try:
+            from notifier import notify_error, wait_pending
+            notify_error(
+                f"スタートアップチェック失敗のため{mode.upper()}実行を中止しました。\n\n"
+                "問題:\n" + "\n".join(f"  - {e}" for e in check_result["issues"]),
+                subject_suffix="スタートアップチェック失敗",
             )
-            is_live = False
-            mode    = "dry"
-            try:
-                from notifier import notify_warning, wait_pending
-                notify_warning(
-                    "⚠️ LIVE→DRY 降格\n\n"
-                    "API認証失敗のため LIVE 発注を停止し DRY モードで実行します。\n"
-                    f"認証エラー: {check_result.get('api_auth_msg', '?')}\n"
-                    "シグナルは生成されますが発注は実行されません。",
-                    subject_suffix="LIVE→DRY降格（認証失敗）",
-                )
-                wait_pending(timeout=12)
-            except Exception:
-                pass
-            # is_live=False になったので後続の script_args に --live が含まれない
-        else:
-            logging.error("スタートアップチェック失敗 → ライブ発注をブロックします")
-            try:
-                from notifier import notify_error, wait_pending
-                notify_error(
-                    "スタートアップチェック失敗のため発注を中止しました。\n\n"
-                    "問題:\n" + "\n".join(f"  - {e}" for e in check_result["issues"]),
-                    subject_suffix="スタートアップチェック失敗",
-                )
-                wait_pending(timeout=12)
-            except Exception:
-                pass
-            return 1
+            wait_pending(timeout=12)
+        except Exception:
+            pass
+        return 1
 
     # ── [2] メインスクリプト実行 ─────────────────────────────────────────────
     script_args: list[str] = []
