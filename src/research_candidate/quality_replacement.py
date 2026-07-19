@@ -159,6 +159,7 @@ def run_quality_replacement_shadow(
     mode:              str,
     signals:           list[dict],
     portfolio_state:   dict,
+    held_positions:    "dict[str, int]",
     cfg,
     audit_file:        Path,
     missed_file:       Path,
@@ -172,7 +173,11 @@ def run_quality_replacement_shadow(
     ----------
     signals         : list of signal dicts from BridgeResult.signals
                       (all RSR≥75 signals including MAX_POS blocked ones)
-    portfolio_state : loaded portfolio_state.json dict
+    portfolio_state : loaded portfolio_state.json dict（entry_metadata系フィールド
+                      参照専用。position_qtys等の資産値は参照しない）
+    held_positions  : {symbol: qty} 現在保有中の銘柄。Broker-as-Sole-SSOT
+                      (2026-07-19) 以降、呼び出し元が bridge._last_current_positions
+                      等のfresh BrokerSnapshot由来の値を渡すこと。
     cfg             : quality_replacement config object (from strategy.yaml)
     Returns dict with summary of shadow evaluation.
     """
@@ -185,7 +190,6 @@ def run_quality_replacement_shadow(
     pos_entry_atrs     = portfolio_state.get("position_entry_atrs", {})
     pos_unrealized_pct = portfolio_state.get("position_unrealized_pct", {})
     pos_entry_rsrs     = portfolio_state.get("position_entry_rsrs", {})
-    pos_qtys           = portfolio_state.get("position_qtys", {})
 
     today_d = datetime.strptime(today, "%Y-%m-%d").date()
 
@@ -196,7 +200,7 @@ def run_quality_replacement_shadow(
     }
 
     # ── Score held positions ──────────────────────────────────────────────────
-    held_syms = [sym for sym, qty in pos_qtys.items() if int(qty) > 0]
+    held_syms = [sym for sym, qty in held_positions.items() if int(qty) > 0]
 
     scored_held: list[dict] = []
     for sym in held_syms:
@@ -262,12 +266,12 @@ def run_quality_replacement_shadow(
     weakest = min(scored_held, key=lambda x: x["qs"])
 
     # ── Score waiting candidates (MAX_POS blocked signals) ───────────────────
-    n_positions = int(portfolio_state.get("positions_count", len(held_syms)))
+    n_positions = len(held_syms)
     # Get max_positions from config context; default=3 (PARAMS_LOCKED)
     max_pos = 3  # PARAMS_LOCKED
 
-    # Candidates = signals NOT currently held AND not in pos_qtys
-    held_set = set(pos_qtys.keys())
+    # Candidates = signals NOT currently held AND not in held_positions
+    held_set = set(held_positions.keys())
     candidates: list[dict] = []
     for sig in signals:
         sym = sig.get("symbol", "")

@@ -312,6 +312,8 @@ def recover_missing_entry_rsr(
     state: dict,
     signals_dir: Path,
     audit_log_path: Path,
+    *,
+    held_symbols: "set[str] | frozenset[str]",
 ) -> dict:
     """
     保有中の全銘柄について position_entry_rsrs 欠落（Study57/58A Quality
@@ -320,18 +322,19 @@ def recover_missing_entry_rsr(
     復元する。復元できた銘柄のみ書き込み、復元不能な銘柄は何もしない
     （既存の QR 側 proxy フォールバックに委ねる — 推測でのRSR書き込みはしない）。
 
+    held_symbols: 現在保有中の銘柄セット。Broker-as-Sole-SSOT (2026-07-19) 以降、
+    stateのposition_qtysではなく呼び出し元が取得したfresh BrokerSnapshot由来の
+    値を渡すこと。
+
     Returns: {"recovered": [...], "unrecoverable": [...]}
     """
-    pos_qtys        = state.get("position_qtys", {})
     pos_entry_dates = state.get("position_entry_dates", {})
     pos_entry_rsrs  = state.setdefault("position_entry_rsrs", {})
 
     recovered: list[dict] = []
     unrecoverable: list[dict] = []
 
-    for sym, qty in pos_qtys.items():
-        if int(qty) <= 0:
-            continue
+    for sym in held_symbols:
         if float(pos_entry_rsrs.get(sym, 0.0) or 0.0) > 0:
             continue  # 既に記録済み
 
@@ -372,6 +375,7 @@ def recover_missing_entry_metadata(
     logs_live_dir: Path,
     audit_log_path: Path,
     *,
+    held_positions: "dict[str, int]",
     orders_dir: "Path | None" = None,
     signals_dir: "Path | None" = None,
     exec_quality_dir: "Path | None" = None,
@@ -381,6 +385,10 @@ def recover_missing_entry_metadata(
     entry_date欠落 または entry_price<=0 または entry_atr 欠落の保有銘柄を検出し、
     4ソース横断で復元を試みる（2026-07-15全面改訂・詳細はモジュールdocstring参照）。
 
+    held_positions: {symbol: qty} 現在保有中の銘柄。Broker-as-Sole-SSOT (2026-07-19)
+    以降、stateのposition_qtysではなく呼び出し元が取得したfresh BrokerSnapshot
+    由来の値を渡すこと。
+
     Returns: {"recovered": [...], "unrecoverable": [...], "atr_only_recovered": [...]}
     """
     from src.paths import RUNTIME_DIR as _default_runtime, SIGNALS_DIR as _default_signals, LOGS_DIR as _default_logs
@@ -388,7 +396,6 @@ def recover_missing_entry_metadata(
     signals_dir      = signals_dir or _default_signals
     exec_quality_dir = exec_quality_dir or (_default_logs / "execution_quality")
 
-    pos_qtys           = state.get("position_qtys", {})
     pos_entry_prices    = state.setdefault("position_entry_prices",   {})
     pos_entry_atrs      = state.setdefault("position_entry_atrs",     {})
     pos_highest_closes  = state.setdefault("position_highest_closes", {})
@@ -401,7 +408,7 @@ def recover_missing_entry_metadata(
     atr_only_recovered: list[dict] = []
     unrecoverable: list[dict] = []
 
-    for sym in list(pos_qtys.keys()):
+    for sym in list(held_positions.keys()):
         entry_price = float(pos_entry_prices.get(sym, 0.0) or 0.0)
         has_date    = bool(pos_entry_dates.get(sym))
         has_atr     = float(pos_entry_atrs.get(sym, 0.0) or 0.0) > 0
@@ -471,7 +478,7 @@ def recover_missing_entry_metadata(
                     )
                     missing_registry[sym] = {
                         "detected_at": detected_at, "entry_date": pos_entry_dates.get(sym, ""),
-                        "qty": pos_qtys.get(sym, 0), "reason": reason,
+                        "qty": held_positions.get(sym, 0), "reason": reason,
                         "recovery_attempts": attempts,
                     }
                     logger.error(
@@ -484,7 +491,7 @@ def recover_missing_entry_metadata(
         else:
             missing_registry[sym] = {
                 "detected_at": detected_at, "entry_date": "",
-                "qty": pos_qtys.get(sym, 0),
+                "qty": held_positions.get(sym, 0),
                 "reason": "no_matching_buy_record_in_any_source"
                           "（order_journal/logs_live/executed_signals/execution_quality 全て探索済み）",
                 "recovery_attempts": attempts,
@@ -515,10 +522,19 @@ def main() -> int:
     sys.stdout.reconfigure(encoding="utf-8")
     from src.paths import RUNTIME_DIR, LOGS_DIR, SIGNALS_DIR
     from src.portfolio.state_store import load_portfolio_state, save_portfolio_state
+    from src.portfolio.broker_source import fetch_broker_snapshot
+    from src.kabusapi.client import KabuClient
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--dry-run", action="store_true", help="portfolio_state.jsonへ書き込まずプレビューのみ")
     args = parser.parse_args()
+
+    # Broker-as-Sole-SSOT (2026-07-19): 保有銘柄セットはfresh BrokerSnapshotから
+    # 取得する。stateのposition_qtysは読まない。
+    client = KabuClient()
+    client.fetch_token()
+    snap = fetch_broker_snapshot(client)
+    held_positions = dict(snap.positions)
 
     state_path = RUNTIME_DIR / "portfolio_state.json"
     state, _vr = load_portfolio_state(state_path)
@@ -526,11 +542,13 @@ def main() -> int:
         state,
         logs_live_dir=LOGS_DIR / "live",
         audit_log_path=LOGS_DIR / "entry_metadata_recovery_audit.jsonl",
+        held_positions=held_positions,
     )
     rsr_result = recover_missing_entry_rsr(
         state,
         signals_dir=SIGNALS_DIR,
         audit_log_path=LOGS_DIR / "entry_rsr_recovery_audit.jsonl",
+        held_symbols=set(held_positions.keys()),
     )
     print(json.dumps({"entry_metadata": result, "entry_rsr": rsr_result}, ensure_ascii=False, indent=2))
 

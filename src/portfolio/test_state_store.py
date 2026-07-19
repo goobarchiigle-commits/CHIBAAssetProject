@@ -30,6 +30,7 @@ from src.portfolio.state_store import (
     STALE_HARD_SECONDS,
     STALE_WARN_SECONDS,
     V2_SAFE_DEFAULTS,
+    AssetFieldReadForbiddenError,
     BrokerSnapshot,
     SnapshotValidationError,
     ValidationResult,
@@ -247,6 +248,61 @@ class TestLoadPortfolioState(unittest.TestCase):
         loaded, vr = load_portfolio_state(p)
         self.assertEqual(loaded["candidate_peak"], cand)
         p.unlink()
+
+
+class TestAssetFieldReadGuard(unittest.TestCase):
+    """load_portfolio_state() の戻り値からの資産系フィールド読み取りガード
+    （Broker-as-Sole-SSOT, 2026-07-19）。"""
+
+    def _read_key_from_fake_module(self, state: dict, key: str, module_name: str):
+        """state.get(key) を module_name という __name__ を持つ偽モジュールの
+        フレームから呼び出す（ガードの呼び出し元判定をテストするため）。"""
+        ns = {"__name__": module_name, "_state": state, "_key": key}
+        exec("_result = _state.get(_key)", ns)
+        return ns["_result"]
+
+    def test_non_asset_key_readable_from_any_module(self):
+        p = _tmp_path()
+        atomic_write_json(p, _make_valid_state())
+        loaded, vr = load_portfolio_state(p)
+        p.unlink()
+        # equity_peak / cb_state は資産の"現在値"ではなく状態管理フィールド → 無制限
+        value = self._read_key_from_fake_module(loaded, "equity_peak", "some.random.module")
+        self.assertEqual(value, 3_048_109.0)
+
+    def test_asset_key_raises_from_disallowed_module(self):
+        p = _tmp_path()
+        atomic_write_json(p, _make_valid_state())
+        loaded, vr = load_portfolio_state(p)
+        p.unlink()
+        with self.assertRaises(AssetFieldReadForbiddenError):
+            self._read_key_from_fake_module(loaded, "available_cash", "src.research_candidate.some_module")
+
+    def test_asset_key_readable_from_allowed_module(self):
+        p = _tmp_path()
+        atomic_write_json(p, _make_valid_state())
+        loaded, vr = load_portfolio_state(p)
+        p.unlink()
+        value = self._read_key_from_fake_module(loaded, "available_cash", "src.portfolio.equity")
+        self.assertEqual(value, 1_799_309.0)
+
+    def test_asset_key_via_getitem_also_guarded(self):
+        p = _tmp_path()
+        atomic_write_json(p, _make_valid_state())
+        loaded, vr = load_portfolio_state(p)
+        p.unlink()
+        ns = {"__name__": "src.research_candidate.some_module", "_state": loaded}
+        with self.assertRaises(AssetFieldReadForbiddenError):
+            exec("_result = _state['position_qtys']", ns)
+
+    def test_asset_key_readable_from_test_module(self):
+        """テストモジュール（test_*/*_test）は資産系フィールドを自由に検証できる。"""
+        p = _tmp_path()
+        atomic_write_json(p, _make_valid_state())
+        loaded, vr = load_portfolio_state(p)
+        p.unlink()
+        value = self._read_key_from_fake_module(loaded, "positions_count", "some_package.test_foo")
+        self.assertEqual(value, 1)
 
 
 class TestValidateState(unittest.TestCase):

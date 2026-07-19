@@ -1193,13 +1193,23 @@ def main() -> int:
                 recover_missing_entry_metadata, recover_missing_entry_rsr,
             )
             from src.portfolio.state_store import load_portfolio_state, save_portfolio_state
+            from src.portfolio.broker_source import fetch_broker_snapshot, BrokerSnapshotUnavailable
+            from src.kabusapi.client import KabuClient
             from src.paths import SIGNALS_DIR as _pmr_signals_dir
             _pmr_state_file = RUNTIME_DIR / "portfolio_state.json"
             _pmr_state, _pmr_vr = load_portfolio_state(_pmr_state_file)
+            # Broker-as-Sole-SSOT (2026-07-19): 保有銘柄セットはfresh BrokerSnapshot
+            # から取得する。stateのposition_qtysは読まない。broker未接続時は
+            # このリカバリ処理のみスキップする（非致命的・観測用途のため
+            # bridge.run()本体のようにAbortErrorでは止めない）。
+            _pmr_client = KabuClient()
+            _pmr_client.fetch_token()
+            _pmr_held_positions = dict(fetch_broker_snapshot(_pmr_client).positions)
             _pmr_result = recover_missing_entry_metadata(
                 _pmr_state,
                 logs_live_dir=LOGS_DIR / "live",
                 audit_log_path=LOGS_DIR / "entry_metadata_recovery_audit.jsonl",
+                held_positions=_pmr_held_positions,
             )
             # entry_rsr 欠落リカバリ（2026-07-08 RCA）: signal_rsr_map が
             # update_state_after_execution() に渡らなかった経路(run_morning_signal.py 等)
@@ -1209,6 +1219,7 @@ def main() -> int:
                 _pmr_state,
                 signals_dir=_pmr_signals_dir,
                 audit_log_path=LOGS_DIR / "entry_rsr_recovery_audit.jsonl",
+                held_symbols=set(_pmr_held_positions.keys()),
             )
             if _pmr_result["recovered"] or _pmr_result["unrecoverable"] or _rsr_result["recovered"]:
                 save_portfolio_state(_pmr_state, path=_pmr_state_file, data_source="internal")
@@ -1504,25 +1515,13 @@ def main() -> int:
         logger.info("[CAPITAL_FALLBACK] banner using capital_state: actual=¥%s eff=¥%s",
                     f"{_banner_actual:,.0f}", f"{_banner_eff:,}")
     else:
-        # 完全フォールバック: portfolio_state.json の last_equity を参照
+        # Broker-as-Sole-SSOT (2026-07-19): portfolio_state.json の last_equity への
+        # フォールバックは廃止。broker/capital_stateのどちらも取得できない場合、
+        # 古い数値をそれらしく表示するより「不明」の方が安全（表示専用バナーとはいえ、
+        # stale asset値を無警告表示しない方針を徹底する）。
         _banner_actual = None
         _banner_eff    = None
-        try:
-            import json as _json_banner
-            _ps_file_banner = RUNTIME_DIR / "portfolio_state.json"
-            if _ps_file_banner.exists():
-                _ps_data = _json_banner.loads(_ps_file_banner.read_text(encoding="utf-8"))
-                _ps_last_eq = float(_ps_data.get("last_equity", 0))
-                if _ps_last_eq > 0:
-                    _banner_actual = _ps_last_eq
-                    _banner_eff    = _eff_capital
-                    logger.info(
-                        "[CAPITAL_FALLBACK] banner using portfolio_state.last_equity=¥%s"
-                        " (broker API unavailable — displayed value may be stale)",
-                        f"{_banner_actual:,.0f}",
-                    )
-        except Exception as _banner_fb_err:
-            logger.debug("[CAPITAL_FALLBACK] portfolio_state fallback failed: %s", _banner_fb_err)
+        logger.info("[CAPITAL_FALLBACK] broker/capital_state 両方とも利用不可 — バナーはN/A表示")
 
     print_banner(args.live, LIVE_UNIVERSE, universe_meta,
                  actual_equity=_banner_actual, eff_capital=_banner_eff)
@@ -1532,20 +1531,25 @@ def main() -> int:
     logger.info(
         "株価上限フィルター適用中（上限: ¥%s/単元 = capital×30%%）", f"{_max_alloc:,}"
     )
-    # 保有中銘柄は price 問わず除外しない（broker API 接続前に portfolio_state から取得）
+    # 保有中銘柄は price 問わず除外しない。
+    # Broker-as-Sole-SSOT (2026-07-19): fresh BrokerSnapshotから取得する
+    # （旧実装はportfolio_state.jsonのposition_qtysを直接読んでいた）。
+    # 非致命的な事前フィルター用途のためFAIL_OPEN（取得失敗時は保護なしで続行、
+    # 実際の売買判断はbridge.run()内のfresh snapshotが唯一の権威）。
     _pf_held_syms: set[str] = set()
     try:
-        _ps_pf_path = RUNTIME_DIR / "portfolio_state.json"
-        if _ps_pf_path.exists():
-            _ps_pf_raw = json.loads(_ps_pf_path.read_text(encoding="utf-8"))
-            _pf_held_syms = set(_ps_pf_raw.get("position_qtys", {}).keys())
-            if _pf_held_syms:
-                logger.info(
-                    "[PRICE_FILTER] 保有銘柄をフィルター除外対象から保護: %s",
-                    sorted(_pf_held_syms),
-                )
+        from src.portfolio.broker_source import fetch_broker_snapshot as _pf_fetch_snap
+        from src.kabusapi.client import KabuClient as _PfKabuClient
+        _pf_client = _PfKabuClient()
+        _pf_client.fetch_token()
+        _pf_held_syms = set(_pf_fetch_snap(_pf_client).positions.keys())
+        if _pf_held_syms:
+            logger.info(
+                "[PRICE_FILTER] 保有銘柄をフィルター除外対象から保護: %s",
+                sorted(_pf_held_syms),
+            )
     except Exception as _pf_held_err:
-        logger.debug("[PRICE_FILTER] portfolio_state 読み込みスキップ (FAIL_OPEN): %s", _pf_held_err)
+        logger.debug("[PRICE_FILTER] broker snapshot取得スキップ (FAIL_OPEN): %s", _pf_held_err)
     LIVE_UNIVERSE, price_skipped = filter_universe_by_price(
         LIVE_UNIVERSE, _max_alloc, held_symbols=_pf_held_syms
     )
@@ -5955,12 +5959,20 @@ def main() -> int:
                             pass
                     from src.paths import CACHE_DIR as _qr_cache_root
                     _ohlcv_cache = _qr_cache_root / "ohlcv"
+                    # Broker-as-Sole-SSOT (2026-07-19): 保有銘柄はraw json.loads()の
+                    # position_qtysではなく、bridge.run()が既に取得したfresh
+                    # BrokerSnapshot由来のbridge._last_current_positionsを使う。
+                    _qr_held_positions = {
+                        sym: int(pos.get("qty", 0))
+                        for sym, pos in bridge._last_current_positions.items()
+                    }
                     _qr_result = run_quality_replacement_shadow(
                         today           = _trading_day,
                         run_id          = run_id,
                         mode            = "LIVE" if not DRY_RUN else "DRY",
                         signals         = list(result.signals),
                         portfolio_state = _ps_qr,
+                        held_positions  = _qr_held_positions,
                         cfg             = _rc_qr_cfg,
                         audit_file      = _qr_audit_f,
                         missed_file     = _qr_missed_f,

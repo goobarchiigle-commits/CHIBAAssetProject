@@ -212,6 +212,7 @@ class TestRecoverMissingEntryMetadataIntegration(unittest.TestCase):
         state = self._make_state()
         result = recover_missing_entry_metadata(
             state, logs_live_dir=self._logs_live_dir, audit_log_path=self._audit_log,
+            held_positions=state["position_qtys"],
             orders_dir=self._orders_dir, signals_dir=self._signals_dir,
             exec_quality_dir=self._exec_quality_dir,
         )
@@ -229,6 +230,7 @@ class TestRecoverMissingEntryMetadataIntegration(unittest.TestCase):
         })
         result = recover_missing_entry_metadata(
             state, logs_live_dir=self._logs_live_dir, audit_log_path=self._audit_log,
+            held_positions=state["position_qtys"],
             orders_dir=self._orders_dir, signals_dir=self._signals_dir,
             exec_quality_dir=self._exec_quality_dir,
         )
@@ -240,6 +242,7 @@ class TestRecoverMissingEntryMetadataIntegration(unittest.TestCase):
         state = self._make_state()
         result = recover_missing_entry_metadata(
             state, logs_live_dir=self._logs_live_dir, audit_log_path=self._audit_log,
+            held_positions=state["position_qtys"],
             orders_dir=self._orders_dir, signals_dir=self._signals_dir,
             exec_quality_dir=self._exec_quality_dir,
         )
@@ -256,6 +259,7 @@ class TestRecoverMissingEntryMetadataIntegration(unittest.TestCase):
         )
         result = recover_missing_entry_metadata(
             state, logs_live_dir=self._logs_live_dir, audit_log_path=self._audit_log,
+            held_positions=state["position_qtys"],
             orders_dir=self._orders_dir, signals_dir=self._signals_dir,
             exec_quality_dir=self._exec_quality_dir,
         )

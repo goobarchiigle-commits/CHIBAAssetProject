@@ -52,6 +52,7 @@ class TestEntryMetadataRecovery(unittest.TestCase):
 
         result = recover_missing_entry_metadata(
             state, logs_live_dir=logs_live, audit_log_path=tmp / "audit.jsonl",
+            held_positions=state["position_qtys"],
         )
 
         self.assertEqual(len(result["recovered"]), 1)
@@ -80,6 +81,7 @@ class TestEntryMetadataRecovery(unittest.TestCase):
 
         result = recover_missing_entry_metadata(
             state, logs_live_dir=logs_live, audit_log_path=tmp / "audit.jsonl",
+            held_positions=state["position_qtys"],
         )
 
         self.assertEqual(result["recovered"], [])
@@ -116,6 +118,7 @@ class TestEntryMetadataRecovery(unittest.TestCase):
         ):
             recover_missing_entry_metadata(
                 state, logs_live_dir=logs_live, audit_log_path=tmp / "audit.jsonl",
+                held_positions=state["position_qtys"],
             )
 
         self.assertEqual(state["position_entry_prices"]["5301.T"], 1758.5)
@@ -163,6 +166,7 @@ class TestEntryRsrRecovery(unittest.TestCase):
 
         result = recover_missing_entry_rsr(
             state, signals_dir=signals_dir, audit_log_path=tmp / "rsr_audit.jsonl",
+            held_symbols=set(state["position_qtys"].keys()),
         )
 
         self.assertEqual(len(result["recovered"]), 1)
@@ -180,6 +184,7 @@ class TestEntryRsrRecovery(unittest.TestCase):
 
         result = recover_missing_entry_rsr(
             state, signals_dir=signals_dir, audit_log_path=tmp / "rsr_audit.jsonl",
+            held_symbols=set(state["position_qtys"].keys()),
         )
 
         self.assertEqual(result["recovered"], [])
@@ -203,6 +208,7 @@ class TestEntryRsrRecovery(unittest.TestCase):
 
         result = recover_missing_entry_rsr(
             state, signals_dir=signals_dir, audit_log_path=tmp / "rsr_audit.jsonl",
+            held_symbols=set(state["position_qtys"].keys()),
         )
 
         self.assertEqual(result["recovered"], [])

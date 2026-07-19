@@ -97,6 +97,86 @@ V2_SAFE_DEFAULTS: dict[str, Any] = {
 }
 
 
+# ── 資産系フィールドの読み取りガード (Broker-as-Sole-SSOT, 2026-07-19) ──────────
+# load_portfolio_state() は state_store.py の宣言された公開読み取りAPIである。
+# その戻り値からcash/positions/market_value/equityの"現在値"を読み出せると、
+# 呼び出し元が誤ってこれを資産計算・売買判断へ使ってしまう
+# （2026-07-15〜17 equity_peak異常値インシデントの根本原因）。
+# ここでは load_portfolio_state() の戻り値を _GuardedStateDict でラップし、
+# 許可モジュール以外からの読み取りを RuntimeError で即座に検知する。
+#
+# 注意: SignalBridge._load_portfolio_state() は json.loads() を直接呼ぶ独自経路
+# であり、この場合 state は plain dict のまま（本ガードは適用されない）。
+# signal_bridge.py内の残存する資産系フィールド読み取りは診断ログ専用であることを
+# 個別レビュー済み（scripts/check_no_state_asset_read.py の ALLOWED_FILES 参照）。
+_ASSET_VALUE_KEYS = frozenset({
+    "available_cash", "last_equity", "position_qtys", "positions_count",
+    "position_current_prices", "snapshot_avg_costs",
+})
+_ASSET_VALUE_ALLOWED_MODULES = frozenset({
+    "src.portfolio.state_store",
+    "src.portfolio.equity",
+    "src.portfolio.broker_source",
+    # Broker-as-Sole-SSOTリファクタ (2026-07-18/19) で fetch_broker_snapshot()
+    # 経由へ移行済み。残る読み取りは診断ログ・CB決済ラグ補償（Step8で再設計予定）・
+    # 直前state比較によるクリーンアップ用途など、個別に検証済み
+    # （scripts/check_no_state_asset_read.py の ALLOWED_FILES と同一の集合）。
+    "src.kabusapi.signal_bridge",
+    "src.startup_check",
+    "src.scripts.sync_positions",
+    "src.run_live_signal",
+})
+
+
+class AssetFieldReadForbiddenError(RuntimeError):
+    """load_portfolio_state() の戻り値から資産系フィールドを許可外モジュールが
+    読み取ろうとした場合の異常。cash/positions/market_value/equityは
+    fetch_broker_snapshot() 経由のBrokerSnapshotのみを入力とすること。"""
+
+
+def _guarded_caller_module() -> str:
+    frame = sys._getframe(2)  # caller of get()/__getitem__ (skip this helper + the dict method)
+    return frame.f_globals.get("__name__", "")
+
+
+def _is_guard_exempt_module(module_name: str) -> bool:
+    """テストモジュールは資産系フィールドを自由に検証できる（本番コードではない）。
+    src.foo.test_bar / foo.test_bar / foo.bar_test いずれの import 経路でも
+    module_name の末尾コンポーネントで判定する（sys.path構成によりsrc.接頭辞の
+    有無が変わるため）。"""
+    last = module_name.rsplit(".", 1)[-1]
+    return last.startswith("test_") or last.endswith("_test")
+
+
+class _GuardedStateDict(dict):
+    """load_portfolio_state() が返す state dict のラッパー。
+    equity_peak / cb_state / candidate_peak 等の状態管理フィールドは無制限に
+    読み取れるが、_ASSET_VALUE_KEYS は _ASSET_VALUE_ALLOWED_MODULES 以外からの
+    読み取りを禁止する。"""
+
+    def __getitem__(self, key):
+        if key in _ASSET_VALUE_KEYS:
+            caller = _guarded_caller_module()
+            if caller not in _ASSET_VALUE_ALLOWED_MODULES and not _is_guard_exempt_module(caller):
+                raise AssetFieldReadForbiddenError(
+                    f"'{key}' はload_portfolio_state()経由で読み取れません "
+                    f"(呼び出し元: {caller or 'unknown'})。"
+                    "fetch_broker_snapshot()経由のBrokerSnapshotを使用してください。"
+                )
+        return super().__getitem__(key)
+
+    def get(self, key, default=None):
+        if key in _ASSET_VALUE_KEYS:
+            caller = _guarded_caller_module()
+            if caller not in _ASSET_VALUE_ALLOWED_MODULES and not _is_guard_exempt_module(caller):
+                raise AssetFieldReadForbiddenError(
+                    f"'{key}' はload_portfolio_state()経由で読み取れません "
+                    f"(呼び出し元: {caller or 'unknown'})。"
+                    "fetch_broker_snapshot()経由のBrokerSnapshotを使用してください。"
+                )
+        return super().get(key, default)
+
+
 # ── Dataclasses ───────────────────────────────────────────────────────────────
 
 @dataclass
@@ -644,7 +724,7 @@ def load_portfolio_state(path: Path | None = None) -> tuple[dict, ValidationResu
             healed     = ["safe defaults を使用"],
         )
         logger.warning("[STATE] %s", vr.hard_fails[0])
-        return state, vr
+        return _GuardedStateDict(state), vr
 
     try:
         raw    = target.read_text(encoding="utf-8")
@@ -660,7 +740,7 @@ def load_portfolio_state(path: Path | None = None) -> tuple[dict, ValidationResu
             hard_fails = [f"JSON 読み込み失敗: {exc}"],
             healed     = ["safe defaults を使用"],
         )
-        return state, vr
+        return _GuardedStateDict(state), vr
 
     # ── generation rollback 検知 ──
     loaded_gen = int(state.get("generation_id", 0))
@@ -688,7 +768,7 @@ def load_portfolio_state(path: Path | None = None) -> tuple[dict, ValidationResu
     for f in vr.hard_fails:
         logger.error("[STATE] HARD FAIL: %s", f)
 
-    return state, vr
+    return _GuardedStateDict(state), vr
 
 
 # ── セーブ ────────────────────────────────────────────────────────────────────
