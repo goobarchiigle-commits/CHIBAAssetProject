@@ -752,6 +752,130 @@ class TestCommitBrokerSnapshot(unittest.TestCase):
         self.assertEqual(state["last_equity"], 3_048_109.0)
 
 
+# ── TestOrphanedEntryMetadataCleanup ───────────────────────────────────────────
+# 2026-07-19: broker上で保有0になった銘柄のper-symbol metadataが
+# commit_broker_snapshot()で削除されることを検証する（entry_metadata cleanup統合）。
+
+class TestOrphanedEntryMetadataCleanup(unittest.TestCase):
+
+    def test_sold_symbol_metadata_removed_across_all_fields(self):
+        """
+        5301.T/6506.T/6981.T型の実インシデント再現:
+        3銘柄がposition_entry_dates/atrs/highest_closes/reentry_blocked/
+        entry_rsrs/unrealized_pnl/pctに残存 → broker側は保有0(空positions)。
+        commit後、全フィールドから3銘柄が削除されること。
+        """
+        state = _make_valid_state(
+            position_entry_dates    = {"5301.T": "2026-07-07", "6506.T": "2026-07-07", "6981.T": "2026-04-28"},
+            position_entry_prices   = {"5301.T": 1758.5, "6506.T": 7349.0, "6981.T": 4864.0},
+            position_qtys           = {"5301.T": 300, "6506.T": 100, "6981.T": 100},
+            positions_count         = 3,
+            position_entry_atrs     = {"5301.T": 45.275, "6506.T": 454.45, "6981.T": 201.85},
+            position_highest_closes = {"5301.T": 1657.0, "6506.T": 5972.0, "6981.T": 9100.0},
+            position_unrealized_pnl = {"6981.T": 78400},
+            position_unrealized_pct = {"6981.T": 0.1612},
+            reentry_blocked         = {"5301.T": "2026-07-22", "6506.T": "2026-07-22", "6981.T": "2026-07-22"},
+            position_entry_rsrs     = {"5301.T": 90.3, "6506.T": 97.4, "6981.T": 92.9},
+        )
+        snap = _make_snapshot(
+            positions={}, avg_costs={}, market_values={},
+        )
+        commit_broker_snapshot(state, snap)
+
+        for field in (
+            "position_entry_dates", "position_entry_atrs", "position_highest_closes",
+            "position_unrealized_pnl", "position_unrealized_pct",
+            "reentry_blocked", "position_entry_rsrs",
+        ):
+            self.assertEqual(
+                state[field], {},
+                f"{field} に売却済み銘柄が残存している: {state[field]}"
+            )
+
+    def test_entry_metadata_missing_only_symbol_removed(self):
+        """
+        2802.T型: position_entry_datesには存在せずentry_metadata_missingにのみ
+        残る銘柄（entry_date検出失敗ケース）も、broker不在なら削除されること。
+        """
+        state = _make_valid_state(
+            position_entry_dates = {"6981.T": "2026-04-28"},   # 2802.T は含まれない
+            position_qtys        = {"6981.T": 100},
+            entry_metadata_missing = {
+                "2802.T": {
+                    "detected_at": "2026-07-10",
+                    "entry_date":  "",
+                    "qty":         100,
+                    "reason":      "no matching BUY order found in logs/live/*_orders.json",
+                },
+            },
+        )
+        snap = _make_snapshot()  # positions = {6981.T, 8015.T}（2802.T不在）
+        commit_broker_snapshot(state, snap)
+
+        self.assertNotIn("2802.T", state["entry_metadata_missing"],
+                         "position_entry_datesに存在しないentry_metadata_missing専属銘柄が削除されない")
+
+    def test_held_symbol_metadata_preserved(self):
+        """broker側に引き続き保有されている銘柄のmetadataは削除されないこと。"""
+        state = _make_valid_state(
+            position_entry_dates    = {"6981.T": "2026-04-28"},
+            position_entry_atrs     = {"6981.T": 201.85},
+            position_highest_closes = {"6981.T": 9100.0},
+            reentry_blocked         = {"6981.T": "2026-07-22"},
+        )
+        snap = _make_snapshot()  # 6981.T は継続保有（positionsに含まれる）
+        commit_broker_snapshot(state, snap)
+
+        self.assertIn("6981.T", state["position_entry_dates"])
+        self.assertIn("6981.T", state["position_entry_atrs"])
+        self.assertIn("6981.T", state["position_highest_closes"])
+        self.assertIn("6981.T", state["reentry_blocked"])
+
+    def test_position_entry_prices_not_touched(self):
+        """position_entry_pricesは今回のcleanup対象外（意図的に変更しない）。"""
+        state = _make_valid_state(
+            position_entry_dates  = {"5301.T": "2026-07-07"},
+            position_entry_prices = {"5301.T": 1758.5, "6981.T": 4864.0},
+            position_qtys         = {"5301.T": 300},
+        )
+        snap = _make_snapshot(positions={}, avg_costs={}, market_values={})
+        commit_broker_snapshot(state, snap)
+
+        # cleanup対象ではないため5301.Tのentry_priceはそのまま残る
+        self.assertIn("5301.T", state["position_entry_prices"],
+                      "position_entry_prices はcleanup対象外のはずが変更された")
+
+    def test_no_cleanup_when_no_orphans(self):
+        """orphanedシンボルが存在しない場合、metadataフィールドは変更されないこと。"""
+        state = _make_valid_state(
+            position_entry_dates    = {"6981.T": "2026-04-28", "8015.T": "2026-07-01"},
+            position_entry_atrs     = {"6981.T": 201.85, "8015.T": 10.0},
+            position_qtys           = {"6981.T": 100, "8015.T": 100},
+        )
+        snap = _make_snapshot()  # positions = {6981.T, 8015.T} 完全一致
+        commit_broker_snapshot(state, snap)
+
+        self.assertEqual(state["position_entry_dates"], {"6981.T": "2026-04-28", "8015.T": "2026-07-01"})
+        self.assertEqual(state["position_entry_atrs"],  {"6981.T": 201.85, "8015.T": 10.0})
+
+    def test_cleanup_logs_structured_summary(self):
+        """[ENTRY_METADATA_CLEANUP] 構造化ログにremoved件数・symbols・fieldsが出力されること。"""
+        state = _make_valid_state(
+            position_entry_dates = {"5301.T": "2026-07-07"},
+            position_qtys        = {"5301.T": 300},
+            reentry_blocked      = {"5301.T": "2026-07-22"},
+        )
+        snap = _make_snapshot(positions={}, avg_costs={}, market_values={})
+
+        with self.assertLogs("src.portfolio.state_store", level="INFO") as cm:
+            commit_broker_snapshot(state, snap)
+
+        combined = "\n".join(cm.output)
+        self.assertIn("[ENTRY_METADATA_CLEANUP]", combined)
+        self.assertIn("removed=1", combined)
+        self.assertIn("5301.T", combined)
+
+
 # ── TestGenerationId ──────────────────────────────────────────────────────────
 
 class TestGenerationId(unittest.TestCase):

@@ -432,7 +432,68 @@ def commit_broker_snapshot(state: dict, snapshot: BrokerSnapshot) -> dict:
             len(orphaned), sorted(orphaned), f"{orphaned_val:,.0f}",
         )
 
+    _cleanup_orphaned_entry_metadata(state, live_pos)
+
     return state
+
+
+# broker上で保有0になった銘柄について、position_qtys以外に残存するper-symbol
+# metadataを削除する対象フィールド一覧（2026-07-19、entry_metadata cleanup統合）。
+# position_entry_prices は対象外（reentry判定・損益分析での過去建値参照用途があり、
+# 削除要否は別途要検討のため今回は変更しない）。
+_ORPHANED_METADATA_FIELDS: tuple[str, ...] = (
+    "position_entry_dates",
+    "position_entry_atrs",
+    "position_highest_closes",
+    "position_unrealized_pnl",
+    "position_unrealized_pct",
+    "reentry_blocked",
+    "position_entry_rsrs",
+    "entry_metadata_missing",
+)
+
+
+def _cleanup_orphaned_entry_metadata(state: dict, live_pos: dict) -> None:
+    """
+    broker snapshot（live_pos）に存在しない銘柄の per-symbol metadata を
+    _ORPHANED_METADATA_FIELDS から削除する（Broker-as-Sole-SSOT, 2026-07-19）。
+
+    commit_broker_snapshot() が position_qtys/positions_count を broker 値で
+    正しく上書きする一方、entry_dates/highest_closes/reentry_blocked 等の
+    per-symbol metadataは銘柄が売却されても削除されず残存し続けていた
+    （実機検証で2802.T/5301.T/6506.T/6981.Tが数日〜1週間以上残存する事例を確認）。
+
+    対象は _ORPHANED_METADATA_FIELDS のいずれかに存在するがlive_posに存在しない
+    symbol（position_entry_dates基準ではなく、8フィールド全ての和集合を基準にする
+    — entry_date記録が欠落したまま他フィールドにのみ残るケース（2802.T型）も
+    確実に捕捉するため）。position_qtys/position_entry_pricesは対象外
+    （前者はこの直前で既にbroker値へ正しく上書き済み、後者は意図的に対象外）。
+    """
+    live_syms: set = set(live_pos.keys())
+    stale_syms: set = set()
+    for field in _ORPHANED_METADATA_FIELDS:
+        d = state.get(field)
+        if isinstance(d, dict):
+            stale_syms |= (set(d.keys()) - live_syms)
+
+    if not stale_syms:
+        return
+
+    removed_by_field: dict[str, list[str]] = {}
+    for field in _ORPHANED_METADATA_FIELDS:
+        d = state.get(field)
+        if not isinstance(d, dict):
+            continue
+        removed = [sym for sym in stale_syms if sym in d]
+        for sym in removed:
+            del d[sym]
+        if removed:
+            removed_by_field[field] = sorted(removed)
+
+    logger.info(
+        "[ENTRY_METADATA_CLEANUP] removed=%d symbols=%s fields=%s",
+        len(stale_syms), sorted(stale_syms), removed_by_field,
+    )
 
 
 # ── アトミック書き込み ────────────────────────────────────────────────────────
