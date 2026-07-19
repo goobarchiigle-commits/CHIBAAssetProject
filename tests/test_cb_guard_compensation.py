@@ -1,18 +1,22 @@
 """
 tests/test_cb_guard_compensation.py
 
-P0 CB_GUARD_COMP バグ修正の検証テスト。
+P0 CB_GUARD_COMP バグ修正の検証テスト（position_qtys書込み部分のみ現存）。
 
-根本原因:
+根本原因（2026-06-04インシデント）:
   update_state_after_execution がBUY約定後に position_qtys を書かなかった。
-  → _cb_pre_qtys に新規BUYシンボルが含まれず SOURCE1 補償がゼロになった。
-  → T+2決済ラグで equity が急落し、誤った DD=-22% でCB_ACTIVEが発動した。
 
 修正: BUYブロックに pos_qtys[sym] = int(qty) を追加 (SELL は pop)。
+この部分（TestPositionQtysWrittenOnBuy）は独立した価値があるため現存する。
 
-再現ケース (2026-06-04):
-  5301.T BUY 400株 @ ¥1852.5 → 運用資金¥741,000が決済ラグで消える
-  equity=3,184,309 / peak=4,089,109 → 補償後 cb_equity=3,925,309 → DD=-4.01%
+2026-07-19 追記: 上記バグが誘発したCB発動抑制機構（SOURCE1/_cb_guard_compensation
+経由のPendingOrderState）自体は、stale portfolio_stateとの区別が原理的に不可能な
+構造的欠陥（実機検証で5日前に確定売却済みの3銘柄を「決済待ち」と誤認し
+¥1,748,850を誤算出）と、SOURCE2(ledger-based)がrun_live_signal.pyから
+呼ばれず実質死コードだった事実が判明したため、Broker-as-Sole-SSOTの方針に
+従い完全撤去した。旧`TestCbGuardCompensationSource1`/`TestCbNotTriggeredAfterCompensation`
+（SOURCE1の算出値そのものを検証していたテスト）は、検証対象の関数
+`_cb_guard_compensation()`が削除されたため本ファイルから削除した。
 """
 import json
 import sys
@@ -165,147 +169,6 @@ class TestPositionQtysWrittenOnBuy(unittest.TestCase):
 
         state = json.loads(self.state_file.read_text(encoding="utf-8"))
         self.assertNotIn("5301.T", state.get("position_qtys", {}))
-
-
-# ---------------------------------------------------------------------------
-# テスト 2: _cb_guard_compensation SOURCE1 の直接検証
-# ---------------------------------------------------------------------------
-
-class TestCbGuardCompensationSource1(unittest.TestCase):
-    """_cb_guard_compensation の SOURCE1 (state-based) 補償ロジックを直接検証。"""
-
-    def _run(self, pre_commit_qtys, pre_commit_costs, current_positions,
-             current_equity=3_184_309.0, ledger_path=None, today="2026-06-04"):
-        from src.kabusapi.signal_bridge import _cb_guard_compensation
-        return _cb_guard_compensation(
-            current_equity    = current_equity,
-            current_positions = current_positions,
-            pre_commit_qtys   = pre_commit_qtys,
-            pre_commit_costs  = pre_commit_costs,
-            ledger_path       = ledger_path,
-            today_str         = today,
-        )
-
-    def test_source1_compensates_settlement_lag(self):
-        """
-        2026-06-04 再現ケース:
-        5301.T が position_qtys にあり (fix後) ブローカーには未着 → SOURCE1 = ¥741,000。
-        """
-        state_comp, state_syms, ledger_comp, ledger_syms = self._run(
-            pre_commit_qtys  = {"6506.T": 100, "6981.T": 100, "5301.T": 400},
-            pre_commit_costs = {"6506.T": 6987.0, "6981.T": 4864.0, "5301.T": 1852.5},
-            current_positions = {
-                "6506.T": {"qty": 100, "avg_price": 6987.0},
-                "6981.T": {"qty": 100, "avg_price": 4864.0},
-                # 5301.T: T+2決済ラグで未着
-            },
-        )
-        self.assertEqual(state_comp, 400 * 1852.5,
-                         f"SOURCE1 expected ¥741,000 got ¥{state_comp}")
-        self.assertIn("5301.T", state_syms)
-        self.assertEqual(ledger_comp, 0.0, "SOURCE2 should be zero (no ledger)")
-
-    def test_no_compensation_when_position_already_in_broker(self):
-        """ブローカーにポジションが既に着荷している場合は補償なし。"""
-        state_comp, state_syms, ledger_comp, ledger_syms = self._run(
-            pre_commit_qtys   = {"5301.T": 400},
-            pre_commit_costs  = {"5301.T": 1852.5},
-            current_positions = {"5301.T": {"qty": 400, "avg_price": 1852.5}},
-        )
-        self.assertEqual(state_comp, 0.0, "着荷済みシンボルを誤補償してはならない")
-        self.assertNotIn("5301.T", state_syms)
-
-    def test_no_compensation_when_pre_qtys_empty(self):
-        """
-        BUG再現: fix前の状態（position_qtys に 5301.T が無い）では補償ゼロ。
-        """
-        state_comp, state_syms, ledger_comp, ledger_syms = self._run(
-            pre_commit_qtys   = {"6506.T": 100, "6981.T": 100},  # 5301.T 欠落
-            pre_commit_costs  = {"6506.T": 6987.0, "6981.T": 4864.0, "5301.T": 1852.5},
-            current_positions = {
-                "6506.T": {"qty": 100, "avg_price": 6987.0},
-                "6981.T": {"qty": 100, "avg_price": 4864.0},
-            },
-        )
-        self.assertEqual(state_comp, 0.0, "BUG再現: SOURCE1補償ゼロを確認")
-
-
-# ---------------------------------------------------------------------------
-# テスト 3: 6/4 シナリオ 完全統合 — CB_ACTIVE にならないことを証明
-# ---------------------------------------------------------------------------
-
-CB_DD_TRIGGER = 0.15  # signal_bridge.CB_DD_TRIGGER と同じ定数
-
-
-class TestCbNotTriggeredAfterCompensation(unittest.TestCase):
-    """
-    修正後シナリオ:
-      equity=3,184,309 / peak=4,089,109
-      5301.T BUY 400 @ ¥1852.5 → position_qtys に記録 (fix)
-      → SOURCE1 補償=¥741,000
-      → cb_equity=3,925,309
-      → DD=(3,925,309/4,089,109)-1 = -4.01%  → -15%以内 → CB_ACTIVE 発動しない
-    """
-
-    def test_cb_equity_calculation(self):
-        """補償後 cb_equity の数値が正しいことを確認。"""
-        from src.kabusapi.signal_bridge import _cb_guard_compensation
-
-        current_equity = 3_184_309.0
-        equity_peak    = 4_089_109.0
-
-        state_comp, _, ledger_comp, _ = _cb_guard_compensation(
-            current_equity    = current_equity,
-            current_positions = {
-                "6506.T": {"qty": 100, "avg_price": 6987.0},
-                "6981.T": {"qty": 100, "avg_price": 4864.0},
-            },
-            pre_commit_qtys  = {"6506.T": 100, "6981.T": 100, "5301.T": 400},
-            pre_commit_costs = {"6506.T": 6987.0, "6981.T": 4864.0, "5301.T": 1852.5},
-            ledger_path      = None,
-            today_str        = "2026-06-04",
-        )
-
-        comp_total = state_comp + ledger_comp
-        cb_equity  = current_equity + comp_total
-        dd_adjusted = cb_equity / equity_peak - 1.0
-
-        self.assertAlmostEqual(comp_total, 741_000.0, places=0,
-                               msg="comp_total が ¥741,000 でない")
-        self.assertAlmostEqual(cb_equity, 3_925_309.0, places=0,
-                               msg="cb_equity が ¥3,925,309 でない")
-        self.assertGreater(dd_adjusted, -CB_DD_TRIGGER,
-                           msg=f"DD={dd_adjusted:.4f} が閾値 -{CB_DD_TRIGGER} 以下 → 誤CB発動")
-
-    def test_dd_raw_would_have_triggered_cb(self):
-        """補償なしの生 DD は -15% を超えること（バグ再現の確認）。"""
-        current_equity = 3_184_309.0
-        equity_peak    = 4_089_109.0
-        dd_raw = current_equity / equity_peak - 1.0
-        self.assertLessEqual(dd_raw, -CB_DD_TRIGGER,
-                             msg="補償なしDDは -15% 以下のはず (バグ再現失敗)")
-
-    def test_comp_source1_label(self):
-        """SOURCE1 補償が ¥741,000 であることを明示的に検証。"""
-        from src.kabusapi.signal_bridge import _cb_guard_compensation
-
-        state_comp, state_syms, ledger_comp, ledger_syms = _cb_guard_compensation(
-            current_equity    = 3_184_309.0,
-            current_positions = {
-                "6506.T": {"qty": 100, "avg_price": 6987.0},
-                "6981.T": {"qty": 100, "avg_price": 4864.0},
-            },
-            pre_commit_qtys  = {"6506.T": 100, "6981.T": 100, "5301.T": 400},
-            pre_commit_costs = {"6506.T": 6987.0, "6981.T": 4864.0, "5301.T": 1852.5},
-            ledger_path      = None,
-            today_str        = "2026-06-04",
-        )
-
-        self.assertEqual(state_comp,   400 * 1852.5, "comp_source1 ≠ ¥741,000")
-        self.assertEqual(ledger_comp,  0.0,          "comp_source2 ≠ ¥0")
-        self.assertEqual(state_comp + ledger_comp, 741_000.0, "comp_total ≠ ¥741,000")
-        self.assertIn("5301.T", state_syms)
-        self.assertEqual(ledger_syms, [])
 
 
 if __name__ == "__main__":

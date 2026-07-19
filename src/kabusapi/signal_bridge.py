@@ -727,130 +727,6 @@ class BridgeResult:
 
 
 # ------------------------------------------------------------------ #
-# CB settlement-lag equity compensation (V2)
-# ------------------------------------------------------------------ #
-
-def _cb_guard_compensation(
-    current_equity:    float,
-    current_positions: dict,
-    pre_commit_qtys:   dict,
-    pre_commit_costs:  dict,
-    ledger_path:       "Path | None",
-    today_str:         str,
-) -> "tuple[float, list[str], float, list[str]]":
-    """
-    同日BUY未着金補償を2ソースで計算して返す。
-
-    SOURCE 1 (state-based):
-        portfolio_state.position_qtys にあったが broker API に未出現のポジション。
-        ケース: 前回ランで購入済み、今回ランで broker がまだ反映していない。
-
-    SOURCE 2 (ledger-based):
-        execution_ledger.json の当日 BUY 成功エントリーで broker 未出現のもの。
-        ケース: 同日先行ランが BUY を確定 → 後続ランで state には未反映だが cash が減額済み。
-
-    Returns:
-        (state_value, state_symbols, ledger_value, ledger_symbols)
-        各ソースの補償額(円)とシンボルリスト。重複なし。
-    """
-    # ── SOURCE 1: state-based ──────────────────────────────────────
-    state_value:   float     = 0.0
-    state_symbols: list[str] = []
-    for sym, qty in pre_commit_qtys.items():
-        q = int(qty or 0)
-        if q > 0 and sym not in current_positions:
-            price = float(pre_commit_costs.get(sym) or 0.0)
-            if price > 0:
-                state_value += q * price
-                state_symbols.append(sym)
-
-    # ── SOURCE 2: execution-ledger-based ──────────────────────────
-    # Include "pending" and "submitted" for same-day AND previous trading days
-    # (up to LEDGER_LOOKBACK_DAYS). This covers the day-after-purchase case where
-    # the settlement lag persists past midnight and today_str != ledger date.
-    # Exclude "failed"/"shadow".
-    _LEDGER_LOOKBACK_DAYS = 2  # 当日 + 前2営業日まで補償
-    ledger_value:   float     = 0.0
-    ledger_symbols: list[str] = []
-    if ledger_path is not None:
-        try:
-            if ledger_path.exists():
-                _ld = json.loads(ledger_path.read_text(encoding="utf-8"))
-                _ld_date = _ld.get("date", "")
-                # Accept ledger if date is within lookback window
-                _today_ts = pd.Timestamp(today_str)
-                try:
-                    _ld_ts    = pd.Timestamp(_ld_date)
-                    _day_diff = (_today_ts - _ld_ts).days
-                    _date_ok  = 0 <= _day_diff <= _LEDGER_LOOKBACK_DAYS
-                except Exception:
-                    _date_ok  = (_ld_date == today_str)
-                if _date_ok:
-                    for _entry in _ld.get("orders", {}).values():
-                        lsym    = _entry.get("symbol", "")
-                        lside   = _entry.get("side", "")
-                        lstatus = _entry.get("execution_status", "")
-                        if (
-                            lside == "BUY"
-                            and lstatus not in ("failed", "shadow")
-                            and lsym not in current_positions
-                            and lsym not in state_symbols  # dedup with SOURCE 1
-                        ):
-                            lqty   = int(_entry.get("qty",   0)   or 0)
-                            lprice = float(_entry.get("price", 0.0) or 0.0)
-                            if lqty > 0 and lprice > 0:
-                                ledger_value += lqty * lprice
-                                ledger_symbols.append(lsym)
-        except Exception as _le:
-            logger.warning("[CB_GUARD] ledger compensation failed (FAIL_OPEN): %s", _le)
-
-    return state_value, state_symbols, ledger_value, ledger_symbols
-
-
-@dataclass(frozen=True)
-class PendingOrderState:
-    """
-    brokerがまだ反映していない可能性のある当日BUYの集合（2026-07-19、
-    Broker-as-Sole-SSOTリファクタ: _cb_equityの合成equity方式を置き換え）。
-
-    禁止事項（ユーザー明示指示）: PendingOrderStateはCB発動可否を判定するため
-    だけに利用する。current_equity・market_value・last_equity・equity_peak・
-    drawdownの永続値を書き換えることを禁止する。pending_valueを
-    current_equityへ加算した「補償済みequity」を作り、それをequity_peak更新や
-    state永続化に使う経路は全廃した。
-    """
-    pending_value: float
-    symbols:       "tuple[str, ...]"
-
-
-def compute_pending_order_state(
-    current_positions: dict,
-    pre_commit_qtys:   dict,
-    pre_commit_costs:  dict,
-    ledger_path:       "Path | None",
-    today_str:         str,
-) -> PendingOrderState:
-    """
-    _cb_guard_compensation() のSOURCE1(state-based)+SOURCE2(ledger-based)検出
-    ロジックをそのまま再利用し、戻り値をPendingOrderStateへ再包装する
-    （数値算出方法は変えない・戻り値の意味論のみ「equity補償額」から
-    「CB発動抑制の判断材料」へ変える）。
-    """
-    state_value, state_symbols, ledger_value, ledger_symbols = _cb_guard_compensation(
-        current_equity=0.0,  # 未使用（戻り値のcurrent_equity+補償計算は呼び出し元がしない）
-        current_positions=current_positions,
-        pre_commit_qtys=pre_commit_qtys,
-        pre_commit_costs=pre_commit_costs,
-        ledger_path=ledger_path,
-        today_str=today_str,
-    )
-    return PendingOrderState(
-        pending_value=state_value + ledger_value,
-        symbols=tuple(state_symbols + ledger_symbols),
-    )
-
-
-# ------------------------------------------------------------------ #
 # _build_orders() 契約バリデーター
 # ------------------------------------------------------------------ #
 def _validate_build_orders_contract(result: object) -> None:
@@ -1015,7 +891,6 @@ class SignalBridge:
         state:               dict,
         current_equity:      float,
         today_str:           str,
-        pending_order_state: "PendingOrderState | None" = None,
         broker_snapshot:     "BrokerSnapshot | None" = None,
     ) -> dict:
         """
@@ -1026,9 +901,15 @@ class SignalBridge:
         リファクタ: 旧_cb_equityの合成equity方式を廃止）。equity_peak・drawdown・
         candidate_peak再確認等、本メソッド内の判定はすべてこのraw equityのみで行う。
 
-        pending_order_state は決済ラグにより一時的にDD閾値を超えて見える場合の
-        CB発動抑制判定にのみ使う（DD_TRIGGER到達時のローカル判断材料）。
-        current_equity・equity_peak・drawdownの永続値を書き換えることはない。
+        PendingOrderState機構（決済ラグ補償によるCB発動抑制）は2026-07-19に完全撤去。
+        根拠: (1) SOURCE1(state-based)はstale portfolio_stateとの区別ができず誤補償を
+        生む構造的欠陥があった（実機検証で5日前に確定売却済みの3銘柄を「決済待ち」と
+        誤認し¥1,748,850を誤算出）。(2) SOURCE2(ledger-based)はrun_live_signal.pyが
+        OrderLedger.check_and_record()を呼ばないため実質死コードだった。(3) 両インシデント
+        の発生前提（run_morning_signal.pyとの並行スケジュール実行）は2026-07-15 SSOT統合
+        で構造的に消滅済み。撤去後もCB_ACTIVEには既存の[CB_FAST_RECOVERY]/[CB_AUTO_RESTORE]
+        機構があり、誤発動しても翌run（最大1日）で自己修復する。詳細は該当セッションの
+        設計レビューを参照。
 
         broker_snapshot は equity_peak 更新前の整合性チェックに使う
         （EQUITY_PEAK_HARDENING, _commit_equity_peak() 経由）。
@@ -1168,50 +1049,15 @@ class SignalBridge:
         # last_equity は commit_broker_snapshot / update_portfolio_state_from_broker が
         # raw equity で設定済み。
 
-        # ── PendingOrderState 発動抑制ゲート (2026-07-19) ──────────────────
-        # 決済ラグ（直前のBUYがbrokerへまだ反映されていない）により一時的に
-        # equityが低く見えているだけの可能性がある場合、CB発動を今回は見送る。
-        # _hypothetical_dd はローカル変数であり、equity_peak/drawdown/current_equity
-        # 等の永続値には一切書き戻さない（PendingOrderStateはCB発動可否の判定材料
-        # としてのみ使う。禁止事項: ユーザー明示指示参照）。
-        _settlement_lag_suspected = False
-        if (
-            pending_order_state is not None
-            and pending_order_state.pending_value > 0
-            and drawdown <= -CB_DD_TRIGGER
-        ):
-            _hypothetical_dd = (
-                (current_equity + pending_order_state.pending_value) / equity_peak - 1.0
-                if equity_peak > 0 else drawdown
-            )
-            if _hypothetical_dd > -CB_DD_TRIGGER:
-                _settlement_lag_suspected = True
-                logger.warning(
-                    "[CB_SETTLEMENT_LAG_SUSPECTED] raw_dd=%.1f%% pending=¥%.0f%s "
-                    "hypothetical_dd=%.1f%% — CB発動を今回は見送り、次runで再評価",
-                    drawdown * 100, pending_order_state.pending_value,
-                    list(pending_order_state.symbols), _hypothetical_dd * 100,
-                )
-
         # ── SAFE_WARN チェック（peak 異常検出）────────────────────────────
-        # settlement lag と判定された場合、DD_TRIGGERだけでなくPEAK_ANOMALY比率も
-        # 同じ一時的な低equityから誤検出され得る。DD判定と同じ根拠
-        # （pending_value分は決済ラグで一時的に見えていないだけ）でanomaly判定にも
-        # 反映する。current_equity自体（永続値・戻り値）は変更しない — この
-        # hypothetical値はcheck_peak_anomaly()への入力としてのみ使う。
         safe_warn_count = int(state.get("safe_warn_count", 0))
-        _anomaly_check_equity = (
-            current_equity + pending_order_state.pending_value
-            if _settlement_lag_suspected and pending_order_state is not None
-            else current_equity
-        )
         is_anomaly, new_safe_warn_count, anomaly_msg = check_peak_anomaly(
-            equity_peak, _anomaly_check_equity, safe_warn_count
+            equity_peak, current_equity, safe_warn_count
         )
 
         # ── 状態遷移 ─────────────────────────────────────────────────────
         if cb_state == "NORMAL":
-            if drawdown <= -CB_DD_TRIGGER and not _settlement_lag_suspected:
+            if drawdown <= -CB_DD_TRIGGER:
                 # PEAK_ANOMALY も同時に検出されている場合: peak を再構築して DD を再評価する。
                 # 異常 peak（stale run / settlement lag 起因）による誤 CB 発動を防止する。
                 if is_anomaly:
@@ -1393,11 +1239,7 @@ class SignalBridge:
 
         # ── [CB_STATE] 構造化ログ ────────────────────────────────────────
         # current_equityは常にbroker直接値の単一equity（2026-07-19以降、
-        # 「補償済み」equityは存在しない）。pending_valueは発動抑制の判断材料と
-        # して参考情報に留め、equity値そのものには一切影響しない。
-        _pending_val  = pending_order_state.pending_value if pending_order_state else 0.0
-        _pending_syms = list(pending_order_state.symbols) if pending_order_state else []
-
+        # 「補償済み」equityは存在しない）。
         if cb_state_after != cb_state_before:
             # 状態遷移あり: 詳細を WARNING
             if drawdown <= -CB_DD_TRIGGER:
@@ -1407,19 +1249,14 @@ class SignalBridge:
             else:
                 _reason = "STATE_TRANSITION"
             logger.warning(
-                "[CB_STATE] before=%s after=%s equity=%.0f dd=%.1f%% "
-                "pending_value=%.0f pending_symbols=%s "
-                "settlement_lag_suspected=%s reason=%s",
-                cb_state_before, cb_state_after, current_equity, drawdown * 100,
-                _pending_val, _pending_syms, _settlement_lag_suspected, _reason,
+                "[CB_STATE] before=%s after=%s equity=%.0f dd=%.1f%% reason=%s",
+                cb_state_before, cb_state_after, current_equity, drawdown * 100, _reason,
             )
         else:
             # 遷移なし: INFO
             logger.info(
-                "[CB_STATE] state=%s equity=%.0f dd=%.1f%% "
-                "pending_value=%.0f pending_symbols=%s settlement_lag_suspected=%s",
+                "[CB_STATE] state=%s equity=%.0f dd=%.1f%%",
                 cb_state_after, current_equity, drawdown * 100,
-                _pending_val, _pending_syms, _settlement_lag_suspected,
             )
 
         return state
@@ -4776,18 +4613,6 @@ class SignalBridge:
                     _cash_event['event_type'],
                 )
 
-        # ── CB settlement-lag guard: save position_qtys BEFORE commit overwrites them
-        # commit_broker_snapshot() sets position_qtys = broker positions.
-        # If a BUY just executed, broker cash is reduced but the new position may not
-        # yet appear in the broker API (settlement lag of seconds to minutes).
-        # This creates a phantom equity drop → false CB trigger.
-        # We save the pre-commit state here and compensate after commit.
-        _cb_pre_qtys  = dict(portfolio_state.get("position_qtys", {}))
-        _cb_pre_costs = {
-            **portfolio_state.get("position_entry_prices", {}),
-            **portfolio_state.get("snapshot_avg_costs", {}),  # snapshot wins over entry price
-        }
-
         # ── snapshot commit または partial equity 更新 ───────────────────
         if _broker_snap is not None:
             _broker_snap.equity = current_equity
@@ -4816,34 +4641,13 @@ class SignalBridge:
             positions_match = _broker_positions_ok,
         )
 
-        # ── CB PendingOrderState (2026-07-19) ────────────────────────
-        # SOURCE 1 (state): pre-commit position_qtys absent from broker API.
-        # SOURCE 2 (ledger): same-day executed BUY in execution_ledger absent
-        #   from broker API (e.g. run_morning_signal placed a BUY at 08:41
-        #   and run_live_signal runs 3 min later before position settles).
-        # PendingOrderStateはCB発動可否の判断材料としてのみ_update_cb_state()に
-        # 渡す。current_equityを書き換えて「補償済みequity」を作ることはしない
-        # （旧_cb_equity方式を廃止。ユーザー明示指示: 資産の永続値を書き換え禁止）。
-        from src.live.order_ledger import LEDGER_PATH as _CB_LEDGER_PATH
-
-        _pending_order_state = compute_pending_order_state(
-            current_positions = current_positions,
-            pre_commit_qtys   = _cb_pre_qtys,
-            pre_commit_costs  = _cb_pre_costs,
-            ledger_path       = _CB_LEDGER_PATH,
-            today_str         = today_str,
-        )
-        if _pending_order_state.pending_value > 0:
-            logger.info(
-                "[CB_PENDING_ORDER_STATE] pending_value=¥%.0f symbols=%s "
-                "(CB発動判定のみに使用。equity自体は変更しない)",
-                _pending_order_state.pending_value, list(_pending_order_state.symbols),
-            )
-
+        # ── CB状態更新 ──────────────────────────────────────────────────
+        # PendingOrderState機構は2026-07-19に完全撤去（_update_cb_state()の
+        # docstring参照）。CB判定はraw broker equityのみで行う。
         if self.live:
             portfolio_state = self._update_cb_state(
                 portfolio_state, current_equity, today_str,
-                pending_order_state=_pending_order_state, broker_snapshot=_broker_snap,
+                broker_snapshot=_broker_snap,
             )
         else:
             # DRY: compute on isolated copy; carry back cb_state for signal gating only.
@@ -4851,7 +4655,7 @@ class SignalBridge:
             _ps_dry_cb = self._update_cb_state(
                 {**portfolio_state},   # shallow copy is sufficient: _update_cb_state writes top-level scalars only
                 current_equity, today_str,
-                pending_order_state=_pending_order_state, broker_snapshot=_broker_snap,
+                broker_snapshot=_broker_snap,
             )
             portfolio_state["cb_state"] = _ps_dry_cb.get("cb_state", portfolio_state.get("cb_state", "NORMAL"))
             logger.info(

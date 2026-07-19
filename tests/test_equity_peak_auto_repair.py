@@ -2,11 +2,16 @@
 tests/test_equity_peak_auto_repair.py
 
 Phase 1-3 の自動修復テスト:
-- settlement lag 補償の翌日対応 (_cb_guard_compensation lookback=2d)
 - rebuild_equity_peak()
 - PEAK_ANOMALY 時の CB FAIL_SAFE (NORMAL 維持)
 - CB_ACTIVE 時の自動修復
 - 乖離警告閾値
+
+2026-07-19 追記: _cb_guard_compensation()（settlement lag補償・PendingOrderState
+機構）はBroker-as-Sole-SSOTの方針に基づき完全撤去された。同機構を検証していた
+テスト3件（test_cb_guard_compensation_next_day_pending等）は検証対象の関数が
+削除されたため本ファイルから削除した。詳細はtest_cb_settlement_guard.pyの
+モジュールdocstringを参照。
 """
 from __future__ import annotations
 import sys, json, tempfile, os
@@ -71,122 +76,6 @@ def test_rebuild_equity_peak_fallback_on_empty():
     finally:
         eq_mod._SNAPSHOT_FILE = orig_file
         tmp_path.unlink(missing_ok=True)
-
-
-# ─────────────────────────────────────────────────────────────────────
-# 2. _cb_guard_compensation — 翌日の pending BUY も補償
-# ─────────────────────────────────────────────────────────────────────
-
-def test_cb_guard_compensation_next_day_pending():
-    """
-    今日が 2026-06-05 / ledger date が 2026-06-04 の場合でも
-    pending BUY が補償される（lookback=2d 拡張）
-    """
-    from src.kabusapi.signal_bridge import _cb_guard_compensation
-
-    ledger_content = {
-        "date": "2026-06-04",
-        "orders": {
-            "2026-06-04_5301.T_BUY": {
-                "symbol": "5301.T",
-                "side": "BUY",
-                "qty": 400,
-                "price": 1852.5,
-                "execution_status": "pending",
-            }
-        }
-    }
-
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False,
-                                     encoding="utf-8") as f:
-        json.dump(ledger_content, f)
-        ledger_path = Path(f.name)
-
-    try:
-        state_val, state_syms, ledger_val, ledger_syms = _cb_guard_compensation(
-            current_equity    = 3_184_309.0,
-            current_positions = {"6981.T": {"qty": 100}, "6506.T": {"qty": 100}},  # 5301.T なし
-            pre_commit_qtys   = {"6981.T": 100, "6506.T": 100},
-            pre_commit_costs  = {"6981.T": 4864.0, "6506.T": 6987.0},
-            ledger_path       = ledger_path,
-            today_str         = "2026-06-05",  # 翌日
-        )
-
-        assert ledger_val == 400 * 1852.5, (
-            f"5301.T の補償額が正しくない: {ledger_val} (期待: {400 * 1852.5})"
-        )
-        assert "5301.T" in ledger_syms
-    finally:
-        ledger_path.unlink(missing_ok=True)
-
-
-def test_cb_guard_compensation_same_day():
-    """同日の pending BUY は従来通り補償される"""
-    from src.kabusapi.signal_bridge import _cb_guard_compensation
-
-    ledger_content = {
-        "date": "2026-06-06",
-        "orders": {
-            "2026-06-06_7203.T_BUY": {
-                "symbol": "7203.T",
-                "side": "BUY",
-                "qty": 100,
-                "price": 3500.0,
-                "execution_status": "submitted",
-            }
-        }
-    }
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False,
-                                     encoding="utf-8") as f:
-        json.dump(ledger_content, f)
-        ledger_path = Path(f.name)
-    try:
-        _, _, ledger_val, ledger_syms = _cb_guard_compensation(
-            current_equity    = 4_000_000.0,
-            current_positions = {},
-            pre_commit_qtys   = {},
-            pre_commit_costs  = {},
-            ledger_path       = ledger_path,
-            today_str         = "2026-06-06",
-        )
-        assert ledger_val == 100 * 3500.0
-        assert "7203.T" in ledger_syms
-    finally:
-        ledger_path.unlink(missing_ok=True)
-
-
-def test_cb_guard_compensation_old_ledger_not_compensated():
-    """3 日以上前の ledger は補償対象外"""
-    from src.kabusapi.signal_bridge import _cb_guard_compensation
-
-    ledger_content = {
-        "date": "2026-05-30",  # 1週間以上前
-        "orders": {
-            "2026-05-30_5301.T_BUY": {
-                "symbol": "5301.T",
-                "side": "BUY",
-                "qty": 400,
-                "price": 1852.5,
-                "execution_status": "pending",
-            }
-        }
-    }
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False,
-                                     encoding="utf-8") as f:
-        json.dump(ledger_content, f)
-        ledger_path = Path(f.name)
-    try:
-        _, _, ledger_val, _ = _cb_guard_compensation(
-            current_equity    = 3_184_309.0,
-            current_positions = {},
-            pre_commit_qtys   = {},
-            pre_commit_costs  = {},
-            ledger_path       = ledger_path,
-            today_str         = "2026-06-06",
-        )
-        assert ledger_val == 0.0, "3日超過の ledger は補償しない"
-    finally:
-        ledger_path.unlink(missing_ok=True)
 
 
 # ─────────────────────────────────────────────────────────────────────
