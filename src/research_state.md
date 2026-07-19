@@ -36,6 +36,24 @@ L5/L6/L7/Section8/L12へ注記反映・旧文は取り消し線で凍結保持�
    Core intrinsic alpha名目≈10-12%/PIT補正後≈0-5%・資本上限≈+1pp・30%残ギャップ≈+18pp超。
    禁止再提案リスト: 資本増額での目標到達／Coreレバ／Core単独30%復活／RSR42名目実績の根拠使用。
 
+**★同日v1.1改定（ユーザーレビュー反映・上記3/6/8を上書き）**:
+1. **Core PIT期待値=UNKNOWN（~0-5%・confidence LOW）へ格下げ**。α≈0の可能性を排除できない
+   （Study101全構成RED）。名目10-15%は歴史参考のみ・意思決定使用禁止。Stretch 15-18%表記は失効。
+   「Coreに5%程度のアルファが残る」と読める表記を禁止。
+2. **Study103新設（Portfolio Architecture Feasibility・CP2）**: 30%∧Calmar1.5の数学的成立性を
+   Satellite掘削前にMonte Carlo逆問題（feasible frontier・仮定3水準事前固定・スイープ禁止）で判定。
+   依存ゼロ・0.5-1日・Study78資産再利用。楽観水準でも不成立→30%最終棄却（Study85を待たず）。
+   実装はASK_FIRST（新規スクリプト）。
+3. **CP再構成**: CP2=Study103（数学的成立性）/ CP3=スリーブ採用ゲート（事前固定:
+   単独CAGR≥15%コスト後∧Calmar≥0.8∧相関<0.5∧WF5/5∧コストストレス。低volスリーブは
+   RoR<1%内vol-targetレバ換算後で判定）/ CP4=Study85統合実測（不変）。
+   Study80は「CP2判定者」からMNスリーブ候補のCP3審査対象へ降格。
+4. **Coreスリーブ格下げ**: Study85の保証枠（Core80-90%）廃止。CoreはPIT再測定値でCP3を
+   他Satelliteと同条件審査。不通過ならSatellite-onlyポートフォリオを正式選択肢とする。
+5. **優先順位v1.1**: ①75完了→②76→③**103**（並行即時着手可）→④**83**（TSMOM・実装容易でROI最高）
+   →⑤80（白でもStudy86実装重量で割引→83の後）→⑥82→⑦85→⑧77（optional・**76 BLACK時のみ**。
+   76 WHITE=多層Exit消滅で起案不要。「76→77」直列廃止）。
+
 **変更しないもの**: PARAMS_LOCKED・恒久閉鎖14項・0.4ゲート・Entry Freeze状態・
 `fujiko_r2_research_roadmap.md`（並立正典・Study95 KILL帰結の決裁は継続保留）・FUJIKO 2.0未決5点。
 
