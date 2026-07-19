@@ -1,7 +1,43 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-17（★Entry Freeze Final Audit完了: 全経路探索+sendorder直前最終ガード2箇所追加・commit f707f4a★）
-# ※研究(Study)系列は2026-07-16 Study101が最新（下記参照）。本セクション先頭は運用インフラ変更の記録。
+# Single Source of Truth / 最終更新: 2026-07-19（★旧正典ロードマップ全面改定: Study74 FINAL BLACK確定・Study79 CLOSED・新CP1・Study102採番★）
+# ※研究(Study)系列は2026-07-16 Study101が最新。本セクション先頭は文書改定の記録。
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
+
+---
+
+## ★★★★★★★★★★★★★★★★★★ 2026-07-19 旧正典ロードマップ全面改定（Post-Study74+90番台反映・文書のみ）
+
+**性格**: 文書改定のみ（新規BTゼロ・コード変更ゼロ・実弾変更ゼロ・Entry Freeze継続）。ユーザー指示
+10項+Appendixに完全準拠。正典: `reports/roadmap_revision_2026-07-19.md`。
+改定対象: `reports/complete_execution_roadmap_2026-07-04.md`（冒頭改定告知+§0.7/Section1/L1/L2/L3/
+L5/L6/L7/Section8/L12へ注記反映・旧文は取り消し線で凍結保持）。
+
+**確定事項（ユーザー決裁）**:
+1. **Study74 = FINAL BLACK**。資本投入単独のCAGR改善余地≈+1.12pp（lot丸め解消のみ）・
+   ¥20-30Mでも22%到達不能。「決裁待ち」状態を終了。
+2. **Study79 = CLOSED（恒久）**。起案条件（Study74 WHITE）が永久成立不能。レバ研究は
+   Study80 WHITE後の統合ポートフォリオ側（Study85/86・MNスプレッドのみ）へ移管。
+   Long Only Coreへのレバは再起案禁止。
+3. **新CP1**: Core単独期待=CAGR **10-15%** / Stretch **15-18%** / 18%+は新アルファ源必須
+   （MN/PEAD/TSMOM）。⚠名目値注記: PIT補正後≈0-5%・TOPIX劣後リスク（Study75C/100/101）。
+   ベンチマーク=TOPIX B&H一本化（Study101判定を追認）。
+4. **Universe二層分離**: Universe-A（ADV20∧lot feasible=Study75A Universe C・バイアス測定専用）/
+   Universe-B（TOPIX500 PIT・Study76比較専用・**未生成=Study75残作業**）。混用=Study52型
+   交絡事故として無効。
+5. **Study76目的明文化**: 複雑性の正当化判定（高CAGR追求ではない）。Δ≥-2pp基準は維持。
+6. **Stage5再定義**: 30%達成条件=複数低相関Satellite統合のみ。Core単独30%前提を全削除。
+   Study80はCP2=「30%経路の生死判定」に格上げ。
+7. **採番衝突解消**: Study81=Cluster RCA（完了・REJECT）で確定。Small Growth Momentum
+   （旧L6・ARCH-E）=**Study102**へ改番（Study87-97=fujiko_r2予約済み・98-101=実施済みのため。
+   ユーザー原案の87は不可）。
+8. **新研究優先順位（ROI順）**: ①Study75完了（Universe-B生成）→②Study76→③Study80
+   feasibility→④Study83→⑤Study77（Exit系はROI最低・任意）。
+9. **Appendix「Post-Study74 Reality Check」**を恒久参照として設置（roadmap_revision§10）:
+   Core intrinsic alpha名目≈10-12%/PIT補正後≈0-5%・資本上限≈+1pp・30%残ギャップ≈+18pp超。
+   禁止再提案リスト: 資本増額での目標到達／Coreレバ／Core単独30%復活／RSR42名目実績の根拠使用。
+
+**変更しないもの**: PARAMS_LOCKED・恒久閉鎖14項・0.4ゲート・Entry Freeze状態・
+`fujiko_r2_research_roadmap.md`（並立正典・Study95 KILL帰結の決裁は継続保留）・FUJIKO 2.0未決5点。
 
 ---
 

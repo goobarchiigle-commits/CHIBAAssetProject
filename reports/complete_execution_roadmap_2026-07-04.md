@@ -1,4 +1,12 @@
-# Complete Execution Roadmap — CAGR30% / Calmar1.5 達成までの完全実行計画
+# Complete Execution Roadmap — ~~CAGR30% / Calmar1.5 達成までの完全実行計画~~
+
+> ## ★★ 2026-07-19 全面改定（正典改定・必読）
+> 本書は `reports/roadmap_revision_2026-07-19.md` により全面改定された。**改定後の正典は同レポート**。
+> 主要変更: ① Study74=**FINAL BLACK確定**（資本経路上限≈+1pp・恒久閉鎖） ② **Study79=CLOSED**（前提永久不成立）
+> ③ 新CP1: Core単独期待=CAGR10-15%/Stretch15-18%・18%+は新アルファ源必須 ④ Universe二層分離（A=バイアス測定/B=TOPIX500 PIT・Study76用）
+> ⑤ Study76目的=複雑性の正当化判定 ⑥ 30%到達経路=複数低相関Satellite統合のみ（Core単独30%前提削除）
+> ⑦ 採番: Study81=Cluster RCA完了で確定・Small Growth Momentum=**Study102**へ改番 ⑧ 優先順位: 75完了→76→80→83→77
+> 以下の本文は歴史記録として凍結保持。矛盾時は改定レポートが優先。
 
 **日付**: 2026-07-04
 **性格**: 実行手順書（Sonnet引き継ぎ前提）。戦略判断は既存6レポートで確定済み — 本書は「誰が実行しても同じ結果になる」ことを目的とする。
@@ -80,17 +88,28 @@ ADOPT ⇔ WF 5/5 ∧ 2022非悪化 ∧ ΔCAGR≥+1pp ∧ Bootstrap P(>0)≥95% �
 | 未解消High risk | Survivorship+Selection Bias（±1-3pp） |
 | ⚠ 環境 | **訂正(M5実行後)**: `.git`は実際には`src/`配下に既存(origin一致・最終コミット2026-04-07・3ヶ月分未コミット)だった。root直下へ統合済み(commit 8641863)。詳細→§2.1 |
 | M1採用状態(2026-07-04) | **採用済み**（addon執行=翌日寄付。BT/Live parity目的・成績改善目的ではない）。詳細→§2.3 |
-| **CP1判定(2026-07-04)** | **🔴 BLACK**（¥20-30MでCAGR≥22%∧WF5/5未達）。目標改定はユーザー決裁待ち。詳細→L1節・`reports/study74_final_review.md` |
+| **CP1判定(2026-07-04)** | **🔴 BLACK** ~~目標改定はユーザー決裁待ち~~ **→確定(2026-07-19改定)**: FINAL BLACK。新CP1=Core 10-15%/Stretch 15-18%（`roadmap_revision_2026-07-19.md`§3。PIT補正後≈0-5%注記付き）。詳細→L1節・`reports/study74_final_review.md` |
 
 ---
 
-# Section 1: 到達方程式（30%∧Calmar1.5への唯一の経路）
+# Section 1: 到達方程式 ~~（30%∧Calmar1.5への唯一の経路）~~
 
-制約固定では矛盾（正典Part1）。到達は以下の**条件連鎖**のみ。各ゲートの白黒で目標を公式改定する — 目標を仮説に賭けない。
+**★2026-07-19改定**: 旧条件連鎖はStage3（Study74白→Core 18-22%）がFINAL BLACKにより恒久不成立。新・到達方程式（正典→`roadmap_revision_2026-07-19.md`§6/§9）:
+
+```
+[確定]     Study74 FINAL BLACK → Core=10-15%(名目)スリーブ固定・資本経路/Study79恒久閉鎖
+[複雑性]   Study76(Universe-B) → 複雑性の正当化判定（CAGR追求ではない）
+[30%経路]  Study80(MN) / Study82(PEAD) / Study83(TSMOM) の複数白 ∧ 低相関<0.5
+[統合]     Study85: Core(10-15%名目) ⊕ 当選Satellite群(レバはMNのみ検討可)
+           結合CAGR≥30% ∧ 結合MaxDD≤20% ∧ RoR<1%              ← CP4: 唯一の30%判定点
+30%達成条件 = 複数低相関Satellite統合のみ。Core単独30%という前提は削除済み。
+```
+
+~~制約固定では矛盾（正典Part1）。到達は以下の**条件連鎖**のみ。各ゲートの白黒で目標を公式改定する — 目標を仮説に賭けない。~~（旧連鎖・凍結保持）
 
 ```
 [Stage1-2] 軽微修正+短期改善     → 実力12-13%・parity確保・RoR確定（土台）
-[Stage3]   Study74白(資本¥20-30M) → Core 18-22% / Calmar1.2   ← CP1: 目標改定
+[Stage3]   Study74白(資本¥20-30M) → Core 18-22% / Calmar1.2   ← CP1: 目標改定【★恒久不成立】
 [Stage4]   Study76/77白(構造純化)  → Core +0〜3pp・複雑性1/10
            Study80白(MNスプレッドα≥8%)                        ← CP2: 30%/1.5に初の実証根拠
 [Stage5]   Study86白(ショート執行) + Study81/82/83白(Satellite群)
@@ -442,9 +461,11 @@ Part1-8全て実行完了。詳細レポート`reports/study78_ror_mc_sensitivit
 
 **次アクション（ユーザー決裁待ち）**: CP1目標改定（黒→CAGR15-20%/Calmar1.2への変更）の可否。統治原則4によりユーザー明示決裁が必須 — 本書は判定材料の提示までとし、目標変更は宣言しない。
 
-### 🔴 CP1判定: **BLACK**（確定・ユーザー決裁待ち）
+### 🔴 CP1判定: **BLACK**（~~確定・ユーザー決裁待ち~~ → **FINAL BLACK確定・2026-07-19ユーザー決裁済み**）
 
-正典ゲート「¥20-30MでCAGR≥22% ∧ WF5/5」に対し全8セル未達。**BLACK判定**（roadmap統治原則の分岐表記に合わせ英語表記で明示）。目標改定（→CAGR15-20%/Calmar1.2）はユーザー決裁待ちのまま据え置き、本書では宣言しない。
+正典ゲート「¥20-30MでCAGR≥22% ∧ WF5/5」に対し全8セル未達。**BLACK判定**（roadmap統治原則の分岐表記に合わせ英語表記で明示）。~~目標改定（→CAGR15-20%/Calmar1.2）はユーザー決裁待ちのまま据え置き、本書では宣言しない。~~
+
+**★2026-07-19確定（ユーザー決裁）**: Study74=**FINAL BLACK**。新CP1目標=Core単独 CAGR **10-15%** / Stretch **15-18%** / 18%以上は新アルファ源（MN/PEAD/TSMOM）必須。旧決裁待ち案（15-20%/Calmar1.2）は採用せず、Study100/101のPIT補正（実力≈0-5%・TOPIX劣後リスク）注記付きの保守的レンジを正式採用。資本投入単独経路は恒久閉鎖（Reality Check→`roadmap_revision_2026-07-19.md`§10）。
 
 ### 統合レビュー（Part1-3・2026-07-04・ユーザー拡張指示・新規BTは合計1回のみ）
 
@@ -500,6 +521,8 @@ Study74を失敗報告で終わらせず、以下3点を追加実施（詳細は
 
 ## L2: Study75 — Survivorship-free ルールベースユニバース（J-Quants）
 
+**★2026-07-19改定（Universe二層分離・`roadmap_revision_2026-07-19.md`§4）**: 「Study75 Universe」の単一名運用を廃止。**Universe-A**（ADV20∧lot feasible=Study75A Universe C・バイアス測定専用）と**Universe-B**（TOPIX500 PIT・Study76比較専用・未生成=残作業）に恒久分離。混用したStudyはStudy52型交絡事故として無効。バイアス実測はUniverse-A系（Study75B/75C）で完了済み: 選定バイアス+12.26pp・生存者バイアス≈0。
+
 - **正典定義**: 成功=バイアス実測≤-1.5pp ∧ 規則ユニバースBaseline CAGR≥9%。失敗=バイアス>-3pp（→全歴史判定の再審査。これ自体が重要情報）。
 - **ASK_FIRST**: 要（J-Quants APIプラン契約 — 料金プラン表を提示しユーザー選定。上場廃止込み株価が取得できるプランであること）。
 - **実装仕様**:
@@ -515,6 +538,8 @@ Study74を失敗報告で終わらせず、以下3点を追加実施（詳細は
 # Section 5: Stage 4 — 構造改革とβ除去の実在確認（2026 Q4〜2027 H1）
 
 ## L3: Study76 — Clenow純正ベンチマークWF（複雑性の対価定量化）
+
+**★2026-07-19改定（目的明文化・`roadmap_revision_2026-07-19.md`§5）**: 目的=高CAGR追求ではなく**複雑性の正当化判定**。Study74後のD_ATR_EQ公式値（Full 11.22%名目）に対し純正Clenowが10%でも、多層機構を削れるなら純正側が勝ち。実行は**Universe-Bのみ**（§4二層分離）。Study95申し送り（Clenow=1-6M正/12M反転/Bear有意悪化）を設計前提として事前固定。
 
 - **正典定義**: 成功=純正構成がD_ATR_EQ比ΔCAGR≥-2pp以内。失敗=<-4pp（→FUJIKO-R骨格放棄・現行維持確定）。
 - **仕様**: Study75規則ユニバース上で、{週次回転・`(slope90d×R²)`ランクのみ・TOPIX>MA200のみ・回転Exit} の最簡構成 vs D_ATR_EQ。Turtleトリガー有無の2アーム。パラメータ<10個・全て事前固定。
@@ -543,22 +568,29 @@ Study75完了時点で、Survivorship-free Universeを新基準Universeと定義
 - **正典定義**: 成功=コストストレス後（貸株料+逆日歩一律-2%/年）スプレッドα≥8% ∧ WF5fold ∧ 2022非悪化 ∧ 2020/3クラッシュDD<25%。失敗=α<5% or ショート側寄与<2pp or 貸借ユニバース<100銘柄。
 - **仕様**: J-Quants貸借銘柄でモメンタムdecile構築 → 上位decileロング/下位decileショートの日次スプレッド系列。**ショート執行は実装しない**（データ分析のみ・研究コスト低）。パラメータ=decile数10・週次リバランスのみ（スイープ禁止）。
 - **分岐（CP2）**: 白 → **30%/1.5再挑戦に初の実証根拠** → Study86起案。黒 → MN経路閉鎖、30%/1.5は最終棄却し、以降はCP1目標+Satellite分散のみ。
+- **★2026-07-19改定（CP2格上げ）**: Study74 FINAL BLACK後、Study80(+PEAD/TSMOM)は「追加根拠」ではなく**30%経路の必要条件**。CP2=「30%経路が生存しているか否か」の判定点。Study95申し送り: Universe-A上の12-1モメンタムは弱い逆転（過去勝者が6M/12Mで最下位）— Long側単独の脆弱性を前提にShort側寄与の単離測定（既定「ショート側寄与<2pp=失敗」）を厳守。
 
 ---
 
 # Section 6: Stage 5 — 拡張（2027）
 
-## L6: Study81 — ARCH-E 小型グロース・モメンタム
+**★2026-07-19改定（Stage5再定義・`roadmap_revision_2026-07-19.md`§6）**: 「Study80失敗→30%終了」の単線構造を廃止。**30%達成条件=複数低相関Satellite統合のみ**。Study80/82/83は各々が30%経路の構成部品であり、全滅時のみ30%最終棄却。Core単独30%前提は本Stageから削除済み。
+
+## L6: ~~Study81~~ **Study102** — ARCH-E 小型グロース・モメンタム【2026-07-19改番】
+
+**★採番衝突解消**: Study81は「Cluster Diversification Hypothesis（L1D・2026-07-04完了・REJECT）」で確定。本項のSmall Growth Momentumは**Study102**へ改番（Study87-97=fujiko_r2予約済み・98-101=実施済みのため。`roadmap_revision_2026-07-19.md`§7）。
 
 - 成功=スリッページ0.5%・値幅制限モデル込みCAGR≥20% ∧ WF5/5。失敗=<15% or MaxDD>40% or 執行不能日>10%。
 - **前提**: Study75廃止込みデータ必須（なければ起案禁止 — 小型はsurvivorship影響が大型の数倍）。
 - 採用時: 「30% vs DD30-50%」トレードオフをユーザー明示決裁 → Satellite 10-20%配分から。Calmar1.5とは両立しない経路であることを提案時に必ず明記。
 
-## L7: Study79 — 資本投入+レバ1.3x設計【3条件成立時のみ起案】
+## L7: Study79 — 資本投入+レバ1.3x設計【**STATUS = CLOSED（2026-07-19恒久確定）**】
 
-- 起案条件: Study74白 ∧ Study78合格（レバ1.3x RoR<5%）∧ CAND_B移行済。1つでも欠ければ**起案自体禁止**。
-- 成功=paper 30営業日 tracking error<1pp ∧ DD予算内 → 段階レバ投入（10%刻み・各段ASK_FIRST）。
-- レバ上限はCalmar制約から逆算（DD≤20%が先・レバが後）。
+**★2026-07-19改定**: 起案条件「Study74白 ∧ Study78合格 ∧ CAND_B移行済」のうち**Study74 WHITEが永久に成立不能**（FINAL BLACK・資本経路上限≈+1.12pp）→ 本Studyは**恒久CLOSED**。レバ研究はStudy80 WHITE後の統合ポートフォリオ側（Study85/86・β≈0のMNスプレッドに対するレバのみ）へ移管。Long Only Coreへのレバは資本水準によらず再起案禁止。`roadmap_revision_2026-07-19.md`§2。
+
+~~- 起案条件: Study74白 ∧ Study78合格（レバ1.3x RoR<5%）∧ CAND_B移行済。1つでも欠ければ**起案自体禁止**。~~
+~~- 成功=paper 30営業日 tracking error<1pp ∧ DD予算内 → 段階レバ投入（10%刻み・各段ASK_FIRST）。~~
+~~- レバ上限はCalmar制約から逆算（DD≤20%が先・レバが後）。~~
 
 ## L8: Study82 — PEAD（決算ドリフト）
 
@@ -587,14 +619,39 @@ Study75完了時点で、Survivorship-free Universeを新基準Universeと定義
 ## L12: Study85 — ポートフォリオ統合（最終形）
 
 - 成功=結合RoR<1% ∧ 結合Calmar≥1.2 ∧ 各スリーブ限界寄与>0（限界寄与≤0のスリーブは除外）。
-- 構成: Core（現行 or Study76/77勝者・80-90%）+ 当選Satellite（MN/PEAD/TSMOM/小型/Study10 RSR90 corr=0.097再評価・計10-20%）。
+- 構成: Core（現行 or Study76/77勝者・80-90%）+ 当選Satellite（MN/PEAD/TSMOM/小型/Study10 RSR90 corr=0.097再評価・計10-20%）。**★2026-07-19改定**: Coreの期待値は18-22%ではなく**10-15%（名目・PIT補正後≈0-5%）**。30%はSatellite群の寄与でのみ成立し得るため、配分比率（Core80-90%）はStudy85起案時に統合最適化で再決定（ASK_FIRST）。
 - **CP4 最終判定**: 結合CAGR≥30% ∧ MaxDD≤20% ∧ RoR<1% が実測で成立 → 30%/Calmar1.5達成を宣言。不成立 → その時点の実測値で最終目標を確定し運用フェーズ（研究は月次decay監視のみ）。
 
 ---
 
 # Section 8: 全体スケジュールと決定木
 
-## タイムライン（依存順・並行可能なものは並記）
+**★2026-07-19改定**: 新タイムライン・新決定木・新優先順位（ROI順: **①Study75完了→②Study76→③Study80 feasibility→④Study83→⑤Study77**）は`roadmap_revision_2026-07-19.md`§8-9が正典。旧表・旧決定木は凍結保持（Study74白分岐・Study79は失効済み）。
+
+## 新タイムライン（2026-07-19正典）
+
+| 時期 | タスク | ゲート |
+|---|---|---|
+| 2026 Q3 | Study75残作業（Universe-B生成）/ Study80 feasibility（並行・純データ分析） | **CP2前哨: MN実在** |
+| 2026 Q3-Q4 | Study76（Universe-B・複雑性判定） | Clenow判定 |
+| 2026 Q4 | Study83（並行）/ Study82発表日時精度監査 | TSMOM/PEAD生死 |
+| 2027 H1 | 生存Satellite群WF本測定 / Study77（76決着後・任意） | CP3 |
+| 2027 H2〜 | Study86（80白のみ）→ Study85統合 | **CP4: 30%最終判定（統合のみ）** |
+
+## 新決定木（2026-07-19正典）
+
+```
+Study74 ─BLACK確定→ Core=10-15%(名目)スリーブ固定・資本経路恒久閉鎖・Study79 CLOSED
+Study80 ─黒→ MN経路閉鎖。82/83も黒なら30%最終棄却→実測値で運用フェーズ
+   └白→ Study86→Study85統合へ（レバはここでのみ検討）
+Study82/83 ─白→ SatelliteスリーブとしてStudy85へ
+Study76 ─黒(<-4pp)→ 複雑性は正当化・現行構成維持 / ─白→ 多層機構削減の根拠成立
+Study102 ─白→ 「20%+ vs DD30-50%」ユーザー明示決裁後Satellite 10-20%
+30%判定 = Study85統合実測のみ（結合CAGR≥30% ∧ MaxDD≤20% ∧ RoR<1%）
+どの時点でも: 連続2四半期採用ゼロ → 運用フェーズ縮退
+```
+
+## ~~タイムライン（依存順・並行可能なものは並記）~~（旧・凍結保持）
 
 | 時期 | タスク | ゲート |
 |---|---|---|
@@ -602,15 +659,15 @@ Study75完了時点で、Survivorship-free Universeを新基準Universeと定義
 | 2026-07〜08 | S3 Study78（BT不要）/ S2 QR Phase9（8月中旬自動） | RoR |
 | 2026 Q3 | L1 Study74 + L2 Study75（並行） | **CP1: 目標改定** |
 | 2026 Q4 | L3 Study76 → L4 Study77 / L5 Study80（並行） | **CP2: MN実在** |
-| 2027 H1 | L6 Study81 / L7 Study79（条件付き）/ L9 Study83（並行可） | CP3 |
+| 2027 H1 | ~~L6 Study81 / L7 Study79（条件付き）~~ / L9 Study83（並行可） | CP3 |
 | 2027 H2〜2028 | L8 Study82 / L10 Study84 kill / L11 Study86（80白時） | — |
 | 2028〜2029 | L12 Study85 統合 | **CP4: 30%/1.5最終判定** |
 
-## 決定木（要点のみ — 詳細は各Study分岐）
+## ~~決定木（要点のみ — 詳細は各Study分岐）~~（旧・凍結保持）
 
 ```
 Study74 ─黒→ 目標15-20%/1.2で運用フェーズ（Stage4以降はCalmar改善目的に縮小）
-   └白→ 入金→Core 18-22%/1.2
+   └白→ 入金→Core 18-22%/1.2                    【★2026-07-19: 白分岐は恒久不成立】
 Study80 ─黒→ 30%/1.5最終棄却。CP1目標+Satellite分散が最終形
    └白→ Study86→Study85で30%/1.5判定
 Study76 ─黒(<-4pp)→ FUJIKO-R骨格放棄・現行Production維持
