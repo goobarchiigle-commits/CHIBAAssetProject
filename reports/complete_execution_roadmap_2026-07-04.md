@@ -9,6 +9,10 @@
 > **★v1.1同日改定（ユーザーレビュー反映）**: Core PIT期待=**UNKNOWN（~0-5%・confidence LOW）**へ格下げ（名目10-15%は歴史参考のみ・Stretch失効）/
 > **CP2=Study103新設**（Portfolio Architecture Feasibility・統合の数学的成立性をSatellite掘削前に判定・依存ゼロ）/ CP3=スリーブ採用ゲート事前固定
 > （CAGR≥15%∧Calmar≥0.8∧相関<0.5∧WF5/5・CoreもStudy85保証枠廃止で同条件審査）/ 優先順位=**75→76→103→83→80→82→85→(77 optional・76 BLACK時のみ)**
+> **★v1.2同日最終確定（ユーザー統合承認）**: CP1=**Expectation Reset**（完了CP）/ Study103=**Research Continuation Gate**（**GREEN/YELLOW/RED**判定・
+> RED→30% Route STATUS=CLOSED恒久・4位以下の優先順位はStudy103結果に従属）/ CP3評価軸=PIT expectancy/Calmar/Correlation/**Capacity**/RoR /
+> Study80正式名=Market Neutral Feasibility（実装研究ではない・重量はStudy86側）/ **永久禁止7項**正式化（Capital scaling for CAGR・Long-only core leverage・
+> Static RSR42 citation・Mixed universe comparison・Result-after parameter tuning・Core single-handed 30%・Core guaranteed allocation）
 > 以下の本文は歴史記録として凍結保持。矛盾時は改定レポートが優先。
 
 **日付**: 2026-07-04
@@ -103,6 +107,7 @@ ADOPT ⇔ WF 5/5 ∧ 2022非悪化 ∧ ΔCAGR≥+1pp ∧ Bootstrap P(>0)≥95% �
 [確定]     Study74 FINAL BLACK → 資本経路/Study79恒久閉鎖
            Core PIT期待=UNKNOWN(~0-5%・LOW)・スリーブ候補の1つへ格下げ(保証枠なし)
 [成立性]   Study103(依存ゼロ・即時) → 30%∧Calmar1.5の数学的成立性     ← CP2
+           GREEN=続行 / YELLOW=追加アルファ必要 / RED=30% Route恒久CLOSED
 [複雑性]   Study76(Universe-B) → 複雑性の正当化判定（CAGR追求ではない・WHITE→77不要）
 [スリーブ] Study83(TSMOM) / Study80(MN) / Study82(PEAD) / Study102 / Core再測定
            各々CP3ゲート: CAGR≥15%∧Calmar≥0.8∧相関<0.5∧WF5/5     ← CP3
@@ -576,7 +581,7 @@ Study75完了時点で、Survivorship-free Universeを新基準Universeと定義
 - **正典定義**: 成功=コストストレス後（貸株料+逆日歩一律-2%/年）スプレッドα≥8% ∧ WF5fold ∧ 2022非悪化 ∧ 2020/3クラッシュDD<25%。失敗=α<5% or ショート側寄与<2pp or 貸借ユニバース<100銘柄。
 - **仕様**: J-Quants貸借銘柄でモメンタムdecile構築 → 上位decileロング/下位decileショートの日次スプレッド系列。**ショート執行は実装しない**（データ分析のみ・研究コスト低）。パラメータ=decile数10・週次リバランスのみ（スイープ禁止）。
 - **分岐（CP2）**: 白 → **30%/1.5再挑戦に初の実証根拠** → Study86起案。黒 → MN経路閉鎖、30%/1.5は最終棄却し、以降はCP1目標+Satellite分散のみ。
-- **★2026-07-19改定（v1.1）**: Study74 FINAL BLACK後、Study80(+PEAD/TSMOM)は30%経路の構成部品。~~CP2格上げ~~ → **CP2はStudy103（統合の数学的成立性・`roadmap_revision_2026-07-19.md`§6A）へ移管**。Study80は**MNスリーブ候補のCP3審査対象**（採用⇔CAGR≥15%∧Calmar≥0.8∧相関<0.5∧WF5/5・レバ換算注記付き）。優先順位はStudy83（TSMOM）の後（白でもStudy86実装重量で実現価値が割引かれるため）。Study95申し送り: Universe-A上の12-1モメンタムは弱い逆転（過去勝者が6M/12Mで最下位）— Long側単独の脆弱性を前提にShort側寄与の単離測定（既定「ショート側寄与<2pp=失敗」）を厳守。
+- **★2026-07-19改定（v1.2）**: Study74 FINAL BLACK後、Study80(+PEAD/TSMOM)は30%経路の構成部品。~~CP2格上げ~~ → **CP2はStudy103（統合の数学的成立性・`roadmap_revision_2026-07-19.md`§6A）へ移管**。Study80の正式名=**Market Neutral Feasibility**（「MN alphaは実在するか」のみ・実装研究ではない・実装重量は全てStudy86側→ROI自体は高い）。**MNスリーブ候補のCP3審査対象**（採用⇔CAGR≥15%∧Calmar≥0.8∧相関<0.5∧Capacity∧WF5/5・レバ換算注記付き）。暫定順位はStudy83（TSMOM）の後だが**Study103の結果に従属**（frontierの欠落プロファイル次第で繰り上げ可）。Study95申し送り: Universe-A上の12-1モメンタムは弱い逆転（過去勝者が6M/12Mで最下位）— Long側単独の脆弱性を前提にShort側寄与の単離測定（既定「ショート側寄与<2pp=失敗」）を厳守。
 
 ---
 
@@ -650,9 +655,10 @@ Study75完了時点で、Survivorship-free Universeを新基準Universeと定義
 ## 新決定木（2026-07-19正典・v1.1）
 
 ```
-Study74 ─BLACK確定→ 資本経路恒久閉鎖・Study79 CLOSED・Core=スリーブ候補の1つへ格下げ
-Study103 ─不成立(楽観水準でも)→ 30%最終棄却（Study85を待たず）→ 目標再定義ユーザー決裁
-   └成立→ CP3ゲート確定・Satellite研究続行
+Study74 ─BLACK確定→ 資本経路恒久閉鎖・Study79 CLOSED・Core=スリーブ候補の1つへ格下げ（CP1完了）
+Study103 ─RED→ 30% Route STATUS=CLOSED恒久（Study85を待たず）→ 目標再定義ユーザー決裁
+   ├YELLOW→ 追加アルファ源必要・既知候補研究は継続可・30%宣言保留
+   └GREEN→ frontier必要条件をCP3へ反映・83/80/82順位再確定・Satellite研究続行
 Study76 ─白→ 簡素化実行・Study77不要 / ─黒(<-4pp)→ 複雑性正当化・77はoptional起案のみ
 Study83/80/82/102 ─各々CP3審査(CAGR≥15%∧Calmar≥0.8∧相関<0.5∧WF5/5)→ 当選のみStudy85へ
 Core ─Study76/FUJIKO2.0後のPIT再測定でCP3同条件審査（保証枠なし・不通過ならSatellite-only許容）

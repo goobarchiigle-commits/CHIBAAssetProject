@@ -54,6 +54,29 @@ L5/L6/L7/Section8/L12へ注記反映・旧文は取り消し線で凍結保持�
    →⑤80（白でもStudy86実装重量で割引→83の後）→⑥82→⑦85→⑧77（optional・**76 BLACK時のみ**。
    76 WHITE=多層Exit消滅で起案不要。「76→77」直列廃止）。
 
+**★同日v1.2最終確定（ユーザー統合承認・上記v1.1を拡張）**:
+1. **CP1=Expectation Reset**と正式命名（完了CP: Capital route CLOSED・Study79 CLOSED・
+   Core alpha=UNKNOWN。「Core神話の終了」）。
+2. **Study103=Research Continuation Gate**へ格上げ。判定=**GREEN/YELLOW/RED**:
+   GREEN=基準水準で成立→frontier必要条件をCP3へ反映（厳格化方向のみ）・Satellite研究続行 /
+   YELLOW=楽観水準のみ成立→追加アルファ源必要・30%宣言保留 /
+   **RED=楽観水準でも不成立→30% Route STATUS=CLOSED恒久（Study85を待たず）**。
+   感度脆弱時は1段階悪い側を機械採用（裁量禁止）。
+   feasible frontier出力様式事前固定: 最低スリーブ数/必要Calmar/必要相関/必要リターン/必要Capacity/許容レバ。
+3. **CP3=Sleeve Gate評価軸拡張**: PIT expectancy / Calmar / Correlation / **Capacity**（想定配分額で
+   ADV比・lot・スリッページ込み期待値非崩壊）/ **RoR**（Study78方式単独実測・統合RoR<1%入力）。
+4. **4位以下の優先順位（83/80/82/102）はStudy103結果に従属**（「MNが必要かTSMOMが必要か」は後決め。
+   現行表はStudy103完了までの暫定順位）。
+5. Study80正式名=**Market Neutral Feasibility**（アルファ実在確認のみ・実装研究ではない・
+   実装重量は全てStudy86側→ROI自体は高い）。
+6. **永久禁止事項7項の正式化**: ①Capital scaling for CAGR ②Long-only core leverage
+   ③Static RSR42 performance citation ④Mixed universe comparison ⑤Result-after parameter tuning
+   ⑥Core single-handed 30% ⑦Core guaranteed allocation（+付随: 「Core 5%アルファ」断定表記禁止）。
+7. **Research Status恒久掲示様式**: Production=Entry Freeze / Core=UNKNOWN / Universe=Rebuilding /
+   Current Phase=Study75（Study103並行可）/ 30% Route=**Pending Study103**。
+8. **研究OS宣言**: 「先に理論上限を測る→成立条件を定義する→条件を満たす候補のみ掘る」
+   （Study74/100/101の教訓の統合。研究を継続する条件そのものを先に定義する構造）。
+
 **変更しないもの**: PARAMS_LOCKED・恒久閉鎖14項・0.4ゲート・Entry Freeze状態・
 `fujiko_r2_research_roadmap.md`（並立正典・Study95 KILL帰結の決裁は継続保留）・FUJIKO 2.0未決5点。
 
