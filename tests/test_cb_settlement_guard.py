@@ -224,7 +224,7 @@ class TestCBSettlementGuard(unittest.TestCase):
 # CB_GUARD V2 tests — execution-ledger-based same-day BUY compensation
 # ─────────────────────────────────────────────────────────────────────────────
 
-from src.kabusapi.signal_bridge import _cb_guard_compensation
+from src.kabusapi.signal_bridge import _cb_guard_compensation, PendingOrderState
 
 
 class TestCBGuardV2ExecutionLedger(unittest.TestCase):
@@ -589,12 +589,16 @@ class TestCBStateStructuredLog(unittest.TestCase):
 
     回帰: 2026-06-04 LIVEで SETTLEMENT_LAG なのに DRAWDOWN_TRIGGER と誤判定
     されていた根本原因の修正確認。
+
+    2026-07-19 Broker-as-Sole-SSOTリファクタ: current_equityは常にraw broker
+    equityを渡す（旧_cb_equityの合成equity方式は廃止）。決済ラグ補償は
+    PendingOrderStateとしてCB発動抑制の判定材料にのみ使う。
     """
 
     PEAK = 4_089_109.0
     RAW  = 3_184_309.0
     COMP = 741_000.0
-    ADJ  = 3_184_309.0 + 741_000.0  # 3,925,309
+    PENDING = PendingOrderState(pending_value=COMP, symbols=("6981.T",))
 
     def _state(self, cb="NORMAL", last_equity=None):
         return {
@@ -607,47 +611,47 @@ class TestCBStateStructuredLog(unittest.TestCase):
         }
 
     # ------------------------------------------------------------------
-    # T1: reason=SETTLEMENT_LAG_COMPENSATED 発行
+    # T1: settlement lag suspected → CB発動見送り (INFO)
     # ------------------------------------------------------------------
     def test_settlement_lag_no_cb_transition_emits_info_not_warning(self):
         """
-        adjusted DD=-4.0% のとき CB は発火しない (NORMAL→NORMAL)。
-        遷移がないため [CB_STATE] は INFO で出力され WARNING は出ない。
+        raw DD=-22.1%だがpending_value=741,000で説明可能 (hypothetical DD=-4.0%)
+        → CB は発火しない (NORMAL→NORMAL)。遷移がないため [CB_STATE] は INFO で
+        出力され WARNING は出ない。
 
-        再現: V2 補償済み equity で 2026-06-04 DRY run が CB 未発動になる経路。
+        再現: 2026-06-04 DRY run が決済ラグにより一時的にequityが低く見えていた
+        だけで、実際にはCB発動すべきでなかったケース。
         """
         bridge = _make_bridge_stub()
         state  = self._state()
 
         with self.assertLogs("src.kabusapi.signal_bridge", level="INFO") as cm:
             bridge._update_cb_state(
-                state, self.ADJ, "2026-06-04", raw_equity=self.RAW
+                state, self.RAW, "2026-06-04", pending_order_state=self.PENDING,
             )
 
         # 状態が NORMAL のまま
         self.assertEqual(state["cb_state"], "NORMAL",
-                         "CB must not fire when adjusted DD < 15%")
+                         "CB must not fire when settlement lag explains the DD")
 
         combined = "\n".join(cm.output)
-        # 遷移なし → INFO の [CB_STATE] のみ、WARNING レベルの [CB_STATE] は出ない
         self.assertIn("[CB_STATE]", combined)
-        # WARNING レベルのログがないこと
+        self.assertIn("settlement_lag_suspected=True", combined)
+        # 遷移なし → WARNING レベルの [CB_STATE] は出ない
         warning_lines = [l for l in cm.output if "WARNING" in l and "[CB_STATE]" in l]
         self.assertEqual(warning_lines, [],
                          "no [CB_STATE] WARNING expected when no state transition")
 
     def test_settlement_lag_reason_with_cb_fire_would_log_warning(self):
         """
-        V2 なし (raw equity のみ) で _update_cb_state を呼ぶと CB が発火し
-        [CB_STATE] reason=DRAWDOWN_TRIGGER が出力されること。
+        pending_order_stateなし（決済ラグ補償なし）で _update_cb_state を呼ぶと
+        CB が発火し [CB_STATE] reason=DRAWDOWN_TRIGGER が出力されること。
         """
         bridge = _make_bridge_stub()
         state  = self._state()
 
         with self.assertLogs("src.kabusapi.signal_bridge", level="WARNING") as cm:
-            bridge._update_cb_state(
-                state, self.RAW, "2026-06-04", raw_equity=self.RAW
-            )
+            bridge._update_cb_state(state, self.RAW, "2026-06-04")
 
         self.assertEqual(state["cb_state"], "CB_ACTIVE",
                          "raw DD=-22.1% must trigger CB_ACTIVE")
@@ -657,20 +661,19 @@ class TestCBStateStructuredLog(unittest.TestCase):
         self.assertIn("before=NORMAL",       combined)
         self.assertIn("after=CB_ACTIVE",     combined)
         self.assertIn("DRAWDOWN_TRIGGER",    combined)
-        self.assertIn("dd_raw=",             combined)
-        self.assertIn("dd_adjusted=",        combined)
+        self.assertIn("dd=",                 combined)
 
     # ------------------------------------------------------------------
-    # T2: settlement lag 補償で CB 発火しないこと (2026-06-04 修正後の期待)
+    # T2: settlement lag 補償で CB 発火しないこと (PendingOrderState抑制)
     # ------------------------------------------------------------------
     def test_v2_compensation_prevents_false_cb(self):
         """
-        adjusted_equity=3,925,309 (DD=-4.0%) を渡せば CB は発火しないこと。
+        pending_value=741,000 (hypothetical DD=-4.0%) を渡せば CB は発火しないこと。
         """
         bridge = _make_bridge_stub()
         state  = self._state()
         bridge._update_cb_state(
-            state, self.ADJ, "2026-06-04", raw_equity=self.RAW
+            state, self.RAW, "2026-06-04", pending_order_state=self.PENDING,
         )
         self.assertEqual(state["cb_state"], "NORMAL")
 
@@ -680,14 +683,14 @@ class TestCBStateStructuredLog(unittest.TestCase):
     def test_last_equity_not_overwritten(self):
         """
         commit_broker_snapshot() が raw equity を last_equity に書く。
-        _update_cb_state() は _cb_equity (補償済み) で呼ばれるが
+        _update_cb_state() はPendingOrderStateを判定材料に使うだけで、
         last_equity を上書きしてはならない。
         """
         bridge = _make_bridge_stub()
         state  = self._state(last_equity=self.RAW)
 
         bridge._update_cb_state(
-            state, self.ADJ, "2026-06-04", raw_equity=self.RAW
+            state, self.RAW, "2026-06-04", pending_order_state=self.PENDING,
         )
         self.assertAlmostEqual(
             state["last_equity"], self.RAW, places=0,
@@ -695,10 +698,10 @@ class TestCBStateStructuredLog(unittest.TestCase):
         )
 
     # ------------------------------------------------------------------
-    # T4: raw_equity=None フォールバック (legacy 呼び出し互換)
+    # T4: pending_order_state=None (既定値) でも例外が起きないこと
     # ------------------------------------------------------------------
-    def test_raw_equity_none_fallback_no_crash(self):
-        """raw_equity を省略しても例外が起きないこと。"""
+    def test_pending_order_state_none_default_no_crash(self):
+        """pending_order_state を省略しても例外が起きないこと。"""
         bridge = _make_bridge_stub()
         state  = self._state()
         result = bridge._update_cb_state(state, self.RAW, "2026-06-04")
@@ -711,14 +714,14 @@ class TestCBStateStructuredLog(unittest.TestCase):
         """遷移がない場合は [CB_STATE] INFO が出ること (WARNING は出ない)。"""
         bridge = _make_bridge_stub()
         state  = self._state()
-        # adjusted DD = -4% → CB は発火しない
+        # settlement lag suppression → CB は発火しない
         with self.assertLogs("src.kabusapi.signal_bridge", level="INFO") as cm:
             bridge._update_cb_state(
-                state, self.ADJ, "2026-06-04", raw_equity=self.RAW
+                state, self.RAW, "2026-06-04", pending_order_state=self.PENDING,
             )
         combined = "\n".join(cm.output)
         self.assertIn("[CB_STATE]", combined)
-        self.assertIn("dd_raw=",   combined)
+        self.assertIn("dd=",        combined)
 
     # ------------------------------------------------------------------
     # T6: PEAK_ANOMALY は NORMAL から到達不能 (設計上の制約確認)
@@ -744,7 +747,7 @@ class TestCBStateStructuredLog(unittest.TestCase):
             "recovery_threshold":   None,
             "last_equity":          equity,
         }
-        bridge._update_cb_state(state, equity, "2026-06-05", raw_equity=equity)
+        bridge._update_cb_state(state, equity, "2026-06-05")
 
         # ratio > 1.25 のとき DD > 20% → CB_ACTIVE が先に発火する
         self.assertEqual(state["cb_state"], "CB_ACTIVE",
@@ -757,17 +760,17 @@ class TestCBStateStructuredLog(unittest.TestCase):
         """
         2026-06-04 DRY run での CB 誤発動を完全再現する。
 
-        V2 なし (raw equity のみ):
-          dd_raw=-22.1% → CB_ACTIVE
+        PendingOrderStateなし (raw equity のみ):
+          dd=-22.1% → CB_ACTIVE
 
-        V2 あり (adjusted equity):
-          dd_adj=-4.0% → NORMAL を維持
+        PendingOrderStateあり (決済ラグ補償で発動抑制):
+          hypothetical_dd=-4.0% → NORMAL を維持
 
         両方を同一 peak/state で検証する。
         """
         bridge = _make_bridge_stub()
 
-        # --- V2 なし (2026-06-04 08:43 の実際の挙動) ---
+        # --- PendingOrderStateなし (2026-06-04 08:43 の実際の挙動) ---
         state_no_v2 = {
             "cb_state":             "NORMAL",
             "equity_peak":          self.PEAK,
@@ -776,11 +779,11 @@ class TestCBStateStructuredLog(unittest.TestCase):
             "recovery_threshold":   None,
             "last_equity":          self.RAW,
         }
-        bridge._update_cb_state(state_no_v2, self.RAW, "2026-06-04", raw_equity=self.RAW)
+        bridge._update_cb_state(state_no_v2, self.RAW, "2026-06-04")
         self.assertEqual(state_no_v2["cb_state"], "CB_ACTIVE",
-                         "V2 なし: raw DD=-22.1% → CB_ACTIVE 必須")
+                         "PendingOrderStateなし: raw DD=-22.1% → CB_ACTIVE 必須")
 
-        # --- V2 あり (修正後の期待挙動) ---
+        # --- PendingOrderStateあり (修正後の期待挙動) ---
         state_with_v2 = {
             "cb_state":             "NORMAL",
             "equity_peak":          self.PEAK,
@@ -789,9 +792,11 @@ class TestCBStateStructuredLog(unittest.TestCase):
             "recovery_threshold":   None,
             "last_equity":          self.RAW,
         }
-        bridge._update_cb_state(state_with_v2, self.ADJ, "2026-06-04", raw_equity=self.RAW)
+        bridge._update_cb_state(
+            state_with_v2, self.RAW, "2026-06-04", pending_order_state=self.PENDING,
+        )
         self.assertEqual(state_with_v2["cb_state"], "NORMAL",
-                         "V2 あり: adj DD=-4.0% → NORMAL を維持必須")
+                         "PendingOrderStateあり: hypothetical DD=-4.0% → NORMAL を維持必須")
 
 
 if __name__ == "__main__":

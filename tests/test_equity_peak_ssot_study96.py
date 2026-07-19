@@ -99,7 +99,7 @@ class TestNormalUpdate(unittest.TestCase):
         new_equity = 3_150_000.0  # +5% < 10%閾値
         bridge._update_cb_state(
             state, current_equity=new_equity, today_str="2026-07-17",
-            raw_equity=new_equity, broker_snapshot=_snapshot(new_equity, {}, {}),
+            broker_snapshot=_snapshot(new_equity, {}, {}),
         )
         self.assertEqual(state["equity_peak"], new_equity)
 
@@ -108,7 +108,7 @@ class TestNormalUpdate(unittest.TestCase):
         state = _base_state(peak=3_000_000.0)
         bridge._update_cb_state(
             state, current_equity=2_800_000.0, today_str="2026-07-17",
-            raw_equity=2_800_000.0, broker_snapshot=_snapshot(2_800_000.0, {}, {}),
+            broker_snapshot=_snapshot(2_800_000.0, {}, {}),
         )
         self.assertEqual(state["equity_peak"], 3_000_000.0)
 
@@ -138,7 +138,7 @@ class TestRestart(unittest.TestCase):
             bridge = _make_bridge_stub()
             bridge._update_cb_state(
                 state, current_equity=3_100_000.0, today_str="2026-07-17",
-                raw_equity=3_100_000.0, broker_snapshot=_snapshot(3_100_000.0, {}, {}),
+                broker_snapshot=_snapshot(3_100_000.0, {}, {}),
             )
             save_portfolio_state(state, path=path, data_source="test_restart2")
             reloaded, _ = load_portfolio_state(path=path)
@@ -275,7 +275,7 @@ class TestPeakJumpReconfirmation(unittest.TestCase):
     def _run_day(self, bridge, state, equity: float, date_str: str):
         bridge._update_cb_state(
             state, current_equity=equity, today_str=date_str,
-            raw_equity=equity, broker_snapshot=_snapshot(equity, {}, {}),
+            broker_snapshot=_snapshot(equity, {}, {}),
         )
 
     def test_single_day_persistence_no_longer_confirms(self):
@@ -368,13 +368,13 @@ class TestPeakJumpReconfirmation(unittest.TestCase):
 
         bridge._update_cb_state(
             state, current_equity=jumped_equity, today_str=date_str,
-            raw_equity=jumped_equity, broker_snapshot=_snapshot(jumped_equity, {}, {}),
+            broker_snapshot=_snapshot(jumped_equity, {}, {}),
         )  # STAGED
         for _ in range(1, CANDIDATE_PEAK_RECONFIRM_COUNT - 1):
             date_str = _next_trading_day(date_str)
             bridge._update_cb_state(
                 state, current_equity=jumped_equity, today_str=date_str,
-                raw_equity=jumped_equity, broker_snapshot=_snapshot(jumped_equity, {}, {}),
+                broker_snapshot=_snapshot(jumped_equity, {}, {}),
             )  # HOLDING（一貫してconsistentなsnapshotで進める）
 
         self.assertEqual(state["candidate_peak"]["confirm_count"], CANDIDATE_PEAK_RECONFIRM_COUNT - 2)
@@ -385,7 +385,7 @@ class TestPeakJumpReconfirmation(unittest.TestCase):
         diverged_snapshot = _snapshot(cash=2_000_000.0, positions={}, prices={})  # 乖離大
         bridge._update_cb_state(
             state, current_equity=jumped_equity, today_str=date_str,
-            raw_equity=jumped_equity, broker_snapshot=diverged_snapshot,
+            broker_snapshot=diverged_snapshot,
         )
         self.assertEqual(
             state["equity_peak"], 4_110_741.0,
@@ -401,7 +401,7 @@ class TestPeakJumpReconfirmation(unittest.TestCase):
         date_str = _next_trading_day(date_str)
         bridge._update_cb_state(
             state, current_equity=jumped_equity, today_str=date_str,
-            raw_equity=jumped_equity, broker_snapshot=_snapshot(jumped_equity, {}, {}),
+            broker_snapshot=_snapshot(jumped_equity, {}, {}),
         )
         self.assertEqual(state["equity_peak"], round(jumped_equity, 0), "整合性回復後は正常に確定すること")
         self.assertIsNone(state["candidate_peak"])
@@ -417,7 +417,7 @@ class TestBrokerRefetch(unittest.TestCase):
         refetched_equity = 3_100_000.0
         bridge._update_cb_state(
             state, current_equity=refetched_equity, today_str="2026-07-17",
-            raw_equity=refetched_equity, broker_snapshot=_snapshot(refetched_equity, {}, {}),
+            broker_snapshot=_snapshot(refetched_equity, {}, {}),
         )
         self.assertEqual(state["equity_peak"], refetched_equity)
 
@@ -428,7 +428,7 @@ class TestBrokerRefetch(unittest.TestCase):
         # broker生値は3,000,000のまま(変化なし)だがcurrent_equityは異常に高い
         bridge._update_cb_state(
             state, current_equity=4_500_000.0, today_str="2026-07-17",
-            raw_equity=4_500_000.0, broker_snapshot=_snapshot(3_000_000.0, {}, {}),
+            broker_snapshot=_snapshot(3_000_000.0, {}, {}),
         )
         self.assertEqual(state["equity_peak"], 3_000_000.0)
 
@@ -439,7 +439,7 @@ class TestBrokerRefetch(unittest.TestCase):
         state = _base_state(peak=3_000_000.0)
         bridge._update_cb_state(
             state, current_equity=3_050_000.0, today_str="2026-07-17",
-            raw_equity=3_050_000.0, broker_snapshot=None,
+            broker_snapshot=None,
         )
         self.assertEqual(state["equity_peak"], 3_050_000.0)
 
@@ -462,7 +462,7 @@ class TestBootstrap(unittest.TestCase):
             bridge = _make_bridge_stub(capital=INITIAL_CAPITAL)
             bridge._update_cb_state(
                 state, current_equity=INITIAL_CAPITAL, today_str="2026-07-17",
-                raw_equity=INITIAL_CAPITAL, broker_snapshot=_snapshot(INITIAL_CAPITAL, {}, {}),
+                broker_snapshot=_snapshot(INITIAL_CAPITAL, {}, {}),
             )
             self.assertEqual(state["equity_peak"], INITIAL_CAPITAL)
 

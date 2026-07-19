@@ -76,7 +76,7 @@ class TestBrokerConsistencyReject(unittest.TestCase):
         snap = _snapshot(cash=3_000_000.0, positions={}, prices={})
         bridge._update_cb_state(
             state, current_equity=4_200_000.0, today_str="2026-07-03",
-            raw_equity=4_200_000.0, broker_snapshot=snap,
+            broker_snapshot=snap,
         )
         self.assertEqual(state["equity_peak"], 3_000_000.0)
         self.assertIsNone(state.get("candidate_peak"))
@@ -92,7 +92,7 @@ class TestBrokerConsistencyReject(unittest.TestCase):
         snap = _snapshot(cash=3_050_000.0, positions={}, prices={})
         bridge._update_cb_state(
             state, current_equity=3_050_000.0, today_str="2026-07-03",
-            raw_equity=3_050_000.0, broker_snapshot=snap,
+            broker_snapshot=snap,
         )
         self.assertEqual(state["equity_peak"], 3_050_000.0)
 
@@ -106,7 +106,7 @@ class TestBrokerConsistencyReject(unittest.TestCase):
         }
         bridge._update_cb_state(
             state, current_equity=3_050_000.0, today_str="2026-07-03",
-            raw_equity=3_050_000.0, broker_snapshot=None,
+            broker_snapshot=None,
         )
         self.assertEqual(state["equity_peak"], 3_050_000.0)
 
@@ -127,7 +127,7 @@ class TestCandidateStaging(unittest.TestCase):
         snap = _snapshot(cash=jumped_equity, positions={}, prices={})
         bridge._update_cb_state(
             state, current_equity=jumped_equity, today_str="2026-07-03",
-            raw_equity=jumped_equity, broker_snapshot=snap,
+            broker_snapshot=snap,
         )
         self.assertEqual(state["equity_peak"], 3_000_000.0)  # 未反映
         self.assertIsNotNone(state["candidate_peak"])
@@ -142,7 +142,7 @@ class TestCandidateStaging(unittest.TestCase):
         snap = _snapshot(cash=small_jump_equity, positions={}, prices={})
         bridge._update_cb_state(
             state, current_equity=small_jump_equity, today_str="2026-07-03",
-            raw_equity=small_jump_equity, broker_snapshot=snap,
+            broker_snapshot=snap,
         )
         self.assertEqual(state["equity_peak"], round(small_jump_equity, 0))
         self.assertIsNone(state["candidate_peak"])
@@ -157,7 +157,7 @@ class TestCandidateStaging(unittest.TestCase):
         }
         bridge._update_cb_state(
             state, current_equity=3_400_000.0, today_str="2026-07-03",
-            raw_equity=3_400_000.0, broker_snapshot=None,
+            broker_snapshot=None,
         )
         self.assertEqual(state["equity_peak"], 3_000_000.0)
         self.assertIsNotNone(state["candidate_peak"])
@@ -181,7 +181,7 @@ class TestCandidateStaging(unittest.TestCase):
         }
         bridge._update_cb_state(
             state, current_equity=3_400_000.0, today_str=next_td,
-            raw_equity=3_400_000.0, broker_snapshot=None,
+            broker_snapshot=None,
         )
         self.assertEqual(state["equity_peak"], 3_000_000.0, "1回の再確認だけでは確定しないこと")
         self.assertIsNotNone(state["candidate_peak"], "候補はHOLDING中で保持され続けること")
@@ -201,7 +201,7 @@ class TestCandidateStaging(unittest.TestCase):
         # 許容下限 = 3,400,000 * (1 - 0.02) = 3,332,000 を大きく下回る equity
         bridge._update_cb_state(
             state, current_equity=3_000_000.0, today_str=next_td,
-            raw_equity=3_000_000.0, broker_snapshot=None,
+            broker_snapshot=None,
         )
         self.assertEqual(state["equity_peak"], 3_000_000.0)
         self.assertIsNone(state["candidate_peak"])
