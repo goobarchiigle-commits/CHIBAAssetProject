@@ -77,6 +77,24 @@ L5/L6/L7/Section8/L12へ注記反映・旧文は取り消し線で凍結保持�
 8. **研究OS宣言**: 「先に理論上限を測る→成立条件を定義する→条件を満たす候補のみ掘る」
    （Study74/100/101の教訓の統合。研究を継続する条件そのものを先に定義する構造）。
 
+**★同日v1.3確定（Falsification原則統合・ユーザー承認）**:
+1. **CP2 Primary Objective=30%ルートの反証試行**を正典文言化:
+   `Attempt to falsify the 30% route. The route is accepted only if it survives all
+   predefined tests. Failure to falsify ≠ proof of feasibility.`
+   **GREENですら「30%達成可能」を意味しない** — 「棄却できなかったため研究継続を正当化できる」のみ。
+2. **Study103三原則**正典化: ①Attempt to falsify ②Only predefined scenarios are valid
+   ③Failure to falsify is not proof（研究継続の正当化のみ）。
+3. **シナリオ凍結の制度化**: 実行開始後のシナリオ追加・変更は一切禁止。追加の唯一の手続き=
+   新版採番（Study103B等）+新規ASK_FIRST承認+全シナリオfull rerun（部分再実行・混用禁止）。
+4. **自動RED境界の事前固定**: required sleeves≥5 / avg corr<0.10 / avg Calmar>2.0 /
+   leverage>2.0x / capacity<¥3M のいずれかで水準判定を経ず自動RED。事後緩和禁止。
+5. **Core表記三行分離（これ以外の表記禁止）**: Intrinsic alpha=UNKNOWN /
+   Observed PIT estimate≈0-5%（**観測範囲であり真値推定区間ではない**）/ Confidence=LOW。
+6. **Case A/B両ケース必須**: Study103全シナリオをCore included(A)/excluded(B)両方で実行。
+   B優位（frontierがより緩い）なら**Core retirement（全面撤退）を正式選択肢**として提示。
+7. **前処理宣言**: Study75/76/103までは前処理。Satellite研究は正式には未開始。
+   4位以下はCP2通過後にre-evaluate。
+
 **変更しないもの**: PARAMS_LOCKED・恒久閉鎖14項・0.4ゲート・Entry Freeze状態・
 `fujiko_r2_research_roadmap.md`（並立正典・Study95 KILL帰結の決裁は継続保留）・FUJIKO 2.0未決5点。
 

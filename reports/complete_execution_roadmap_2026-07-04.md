@@ -13,6 +13,10 @@
 > RED→30% Route STATUS=CLOSED恒久・4位以下の優先順位はStudy103結果に従属）/ CP3評価軸=PIT expectancy/Calmar/Correlation/**Capacity**/RoR /
 > Study80正式名=Market Neutral Feasibility（実装研究ではない・重量はStudy86側）/ **永久禁止7項**正式化（Capital scaling for CAGR・Long-only core leverage・
 > Static RSR42 citation・Mixed universe comparison・Result-after parameter tuning・Core single-handed 30%・Core guaranteed allocation）
+> **★v1.3同日確定（Falsification原則統合）**: CP2 Primary Objective=**30%ルートの反証試行**（`Failure to falsify ≠ proof of feasibility`・GREEN≠実現可能性の証明）/
+> Study103三原則正典化 / シナリオ凍結制度化（実行後追加=新版採番+新承認+full rerun）/ 自動RED境界事前固定（sleeves≥5・corr<0.10・Calmar>2.0・レバ>2x・capacity<¥3M）/
+> Core表記三行分離（Intrinsic alpha=UNKNOWN / Observed PIT estimate≈0-5%=観測範囲であり真値推定区間ではない / Confidence=LOW）/
+> Study103はCase A（Core included）/Case B（Core excluded）両ケース必須・Case B優位なら**Core retirement**正式選択肢 / Study75/76/103=前処理（Satellite研究は未開始）
 > 以下の本文は歴史記録として凍結保持。矛盾時は改定レポートが優先。
 
 **日付**: 2026-07-04
@@ -106,8 +110,9 @@ ADOPT ⇔ WF 5/5 ∧ 2022非悪化 ∧ ΔCAGR≥+1pp ∧ Bootstrap P(>0)≥95% �
 ```
 [確定]     Study74 FINAL BLACK → 資本経路/Study79恒久閉鎖
            Core PIT期待=UNKNOWN(~0-5%・LOW)・スリーブ候補の1つへ格下げ(保証枠なし)
-[成立性]   Study103(依存ゼロ・即時) → 30%∧Calmar1.5の数学的成立性     ← CP2
-           GREEN=続行 / YELLOW=追加アルファ必要 / RED=30% Route恒久CLOSED
+[成立性]   Study103(依存ゼロ・即時) → 30%ルートの反証試行(Falsification) ← CP2
+           GREEN=棄却できず(≠達成可能の証明)・続行 / YELLOW=追加アルファ必要 / RED=30% Route恒久CLOSED
+           Case A(Core included)/Case B(Core excluded)両実行・B優位ならCore retirement選択肢
 [複雑性]   Study76(Universe-B) → 複雑性の正当化判定（CAGR追求ではない・WHITE→77不要）
 [スリーブ] Study83(TSMOM) / Study80(MN) / Study82(PEAD) / Study102 / Core再測定
            各々CP3ゲート: CAGR≥15%∧Calmar≥0.8∧相関<0.5∧WF5/5     ← CP3

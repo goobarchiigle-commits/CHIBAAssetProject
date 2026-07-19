@@ -1,7 +1,7 @@
 # Roadmap Revision 2026-07-19 — Post-Study74 + Study90番台反映・complete_execution_roadmap 全面改定
 
 **日付**: 2026-07-19
-**版**: v1.2（同日最終確定・ユーザー統合承認）
+**版**: v1.3（同日確定・Falsification原則統合）
 **性格**: 文書改定のみ。新規バックテストゼロ・コード変更ゼロ・実弾変更ゼロ。
 
 **改版履歴**:
@@ -10,6 +10,7 @@
 | v1.0 | 2026-07-19 | 初版（ユーザー指示10項+Appendix） |
 | v1.1 | 2026-07-19 | ユーザーレビュー反映: ①Core PIT期待値=**UNKNOWN（~0-5%・confidence LOW）**へ格下げ・Stretch表記失効 ②優先順位83⇄80入替（TSMOM先行） ③CP2再定義=**Study103**（統合の数学的成立性）+CP3スリーブ採用ゲート事前固定 ④Study77=条件付き凍結（76 BLACK時のみoptional） ⑤**Study103新設**（Portfolio Architecture Feasibility） ⑥Core=Study85保証枠（80-90%）廃止・スリーブ候補の1つへ格下げ |
 | **v1.2** | 2026-07-19 | **ユーザー最終確定版（統合承認）**: CP1=**Expectation Reset**と正式命名（完了済みCP） / CP2=Study103に**GREEN/YELLOW/RED**判定を導入し**Research Continuation Gate**へ格上げ（RED→30% Route STATUS=CLOSED恒久） / CP3評価軸にPIT expectancy・**Capacity**・RoRを正式追加 / 4位以下の優先順位（83/80/82）は**Study103結果に従属** / Study80正式名=**Market Neutral Feasibility**（実装研究ではない・重いのはStudy86側） / **永久禁止事項7項**の正式化 / Research Status・Goal Tree様式を正典掲示 |
+| **v1.3** | 2026-07-19 | **Falsification原則統合（ユーザー承認）**: CP2 Primary Objective=**30%ルートの反証試行**（`Failure to falsify ≠ proof of feasibility`・GREENは実現可能性の証明ではない） / **Study103三原則**正典化 / **シナリオ凍結**の制度化（実行後追加=新版番号+新承認+full rerun必須） / **自動RED境界**の事前固定（sleeves≥5・corr<0.10・Calmar>2.0・レバ>2x等） / Core表記を三行分離（Intrinsic alpha=**UNKNOWN** / Observed PIT estimate=**≈0-5%（観測範囲・真値推定区間ではない）** / Confidence=**LOW**） / Study103は**Case A（Core included）/ Case B（Core excluded）両ケース必須**・Case B優位なら**Core retirement**正式選択肢 / Study75/76/103=**前処理**（Satellite研究は未開始）の明文化 |
 **改定対象**: `reports/complete_execution_roadmap_2026-07-04.md`（以下「旧正典実行手順書」）
 **ファイル名注記**: ユーザー指示原文は `roadmap_revision_2026-07-17.md` だが、SAVE規約（実日付）により 2026-07-19 を採用。
 **拘束エビデンス**:
@@ -84,14 +85,23 @@ STATUS = CLOSED（2026-07-19恒久確定）
 
 **新CP1（Core単独期待値・v1.1改定）**:
 
+**Core公式表記（v1.3・三行分離様式・これ以外の表記を禁止）**:
+```
+Core:
+  Intrinsic alpha       : UNKNOWN
+  Observed PIT estimate : ≈0-5%   ← 現在までに観測された範囲。真値の推定区間ではない
+  Confidence            : LOW
+```
+0-5%は「観測範囲（observed range）」であり「真値推定区間」ではない — この区別を全文書で厳守。α≈0（TOPIX劣後）の可能性を排除できない（Study101全4構成RED・Study75C PIT無作為median IS -2.48%）。
+
 | 区分 | 値 | 備考 |
 |---|---|---|
-| **Core intrinsic alpha（PIT・公式表記）** | **UNKNOWN（~0-5%・confidence LOW）** | **α≈0（TOPIX劣後）の可能性を排除できない**。Study101全4構成RED・Study75C PIT無作為median IS -2.48%。0-5%自体が推定にすぎない |
+| **Core intrinsic alpha（公式）** | **UNKNOWN**（上記三行様式で表記） | Observed PIT estimate ≈0-5%・Confidence LOW |
 | 名目参考値（RSR42） | 10-15% | 歴史記録としてのみ保持（M1後公式値 IS 12.22% / OOS 11.42% / Full 11.22%）。**意思決定根拠使用禁止**（Study100 FATAL・名簿残存期間の名目値） |
 | ~~Stretch 15-18%~~ | **失効（v1.1）** | 名目実績前提のため定義不能。純化後PIT再測定（Study76 / FUJIKO 2.0）完了後に再定義 |
 | 18%以上（旧表記の帰結） | 新アルファ源必須（不変） | MN / PEAD / TSMOM。Core改良では到達不能 |
 
-**表記禁止則（v1.1）**: 「Coreには5%程度のアルファが残る」と読める記述を禁止。公式表記は常に `UNKNOWN (~0-5%, confidence LOW)`。
+**表記禁止則（v1.3拡張）**: (a)「Coreには5%程度のアルファが残る」と読める記述 (b) Observed PIT estimate（≈0-5%）を真値推定区間・信頼区間として引用する行為 — いずれも禁止。公式表記は常に上記三行様式。
 
 **Coreの位置づけ格下げ（v1.1・⑥）**: CoreはStudy85統合における**保証スリーブではない**。旧「Core 80-90% + Satellite 10-20%」構成を廃止し、CoreはPIT再測定値で**CP3スリーブ採用ゲート（§6）を他Satelliteと同条件で通過した場合のみ**採用。通過不能なら**Satellite-onlyポートフォリオを正式な選択肢とする**。
 
@@ -145,7 +155,7 @@ Coreの役割 = 統合ポートフォリオの土台スリーブ（10-15%・名�
 | CP | 名称・定義 | 判定Study | 状態 |
 |---|---|---|---|
 | **CP1** | **Expectation Reset**（Core神話の終了）: Capital route CLOSED・Study79 CLOSED・Core alpha=UNKNOWN | Study74/100/101 | **完了（2026-07-19確定）** |
-| **CP2** | **統合の数学的成立性** = **Research Continuation Gate**。「結合30%∧Calmar1.5∧DD≤20%∧RoR<1%」の必要条件を逆算し**GREEN/YELLOW/RED**で判定。**RED→30% Route STATUS=CLOSED（恒久）** | **Study103**（§6A・Satellite掘削前に先行判定） | 未実施 |
+| **CP2** | **統合の数学的成立性** = **Research Continuation Gate**。**Primary objective=30%ルートの反証試行（Falsification）**。「結合30%∧Calmar1.5∧DD≤20%∧RoR<1%」の必要条件を逆算し**GREEN/YELLOW/RED**で判定。**RED→30% Route STATUS=CLOSED（恒久）**。`Failure to falsify ≠ proof of feasibility` | **Study103**（§6A・Satellite掘削前に先行判定） | 未実施 |
 | **CP3** | **Sleeve Gate**（事前固定・裁量禁止・各スリーブ個別判定）。評価軸: **PIT expectancy / Calmar / Correlation / Capacity / RoR** | Study80/82/83/102 + Core再測定 | 未実施 |
 | CP4 | **Portfolio Integration** 統合実測: 結合CAGR≥30% ∧ 結合MaxDD≤20% ∧ RoR<1%（30%/Calmar1.5の実測判定はここのみ） | Study85 | 未実施 |
 
@@ -175,21 +185,63 @@ Coreの役割 = 統合ポートフォリオの土台スリーブ（10-15%・名�
 
 **性格（v1.2格上げ）**: 単なるStudyではなく**Research Continuation Gate** — Satellite研究の続行可否・優先順位・30% Routeの生死そのものを決める。旧発想「Satelliteを掘る→30%を目指す」を「30%の必要条件を先に定義→条件を満たす候補のみ掘る」へ転換する（Study74「先に上限を測る」のポートフォリオ全体への拡張）。
 
+**Primary Objective（v1.3・正典文言）**:
+```
+Attempt to falsify the 30% route.
+The route is accepted only if it survives all predefined tests.
+
+Failure to falsify ≠ proof of feasibility.
+```
+Study103の目的は「30%へ到達する方法を探す」ことでは**ない**。「30%ルートを否定できるか試みる」ことである。従って**GREENですら「30%達成可能」を意味しない** — 意味するのは「30%ルートを棄却できなかったため、研究継続を正当化できる」のみ。この非対称を全報告文書の冒頭に明記する（Study52型認知バイアスの制度的防止）。
+
+**Study103三原則（正典）**:
+```
+1. Attempt to falsify the hypothesis.
+   （仮説の反証を試みる）
+2. Only predefined scenarios are valid.
+   （事前定義されたシナリオのみが有効）
+3. Failure to falsify is not proof.
+   It only justifies continuing research.
+   （反証の失敗は証明ではない。研究継続を正当化するのみ）
+```
+
 **手法**（新規BT不要・データ取得不要・Study78 MC資産再利用・0.5-1日規模）:
 1. スリーブ候補{Core, MN, PEAD, TSMOM, SmallGrowth}のCAGR/Vol/Core相関を**3水準（保守/基準/楽観）の事前固定表**で仮置き（外部文献+内部実測レンジ。表確定後の変更・追加は禁止）。
 2. Monte Carlo（ブロックbootstrap・Study78方式）で結合CAGR分布・結合MaxDD・Calmar・RoRを算出。
 3. **逆問題形式を主出力とする**（feasible frontier・様式事前固定）: 「30%∧Calmar1.5∧DD≤20%∧RoR<1%」成立に必要な——
    **最低スリーブ数 / 必要単独Calmar / 必要相関上限 / 必要単独リターン / 必要Capacity / 許容レバ**
    （出力例: `3 sleeves ∧ avg corr<0.25 ∧ avg Calmar>1.2 ∧ capacity>¥3M`）
-4. **禁止**: 仮定を動かして30%が出るまで探索する行為（single_metric_optimization=forbid・仮定スイープはStudy52型汚染と同格・永久禁止5項「Result-after parameter tuning」該当）。
+4. **Case A / Case B 両ケース必須（v1.3）**: 全シナリオを **Case A（Core included）/ Case B（Core excluded）** の両方で実行。
+   **Case Bのfrontierの方が緩い**（=Coreの追加が統合効率を悪化させている）場合、**Core retirement（Core全面撤退）を正式選択肢**としてユーザーへ提示する（Core guaranteed allocationは既に禁止済み — 本項はその対偶の検証）。
+5. **禁止**: 仮定を動かして30%が出るまで探索する行為（single_metric_optimization=forbid・仮定スイープはStudy52型汚染と同格・永久禁止5項「Result-after parameter tuning」該当）。
+
+**シナリオ凍結（v1.3・制度的禁止）**:
+```
+No additional scenarios may be introduced after execution.
+実行開始後のシナリオ追加・変更・水準調整（「corr=0.20なら？0.18なら？」型の探索）は一切禁止。
+シナリオ追加が必要になった場合の唯一の手続き:
+  1. 新バージョン採番（Study103B等・別Studyとして扱う）
+  2. 新規ASK_FIRST承認
+  3. 全シナリオのfull rerun（部分再実行・旧結果との混用は禁止）
+```
 
 **判定（GREEN/YELLOW/RED・事前固定・v1.2）**:
 
 | 判定 | 条件 | 帰結 |
 |---|---|---|
-| **GREEN** | 基準水準の仮定で成立（成立条件が現実的） | frontier必要条件をCP3ゲートへ反映（注4・厳格化方向のみ）。Satellite研究続行。**83/80/82の順位はfrontierが示す欠落プロファイルに従い再確定**（ユーザー決裁） |
+| **GREEN** | 基準水準の仮定で成立（成立条件が現実的） | frontier必要条件をCP3ゲートへ反映（注4・厳格化方向のみ）。Satellite研究続行。**83/80/82の順位はfrontierが示す欠落プロファイルに従い再確定**（ユーザー決裁）。**GREEN≠実現可能性の証明**（Primary Objective参照 — 「棄却できなかった」のみ） |
 | **YELLOW** | 楽観水準のみ成立、または必要条件が既知候補群（MN/PEAD/TSMOM/SmallGrowth）の想定レンジを超える | **追加アルファ源が必要**。既知候補の研究は継続可だが30%宣言はStudy85前でも保留。新アルファ探索の起案はユーザー決裁 |
-| **RED** | 楽観水準でも不成立（必要条件が非現実的） | **30% Route STATUS = CLOSED（恒久・Study85を待たず）**。Satellite研究は「Calmar改善・絶対リターン向上」へ目標再定義（ユーザー決裁） |
+| **RED** | 楽観水準でも不成立（必要条件が非現実的）、**または下記の自動RED境界のいずれかに該当** | **30% Route STATUS = CLOSED（恒久・Study85を待たず）**。Satellite研究は「Calmar改善・絶対リターン向上」へ目標再定義（ユーザー決裁） |
+
+**自動RED境界（現実的境界の事前固定・v1.3）**: feasible frontierの必要条件が以下のいずれかに達した場合、水準判定を経ず**自動RED**:
+```
+required sleeves     ≥ 5      （検証・運用能力の現実的上限超過 — 現体制で5系統の独立戦略維持は不能）
+required avg corr    < 0.10   （現実の市場でストレス時まで恒常維持できる水準ではない）
+required avg Calmar  > 2.0    （既知のどの候補アルファ類型にも到達実績がない）
+required leverage    > 2.0x   （証拠金・RoR<1%・DD予算と非両立）
+required capacity    < ¥3M    （現行資本で執行不能）
+```
+境界値の事後緩和は禁止（永久禁止5項「Result-after parameter tuning」該当）。厳格化方向の変更のみ許容（要ユーザー決裁）。
 
 感度脆弱の場合（相関±0.1・Calmar±0.2で判定が反転）は**1段階悪い側の判定を機械採用**（GREEN→YELLOW / YELLOW→RED。裁量禁止）。
 
@@ -237,6 +289,8 @@ Study102の起案条件（旧L6から継承・変更なし）: Study75廃止込�
 **順位の従属性（v1.2）**: 4位以下（Study83/80/82/102）の相対順位は**Study103の結果に従属**する。「MNが必要なのかTSMOMが必要なのか」自体が後決め — feasible frontierが示す欠落プロファイル（例: 「相関<0.25のスリーブ2本必要」→TSMOM先行 / 「単独Calmar>1.2必須」→MN先行）に従い、CP2判定後にユーザー決裁で再確定。上表の4位以下は**Study103完了までの暫定順位**。
 
 **Study80の位置付け（v1.2明確化・誤解防止）**: Study80の正式名は**Market Neutral Feasibility** — 「MN alphaは実在するか」だけを調べる純データ分析であり、**MN実装研究ではない**。実装コストが重いのは全てStudy86側（信用口座・borrow fee・在庫管理・執行インフラ）。従ってStudy80自体のROIは依然高く、順位5はStudy86割引を含む統合評価。Study103の結果次第で繰り上げ可。
+
+**研究フェーズ認識（v1.3）**: **Study75/76/103までは前処理（pre-processing）であり、Satellite研究は正式にはまだ始まっていない**。4位以下（83/80/82/102）はCP2通過後にre-evaluate（frontierの欠落プロファイルに従い再順位付け・ユーザー決裁）。CP2がREDなら4位以下は現行定義のまま起案されることはない（目標再定義後に別途起案）。
 
 **Study90番台（FUJIKO 2.0系）との関係**:
 - 本改定は**旧正典（Study74-86系）の改定**であり、`fujiko_r2_research_roadmap.md`（Study87-97系）を上書きしない。両者は並立し、衝突時はユーザー決裁。
@@ -297,10 +351,12 @@ Study83/80/82/102 ─各々CP3審査→ 当選スリーブのみStudy85へ（Cor
 
 ```
 Production   : Entry Freeze（新規BUY全面停止・SELL/exit/研究データ収集は稼働）
-Core         : UNKNOWN（~0-5%・confidence LOW）
+Core         : Intrinsic alpha UNKNOWN
+               Observed PIT estimate ≈0-5%（観測範囲・真値推定区間ではない）
+               Confidence LOW
 Universe     : Rebuilding（Universe-A確定済み / Universe-B未生成）
-Current Phase: Study75残作業（Study103は依存ゼロ・並行着手可）
-30% Route    : Pending Study103（CP2・GREEN/YELLOW/RED未判定）
+Current Phase: Study75残作業 + Study103（依存ゼロ・並行着手可）
+30% Route    : Pending CP2（Study103・GREEN/YELLOW/RED未判定）
 ```
 
 ### Goal Tree（最終版・v1.2）
@@ -369,7 +425,11 @@ Current Phase: Study75残作業（Study103は依存ゼロ・並行着手可）
 7  Core guaranteed allocation        — Core保証枠（80-90%）の復活（CP3同条件審査のみ）
 ```
 
-付随禁止: 「Coreに5%程度のアルファが残る」と断定する表記（§3・公式表記は常にUNKNOWN/confidence LOW）。
+付随禁止（v1.3拡張）:
+- 「Coreに5%程度のアルファが残る」と断定する表記（§3・公式表記は常に三行分離様式）
+- Observed PIT estimate（≈0-5%）を真値推定区間・信頼区間として引用する行為（§3）
+- Study103実行後のシナリオ追加・自動RED境界の事後緩和（§6A・新版採番+新承認+full rerunのみ許容）
+- GREENを「30%達成可能の証明」として引用する行為（§6A・`Failure to falsify ≠ proof of feasibility`）。
 
 ---
 
