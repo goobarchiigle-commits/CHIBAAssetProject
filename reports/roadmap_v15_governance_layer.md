@@ -218,6 +218,72 @@ All sleeves fail              → Route F（Trigger B）
 
 ---
 
+## §8A Post-CP2 Focus（v1.5.3・Study103結果後の研究フェーズ確定）
+
+**フェーズ転換宣言**: 「新しい夢を探すフェーズ」から「**Route Bの実力上限を定量化するフェーズ**」へ正式移行。
+
+```
+Primary  : Determine achievable ceiling of Route B.
+Secondary: Monitor conditions for Route C reactivation.
+```
+
+### Route C（30% Frontier）の正式位置付け — DORMANT（閉鎖ではない）
+
+```
+Route C = DORMANT
+```
+
+**再起動条件（固定・OR結合・これ以外での再開は禁止）**:
+```
+A. TSMOM実測 > Study103仮定（Base）+5pp
+OR
+B. PEAD実測  > Study103仮定（Base）+5pp
+OR
+C. 新しい独立スリーブがCP3通過
+```
+
+上記いずれも成立しない限りRoute Cの再審議自体を禁止する（Study52型延命の再発防止）。Route再起動の判定は実測値確定時に機械的に行い、「惜しい」「もう少しで」といった裁量判断は挟まない（§9原則5と同型の規律）。
+
+### 今後数ヶ月のPhaseロードマップ（固定）
+
+```
+Phase A: Study82 Phase0（PEAD発表日時精度監査）  → PEAD研究可能か（PASS/FAIL）
+Phase B: Study83 Proposal（起案のみ・実装せず）   → TSMOMの情報価値の事前評価
+Phase C: Study83 Implementation（Proposal承認後） → Route B frontier更新
+Phase D: Study82 Alpha Study（Phase0=PASS後）     → PEAD期待値の実測
+Phase E: Route B Ceiling Re-estimation            → 20-25%/Calmar1.3+の実測確認
+```
+
+### 将来のCP3イメージ（Route B自体の生死判定・事前告知）
+
+```
+GREEN  → Route B正式運用
+YELLOW → Satellite縮小（構成スリーブを絞る）
+RED    → Route A または Route F
+```
+
+### 明確に閉鎖されるもの（Post-CP2期間中）
+
+```
+30%達成研究（Primary Goalとしては終了・Route C DORMANT）
+Capital Route（Study74で終了・恒久）
+無制限Satellite探索（concurrent studies≤2を維持）
+新しいRoute乱立（§R Registryのアンチ乱立規則と同型で禁止）
+Route C延命研究（再起動条件A/B/C以外での議論禁止）
+```
+
+### 優先順位（確定・v1.5.3）
+
+```
+第1優先: Study82 Phase0（決算日時精度監査・PASS/FAIL出力のみ）
+第2優先: Study83 Proposal（起案のみ・実装は別途承認）
+第3優先: Study83 Implementation（Proposal承認後）
+第4優先: Core CP3審査（急がない — Core weight=0%は「死亡」ではなく仮定表上の最適解にすぎず、
+         生死は実測でのみ判定可能。Study75/76と接続するが優先度は下げる）
+```
+
+---
+
 ## §9 Research Status（現在地・2026-07-20 Study103実行後）
 
 ```
@@ -226,8 +292,9 @@ Core         : Intrinsic alpha UNKNOWN
                Observed PIT ≈0-5%（観測範囲・真値推定区間ではない）
                Confidence LOW
 Universe     : Rebuilding（Universe-A確定 / Universe-B未生成）
-Current Phase: Route B起動（Study82・Study83着手準備）
-30% Route    : CP2 = RED（確定・Tier2 GREENによりRoute B起動）
+Current Phase: **Ceiling Measurement Phase**（Phase A: Study82 Phase0 起案完了・承認待ち）
+Active Route : Route B（Core+PEAD+TSMOM・20-25%/Calmar1.3+）
+30% Route    : DORMANT（§8A再起動条件A/B/C成立まで）
 ```
 
 ### §9A CP2判定確定（Study103実行結果・2026-07-20）
@@ -284,6 +351,7 @@ Study95でMN期待値が低下した結果、PEAD/TSMOMの相対順位が上が�
 | 版 | 日付 | 内容 |
 |---|---|---|
 | v1.0-v1.4 | 2026-07-19/20 | `roadmap_revision_2026-07-19.md`§改版履歴参照（HISTORY） |
+| **v1.5.3** | 2026-07-20 | **Post-CP2 Focus確定**: フェーズ宣言（Primary=Route B ceiling測定・Secondary=Route C再起動条件監視）/ **Route C=DORMANT**（閉鎖ではない・再起動条件A(TSMOM実測>Base+5pp)/B(PEAD実測>Base+5pp)/C(新規スリーブCP3通過)のOR・これ以外の再審議禁止）/ **Phase A-E固定**（82 Phase0→83 Proposal→83実装→82 Alpha Study→Route B Ceiling再推定）/ 将来CP3イメージ告知（GREEN=正式運用/YELLOW=Satellite縮小/RED=A or F）/ 閉鎖対象明記（30%研究・Capital Route・無制限探索・新Route乱立・Route C延命）/ 優先順位=Study82 Phase0→83 Proposal→83実装→Core CP3(急がず) |
 | **v1.5.2** | 2026-07-20 | **Study103実行完了・CP2確定**: `src/backtest/study103_portfolio_feasibility.py`実装+fresh run（6シナリオ・N=20,000精査MC）。**CP2=RED**（Tier3=30%/1.5・Base到達27.7%で僅差不成立・Optimisticは自動RED境界=avg Calmar>2.0に抵触し実質不成立）。Tier2=GREEN・Tier1=GREEN。§1A決定木を機械適用し**Route B正式起動**（Core+PEAD+TSMOM・20-25%/1.3-1.5）。副次所見: Core Retirement Probability=100%（弱い証拠として記録・Falsification原則3）。優先順位をStudy82(PEAD監査)→Study83(TSMOM)へ更新。詳細→`reports/study103_portfolio_feasibility.md` |
 | **v1.5.1** | 2026-07-20 | Study103実装直前の事前固定（ユーザー承認）: **§1A CP2後の行動決定木**（GREEN→76/YELLOW→Satellite最大2本/RED→Tier2?→B・Tier1?→A・否→F — 事後議論禁止）/ **Planning Priorをordinal表現へ**（LOW/MEDIUM/MEDIUM-HIGH・数値は`Illustrative only`注記必須）/ **Route F Trigger E追加**（Infrastructure burden > Expected research value・ユーザー認定制）/ Study103成果物#7=**Research Continuation Policy**へ改称（Terminal state recommendation含む）/ Satellite暫定順位表（TSMOM→PEAD→MN→SG(Dormant)→Lead-Lag・原案の102/ARCH-E重複をMN=3位に補正）/ **Study103実装承認**（ユーザータスク指示による・ASK_FIRST充足） |
 | **v1.5** | 2026-07-20 | 統合正典化（本書新設・Registry設置・アンチ乱立規則）/ Study103目的の二層化（Primary=反証・Secondary=天井と終端の確定）/ **Tier番号を昇順体系へ反転**（Tier3=30%…Tier0=市場リターン・対照表§2）/ Route D=**Dormant High Alpha Branch**（Study102 WHITEまで独立Route化禁止・工数ゼロ）/ **Route F発動条件4トリガー正式化**（既存2四半期Killとの二段階整合）/ Planning Prior正式規律（ordinal only・CP2/CP3引用禁止）/ **Research Budget新設**（工数配分35/45/10/10・active routes≤2・concurrent studies≤2）/ Route Transition Matrix正式図 / **Study103成果物7点固定**（Termination/Core retirement probabilityは機械的定義）/ 優先順位=103最優先へ / 結語追加 / `final_research_roadmap_2026-07-04.md`をSUPERSEDEDへ格下げ |

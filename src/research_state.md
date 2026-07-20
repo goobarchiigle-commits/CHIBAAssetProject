@@ -1,8 +1,47 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-20（★Study103実行完了・CP2=RED確定・Route B正式起動★）
+# Single Source of Truth / 最終更新: 2026-07-20（★Post-CP2 Focus確定+Study82 Phase0/Study83 Proposal起案★）
 # ※ロードマップ参照は必ず reports/roadmap_v15_governance_layer.md から開始（他は全てANNEX/HISTORY/FROZEN/SUPERSEDED）
-# ※研究(Study)系列は2026-07-16 Study101が最新（実測ベース）。Study103はMC完了（Study82/83が次点・未着手）。
+# ※研究フェーズ = Ceiling Measurement Phase（Route B実力上限の定量化）。30% RouteはDORMANT。
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
+
+---
+
+## ★★★★★★★★★★★★★★★★★★★★★★★ 2026-07-20 Post-CP2 Focus確定 + Study82 Phase0/Study83 Proposal起案
+
+**性格**: 文書のみ（BT・コード・データ取得なし）。Study103結果（CP2=RED・Route B起動）を受け、
+研究フェーズを正式転換。成果物: `roadmap_v15_governance_layer.md`v1.5.3改版 +
+`reports/study82_phase0_design.md` + `reports/study83_proposal.md`。
+
+**フェーズ転換**: 「新しい夢を探すフェーズ」→「**Route Bの実力上限を定量化するフェーズ**」。
+```
+Primary  : Determine achievable ceiling of Route B.
+Secondary: Monitor conditions for Route C reactivation.
+```
+
+**Route C = DORMANT**（閉鎖ではない）。再起動条件（OR・これ以外での再審議禁止）:
+```
+A. TSMOM実測 > Study103仮定(Base)+5pp
+B. PEAD実測  > Study103仮定(Base)+5pp
+C. 新しい独立スリーブがCP3通過
+```
+
+**Phase A-E固定**: A=Study82 Phase0(監査) → B=Study83 Proposal(起案のみ) →
+C=Study83 Implementation(承認後) → D=Study82 Alpha Study(Phase0=PASS後) →
+E=Route B Ceiling Re-estimation。将来CP3イメージ: GREEN=Route B正式運用/YELLOW=Satellite縮小/
+RED=Route A or F。
+
+**Study82 Phase0起案（`study82_phase0_design.md`）**: 決算発表日時精度監査。出力はPASS/FAILのみ・
+アルファ測定は含まない。必須6項目（発表日時粒度・場中/引後区別・訂正開示・配信遅延・PIT保証・
+廃止銘柄整合性）のうち粒度/区別/PIT保証/廃止銘柄の4項目が判定必須。**現状確認**: J-Quants側の
+決算発表日時・財務諸表エンドポイントは`src/jquants/provider.py`で**未疎通**（daily bars/TOPIX/
+master の3種のみ疎通済み）——本監査で初めて確認する。FAIL時はRoute B構成をCore+TSMOMへ縮小検討。
+
+**Study83 Proposal（`study83_proposal.md`）**: 実装コスト=低（データ調達容易・パラメータ最小・
+kabuステーション先物対応要確認）。相関仮定（Core-TSMOM/PEAD-TSMOM）は全て未実測——実装の主目的は
+「アルファ発見」より「Study103仮定の検証」に近い。実装推奨=中〜高だがStudy82 Phase0結果待ちが
+合理的（データ独立のため並行着手も選択肢・concurrent studies≤2枠内）。
+
+**次アクション（ASK_FIRST）**: 両起案書の承認 → 小サンプル疎通/実装スクリプトは個別新規作成。
 
 ---
 
