@@ -220,27 +220,63 @@ All sleeves fail              → Route F（Trigger B）
 
 ## §8A Post-CP2 Focus（v1.5.4・Study103結果後の研究フェーズ確定・Route状態マトリクス）
 
-### §8A-0 現在地の確定（正式状態・v1.5.4）
+### §8A-0 現在地の確定（正式状態・v1.5.5・ロードマップ凍結）
 
 ```
-Research Status : Ceiling Measurement Phase
-Primary Route    : Route B
-Fallback         : Route A
+Program Phase    : Phase3
+Research Status  : Route B Assumption Validation Phase
+Primary Route    : Route B (Candidate)
+Fallback         : Route A (Standby)
 Dormant          : Route C
 Terminal         : Route F
 ```
 
-Route Aは閉鎖しない（時期尚早）。Study103でTier2・Tier1が共にGREENであるため、Route Bが崩れた場合に
-`B → A → F`という縮退経路が存在すること自体が研究OSの安定性を構成する。
+**用語訂正（v1.5.5）**: 「ACTIVE」表記を廃止。ACTIVEは「採択済み」という誤った認知を無意識に誘発する
+語であり、PEAD=未実測・TSMOM=未実測の現状（frontierそのものが未確定）と整合しない。以後Route Bは
+**Candidate Operating Route**（略記: Route B (Candidate)）と表記する。
 
-### §8A-1 Route状態マトリクス（正式・v1.5.4）
+Route Aは閉鎖しない。Study103でTier2・Tier1が共にGREENであるため、Route Bが崩れた場合に
+`B → A → F`という縮退経路が存在すること自体が研究OSの安定性を構成する。Route Aは
+**Graceful Degradation Path**として明示的に位置づける（単なる待機ではなく「研究OSが備える
+縮退能力そのもの」としての役割）。
+
+### §8A-1 Route状態マトリクス（正式・v1.5.5）
 
 | Route | Status | 内容・起動/再起動条件 | 研究工数 |
 |---|---|---|---|
-| **B** | **ACTIVE**（正確には**Route B Frontier Validation Phase**——「採択済み運用戦略」ではなく検証中） | Core+PEAD+TSMOM・目標20-25%/Calmar1.3+。現時点でPEAD=existence unknown（Study82未完了）・TSMOM=assumption only（Study83未実施）のため、frontier自体が未確定 | Satellite枠45% |
-| **A** | **STANDBY**（削除禁止・工数0%で待機） | 起動条件（OR）: A. Study82 FAIL / B. Route B upper bound劣化 / C. 連続2年次サイクル採用ゼロ | 0%（起動時に再配分） |
-| **C** | **DORMANT**（§8A既定・変更なし） | 再起動条件（OR）: A. PEAD実測>assumption+5pp / B. TSMOM実測>assumption+5pp / C. 新規直交スリーブがCP3通過。これ以外での再審議禁止 | 0% |
-| **F** | **TERMINAL** | Trigger（OR・v15§4定義のA-Eと同一）: A. Tier1 infeasible / B. 全スリーブfail / C. Research budget exhausted / D. 連続2年次サイクル無採用 / E. Maintenance burden>expected research value | — |
+| **B** | **Candidate Operating Route**（`Route B (Candidate)`。「採択済み運用戦略」ではなく検証中） | Core+PEAD+TSMOM・目標20-25%/Calmar1.3+。現時点でPEAD=existence unknown（Study82未完了）・TSMOM=assumption only（Study83未実施）のため、frontier自体が未確定 | Satellite枠45% |
+| **A** | **Standby**（**Graceful Degradation Path**・削除禁止・工数0%で待機） | 起動条件は§8A-1A（Study82 FAIL決定木）参照——**「Study82 FAIL→即Route A」ではない** | 0%（起動時に再配分） |
+| **C** | **DORMANT**（§8A既定・変更なし・これ以上触らない） | 再起動条件（OR）: A. PEAD実測>assumption+5pp / B. TSMOM実測>assumption+5pp / C. 新規直交スリーブがCP3通過。これ以外での再審議禁止 | 0% |
+| **F** | **TERMINAL** | Trigger（OR・v15§4定義のA-Eと同一・**E=維持コスト評価は詳細未確定のまま将来課題として保持**） | — |
+
+### §8A-1A Study82 FAIL時の正式決定木（v1.5.5新設・最重要補正）
+
+**旧記述の誤り（訂正）**: 「Study82 FAIL → Route A」という単純遷移は**誤り**。Study82 FAILは
+PEAD単体の死亡であって**Route B（Core+TSMOMのみでの残存可能性）の死亡ではない**。Study103最適解
+（Base水準）はPEAD70%だったが、PEADが失われてもCore+TSMOMでTier2/Tier1が残る可能性は排除されない。
+
+**正式決定木（Study82 Phase0/Phase0.1のFAIL・NOT_CONNECTABLE、およびPhase D=Alpha Studyの弱結果を統一的に扱う）**:
+```
+Study82 FAIL（データ基盤自体が使用不能）
+  or Alpha Study結果がStudy103仮定を下回る
+        ↓
+PEAD assumptions downgraded
+  （データ基盤自体が不能な場合は「PEAD配分上限=0%」への完全ダウングレードとして扱う——
+    これは特殊ケースであり別扱いの分岐ではない）
+        ↓
+Study103 assumptions rerun
+  （シナリオ凍結規定に従い新版採番＝Study103B・新規ASK_FIRST・full rerun。
+    §6A「シナリオ凍結」の正規手続きに則る）
+        ↓
+Route B frontier re-estimation
+        ↓
+判定: B confirmed（Core+TSMOM等の縮小構成でもTier2/Tier1成立）
+    or B degraded（Tier1のみ成立・目標レンジを切り下げて存続）
+    or A promoted（縮小構成でもTier1すら不成立→Route A標準へ正式移行）
+```
+
+この決定木がStudy82 FAIL時の**唯一の正式経路**。Phase0（データ品質監査）とPhase D（アルファ実測）の
+FAILは、Route Bへの影響という観点では同一の下流処理（PEAD assumptions downgraded以降）に合流する。
 
 ### §8A-2 Research Freeze Rule（正式・v1.5.4・重要）
 
@@ -256,17 +292,24 @@ Proposal documents only are allowed.
 （提案書自体は保持するが、実装着手の判断はStudy82完了後に限定する）。Proposal文書の作成・改訂は
 本ルールの制約対象外（BT・コード・データ取得を伴わないため）。
 
-### §8A-3 CP3の位置付け（Route B生死判定・ケース分岐・v1.5.4）
+### §8A-3 CP3の位置付け（Route B生死判定・ケース分岐・v1.5.5）
 
-CP3で以下を判断する（Study82・Study83実測が出揃った時点）:
+CP3で以下を判断する（Study82・Study83実測が出揃った時点）。**Case1-3は方向性の例示であり、
+CP3の正式な閾値・判定統計量（成功/劣化/降格の数値境界）は未確定 — v1.5.5では既知の未決事項として
+明記するに留め、詳細確定は将来課題とする（今の段階で確定させると拙速なCP3設計になりかねないため）**:
 
 ```
 Case1: PEAD PASS ∧ TSMOM GOOD           → Route B confirmed（正式運用へ）
-Case2: PEAD FAIL                        → Route A promotion（Route B構成をCore+TSMOMへ縮小
-                                            or Route A標準へ切替。§4決定木のB→A降格と同型）
+Case2: PEAD FAIL                        → §8A-1A決定木を適用（PEAD assumptions downgraded→
+                                            Study103 rerun→B confirmed/degraded/A promotedのいずれか。
+                                            「即Route A」ではない）
 Case3: PEAD PASS ∧ TSMOM >> assumption  → Route C reactivation review（§8A-1 Route C条件Bに該当
                                             した場合の正式レビュー起動——再起動そのものではない）
 ```
+
+**未決事項（v1.5.5で明記・今後詰める）**: CP3の正式条件（数値閾値・判定統計量）は上記Case分類より
+細かい仕様化が必要。Study82/Study83実測結果が出た時点で、Study103の判定統計量（median CAGR/Calmar/
+MaxDD/RoR）と同型の形式で改めて固定する。
 
 ### §8A-4 当面の研究目的（改定・v1.5.4）
 
@@ -304,16 +347,24 @@ C. 新しい独立スリーブがCP3通過
 
 上記いずれも成立しない限りRoute Cの再審議自体を禁止する（Study52型延命の再発防止）。Route再起動の判定は実測値確定時に機械的に行い、「惜しい」「もう少しで」といった裁量判断は挟まない（§9原則5と同型の規律）。
 
-### 完全版ロードマップ（Program Phase 0-5・v1.5.4・マクロ粒度）
+### 完全版ロードマップ（Program Phase 0-5・v1.5.5で凍結確定・マクロ粒度）
 
 ```
-Phase0  Core reset                                          ✓ 完了（Study74/100/101・CP1 Expectation Reset）
-Phase1  30% route falsification                              ✓ 完了（Study103設計・凍結仕様確定）
-Phase2  Portfolio frontier measurement                        ✓ 完了 → CP2 RED
-Phase3  Route B validation                                    ← 現在地
-Phase4  Route B ceiling update（CP3）
-Phase5  Determine final state: Route A/B/C/F
+Phase0  Expectation Reset                                    ✓ 完了（Study74/100/101・CP1）
+Phase1  30% Falsification                                    ✓ 完了（Study103設計・凍結仕様確定）
+Phase2  Portfolio Frontier Measurement                        ✓ 完了 → CP2 RED
+Phase3  Route B Assumption Validation                         ← NOW
+Phase4  Route B Ceiling Measurement（CP3）
+Phase5  Final Route Determination
 ```
+
+**残存する未確定事項は実質3つのみ（v1.5.5・明記）**:
+```
+Unknown #1: PEADはPIT研究可能か？  → Study82
+Unknown #2: TSMOMの実測性能は？    → Study83
+Unknown #3: Coreの真の能力は？     → CP3
+```
+これ以外の構造（Route体系・Freeze Rule・Phase体系）は本改版をもって**凍結**する。
 
 ### Phase3-4詳細（Route B Validation・Program Phase3-4のミクロ内訳・固定）
 
@@ -344,18 +395,30 @@ Capital Route（Study74で終了・恒久）
 Route C延命研究（再起動条件A/B/C以外での議論禁止）
 ```
 
-### 優先順位（確定・v1.5.4・5段固定）
+### 優先順位（確定・v1.5.5・6段固定）
 
 ```
-第1優先: Study82 Phase0.1（J-Quants API疎通確認）— 情報価値最大。失敗ならRoute B自体が大幅弱体化
+第1優先: Study82 Phase0.1（J-Quants API疎通確認）— 情報価値最大。着手中
 第2優先: Study82 Phase0（決算日時精度監査・PASS/FAIL/UNKNOWN出力のみ・アルファ測定は絶対に行わない）
-第3優先: Route B Viability Review（Study82結果を受けたfrontier再確認 — PEAD70%仮定の生死確認）
+第3優先: Study103 assumption rerun（if necessary・§8A-1A決定木適用時のみ発動。Study82結果が
+         PASSでStudy103仮定と整合すれば本項はスキップ）
 第4優先: Study83 Proposal（文書のみ・実装禁止・BT禁止 — ここまでは許容）
-第5優先: Study83 Implementation（Study82 PASS後のみ・§8A-2 Research Freeze Rule）
+第5優先: Study83 Implementation（Study82完了後のみ・§8A-2 Research Freeze Rule）
+第6優先: CP3 最終評価
 
-現時点でStudy83実装・新アルファ探索・Route C再検討は全て時期尚早（§8A-2）。
 Core CP3審査は急がない（Core weight=0%は仮定表上の最適解にすぎず生死は実測でのみ判定可能）。
 ```
+
+### §8A-5 ロードマップ凍結宣言（v1.5.5）
+
+```
+Freeze roadmap. Execute Study82.
+```
+
+Research OS Design フェーズ（v1.0-v1.5.5・本日2026-07-20に渡り実施）は本改版をもって終了。
+以後は**Research Execution フェーズ**——ロードマップそのものの議論・最適化は行わず、上記優先順位
+通りに実行する。ロードマップへの追加改版は、Study82/83/CP3の**実測結果を反映する場合のみ**行う
+（計画の最適化それ自体を目的化しない）。
 
 ---
 
@@ -368,9 +431,10 @@ Core         : Intrinsic alpha UNKNOWN
                Confidence LOW
 Universe     : Rebuilding（Universe-A確定 / Universe-B未生成）
 Current Phase: **Ceiling Measurement Phase**（Program Phase3・Study82 Phase0.1起案完了・承認待ち）
-Route Status : B=ACTIVE(Frontier Validation) / A=STANDBY / C=DORMANT / F=TERMINAL
+Route Status : B=Candidate / A=Standby(Graceful Degradation Path) / C=DORMANT / F=TERMINAL
 30% Route    : DORMANT（§8A-1 Route C再起動条件A/B/C成立まで）
 Freeze Rule  : No new alpha impl/BT until Study82完了（§8A-2）
+Study82      : Phase0.1=CONNECTABLE（暫定・ドキュメント調査完了）→ Phase0本審査は新規実装ASK_FIRST待ち
 ```
 
 ### §9A CP2判定確定（Study103実行結果・2026-07-20）
@@ -427,6 +491,8 @@ Study95でMN期待値が低下した結果、PEAD/TSMOMの相対順位が上が�
 | 版 | 日付 | 内容 |
 |---|---|---|
 | v1.0-v1.4 | 2026-07-19/20 | `roadmap_revision_2026-07-19.md`§改版履歴参照（HISTORY） |
+| v1.5.6 | 2026-07-20 | **Study82 Phase0.1実行**（読み取り調査のみ・ロードマップ議論なし=Execution Phase初回実行）: `/fins/summary`エンドポイントの存在・現行Standardプラン内・DiscTime等の関連フィールドを公式ドキュメントで確認。判定=**CONNECTABLE（暫定）**。詳細→`reports/study82_phase0_1_result.md`。次アクション=Phase0本審査（実データ検証・新規実装）はASK_FIRST待ち |
+| **v1.5.5** | 2026-07-20 | **ロードマップ凍結（Research OS Design→Research Execution移行）**: ACTIVE表記廃止→**Route B (Candidate)**へ改称（採択済み誤認防止）/ Research Status=**Route B Assumption Validation Phase** / Route A=**Graceful Degradation Path**として明示 / **§8A-1A Study82 FAIL決定木新設**（旧「即Route A」を誤りとして訂正——正式には PEAD assumptions downgraded→Study103 assumptions rerun→B confirmed/degraded/A promotedの3分岐。Phase0監査FAILとPhase Dアルファ弱結果を同一下流処理に統合） / CP3正式条件は**未決事項として明記**（詳細確定は将来課題） / Route F Trigger Eは将来課題のまま維持 / 残存Unknown3点を明記（PEAD=Study82・TSMOM=Study83・Core=CP3） / 優先順位6段化（Study103 assumption rerun・CP3最終評価を追加） / **Freeze roadmap. Execute Study82.**宣言 |
 | **v1.5.4** | 2026-07-20 | **Route状態マトリクス正式化**（B=ACTIVE/Frontier Validation Phase・A=STANDBY削除禁止・C=DORMANT・F=TERMINAL、各起動/再起動条件を表で固定）/ **Research Freeze Rule新設**（Study82完了までStudy83実装含む新規alpha実装/BT一切禁止・Proposal文書のみ許容・study83_proposalの並行着手選択肢を上書き凍結）/ **CP3ケース分岐**（Case1=PEAD PASS∧TSMOM GOOD→Route B confirmed / Case2=PEAD FAIL→Route A promotion / Case3=PEAD PASS∧TSMOM超過→Route C reactivation review）/ 研究目的の正式表現確定 / **Program Phase0-5**マクロ工程表新設（0-2完了・3=現在地・4=CP3・5=最終状態決定）/ **Study82をPhase0.1（API疎通確認）とPhase0（日時監査）に分割**・出力にUNKNOWN追加 / 優先順位5段固定（0.1→0→Viability Review→83Proposal→83実装） |
 | **v1.5.3** | 2026-07-20 | **Post-CP2 Focus確定**: フェーズ宣言（Primary=Route B ceiling測定・Secondary=Route C再起動条件監視）/ **Route C=DORMANT**（閉鎖ではない・再起動条件A(TSMOM実測>Base+5pp)/B(PEAD実測>Base+5pp)/C(新規スリーブCP3通過)のOR・これ以外の再審議禁止）/ **Phase A-E固定**（82 Phase0→83 Proposal→83実装→82 Alpha Study→Route B Ceiling再推定）/ 将来CP3イメージ告知（GREEN=正式運用/YELLOW=Satellite縮小/RED=A or F）/ 閉鎖対象明記（30%研究・Capital Route・無制限探索・新Route乱立・Route C延命）/ 優先順位=Study82 Phase0→83 Proposal→83実装→Core CP3(急がず) |
 | **v1.5.2** | 2026-07-20 | **Study103実行完了・CP2確定**: `src/backtest/study103_portfolio_feasibility.py`実装+fresh run（6シナリオ・N=20,000精査MC）。**CP2=RED**（Tier3=30%/1.5・Base到達27.7%で僅差不成立・Optimisticは自動RED境界=avg Calmar>2.0に抵触し実質不成立）。Tier2=GREEN・Tier1=GREEN。§1A決定木を機械適用し**Route B正式起動**（Core+PEAD+TSMOM・20-25%/1.3-1.5）。副次所見: Core Retirement Probability=100%（弱い証拠として記録・Falsification原則3）。優先順位をStudy82(PEAD監査)→Study83(TSMOM)へ更新。詳細→`reports/study103_portfolio_feasibility.md` |

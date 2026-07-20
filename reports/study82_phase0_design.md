@@ -1,6 +1,6 @@
 # Study82 Phase0.1 + Phase0 — 決算発表日時 API疎通確認 + 精度監査（起案書）
 
-**日付**: 2026-07-20（v1.1: Phase0.1分離・UNKNOWN出力追加）
+**日付**: 2026-07-20（v1.2: FAIL帰結を§8A-1A決定木へ整合。v1.1: Phase0.1分離・UNKNOWN出力追加）
 **性格**: 起案書のみ。**監査であって研究ではない**。アルファ探索・パラメータ推定・BTは一切含まない。
 **正典**: `roadmap_v15_governance_layer.md`§8A-1/§8A-2/Phase3詳細 / `alternative_architectures_5x_2026-07-03.md`§ARCH-B「発表日時精度監査を先行実施」。
 **位置づけ**: Route B（Core+PEAD+TSMOM）の土台であるPEADが**そもそも研究可能か**を確定する第一関門。FAILならStudy82は即終了し、Route BはCore+TSMOMの2スリーブ構成へ縮小する（frontier再測定が必要）。**§8A-2 Research Freeze Rule対象**: 本Study82完了まで、Study83実装を含む新規alpha実装/BTは一切着手しない。
@@ -48,7 +48,7 @@ Phase0   Determine: Is PEAD research possible at all (given Phase0.1=CONNECTABLE
    UNKNOWN         = ドキュメント記載が不明瞭・プラン条件が確認不能等、上記いずれとも確定できない
 ```
 
-**NOT_CONNECTABLE時**: Phase0は実施不能のままStudy82終了。Route B構成をCore+TSMOMへ縮小する検討をv15へ反映（TDnet等の代替データソース契約は別途新規提案・ASK_FIRST）。
+**NOT_CONNECTABLE時**: Phase0は実施不能のままStudy82終了。§3のFAIL時と同一の決定木（§8A-1A）を適用する（TDnet等の代替データソース契約は別途新規提案・ASK_FIRST）。
 **UNKNOWN時**: 判明した不明点を記録し、確認可能になるまでPhase0.1を保留（Route B構成は変更しない・Freeze Ruleは継続）。
 
 ---
@@ -72,8 +72,12 @@ PASS    ⇔ 項目1(分単位) ∧ 項目2(区別可能) ∧ 項目5(PIT保証�
           （訂正開示・配信遅延はイベントスタディ設計側で対処可能なため）。
 
 FAIL    ⇔ 項目1・2・5・6のいずれか1つでも「不成立」と明確に確認できる。
-          FAIL時は本Study82全体を即終了する（永久閉鎖ではなく現行データソースでの
-          再訪禁止 — 将来別データソースが利用可能になった場合のみ再起案可）。
+          FAIL時は`roadmap_v15_governance_layer.md`§8A-1A Study82 FAIL決定木を適用する
+          （現行データソースでの本Study82再訪は禁止・将来別データソースが利用可能になった
+          場合のみ再起案可）: PEAD assumptions downgraded（配分上限0%への完全ダウングレード）
+          → Study103 assumptions rerun → Route B frontier re-estimation →
+          B confirmed/degraded/A promotedのいずれか。**「Route Bの死亡」ではなく
+          「PEADの死亡」** — Core+TSMOMでTier2/Tier1が残る可能性は排除しない。
 
 UNKNOWN ⇔ 項目1・2・5・6のいずれかについて、サンプル不足・ドキュメント不備・
           API仕様の解釈不能等により成立/不成立を確認できない。

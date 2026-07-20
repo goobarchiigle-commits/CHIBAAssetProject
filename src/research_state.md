@@ -1,8 +1,40 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-20（★v1.5.4: Route状態マトリクス+Research Freeze Rule確定★）
+# Single Source of Truth / 最終更新: 2026-07-20（★ロードマップ凍結(v1.5.5)→Execution Phase開始・Study82 Phase0.1=CONNECTABLE(暫定)★）
 # ※ロードマップ参照は必ず reports/roadmap_v15_governance_layer.md から開始（他は全てANNEX/HISTORY/FROZEN/SUPERSEDED）
-# ※研究フェーズ = Program Phase3 Route B Validation。次アクション=Study82 Phase0.1（API疎通確認）。
+# ※研究フェーズ = Program Phase3 Route B Assumption Validation。次アクション=Study82 Phase0本審査（実装ASK_FIRST待ち）。
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
+
+---
+
+## ★★★★★★★★★★★★★★★★★★★★★★★★★ 2026-07-20 Roadmap v1.5.5凍結 + Study82 Phase0.1実行（CONNECTABLE）
+
+**性格**: v1.5.5=文書のみ（Route体系用語訂正・Study82 FAIL決定木新設・ロードマップ凍結宣言）。
+v1.5.6=読み取り調査実行（公式ドキュメント確認のみ・コード実行/データ取得なし）。
+
+**v1.5.5 最終補正（ユーザー指摘反映）**:
+1. **「ACTIVE」表記廃止** → Route B = **Candidate Operating Route**（`Route B (Candidate)`）。
+   採択済み誤認防止。Research Status = **Route B Assumption Validation Phase**。
+2. **§8A-1A Study82 FAIL決定木新設（最重要補正）**: 旧「Study82 FAIL→即Route A」は誤りとして訂正。
+   正式には `PEAD assumptions downgraded → Study103 assumptions rerun（Study103B新版・ASK_FIRST・
+   full rerun）→ Route B frontier re-estimation → B confirmed/degraded/A promoted`。
+   Phase0監査FAILとPhase Dアルファ弱結果は同一下流処理に統合（Phase0 FAIL=PEAD配分上限0%への
+   完全ダウングレードという特殊ケースとして扱う）。「Route Bの死亡」ではなく「PEADの死亡」。
+3. Route A = **Graceful Degradation Path**として明示（削除禁止は不変）。
+4. CP3正式条件（数値閾値）は**未決事項として明記**——Case1-3は方向性の例示に留め、詳細確定は
+   Study82/83実測後に持ち越し（拙速な確定を避ける）。
+5. 残存Unknown3点を明記: #1 PEAD PIT研究可能か(Study82) / #2 TSMOM実測性能(Study83) /
+   #3 Core真の能力(CP3)。
+6. **ロードマップ凍結宣言**: `Freeze roadmap. Execute Study82.` Research OS Designフェーズ終了・
+   Research Executionフェーズへ移行。以後の改版はStudy82/83/CP3実測結果の反映時のみ。
+
+**v1.5.6 Study82 Phase0.1実行結果**: `/fins/summary`エンドポイント（決算短信サマリ・DiscDate/
+DiscTime・TypeOfDocument/DisclosureNumberフィールド）が現行契約プラン（Standard・過去10年）内に
+実在することを公式ドキュメントで確認。**Phase0.1判定 = CONNECTABLE（暫定）**。
+真の時刻精度・訂正レコード実在・廃止銘柄カバレッジの3点はPhase0本審査（実データ検証）待ち。
+詳細→`reports/study82_phase0_1_result.md`。
+
+**次アクション（ASK_FIRST）**: Phase0本審査（`/fins/summary`用メソッド新規実装+小サンプル取得+
+6項目監査実データ検証）。
 
 ---
 
