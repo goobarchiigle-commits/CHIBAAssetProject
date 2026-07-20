@@ -1,8 +1,56 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-20（★Study82 Phase0 = PASS確定（実データ監査完了）★）
+# Single Source of Truth / 最終更新: 2026-07-21（★Study83実装+実測完了 = REJECT確定（TSMOM仮定は楽観的だったと判明）★）
 # ※ロードマップ参照は必ず reports/roadmap_v15_governance_layer.md から開始（他は全てANNEX/HISTORY/FROZEN/SUPERSEDED）
-# ※研究フェーズ = Program Phase3 Route B Assumption Validation。Study82完了→次点=Study83 Proposal評価。
+# ※研究フェーズ = Program Phase3 Route B Assumption Validation。Study82(PASS)+Study83(REJECT)完了→
+#   次点=Study103 rerun要否の決裁 or Core実測。
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
+
+---
+
+## ★★★★★★★★★★★★★★★★★★★★★★★★★★★★ 2026-07-21 Study83実装+実測完了 — REJECT確定（Unknown #2解消）
+
+**性格**: fresh run実施（実データバックテスト・単一パス・TOPIX 2016-2026・固定グリッド3本・
+アルファ計算/PEAD推定/ポートフォリオ最適化ゼロ）。ユーザーASK_FIRST承認済みタスクに従い実装・実行。
+成果物: `src/backtest/study83_tsmom_sleeve.py`（新規） / `backtests/study83_tsmom_sleeve_2026-07-21.json`
+/ `reports/study83_tsmom_sleeve.md`。
+
+**実装**: TOPIX単一指数・絶対モメンタム(N=20/60/120d固定グリッド)・vol-target22.5%
+（Study103 Base仮定中央値を流用）・レバ上限2.0x（Study103自動RED境界と整合）・
+コスト0.05%/turnover単位（保守的近似）。Core相関はstudy78_trade_dataset.json（309トレード）の
+月次PnL帰属近似から算出。
+
+**最終判定 = REJECT**（本実装スコープにおいて）:
+| 指標 | N=20d | N=60d(最良) | N=120d |
+|---|---|---|---|
+| CAGR | -3.13% | +2.47% | -2.22% |
+| Sharpe | -0.13 | 0.10 | -0.09 |
+| MaxDD | -69.48% | -43.99% | -70.06% |
+| Core相関(月次) | -0.262 | -0.002 | +0.183 |
+
+canon成功ゲート（Sharpe≥0.8∧Corr<0.5∧コスト後正）**0/3アーム通過**。Study103仮定Conservative
+（CAGR15%）にすら全アーム未達（最良でも-12.5pp）。MaxDDは仮定を最大+55pp超過。
+**Core相関のみ仮定より良好**（実測がより低い/負相関）。
+
+**機序確認（実装バグでないことを確認済み）**: MaxDDは単発急落ではなく複数年の緩慢な劣化
+（ピーク〜トラフ4-5年）。2020年COVID前後で低ボラ局面のレバ上限張り付き（全期間pct_at_cap≈11%）→
+後方参照型vol-targetのラグが実際に発現。より支配的要因は高turnover(13-25回/年)によるwhipsawコスト
+——`alternative_architectures_5x`原典の想定弱点・Study95のfactor-level知見（Clenow型12M反転・
+Bear悪化）と方向性が整合する既存知見との符合。
+
+**PEAD相関**: N/A（意図的未測定・Phase D未実施のためアルファ推定を伴う代替値算出は禁止事項に抵触）。
+
+**Capacity**: 定性的に非拘束（指数先物の流動性は資本規模比で実質無限大）。
+
+**スコープ限定の明記**: 本結果は「単一指数TOPIX・素朴vol-target・クラッシュ保護なし」の最小実装への
+判定であり、ARCH-C原典想定の複数商品構成・overlay付き設計への判定ではない（誤読防止）。
+
+**推奨（advisory・未実行）**: §8A-1A/§8A-4A決定木の技術的帰結として、TSMOM assumptions
+downgraded→Study103 assumptions rerun（major downgrade毎に1回のみ）→Route B frontier
+re-estimationが整合的だが、**本タスクでは実行していない**（追加ガバナンス変更/ポートフォリオ
+再最適化は禁止事項）。次アクションとして提案するに留める。
+
+**CP3 Readiness**: Study82=PASS・Study83=REJECT（Unknown#2解消）・Core=未測定（Unknown#3・CP3本体）。
+CP3確定にはCore実測が必須で未完了。
 
 ---
 

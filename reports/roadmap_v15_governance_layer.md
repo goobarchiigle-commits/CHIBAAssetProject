@@ -471,10 +471,13 @@ Research Execution   : ≈10-15%
 ✓ Governance Layer（v1.5.x全体）
 ✓ Study82 Phase0.1（API疎通・CONNECTABLE暫定）
 ✓ Study82 Phase0（実データ監査・PASS確定・2026-07-20）
+✓ Study83（TSMOM実装+実測・REJECT確定・2026-07-21）
 ```
 
-**残っているもの**: Study83 Proposal評価・Satellite validation（Study83実装）・CP3。
-**Unknown #1（PEAD PIT研究可能か）解消**: PASS（`reports/study82_phase0_report.md`）。
+**残っているもの**: Core実測（CP3本体）・Study103 rerun要否の決裁（TSMOM仮定ダウングレード分・
+§8A-4A規則により1回のみ許容）。
+**Unknown #1（PEAD PIT研究可能か）解消**: PASS。**Unknown #2（TSMOM実測性能）解消**: 楽観的だったと判明
+（`reports/study83_tsmom_sleeve.md`）。残りはUnknown #3（Core真の能力・CP3本体）のみ。
 
 ### §8A-7 現時点で禁止される事項（v1.5.7・明示列挙）
 
@@ -520,10 +523,15 @@ Route Status : B=Candidate(Mission=Assumption validation) / A=Standby(Graceful D
                / C=DORMANT / F=TERMINAL
 30% Route    : Optional Upside — DORMANT（§8A-1 Route C再起動条件A/B/C成立まで）
 Freeze Rule  : No new alpha impl/BT until Study82完了（§8A-2）
-Study82      : **Phase0 = PASS（実データ検証・n=83・2026-07-20実行完了）**
-               → §8A-1A決定木適用: Study103 rerun不要・Study83 Proposalへ進行可
-Freeze Rule  : **解除条件成立**（Study82完了）。Study83実装への着手は別途ユーザー判断
-Completion   : Research OS Design ≈99% / Research Execution ≈15-20%（Study82完了で上振れ）
+Study82      : Phase0 = PASS（実データ検証・n=83・2026-07-20実行完了）
+Study83      : **実装+実測完了（2026-07-21）= REJECT（本実装スコープ）**。3アーム
+               （N=20/60/120d）全てcanon成功ゲート不通過。TSMOM仮定は楽観的だったと判明
+               （最良アームCAGR+2.47% vs 仮定Conservative15%）。Core相関のみ仮定より良好
+               （実測-0.26〜+0.18 vs 仮定0.15-0.35）。詳細→`reports/study83_tsmom_sleeve.md`
+Freeze Rule  : Study82完了で一部解除。Study83は完了済み（結果=REJECT）
+Completion   : Research OS Design ≈99% / Research Execution ≈25-30%（Study82+83完了で上振れ）
+Unknown解消  : #1 PEAD PIT研究可能=PASS(解消) / #2 TSMOM実測=楽観的と判明(解消) /
+               #3 Core真の能力=CP3待ち（未解消）
 ```
 
 ### §9A CP2判定確定（Study103実行結果・2026-07-20）
@@ -580,6 +588,7 @@ Study95でMN期待値が低下した結果、PEAD/TSMOMの相対順位が上が�
 | 版 | 日付 | 内容 |
 |---|---|---|
 | v1.0-v1.4 | 2026-07-19/20 | `roadmap_revision_2026-07-19.md`§改版履歴参照（HISTORY） |
+| v1.5.9 | 2026-07-21 | **Study83実装+実測完了（実測反映）**: `src/backtest/study83_tsmom_sleeve.py`新規実装（TOPIX単一指数・vol-target22.5%・レバ上限2.0x・固定グリッド20/60/120d・Study78trade帰属近似によるCore相関測定）。**結果=REJECT**（0/3アームがcanon成功ゲート通過・全アームCAGR仮定Conservative未達・MaxDD仮定を最大+55pp超過）。機序確認: 2020年COVID前後の低ボラ局面でレバ上限張り付き→後方参照型vol-target特有のラグ+高turnover(13-25回/年)によるwhipsawコストが主因（実装バグでないことを確認済み）。Core相関のみ仮定より良好（実測-0.26〜+0.18）。PEAD相関はN/A（Phase D未実施のため測定禁止・意図的未測定）。Study103仮定は「楽観的だった」と判定。Unknown#2解消。次段階=Study103 rerun要否の決裁（§8A-4A規則適用・未実行のまま提案のみ）→Core実測→CP3。詳細→`reports/study83_tsmom_sleeve.md` |
 | v1.5.8 | 2026-07-20 | **Study82 Phase0実行完了（実測反映・governance許容改定）**: `src/jquants/provider.py::get_fins_summary()`新規実装+`src/scripts/study82_phase0_audit.py`実行（n=83・`/v2/fins/summary`）。Audit1-6全PASS（DiscTime実測12種の時刻分布で場中/引後判別可能・DocType+DiscNoで訂正開示区別可能かつ実データにも修正開示13件実在・廃止銘柄29件取得）。**Study82 = PASS確定**。実データでv1想定フィールド名`TypeOfDocument`/`DisclosureNumber`は実在せず実際は`DocType`/`DiscNo`と判明（他エンドポイントと同型のv1/v2乖離）。留保: `from`/`to`パラメータ不機能の疑い（1コードで全履歴約10年分が返る）・Audit4は業績予想修正のみ確認（決算数値自体の訂正は本サンプル未確認）。§8A-1A決定木適用: Study103 rerun不要→Study83 Proposalへ進行可（実装着手は別途判断）。詳細→`reports/study82_phase0_report.md` |
 | **v1.5.7** | 2026-07-20 | **最終自己整合化（ユーザー補正・Execution Phase定着）**: Primary/Secondary/Optional Upside三層に研究目的を再表現（Primary=Study103仮定が現実データで生存するか検証・Secondary=Route B現実的上限測定・Optional Upside=30%/1.5はDormant） / 唯一の未確定事項を単一命題化（`Do Study103 assumptions survive real-world data constraints?`） / **§8A-4A Study52再発防止規則新設**（Study103 rerunはmajor assumption downgrade毎に1回のみ・段階的すり合わせ型rerun禁止・materially new evidence必須） / §8A-6完成度評価（Design≈99%/Execution≈10-15%・完了チェックリスト） / §8A-7現時点禁止事項の明示列挙（7項） / §8A-8 CP3までのフローチャート / Study82目的を"PEAD works?"から**"Can PEAD be researched without leakage?"**へ再定義・監査項目をAudit1-6体系へ再編（`study82_phase0_design.md`v1.3で反映）/ 優先順位の文言をPASS/FAIL決定木の機械適用として明確化・「PEAD FAIL≠Route B FAIL」を再強調 / 最終一文確定: `Freeze roadmap. Execute Study82. Attempt to falsify Route B assumptions.` |
 | v1.5.6 | 2026-07-20 | **Study82 Phase0.1実行**（読み取り調査のみ・ロードマップ議論なし=Execution Phase初回実行）: `/fins/summary`エンドポイントの存在・現行Standardプラン内・DiscTime等の関連フィールドを公式ドキュメントで確認。判定=**CONNECTABLE（暫定）**。詳細→`reports/study82_phase0_1_result.md`。次アクション=Phase0本審査（実データ検証・新規実装）はASK_FIRST待ち |

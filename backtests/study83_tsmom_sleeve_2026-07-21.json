@@ -1,0 +1,155 @@
+{
+ "config": {
+  "lookbacks": [
+   20,
+   60,
+   120
+  ],
+  "target_vol": 0.225,
+  "vol_window": 63,
+  "max_leverage": 2.0,
+  "cost_bp_per_turnover_unit": 0.0005,
+  "data_source": "C:\\ai-trading\\data\\jquants\\processed\\TOPIX.parquet",
+  "core_reference": "C:\\ai-trading\\backtests\\study78_trade_dataset.json"
+ },
+ "arms": {
+  "N20": {
+   "perf": {
+    "cagr": -0.0313,
+    "ann_vol": 0.2398,
+    "sharpe": -0.131,
+    "maxdd": 0.6948,
+    "calmar": -0.045,
+    "n_years": 9.35
+   },
+   "turnover_per_year": 25.24,
+   "avg_gross_exposure": 1.433,
+   "pct_flat": 0.0,
+   "pct_long": 0.6356,
+   "pct_short": 0.3644,
+   "core_correlation_monthly": -0.262,
+   "n_months_aligned": 82,
+   "canon_success_gate": {
+    "sharpe_ge_0.8": false,
+    "core_corr_lt_0.5": true,
+    "cost_adjusted_positive": false,
+    "overall": false
+   },
+   "vs_study103_assumption": {
+    "Conservative": {
+     "cagr_delta_pp": -18.13,
+     "vol_delta_pp": -1.02,
+     "maxdd_delta_pp": 49.48,
+     "core_corr_delta": -0.612
+    },
+    "Base": {
+     "cagr_delta_pp": -21.13,
+     "vol_delta_pp": 1.48,
+     "maxdd_delta_pp": 54.48,
+     "core_corr_delta": -0.512
+    },
+    "Optimistic": {
+     "cagr_delta_pp": -28.13,
+     "vol_delta_pp": 3.98,
+     "maxdd_delta_pp": 57.48,
+     "core_corr_delta": -0.412
+    }
+   },
+   "closest_assumption_level": "Conservative"
+  },
+  "N60": {
+   "perf": {
+    "cagr": 0.0247,
+    "ann_vol": 0.241,
+    "sharpe": 0.102,
+    "maxdd": 0.4399,
+    "calmar": 0.056,
+    "n_years": 9.19
+   },
+   "turnover_per_year": 16.1,
+   "avg_gross_exposure": 1.437,
+   "pct_flat": 0.0,
+   "pct_long": 0.669,
+   "pct_short": 0.331,
+   "core_correlation_monthly": -0.002,
+   "n_months_aligned": 82,
+   "canon_success_gate": {
+    "sharpe_ge_0.8": false,
+    "core_corr_lt_0.5": true,
+    "cost_adjusted_positive": true,
+    "overall": false
+   },
+   "vs_study103_assumption": {
+    "Conservative": {
+     "cagr_delta_pp": -12.53,
+     "vol_delta_pp": -0.9,
+     "maxdd_delta_pp": 23.99,
+     "core_corr_delta": -0.352
+    },
+    "Base": {
+     "cagr_delta_pp": -15.53,
+     "vol_delta_pp": 1.6,
+     "maxdd_delta_pp": 28.99,
+     "core_corr_delta": -0.252
+    },
+    "Optimistic": {
+     "cagr_delta_pp": -22.53,
+     "vol_delta_pp": 4.1,
+     "maxdd_delta_pp": 31.99,
+     "core_corr_delta": -0.152
+    }
+   },
+   "closest_assumption_level": "Conservative"
+  },
+  "N120": {
+   "perf": {
+    "cagr": -0.0222,
+    "ann_vol": 0.2422,
+    "sharpe": -0.092,
+    "maxdd": 0.7006,
+    "calmar": -0.032,
+    "n_years": 8.96
+   },
+   "turnover_per_year": 13.39,
+   "avg_gross_exposure": 1.434,
+   "pct_flat": 0.0,
+   "pct_long": 0.6907,
+   "pct_short": 0.3093,
+   "core_correlation_monthly": 0.183,
+   "n_months_aligned": 82,
+   "canon_success_gate": {
+    "sharpe_ge_0.8": false,
+    "core_corr_lt_0.5": true,
+    "cost_adjusted_positive": false,
+    "overall": false
+   },
+   "vs_study103_assumption": {
+    "Conservative": {
+     "cagr_delta_pp": -17.22,
+     "vol_delta_pp": -0.78,
+     "maxdd_delta_pp": 50.06,
+     "core_corr_delta": -0.167
+    },
+    "Base": {
+     "cagr_delta_pp": -20.22,
+     "vol_delta_pp": 1.72,
+     "maxdd_delta_pp": 55.06,
+     "core_corr_delta": -0.067
+    },
+    "Optimistic": {
+     "cagr_delta_pp": -27.22,
+     "vol_delta_pp": 4.22,
+     "maxdd_delta_pp": 58.06,
+     "core_corr_delta": 0.033
+    }
+   },
+   "closest_assumption_level": "Conservative"
+  }
+ },
+ "pead_correlation": "N/A — Study82 Phase D（PEADアルファ実測）未実施のため測定不能。代替値の推定は禁止事項（PEAD alpha estimation）に該当するため実施していない。",
+ "summary": {
+  "n_arms_pass_canon_gate": 0,
+  "n_arms_total": 3,
+  "run_at": "2026-07-20T22:29:45.671157+00:00"
+ }
+}
