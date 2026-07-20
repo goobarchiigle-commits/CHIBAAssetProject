@@ -1,7 +1,33 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-19（★旧正典ロードマップ全面改定: Study74 FINAL BLACK確定・Study79 CLOSED・新CP1・Study102採番★）
-# ※研究(Study)系列は2026-07-16 Study101が最新。本セクション先頭は文書改定の記録。
+# Single Source of Truth / 最終更新: 2026-07-20（★Study103設計書完成: Portfolio Architecture Feasibility起案★）
+# ※研究(Study)系列は2026-07-16 Study101が最新（実測ベース）。Study103は設計書段階（未実装）。
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
+
+---
+
+## ★★★★★★★★★★★★★★★★★★★ 2026-07-20 Study103 — Portfolio Architecture Feasibility 設計書完成（CP2起案）
+
+**性格**: 設計書のみ（コード・BT・パラメータ探索ゼロ）。`roadmap_revision_2026-07-19.md`§6A（v1.3）の
+Study103仕様を実行可能な起案仕様まで具体化。成果物: `reports/study103_design.md`。
+
+**内容**: CP2 Primary Objective（30%ルートの反証試行）を冒頭再掲 → 対象5スリーブ（Core/MN/PEAD/
+TSMOM/SmallGrowth・固定・追加禁止）→ 各スリーブのConservative/Base/Optimistic仮定表（21指標×5、
+出典=`alternative_architectures_5x_2026-07-03.md`/`study78_ror_mc_sensitivity.md`/`study74_final_review.md`から
+機械配分）→ シナリオ凍結手続き明記 → Case A(Core included)/B(excluded)両方必須（6シナリオ全実行）→
+逆問題形式の出力様式定義 → 自動RED境界5項の発動可能性を定性評価（**sleeves≥5・avg corr<0.10が
+発動しやすいと予備判定** — トレードオフ構造: SmallGrowth含めると相関要求未達／除外するとリターン不足）→
+Falsification四原則 → 暫定CP2判定基準案（**現時点の暫定見立てはYELLOW〜RED寄り** — 正式判定ではない）。
+
+**Core仮定の遵守事項**: CAGR ConservativeはCore alpha消滅（0%）を採用。名目10-15%は永久禁止3
+「Static RSR42 performance citation」該当のため一切使用せず、Optimisticの上限もObserved PIT
+estimateの上端5%に固定（`roadmap_revision`§3のCore三行表記を仮定表へ正しく反映）。
+
+**予備的手計算（正式MC結果ではない・注意書き付きで記載）**: Base・Case A等配分の単純平均でCAGR
+概算16.9%——30%には遠く届かない方向性を示唆。ただし相関構造未考慮の粗い概算であり、正式判定は
+MC実装後。
+
+**次アクション（ASK_FIRST）**: `src/backtest/study103_portfolio_feasibility.py`新規作成 →
+6シナリオ(3水準×2ケース)fresh run → GREEN/YELLOW/RED確定 → CP2判定。
 
 ---
 
