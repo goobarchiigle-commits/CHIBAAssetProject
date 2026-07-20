@@ -1,8 +1,47 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-20（★ロードマップ凍結(v1.5.5)→Execution Phase開始・Study82 Phase0.1=CONNECTABLE(暫定)★）
+# Single Source of Truth / 最終更新: 2026-07-20（★v1.5.7: 研究目的の最終自己整合化+Study52再発防止規則+Audit1-6体系★）
 # ※ロードマップ参照は必ず reports/roadmap_v15_governance_layer.md から開始（他は全てANNEX/HISTORY/FROZEN/SUPERSEDED）
 # ※研究フェーズ = Program Phase3 Route B Assumption Validation。次アクション=Study82 Phase0本審査（実装ASK_FIRST待ち）。
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
+
+---
+
+## ★★★★★★★★★★★★★★★★★★★★★★★★★★ 2026-07-20 Roadmap v1.5.7 — 研究目的の最終自己整合化
+
+**性格**: 文書のみ。`roadmap_v15_governance_layer.md`v1.5.7 + `study82_phase0_design.md`v1.3
+（Audit1-6再編）+ `study83_proposal.md`v1.2（Proposal only明示）。
+
+**研究目的の三層再表現**:
+```
+Primary Goal   : Validate whether Study103 assumptions survive real-world constraints.
+Secondary Goal : Measure realistic ceiling of Route B.
+Optional Upside: 30% / Calmar1.5 route — Dormant.
+```
+唯一の未確定事項を単一命題化: `Do Study103 assumptions survive real-world data constraints?`
+（「Route Bは存在するか」でも「Route Bは20-25%達成できるか」でもない——Study103 Falsification
+原則の適用対象を現フェーズへ正しく延長）。
+
+**§8A-4A Study52再発防止規則（新設・重要）**: `Study103 rerun is allowed only once per major
+assumption downgrade. Repeated reruns are prohibited unless materially new evidence appears.`
+既存シナリオ凍結規定（§6A）だけでは「1つの大きなダウングレード」と「複数回の段階的すり合わせ」を
+区別できない抜け穴があったため、rerun回数そのものを制限する規則を追加。
+
+**完成度評価**: Research OS Design≈99% / Research Execution≈10-15%（完了済み: CP1・CP2・
+Study103・Goal Ladder・Route Registry・Governance Layer・Study82 Phase0.1）。
+
+**§8A-7 現時点禁止事項（明示7項）**: PEAD alpha estimation／Study83 implementation／
+new alpha studies／Route C discussion／Core retirement discussion／portfolio re-optimization／
+satellite ranking。全て時期尚早。
+
+**Study82目的の再定義（v1.3・重要）**: "PEAD works?" ではなく **"Can PEAD be researched
+without leakage?"**。監査項目を旧6項目からAudit1-6（DiscTime precision/Correction handling/
+**Missing ratio(新規)**/Delisted coverage/**Leakage possibility(場中区別+配信遅延を統合)**/
+PIT reconstruction）へ再編。PASS/FAIL判定基準もAudit番号へ更新。
+
+**§8A-8 CP3までのフロー**: Study82→Study103 assumption update(FAIL時のみ)→Route B frontier
+re-estimation(rerun発生時のみ)→Study83 Proposal→Satellite validation→CP3。
+
+**最終一文（確定）**: `Freeze roadmap. Execute Study82. Attempt to falsify Route B assumptions.`
 
 ---
 

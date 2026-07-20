@@ -1,6 +1,6 @@
 # Study82 Phase0.1 + Phase0 — 決算発表日時 API疎通確認 + 精度監査（起案書）
 
-**日付**: 2026-07-20（v1.2: FAIL帰結を§8A-1A決定木へ整合。v1.1: Phase0.1分離・UNKNOWN出力追加）
+**日付**: 2026-07-20（v1.3: 監査項目をAudit1-6体系へ再編・目的をleakage起点で再定義。v1.2: FAIL帰結を§8A-1A決定木へ整合。v1.1: Phase0.1分離・UNKNOWN出力追加）
 **性格**: 起案書のみ。**監査であって研究ではない**。アルファ探索・パラメータ推定・BTは一切含まない。
 **正典**: `roadmap_v15_governance_layer.md`§8A-1/§8A-2/Phase3詳細 / `alternative_architectures_5x_2026-07-03.md`§ARCH-B「発表日時精度監査を先行実施」。
 **位置づけ**: Route B（Core+PEAD+TSMOM）の土台であるPEADが**そもそも研究可能か**を確定する第一関門。FAILならStudy82は即終了し、Route BはCore+TSMOMの2スリーブ構成へ縮小する（frontier再測定が必要）。**§8A-2 Research Freeze Rule対象**: 本Study82完了まで、Study83実装を含む新規alpha実装/BTは一切着手しない。
@@ -25,9 +25,16 @@ Phase0.1 Determine: Can we connect to a J-Quants endpoint that carries
                      earnings announcement timestamps / financial statements?
          Output   : CONNECTABLE / NOT_CONNECTABLE / UNKNOWN
 
-Phase0   Determine: Is PEAD research possible at all (given Phase0.1=CONNECTABLE)?
+Phase0   Determine: Can PEAD be researched safely
+                     (given Phase0.1=CONNECTABLE)?
          Output   : PASS / FAIL / UNKNOWN
 ```
+
+**目的の再定義（v1.3・重要）**: Phase0の問いは「PEAD works?」（PEADは機能するか）では**ない**。
+正確には**「PEAD can be researched without leakage?」**（PEADはリーク混入なしに研究可能か）。
+「機能するか」はStudy82 Alpha Study（Phase D）の管轄——Phase0は**安全性の監査**であり、有効性の
+予備測定ではない。この区別を崩す（=監査中にアルファらしき数値へ言及する）行為はPhase0自体の
+無効化として扱う。
 
 **UNKNOWN追加の理由（v1.1）**: 従来のPASS/FAIL二値では「ドキュメント記載はあるがプラン外で実接続テストできない」「サンプル数が少なすぎて判定不能」等の中間状態を表現できなかった。UNKNOWNは**保留**を意味し、Route B構成の即時縮小はトリガーしないが、**Phase0.1/Phase0を「PASS/FAIL確定」と扱わずCP3判定を待たせる**（§8A-3のCase1-3はいずれもPEAD PASS/FAILの確定を前提とするため、UNKNOWNのまま先へ進めない）。
 
@@ -53,37 +60,43 @@ Phase0   Determine: Is PEAD research possible at all (given Phase0.1=CONNECTABLE
 
 ---
 
-## 2. Phase0 必須監査項目（6項・固定・追加禁止・Phase0.1=CONNECTABLE後のみ実施）
+## 2. Phase0 必須監査項目（Audit1-6・v1.3再編・固定・追加禁止・Phase0.1=CONNECTABLE後のみ実施）
+
+**再編方針（v1.3）**: 旧項目1-6を、判定意図がより明確な6項目（Audit1-6）へ再構成。「Missing ratio」を
+新規追加（定量的完全性チェックの欠落を補完）・旧「場中/引後区別」「配信遅延」は共に**leakage
+（リーク混入）の下位問題**として`Audit5`へ統合し、監査の核心が「leakageの有無」であることを明示。
 
 | # | 項目 | 判定基準 |
 |---|---|---|
-| 1 | 発表日時粒度 | 分単位まで取得可能か。日付のみ（時刻欠落）ならFAIL相当の重大欠陥 |
-| 2 | 場中/前場/後場/引け後区別 | 場中発表と引け後発表を判別できるフィールドが存在するか（執行タイミングの根拠に必須） |
-| 3 | 訂正開示の扱い | 一度公表された決算の訂正・修正が別レコードとして記録され、初回発表と混同しない設計か |
-| 4 | 配信遅延 | 発表時刻とデータベース記録時刻（取得可能なら）の乖離。遅延がPIT保証を壊す規模か |
-| 5 | PIT保証 | 「発表翌営業日寄付エントリー」の前提が成立するか — 発表時刻から翌営業日寄付までに情報が確実に公開されている構造か（lookahead混入経路の有無） |
-| 6 | 廃止銘柄整合性 | 上場廃止銘柄の決算データが欠落なく含まれるか（欠落=survivorship bias再混入） |
+| **Audit1** | DiscTime precision | `DiscTime`が分単位まで意味のある精度を持つか。定型値（例: 一律"12:00:00"のような機械的デフォルト）ならFAIL相当の重大欠陥 |
+| **Audit2** | Correction handling | 訂正・修正開示が`TypeOfDocument`/`DisclosureNumber`等により初回発表と区別可能な別レコードとして記録されるか |
+| **Audit3** | Missing ratio | サンプル対象銘柄・四半期のうち`DiscDate`/`DiscTime`が欠損しているレコードの比率。高比率はPIT再構成の信頼性を損なう |
+| **Audit4** | Delisted coverage | 上場廃止銘柄の決算データが欠落なく含まれるか（欠落=survivorship bias再混入） |
+| **Audit5** | Leakage possibility | 場中/引け後の区別可否・配信遅延（発表時刻とAPI反映時刻の乖離）を含め、「発表翌営業日寄付エントリー」の前提を破ってlookaheadが混入し得る経路の有無を総合評価 |
+| **Audit6** | Point-in-Time reconstruction | Audit1-5の結果を踏まえ、「時点Tにおいて何が公知だったか」を過去に遡って正しく再構成できるか（PIT保証の最終確認） |
 
-## 3. Phase0 PASS/FAIL/UNKNOWN判定基準（事前固定・v1.1でUNKNOWN追加）
+## 3. Phase0 PASS/FAIL/UNKNOWN判定基準（事前固定・v1.3でAudit番号へ更新）
 
 ```
-PASS    ⇔ 項目1(分単位) ∧ 項目2(区別可能) ∧ 項目5(PIT保証成立) ∧ 項目6(廃止銘柄含む)
-          が全て満たされる。項目3・4は付随所見として記録するが単独ではFAILとしない
-          （訂正開示・配信遅延はイベントスタディ設計側で対処可能なため）。
+PASS    ⇔ Audit1(分単位精度) ∧ Audit5(leakage経路なし) ∧ Audit6(PIT再構成可能) ∧
+          Audit4(廃止銘柄含む) が全て満たされる。Audit2・Audit3は付随所見として記録するが
+          単独ではFAILとしない（訂正開示・欠損率はイベントスタディ設計側でフィルタ/除外
+          対処が可能なため）。
 
-FAIL    ⇔ 項目1・2・5・6のいずれか1つでも「不成立」と明確に確認できる。
+FAIL    ⇔ Audit1・Audit4・Audit5・Audit6のいずれか1つでも「不成立」と明確に確認できる。
           FAIL時は`roadmap_v15_governance_layer.md`§8A-1A Study82 FAIL決定木を適用する
           （現行データソースでの本Study82再訪は禁止・将来別データソースが利用可能になった
           場合のみ再起案可）: PEAD assumptions downgraded（配分上限0%への完全ダウングレード）
-          → Study103 assumptions rerun → Route B frontier re-estimation →
-          B confirmed/degraded/A promotedのいずれか。**「Route Bの死亡」ではなく
-          「PEADの死亡」** — Core+TSMOMでTier2/Tier1が残る可能性は排除しない。
+          → Study103 assumptions rerun（§8A-4A Study52再発防止規則=major downgrade毎に1回のみ）
+          → Route B frontier re-estimation → B confirmed/degraded/A promotedのいずれか。
+          **「Route Bの死亡」ではなく「PEADの死亡」** — Core+TSMOMでTier2/Tier1が残る
+          可能性は排除しない。
 
-UNKNOWN ⇔ 項目1・2・5・6のいずれかについて、サンプル不足・ドキュメント不備・
+UNKNOWN ⇔ Audit1・Audit4・Audit5・Audit6のいずれかについて、サンプル不足・ドキュメント不備・
           API仕様の解釈不能等により成立/不成立を確認できない。
           UNKNOWN時はPASS/FAILいずれも確定させず、不明点を明記した上でStudy82を保留する
           （§8A-3のCP3ケース分岐はPEAD PASS/FAILの確定を前提とするため、UNKNOWNのままでは
-          Route B Viability Reviewへ進めない）。
+          次段階へ進めない）。
 ```
 
 ## 4. データソース候補（現状確認済み事実）
@@ -96,17 +109,17 @@ UNKNOWN ⇔ 項目1・2・5・6のいずれかについて、サンプル不足�
 ```
 **決算発表日時・財務諸表エンドポイントは未疎通**（本監査で初めて確認する）。`alternative_architectures_5x`原文が要求するデータ源は「J-Quants（決算発表日時・財務諸表・会社予想）+ TDnet適時開示」——J-Quants Standardプラン（契約済み・`research_state.md` 2026-07-09ログ）に財務諸表エンドポイントが含まれるかは**未確認**。TDnetは別データ源（現行未契約・未実装）。
 
-**本監査の実施範囲（重要な絞り込み）**: J-Quants側のエンドポイント確認・少数サンプル取得・項目1-6評価をまず行う。TDnetは、J-Quants側で項目1-2-5-6を満たせない場合の代替候補として検討するが、**新規データソース契約はASK_FIRST**（CLAUDE.md `ASK_FIRST`該当：新規スクリプト作成/契約級の変更）のため、本Phase0では「TDnet必要性の有無」を出力するに留め、契約自体は別途提案する。
+**本監査の実施範囲（重要な絞り込み）**: J-Quants側のエンドポイント確認・少数サンプル取得・Audit1-6評価をまず行う。TDnetは、J-Quants側でAudit1・4・5・6を満たせない場合の代替候補として検討するが、**新規データソース契約はASK_FIRST**（CLAUDE.md `ASK_FIRST`該当：新規スクリプト作成/契約級の変更）のため、本Phase0では「TDnet必要性の有無」を出力するに留め、契約自体は別途提案する。
 
 ## 5. 実施手順（最小限・監査に徹する）
 
 ```
 1. J-Quants API仕様（財務諸表/決算発表関連エンドポイントの有無）を公式ドキュメントで確認
 2. エンドポイントが存在すれば、小サンプル（直近1-2四半期・数十銘柄）を取得し
-   項目1-6を実データで検証
-3. エンドポイントが存在しない、または項目1-2-5-6のいずれかを満たさない場合、
+   Audit1-6を実データで検証
+3. エンドポイントが存在しない、またはAudit1・4・5・6のいずれかを満たさない場合、
    TDnet併用の要否を判定材料として記録した上でFAIL
-4. 結果を reports/study82_phase0_audit.md へPASS/FAILと6項目の実測所見のみで記録
+4. 結果を reports/study82_phase0_audit.md へPASS/FAIL/UNKNOWNとAudit1-6の実測所見のみで記録
    （サプライズ率・リターン等のアルファ関連数値は算出しない — 目的外）
 ```
 

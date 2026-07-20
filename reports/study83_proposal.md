@@ -1,10 +1,18 @@
 # Study83 Proposal — 指数TSMOM 情報価値評価（起案書・実装なし）
 
 **日付**: 2026-07-20（v1.1: §8A-2 Research Freeze Rule反映）
-**★実装凍結告知（v1.1）**: `roadmap_v15_governance_layer.md`§8A-2「Research Freeze Rule」により、
+**★実装凍結告知（v1.2: Proposal only明示・v1.1: Freeze Rule反映）**: `roadmap_v15_governance_layer.md`§8A-2「Research Freeze Rule」により、
 **Study82完了（PASS/FAIL確定）までStudy83の実装（新規BT・新規スクリプト）は着手しない**。
 本書§3で示した「データ独立のため並行着手も選択肢」は本ルールにより**上書き・凍結**。
 本Proposal文書自体（改訂含む）はFreeze Rule対象外（BT・コード・データ取得を伴わないため）。
+
+```
+Proposal only.
+× implementation
+× backtest
+× optimization
+```
+（§8A-7「現時点で禁止される事項」と同型。本書はこの制約下で作成された文書である）
 **性格**: **起案書のみ**。「まだ実装しない」——本書はStudy83実装可否をユーザーが判断するための事前評価。BT・コード・データ取得は一切実施しない。
 **正典**: `roadmap_v15_governance_layer.md`§8A Phase B / `alternative_architectures_5x_2026-07-03.md`§ARCH-C / `study103_design.md`§3.4（TSMOM仮定表）。
 **位置づけ**: Route Bのもう一方の柱。Study103仮定表（文献レンジからの機械配分）を実装判断可能な精度まで具体化する。

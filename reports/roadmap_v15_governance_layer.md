@@ -311,17 +311,42 @@ Case3: PEAD PASS ∧ TSMOM >> assumption  → Route C reactivation review（§8A
 細かい仕様化が必要。Study82/Study83実測結果が出た時点で、Study103の判定統計量（median CAGR/Calmar/
 MaxDD/RoR）と同型の形式で改めて固定する。
 
-### §8A-4 当面の研究目的（改定・v1.5.4）
+### §8A-4 当面の研究目的（v1.5.7で再確定・最終表現）
 
 ```
-旧: 30% / Calmar1.5
-
-新:
-Primary  : Determine the achievable ceiling of Route B.
-Secondary: Monitor conditions that may justify reactivating Route C.
+Primary Goal    : Validate whether Study103 assumptions survive real-world constraints.
+Secondary Goal  : Measure realistic ceiling of Route B.
+Optional Upside : 30% / Calmar1.5 route — Dormant.
 ```
 
-（§8A初版のPrimary/Secondary文言と同一趣旨・本節で正式表現として確定）
+**重要な区別（v1.5.7・falsification原則の適用範囲確定）**: 現フェーズの核心は「Route Bは存在するか
+（Route B exists?）」でも「Route Bは20-25%を達成できるか（Can Route B achieve 20-25%?）」でもない。
+正式には**「Study103で採用したRoute Bの前提が、現実データでも維持可能か（survive）を反証しに行く
+フェーズ」**——これまでのFalsification原則（Study103 Primary Objective）と完全に整合する適用対象の
+延長。旧Primary/Secondary文言（Determine ceiling / Monitor Route C conditions）は本節で上記へ置換。
+
+**唯一の未確定事項（v1.5.7で単一命題化）**:
+```
+Do Study103 assumptions survive real-world data constraints?
+```
+これ以外の問い（Route Bは20-25%を達成できるか等）は本フェーズのスコープ外——Route B Ceiling
+Measurement（Phase4）まで持ち越す。
+
+### §8A-4A Study52再発防止規則（v1.5.7新設・Study103 rerun制限）
+
+既存のシナリオ凍結規定（§6A: 新版採番+新規ASK_FIRST+full rerun）に**追加**する形で、以下を固定する:
+
+```
+Study103 rerun is allowed only once per major assumption downgrade.
+Repeated reruns are prohibited unless materially new evidence appears.
+```
+
+**防止したい事態（Study52型の再演）**: 「PEAD少し悪化→再実行→もう少し悪化→再実行→さらに調整→
+再実行」という段階的すり合わせ。これは既存のシナリオ凍結規定（1回の変更=1回のfull rerun）だけでは
+「1つの大きなダウングレード」と「複数回の小さな調整」を区別できず、後者が形式上ルールを満たしながら
+実質的な延命探索になり得る抜け穴だった。本規則により、1つのmajor assumption downgrade（例:
+Study82 FAILによるPEAD配分上限0%化）につきrerunは1回のみとし、再度のrerunには「実質的に新しい
+証拠（materially new evidence）」の提示を要求する——単なる数値の微調整は該当しない。
 
 **フェーズ転換宣言**: 「新しい夢を探すフェーズ」から「**Route Bの実力上限を定量化するフェーズ**」へ正式移行。
 
@@ -395,30 +420,88 @@ Capital Route（Study74で終了・恒久）
 Route C延命研究（再起動条件A/B/C以外での議論禁止）
 ```
 
-### 優先順位（確定・v1.5.5・6段固定）
+### 優先順位（確定・v1.5.7・6段固定）
 
 ```
-第1優先: Study82 Phase0.1（J-Quants API疎通確認）— 情報価値最大。着手中
-第2優先: Study82 Phase0（決算日時精度監査・PASS/FAIL/UNKNOWN出力のみ・アルファ測定は絶対に行わない）
-第3優先: Study103 assumption rerun（if necessary・§8A-1A決定木適用時のみ発動。Study82結果が
-         PASSでStudy103仮定と整合すれば本項はスキップ）
-第4優先: Study83 Proposal（文書のみ・実装禁止・BT禁止 — ここまでは許容）
-第5優先: Study83 Implementation（Study82完了後のみ・§8A-2 Research Freeze Rule）
+第1優先: Study82 Phase0 本監査 — 完了済みはPhase0.1のみ。目的の再定義（v1.5.7・重要）:
+         "Can PEAD be researched safely?"（PEADは機能するか、ではない）
+         正確には "Can PEAD be researched without leakage?"
+         Audit1-6体系（§Study82設計書v1.3参照）・出力はPASS/FAIL/UNKNOWNのみ
+第2優先: 決定木の機械適用（§8A-1A）:
+         PASS → Study103 assumptions survive → Study83 Proposalへ
+         FAIL → PEAD assumptions downgraded → Study103 assumptions rerun（§8A-4A規則適用）
+                → Route B frontier re-estimation → B confirmed/degraded/A promoted
+         **PEAD FAIL ≠ Route B FAIL**（重要な区別・不変）
+第3優先: Study83 Proposal（**Proposal only**。禁止: × implementation × backtest × optimization）
+第4優先: Study83 Implementation（Study82完了後のみ・§8A-2 Research Freeze Rule）
+第5優先: Satellite validation
 第6優先: CP3 最終評価
 
 Core CP3審査は急がない（Core weight=0%は仮定表上の最適解にすぎず生死は実測でのみ判定可能）。
+現時点で禁止される事項の全リストは§8A-7参照。
 ```
 
-### §8A-5 ロードマップ凍結宣言（v1.5.5）
+### §8A-5 ロードマップ凍結宣言（v1.5.7で最終表現確定）
 
 ```
-Freeze roadmap. Execute Study82.
+Freeze roadmap.
+Execute Study82.
+Attempt to falsify Route B assumptions.
 ```
 
-Research OS Design フェーズ（v1.0-v1.5.5・本日2026-07-20に渡り実施）は本改版をもって終了。
+Research OS Design フェーズ（v1.0-v1.5.5・本日2026-07-20に渡り実施）は完了済み。
 以後は**Research Execution フェーズ**——ロードマップそのものの議論・最適化は行わず、上記優先順位
 通りに実行する。ロードマップへの追加改版は、Study82/83/CP3の**実測結果を反映する場合のみ**行う
 （計画の最適化それ自体を目的化しない）。
+
+### §8A-6 完成度（v1.5.7・現状評価）
+
+```
+Research OS Design   : ≈99%
+Research Execution   : ≈10-15%
+```
+
+**Execution完了済み項目（チェックリスト）**:
+```
+✓ CP1（Expectation Reset）
+✓ CP2（Study103・RED判定）
+✓ Study103（実装+実行+結果確定）
+✓ Goal Ladder（Sweep機構含む）
+✓ Route Registry（乱立解消・単一正典化）
+✓ Governance Layer（v1.5.x全体）
+✓ Study82 Phase0.1（API疎通・CONNECTABLE暫定）
+```
+
+**残っているもの**: Route B validation（Study82本審査）・Satellite validation（Study83）・CP3。
+
+### §8A-7 現時点で禁止される事項（v1.5.7・明示列挙）
+
+```
+× PEAD alpha estimation      （Study82は監査のみ・アルファ測定は含まない・不変）
+× Study83 implementation      （Study82完了までFreeze Rule対象・不変）
+× New alpha studies           （新規スリーブ探索は不可）
+× Route C discussion          （再起動条件A/B/C成立まで再議論禁止・不変）
+× Core retirement discussion  （CP3前の議論は時期尚早——Study103のCore weight=0%は弱い証拠のみ）
+× Portfolio re-optimization   （Study103仮定表・配分グリッドは凍結済み・変更禁止）
+× Satellite ranking           （暫定順位表はCP2結果を受けた参考情報に留め、正式な優先度決定は
+                                Study82/83実測後）
+```
+
+### §8A-8 CP3までの流れ（v1.5.7・フローチャート）
+
+```
+Study82
+  ↓
+Study103 assumption update（PASS時は不要・FAIL時のみ§8A-1A決定木を適用）
+  ↓
+Route B frontier re-estimation（rerun発生時のみ）
+  ↓
+Study83 Proposal
+  ↓
+Satellite validation（Study83 Implementation・Study82完了後）
+  ↓
+CP3 最終まとめ
+```
 
 ---
 
@@ -431,10 +514,12 @@ Core         : Intrinsic alpha UNKNOWN
                Confidence LOW
 Universe     : Rebuilding（Universe-A確定 / Universe-B未生成）
 Current Phase: **Ceiling Measurement Phase**（Program Phase3・Study82 Phase0.1起案完了・承認待ち）
-Route Status : B=Candidate / A=Standby(Graceful Degradation Path) / C=DORMANT / F=TERMINAL
-30% Route    : DORMANT（§8A-1 Route C再起動条件A/B/C成立まで）
+Route Status : B=Candidate(Mission=Assumption validation) / A=Standby(Graceful Degradation Path)
+               / C=DORMANT / F=TERMINAL
+30% Route    : Optional Upside — DORMANT（§8A-1 Route C再起動条件A/B/C成立まで）
 Freeze Rule  : No new alpha impl/BT until Study82完了（§8A-2）
 Study82      : Phase0.1=CONNECTABLE（暫定・ドキュメント調査完了）→ Phase0本審査は新規実装ASK_FIRST待ち
+Completion   : Research OS Design ≈99% / Research Execution ≈10-15%（§8A-6）
 ```
 
 ### §9A CP2判定確定（Study103実行結果・2026-07-20）
@@ -491,6 +576,7 @@ Study95でMN期待値が低下した結果、PEAD/TSMOMの相対順位が上が�
 | 版 | 日付 | 内容 |
 |---|---|---|
 | v1.0-v1.4 | 2026-07-19/20 | `roadmap_revision_2026-07-19.md`§改版履歴参照（HISTORY） |
+| **v1.5.7** | 2026-07-20 | **最終自己整合化（ユーザー補正・Execution Phase定着）**: Primary/Secondary/Optional Upside三層に研究目的を再表現（Primary=Study103仮定が現実データで生存するか検証・Secondary=Route B現実的上限測定・Optional Upside=30%/1.5はDormant） / 唯一の未確定事項を単一命題化（`Do Study103 assumptions survive real-world data constraints?`） / **§8A-4A Study52再発防止規則新設**（Study103 rerunはmajor assumption downgrade毎に1回のみ・段階的すり合わせ型rerun禁止・materially new evidence必須） / §8A-6完成度評価（Design≈99%/Execution≈10-15%・完了チェックリスト） / §8A-7現時点禁止事項の明示列挙（7項） / §8A-8 CP3までのフローチャート / Study82目的を"PEAD works?"から**"Can PEAD be researched without leakage?"**へ再定義・監査項目をAudit1-6体系へ再編（`study82_phase0_design.md`v1.3で反映）/ 優先順位の文言をPASS/FAIL決定木の機械適用として明確化・「PEAD FAIL≠Route B FAIL」を再強調 / 最終一文確定: `Freeze roadmap. Execute Study82. Attempt to falsify Route B assumptions.` |
 | v1.5.6 | 2026-07-20 | **Study82 Phase0.1実行**（読み取り調査のみ・ロードマップ議論なし=Execution Phase初回実行）: `/fins/summary`エンドポイントの存在・現行Standardプラン内・DiscTime等の関連フィールドを公式ドキュメントで確認。判定=**CONNECTABLE（暫定）**。詳細→`reports/study82_phase0_1_result.md`。次アクション=Phase0本審査（実データ検証・新規実装）はASK_FIRST待ち |
 | **v1.5.5** | 2026-07-20 | **ロードマップ凍結（Research OS Design→Research Execution移行）**: ACTIVE表記廃止→**Route B (Candidate)**へ改称（採択済み誤認防止）/ Research Status=**Route B Assumption Validation Phase** / Route A=**Graceful Degradation Path**として明示 / **§8A-1A Study82 FAIL決定木新設**（旧「即Route A」を誤りとして訂正——正式には PEAD assumptions downgraded→Study103 assumptions rerun→B confirmed/degraded/A promotedの3分岐。Phase0監査FAILとPhase Dアルファ弱結果を同一下流処理に統合） / CP3正式条件は**未決事項として明記**（詳細確定は将来課題） / Route F Trigger Eは将来課題のまま維持 / 残存Unknown3点を明記（PEAD=Study82・TSMOM=Study83・Core=CP3） / 優先順位6段化（Study103 assumption rerun・CP3最終評価を追加） / **Freeze roadmap. Execute Study82.**宣言 |
 | **v1.5.4** | 2026-07-20 | **Route状態マトリクス正式化**（B=ACTIVE/Frontier Validation Phase・A=STANDBY削除禁止・C=DORMANT・F=TERMINAL、各起動/再起動条件を表で固定）/ **Research Freeze Rule新設**（Study82完了までStudy83実装含む新規alpha実装/BT一切禁止・Proposal文書のみ許容・study83_proposalの並行着手選択肢を上書き凍結）/ **CP3ケース分岐**（Case1=PEAD PASS∧TSMOM GOOD→Route B confirmed / Case2=PEAD FAIL→Route A promotion / Case3=PEAD PASS∧TSMOM超過→Route C reactivation review）/ 研究目的の正式表現確定 / **Program Phase0-5**マクロ工程表新設（0-2完了・3=現在地・4=CP3・5=最終状態決定）/ **Study82をPhase0.1（API疎通確認）とPhase0（日時監査）に分割**・出力にUNKNOWN追加 / 優先順位5段固定（0.1→0→Viability Review→83Proposal→83実装） |
