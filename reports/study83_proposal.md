@@ -1,6 +1,10 @@
 # Study83 Proposal — 指数TSMOM 情報価値評価（起案書・実装なし）
 
-**日付**: 2026-07-20
+**日付**: 2026-07-20（v1.1: §8A-2 Research Freeze Rule反映）
+**★実装凍結告知（v1.1）**: `roadmap_v15_governance_layer.md`§8A-2「Research Freeze Rule」により、
+**Study82完了（PASS/FAIL確定）までStudy83の実装（新規BT・新規スクリプト）は着手しない**。
+本書§3で示した「データ独立のため並行着手も選択肢」は本ルールにより**上書き・凍結**。
+本Proposal文書自体（改訂含む）はFreeze Rule対象外（BT・コード・データ取得を伴わないため）。
 **性格**: **起案書のみ**。「まだ実装しない」——本書はStudy83実装可否をユーザーが判断するための事前評価。BT・コード・データ取得は一切実施しない。
 **正典**: `roadmap_v15_governance_layer.md`§8A Phase B / `alternative_architectures_5x_2026-07-03.md`§ARCH-C / `study103_design.md`§3.4（TSMOM仮定表）。
 **位置づけ**: Route Bのもう一方の柱。Study103仮定表（文献レンジからの機械配分）を実装判断可能な精度まで具体化する。
@@ -61,7 +65,7 @@ Study103 MC結果（`reports/study103_portfolio_feasibility.md`）でBase水準�
 - Study103 MCで既にRoute B主要構成要素として組み込まれている（Conservative水準で20%配分）
 - ただし相関仮定が全て未実測のため、Study83実装の主目的は「アルファの発見」ではなく「**Study103仮定の検証**」に近い——期待情報価値は「Route B frontierがどれだけ動くか」に直結する
 
-**実装時期の推奨**: Study82 Phase0のPASS/FAIL確定後。理由はPhase0結果によりRoute B構成そのもの（3スリーブか2スリーブか）が変わり得るため、TSMOM実装の優先度・検証設計（PEADとの相関測定を含むか否か）が変わる。ただしTSMOMはデータ独立（`alternative_architectures_5x`原文「並行可・最安」）のため、**Study82 Phase0と並行着手は妨げない**——v15§6のconcurrent studies≤2枠内で両者を同時に走らせることも選択肢（ユーザー決裁）。
+**実装時期（v1.1確定・§8A-2 Research Freeze Ruleにより裁量なし）**: Study82完了（PASS/FAIL確定）後のみ。~~ただしTSMOMはデータ独立のため並行着手も妨げない~~ → **この選択肢は凍結**。理由: Phase0結果によりRoute B構成そのもの（3スリーブか2スリーブか）が変わり得るため、TSMOM実装の優先度・検証設計（PEADとの相関測定を含むか否か）が変わる。データ独立性はコスト面の利点であって着手順序を早める根拠にはならない——優先順位表（v15§8A・5段固定）通りStudy82 Phase0.1→Phase0→Viability Review→Study83Proposal→Study83実装の順を厳守する。
 
 ---
 

@@ -1,8 +1,46 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-20（★Post-CP2 Focus確定+Study82 Phase0/Study83 Proposal起案★）
+# Single Source of Truth / 最終更新: 2026-07-20（★v1.5.4: Route状態マトリクス+Research Freeze Rule確定★）
 # ※ロードマップ参照は必ず reports/roadmap_v15_governance_layer.md から開始（他は全てANNEX/HISTORY/FROZEN/SUPERSEDED）
-# ※研究フェーズ = Ceiling Measurement Phase（Route B実力上限の定量化）。30% RouteはDORMANT。
+# ※研究フェーズ = Program Phase3 Route B Validation。次アクション=Study82 Phase0.1（API疎通確認）。
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
+
+---
+
+## ★★★★★★★★★★★★★★★★★★★★★★★★ 2026-07-20 Roadmap v1.5.4 — Route状態マトリクス + Research Freeze Rule確定
+
+**性格**: 文書のみ（BT・コード・データ取得なし）。`roadmap_v15_governance_layer.md`v1.5.4改版 +
+`study82_phase0_design.md`v1.1（Phase0.1分離+UNKNOWN追加）+ `study83_proposal.md`v1.1（Freeze Rule反映）。
+
+**正式状態確定**: Research Status=Ceiling Measurement Phase / Primary Route=B / Fallback=A(STANDBY・
+削除禁止) / Dormant=C / Terminal=F。**Route Aは閉鎖しない**（Study103でTier2/Tier1共にGREENのため
+B→A→Fの縮退経路自体が研究OSの安定性を構成する）。
+
+**Route状態マトリクス**:
+- B=ACTIVE（正確にはRoute B Frontier Validation Phase・PEAD=existence unknown・TSMOM=assumption only）
+- A=STANDBY（起動条件OR: Study82 FAIL／Route B upper bound劣化／連続2年次無採用）
+- C=DORMANT（既定の再起動条件A/B/C不変）
+- F=TERMINAL（既定の5トリガー不変）
+
+**Research Freeze Rule（新設・重要）**: `No new alpha implementations or backtests may be initiated
+until Study82 determines whether Route B remains viable. Proposal documents only are allowed.`
+Study83実装（新規BT）はStudy82完了までは着手しない——旧提案書にあった「データ独立ゆえ並行着手可」の
+選択肢はこのルールにより上書き・凍結（`study83_proposal.md`v1.1で反映済み）。
+
+**CP3ケース分岐**: Case1=PEAD PASS∧TSMOM GOOD→Route B confirmed / Case2=PEAD FAIL→Route A promotion /
+Case3=PEAD PASS∧TSMOM実測が仮定を大幅超過→Route C reactivation review（再起動そのものではなく
+レビュー起動）。
+
+**Program Phase0-5**: 0=Core reset✓ / 1=30% route falsification✓ / 2=Portfolio frontier measurement✓
+→CP2 RED / **3=Route B validation（現在地）** / 4=Route B ceiling update(CP3) / 5=最終状態A/B/C/F決定。
+
+**Study82分割（Phase0.1新設）**: 従来のPhase0（6項目監査）の前段として**Phase0.1（API疎通確認）**を
+新設・最優先化。出力にPASS/FAILへ加え**UNKNOWN**を追加（判定不能時の保留状態・Route B構成変更は
+トリガーしないがCP3ケース分岐へは進めない）。Phase0.1判定=CONNECTABLE/NOT_CONNECTABLE/UNKNOWN。
+
+**優先順位5段固定**: ①Study82 Phase0.1（API疎通・情報価値最大）②Study82 Phase0（日時監査・
+PASS/FAIL/UNKNOWN・アルファ測定は絶対禁止）③Route B Viability Review④Study83 Proposal（文書のみ）
+⑤Study83 Implementation（Study82 PASS後のみ）。Study83実装・新アルファ探索・Route C再検討は
+現時点で全て時期尚早。
 
 ---
 
