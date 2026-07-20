@@ -73,6 +73,10 @@ def raw_records_to_frame(records: list[dict]) -> pd.DataFrame:
 DAILY_BARS_PATH = "/v2/equities/bars/daily"   # 確認済み: code+date/code+from-to/date単独 いずれも200
 TOPIX_PATH = "/v2/indices/bars/daily"          # 確認済み: code="0000"+date/from-to で200
 LISTED_INFO_PATH = "/v2/equities/master"       # 確認済み: code指定で200・data配下1件（2026-07-09追加確認）
+# Study82 Phase0.1（2026-07-20公式ドキュメント調査・reports/study82_phase0_1_result.md）で存在確認。
+# 実APIパスはv1想定の "/fins/statements" ではなくv2体系のため未実測 — 以下は候補。
+# get_fins_summary() 初回呼び出し時に実パスをスモークテストで確認すること（Study82 Phase0本審査の一部）。
+FINS_SUMMARY_PATH_CANDIDATES = ("/v2/fins/summary", "/fins/summary")
 _LIST_KEY = "data"
 
 
@@ -116,6 +120,45 @@ class JQuantsProvider:
         """TOPIXをDataFrame化（列名リネームなし）。"""
         records = self.topix_raw(from_date, to_date)
         return raw_records_to_frame(records)
+
+    def get_fins_summary(
+        self, code: str = "", date_from: str = "", date_to: str = "", date: str = "",
+    ) -> tuple[list[dict], str]:
+        """
+        決算短信サマリ（発表日時・業績数値）生レコード取得（Study82 Phase0監査専用・列名リネームなし）。
+        code と (date_from/date_to または date) の少なくとも一方の組み合わせを指定すること
+        （J-Quants API共通の慣例に倣う・詳細はv2実APIスモークテストで確認）。
+
+        戻り値: (records, resolved_path)。resolved_path はどの候補パスで疎通できたかを示す
+        （FINS_SUMMARY_PATH_CANDIDATES を順に試し、200が返った最初のパスを採用・キャッシュしない
+        — Phase0監査は都度実測することが目的のため）。
+
+        監査専用メソッド: raw responseをそのまま返す（正規化・列選別なし・raw/processed分離原則）。
+        Production判定・アルファ計算には使用しないこと（本Study82の禁止事項）。
+        """
+        params: dict[str, str] = {}
+        if code:
+            params["code"] = code
+        if date:
+            params["date"] = date
+        else:
+            if date_from:
+                params["from"] = date_from
+            if date_to:
+                params["to"] = date_to
+
+        last_error: JQuantsAPIError | None = None
+        for path in FINS_SUMMARY_PATH_CANDIDATES:
+            try:
+                records = list(self.client.get_paginated(path, params, list_key=_LIST_KEY))
+                return records, path
+            except JQuantsAPIError as e:
+                last_error = e
+                logger.info("[JQUANTS_PROVIDER] get_fins_summary: path=%s 疎通失敗 (%s)・次の候補を試行", path, e)
+                continue
+        raise JQuantsAPIError(
+            f"get_fins_summary: 候補パス全滅（{FINS_SUMMARY_PATH_CANDIDATES}）: {last_error}"
+        )
 
     def detect_subscription_floor(self) -> str | None:
         """

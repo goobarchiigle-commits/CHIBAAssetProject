@@ -470,9 +470,11 @@ Research Execution   : ≈10-15%
 ✓ Route Registry（乱立解消・単一正典化）
 ✓ Governance Layer（v1.5.x全体）
 ✓ Study82 Phase0.1（API疎通・CONNECTABLE暫定）
+✓ Study82 Phase0（実データ監査・PASS確定・2026-07-20）
 ```
 
-**残っているもの**: Route B validation（Study82本審査）・Satellite validation（Study83）・CP3。
+**残っているもの**: Study83 Proposal評価・Satellite validation（Study83実装）・CP3。
+**Unknown #1（PEAD PIT研究可能か）解消**: PASS（`reports/study82_phase0_report.md`）。
 
 ### §8A-7 現時点で禁止される事項（v1.5.7・明示列挙）
 
@@ -518,8 +520,10 @@ Route Status : B=Candidate(Mission=Assumption validation) / A=Standby(Graceful D
                / C=DORMANT / F=TERMINAL
 30% Route    : Optional Upside — DORMANT（§8A-1 Route C再起動条件A/B/C成立まで）
 Freeze Rule  : No new alpha impl/BT until Study82完了（§8A-2）
-Study82      : Phase0.1=CONNECTABLE（暫定・ドキュメント調査完了）→ Phase0本審査は新規実装ASK_FIRST待ち
-Completion   : Research OS Design ≈99% / Research Execution ≈10-15%（§8A-6）
+Study82      : **Phase0 = PASS（実データ検証・n=83・2026-07-20実行完了）**
+               → §8A-1A決定木適用: Study103 rerun不要・Study83 Proposalへ進行可
+Freeze Rule  : **解除条件成立**（Study82完了）。Study83実装への着手は別途ユーザー判断
+Completion   : Research OS Design ≈99% / Research Execution ≈15-20%（Study82完了で上振れ）
 ```
 
 ### §9A CP2判定確定（Study103実行結果・2026-07-20）
@@ -576,6 +580,7 @@ Study95でMN期待値が低下した結果、PEAD/TSMOMの相対順位が上が�
 | 版 | 日付 | 内容 |
 |---|---|---|
 | v1.0-v1.4 | 2026-07-19/20 | `roadmap_revision_2026-07-19.md`§改版履歴参照（HISTORY） |
+| v1.5.8 | 2026-07-20 | **Study82 Phase0実行完了（実測反映・governance許容改定）**: `src/jquants/provider.py::get_fins_summary()`新規実装+`src/scripts/study82_phase0_audit.py`実行（n=83・`/v2/fins/summary`）。Audit1-6全PASS（DiscTime実測12種の時刻分布で場中/引後判別可能・DocType+DiscNoで訂正開示区別可能かつ実データにも修正開示13件実在・廃止銘柄29件取得）。**Study82 = PASS確定**。実データでv1想定フィールド名`TypeOfDocument`/`DisclosureNumber`は実在せず実際は`DocType`/`DiscNo`と判明（他エンドポイントと同型のv1/v2乖離）。留保: `from`/`to`パラメータ不機能の疑い（1コードで全履歴約10年分が返る）・Audit4は業績予想修正のみ確認（決算数値自体の訂正は本サンプル未確認）。§8A-1A決定木適用: Study103 rerun不要→Study83 Proposalへ進行可（実装着手は別途判断）。詳細→`reports/study82_phase0_report.md` |
 | **v1.5.7** | 2026-07-20 | **最終自己整合化（ユーザー補正・Execution Phase定着）**: Primary/Secondary/Optional Upside三層に研究目的を再表現（Primary=Study103仮定が現実データで生存するか検証・Secondary=Route B現実的上限測定・Optional Upside=30%/1.5はDormant） / 唯一の未確定事項を単一命題化（`Do Study103 assumptions survive real-world data constraints?`） / **§8A-4A Study52再発防止規則新設**（Study103 rerunはmajor assumption downgrade毎に1回のみ・段階的すり合わせ型rerun禁止・materially new evidence必須） / §8A-6完成度評価（Design≈99%/Execution≈10-15%・完了チェックリスト） / §8A-7現時点禁止事項の明示列挙（7項） / §8A-8 CP3までのフローチャート / Study82目的を"PEAD works?"から**"Can PEAD be researched without leakage?"**へ再定義・監査項目をAudit1-6体系へ再編（`study82_phase0_design.md`v1.3で反映）/ 優先順位の文言をPASS/FAIL決定木の機械適用として明確化・「PEAD FAIL≠Route B FAIL」を再強調 / 最終一文確定: `Freeze roadmap. Execute Study82. Attempt to falsify Route B assumptions.` |
 | v1.5.6 | 2026-07-20 | **Study82 Phase0.1実行**（読み取り調査のみ・ロードマップ議論なし=Execution Phase初回実行）: `/fins/summary`エンドポイントの存在・現行Standardプラン内・DiscTime等の関連フィールドを公式ドキュメントで確認。判定=**CONNECTABLE（暫定）**。詳細→`reports/study82_phase0_1_result.md`。次アクション=Phase0本審査（実データ検証・新規実装）はASK_FIRST待ち |
 | **v1.5.5** | 2026-07-20 | **ロードマップ凍結（Research OS Design→Research Execution移行）**: ACTIVE表記廃止→**Route B (Candidate)**へ改称（採択済み誤認防止）/ Research Status=**Route B Assumption Validation Phase** / Route A=**Graceful Degradation Path**として明示 / **§8A-1A Study82 FAIL決定木新設**（旧「即Route A」を誤りとして訂正——正式には PEAD assumptions downgraded→Study103 assumptions rerun→B confirmed/degraded/A promotedの3分岐。Phase0監査FAILとPhase Dアルファ弱結果を同一下流処理に統合） / CP3正式条件は**未決事項として明記**（詳細確定は将来課題） / Route F Trigger Eは将来課題のまま維持 / 残存Unknown3点を明記（PEAD=Study82・TSMOM=Study83・Core=CP3） / 優先順位6段化（Study103 assumption rerun・CP3最終評価を追加） / **Freeze roadmap. Execute Study82.**宣言 |

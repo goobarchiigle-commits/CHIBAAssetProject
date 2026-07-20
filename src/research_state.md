@@ -1,8 +1,43 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-20（★v1.5.7: 研究目的の最終自己整合化+Study52再発防止規則+Audit1-6体系★）
+# Single Source of Truth / 最終更新: 2026-07-20（★Study82 Phase0 = PASS確定（実データ監査完了）★）
 # ※ロードマップ参照は必ず reports/roadmap_v15_governance_layer.md から開始（他は全てANNEX/HISTORY/FROZEN/SUPERSEDED）
-# ※研究フェーズ = Program Phase3 Route B Assumption Validation。次アクション=Study82 Phase0本審査（実装ASK_FIRST待ち）。
+# ※研究フェーズ = Program Phase3 Route B Assumption Validation。Study82完了→次点=Study83 Proposal評価。
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
+
+---
+
+## ★★★★★★★★★★★★★★★★★★★★★★★★★★★ 2026-07-20 Study82 Phase0実行完了 — PASS確定（Unknown #1解消）
+
+**性格**: fresh run実施（実データ検証・小サンプルn=83・監査のみ・アルファ計算ゼロ）。
+`study82_phase0_design.md`v1.3仕様通りに実装・実行。成果物: `src/jquants/provider.py::get_fins_summary()`
+（新規実装）/ `src/scripts/study82_phase0_audit.py`（新規） / `backtests/study82_phase0_raw_sample_2026-07-20.json`
+（生データ83件） / `backtests/study82_phase0_audit_2026-07-20.json` / `reports/study82_phase0_report.md`。
+
+**最終判定 = PASS**（Audit1-6全PASS）:
+| Audit | 結果 | 根拠 |
+|---|---|---|
+| Audit1 Endpoint availability | PASS | `/v2/fins/summary`疎通・83件取得 |
+| Audit2 DiscDate/DiscTime existence | PASS | 両フィールド実在・欠損率0% |
+| Audit3 Missing ratio | PASS | 0.0% |
+| Audit4 Correction disclosure existence | PASS | `DocType`+`DiscNo`で区別可能・実データにも修正開示13件実在(EarnForecastRevision) |
+| Audit5 Leakage possibility | PASS | DiscTime12種の時刻分布(08:30-15:38)・場中50件/引後33件を機械判別可能 |
+| Audit6 Delisted stock coverage | PASS | 実在廃止銘柄(44490・2026-06-29上場廃止)で29件取得 |
+
+**重要な実測発見（v1想定ドキュメントとの乖離）**: フィールド名は`TypeOfDocument`/`DisclosureNumber`
+ではなく実際は`DocType`/`DiscNo`（略記）。Phase0.1時点の候補リストで検知できずAudit4を一度FAILと
+誤判定→実データ確認後にスクリプト修正→再実行でPASS確定。他エンドポイント（daily_quotes等）と
+同型のv1ドキュメント/v2実装乖離パターン（2026-07-10ログの先例と整合）。
+
+**留保事項（正直に記録）**: ①`from`/`to`パラメータが本エンドポイントで機能していない疑い
+（1コード指定のみで約10年分全履歴が返る——Phase D大規模収集時はコード単位取得+事後フィルタ設計が必要）
+②Audit4で確認できた修正開示は業績予想修正のみ・決算数値自体の訂正（restatement）は本サンプル未確認
+③DiscTime表記に"12:00"/"12:00:00"の不統一あり（軽微）④Audit6は単一銘柄プローブ（母集団欠落率未測定）。
+
+**§8A-1A決定木の適用**: `PASS → Study103 rerun unnecessary → Proceed only to Study83 Proposal`。
+**Freeze Rule解除条件成立**（Study82完了）。Study83実装への着手は本タスクの範囲外・別途ユーザー判断。
+
+**Unknown #1（PEAD PIT研究可能か）解消**: PASS。残るUnknown: #2 TSMOM実測性能(Study83) /
+#3 Core真の能力(CP3)。
 
 ---
 
