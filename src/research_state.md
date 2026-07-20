@@ -1,7 +1,60 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-20（★Study103設計書完成: Portfolio Architecture Feasibility起案★）
+# Single Source of Truth / 最終更新: 2026-07-20（★Roadmap v1.4戦略層追加: Strategic Route Tree A-F・Goal Ladder・Failure Tree★）
 # ※研究(Study)系列は2026-07-16 Study101が最新（実測ベース）。Study103は設計書段階（未実装）。
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
+
+---
+
+## ★★★★★★★★★★★★★★★★★★★★ 2026-07-20 Roadmap v1.4 — 戦略層（Strategic Layer）追加
+
+**性格**: 文書のみ（BT・コード変更・新規仮説生成なし）。v1.3統治層（How not to fool ourselves）の
+上位に戦略目標層（Where we go / what if it fails）を追加。成果物: `reports/roadmap_v14_strategy_layer.md`
+（別冊）+ `roadmap_revision_2026-07-19.md` v1.4改版（§12参照追加）+ `study103_design.md` §9A追補。
+
+**ARCH-A〜E再評価（Study74/95/98/99/100/101後の仕分け）**:
+- A(MN): **再スコープ** — Study95でUniverse-A 12-1モメンタム12Mスプレッドは負（-1.83%）→
+  生存余地はClenow型1-3M短期スプレッドのみ。Study80設計はリバランス1-3M・Short側単離を事前固定。
+  prior 0.30→0.20-0.25へ低下。
+- B(PEAD): ほぼ全部生存（価格外シグナル=Study95射程外）。prior 0.35-0.45不変。
+- C(TSMOM): ほぼ全部生存（指数TS≠CS株式モメンタム）。「現物12%+上乗せ」の現物側死亡により
+  **主力候補へ役割格上げ**。prior 0.45-0.55=相対最有力。
+- D(リードラグ): Route構成外（killテストのみ・不変）。
+- E(小型グロース): **「現物30%唯一の経路」表現を恒久撤回**（未検証・小型固有テール・Study101の
+  2025-04高モメンタム直撃警告・Calmar非両立）→ High CAGR/High DD/Low CapacityのSatellite
+  （配分10-20%上限）へ恒久格下げ。
+
+**Strategic Route Tree**:
+- Route A (Conservative): TSMOM主軸+Core残置。**10-18%/Calmar1.0+**（ユーザー原案15-20%は
+  Optimistic側へ — BaseはStudy103仮定表から機械導出）。発動=Study103 RED or 生存={TSMOM}。prior~30%
+- Route B (Balanced・最有力): Core+PEAD+TSMOM。20-25%/1.3-1.5。kill=PEAD監査FAIL→Aへ自動降格。prior~20-25%
+- Route C (Aggressive): B+MN(1-3M・レバ2-2.5x)±SG。30%/1.5。発動=GREEN∧複数CP3∧86parity全AND。
+  kill=80/86 fail→Bへ降格。prior~5-10%
+- Route D (SG Pivot): 独立Routeではなく**overlay部品**（+2-5pp・配分10-20%上限・DD30-50%明示決裁必須）
+- Route E: **二分割** — E1=Core Replacement（Study76 WHITE→Clenow置換・fujiko_r2 Candidate Aと同一
+  ビークル・二重実装禁止・prior~40-50%）/ E2=Core Retirement（Case B優位 or CP3 fail→Satellite-only・
+  prior~40-55%＝Core復権を既定路線としない）
+- Route F (Terminal・**新設**): 全滅時の正式着地=市場リターン（TOPIX B&H）。架空の15-20%床を
+  置かない。「敗北ではなく完了」を明文化（延命バイアス防止）。prior~20-30%
+
+**Goal Ladder（再較正）**: Tier1=30%/1.5(~5-10%) / Tier2=20-25%/1.3(~20-25%) /
+Tier3=**10-18%/1.0-1.2**(~30%・原案15-20%から下方修正=Tierは対応RouteのConservative-Baseで
+到達可能でなければ「目標を仮説に賭ける」再演) / Tier4=市場リターン(~35-40%)。
+上位Tier閉鎖は下位Tier研究を止めない。
+
+**Failure Tree（自動遷移・事前固定）**: 103 Tier1 RED→C閉鎖・Tier2再アンカー / 103全RED→
+Calmar改善へ再定義orF前倒し(決裁) / Case B優位→E2 / 76 WHITE→E1 / 82監査FAIL→B→A降格 /
+83 fail→A構成不能→Core単独orF / 80 fail→C到達不能・B天井 / 全滅→F。
+遷移は研究方針の自動切替のみ・実弾配分変更は常に個別ASK_FIRST。
+
+**Plan体系**: Plan A=Route C / Plan B=Route B（既定主計画）/ Plan C=Route A / Plan D=Route F。
+旧CP1白黒フォールバック（18-22%/15-20%）は完全置換。
+
+**Study103追補（§9A・実行前手続き）**: **Goal Ladder Sweep** — 同一6シナリオ・同一MCから
+Tier1/2/3をread-out（新規シナリオではない・読み出し閾値3本も凍結）。自動RED境界はTier1のみ適用。
+**Tier1 REDでもロードマップは終了しない**（ユーザー指摘の崖を解消）。
+
+**確率規律**: 計画priorは全てconfidence LOW・リソース配分専用・採用判定使用禁止・
+CP2/CP3で更新・恣意的上方修正は永久禁止5該当。
 
 ---
 

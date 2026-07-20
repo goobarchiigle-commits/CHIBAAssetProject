@@ -1,7 +1,7 @@
 # Roadmap Revision 2026-07-19 — Post-Study74 + Study90番台反映・complete_execution_roadmap 全面改定
 
 **日付**: 2026-07-19
-**版**: v1.3（同日確定・Falsification原則統合）
+**版**: v1.4（2026-07-20・戦略層追加）
 **性格**: 文書改定のみ。新規バックテストゼロ・コード変更ゼロ・実弾変更ゼロ。
 
 **改版履歴**:
@@ -11,6 +11,7 @@
 | v1.1 | 2026-07-19 | ユーザーレビュー反映: ①Core PIT期待値=**UNKNOWN（~0-5%・confidence LOW）**へ格下げ・Stretch表記失効 ②優先順位83⇄80入替（TSMOM先行） ③CP2再定義=**Study103**（統合の数学的成立性）+CP3スリーブ採用ゲート事前固定 ④Study77=条件付き凍結（76 BLACK時のみoptional） ⑤**Study103新設**（Portfolio Architecture Feasibility） ⑥Core=Study85保証枠（80-90%）廃止・スリーブ候補の1つへ格下げ |
 | **v1.2** | 2026-07-19 | **ユーザー最終確定版（統合承認）**: CP1=**Expectation Reset**と正式命名（完了済みCP） / CP2=Study103に**GREEN/YELLOW/RED**判定を導入し**Research Continuation Gate**へ格上げ（RED→30% Route STATUS=CLOSED恒久） / CP3評価軸にPIT expectancy・**Capacity**・RoRを正式追加 / 4位以下の優先順位（83/80/82）は**Study103結果に従属** / Study80正式名=**Market Neutral Feasibility**（実装研究ではない・重いのはStudy86側） / **永久禁止事項7項**の正式化 / Research Status・Goal Tree様式を正典掲示 |
 | **v1.3** | 2026-07-19 | **Falsification原則統合（ユーザー承認）**: CP2 Primary Objective=**30%ルートの反証試行**（`Failure to falsify ≠ proof of feasibility`・GREENは実現可能性の証明ではない） / **Study103三原則**正典化 / **シナリオ凍結**の制度化（実行後追加=新版番号+新承認+full rerun必須） / **自動RED境界**の事前固定（sleeves≥5・corr<0.10・Calmar>2.0・レバ>2x等） / Core表記を三行分離（Intrinsic alpha=**UNKNOWN** / Observed PIT estimate=**≈0-5%（観測範囲・真値推定区間ではない）** / Confidence=**LOW**） / Study103は**Case A（Core included）/ Case B（Core excluded）両ケース必須**・Case B優位なら**Core retirement**正式選択肢 / Study75/76/103=**前処理**（Satellite研究は未開始）の明文化 |
+| **v1.4** | 2026-07-20 | **戦略層追加（別冊: `reports/roadmap_v14_strategy_layer.md`）**: ARCH-A〜E再評価（MN=Study95により1-3M短期スプレッドへ再スコープ・prior低下 / 小型グロース「30%唯一の経路」表現撤回）/ **Strategic Route Tree**（A: Conservative 10-18%・B: Balanced 20-25%=最有力・C: Aggressive 30%・D: SG Pivot=overlay部品・E1: Core Replacement / E2: Core Retirement・**F: Terminal=新設終端状態**）/ **Goal Ladder** Tier1-4（Tier3はユーザー原案15-20%→10-18%へ下方再較正・Tier4=市場リターン床）/ **Failure Tree自動遷移規則** / Plan A-D定義（旧CP1白黒フォールバック体系を完全置換）/ **Study103 Goal Ladder Sweep追補**（同一runからTier1/2/3をread-out・RED即終了の崖を解消・凍結非抵触を事前確定）/ 計画priorの規律（採用判定使用禁止・LOW confidence・CP2/CP3で更新） |
 **改定対象**: `reports/complete_execution_roadmap_2026-07-04.md`（以下「旧正典実行手順書」）
 **ファイル名注記**: ユーザー指示原文は `roadmap_revision_2026-07-17.md` だが、SAVE規約（実日付）により 2026-07-19 を採用。
 **拘束エビデンス**:
@@ -444,5 +445,19 @@ Current Phase: Study75残作業 + Study103（依存ゼロ・並行着手可）
 | PARAMS_LOCKED / strategy.yaml / 実弾運用 | **無変更**（Entry Freeze継続・本改定は文書のみ） |
 
 **本改定が変更しないもの**: 恒久閉鎖14項・0.4採用ゲート・fresh run原則・ASK_FIRST体系・Entry Freeze状態・FUJIKO 2.0未決5点（ユーザー決裁待ち継続）。
+
+---
+
+## §12 戦略層（v1.4・別冊参照）
+
+本書（統治層=How not to fool ourselves）の上位に、**戦略目標層（Where we go / what if it fails）**を`reports/roadmap_v14_strategy_layer.md`として追加した。内容: ARCH-A〜E再評価 / Strategic Route Tree（A-F）/ Goal Ladder（Tier1-4）/ Failure Tree自動遷移 / Plan A-D / Study103 Goal Ladder Sweep追補。**本書のCP体系・永久禁止7項・シナリオ凍結・自動RED境界は戦略層によって一切変更されない**（矛盾時は本書優先）。要点:
+
+```
+Plan A = Route C（30%/1.5）    ← Study103 GREEN∧複数CP3のみ
+Plan B = Route B（20-25%/1.3） ← 既定の主計画（Core+PEAD+TSMOM）
+Plan C = Route A（10-18%/1.0+）← Study103 RED時の既定（TSMOM主軸）
+Plan D = Route F（Terminal）   ← 全滅時の正式着地=市場リターン（延命禁止）
+Study103はGoal Ladder Sweepにより同一runでTier1/2/3を判定（RED即終了の崖なし）
+```
 
 *作成: CLD (Fable 5)・2026-07-19。新規バックテスト実行なし。*

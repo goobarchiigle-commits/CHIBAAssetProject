@@ -246,6 +246,21 @@ RED    : Conservative/Baseの双方で自動RED該当、またはOptimisticで�
 
 ---
 
+## 9A. 設計追補（2026-07-20・v1.4戦略層による・実行前=シナリオ凍結発効前の正規手続き）
+
+**Goal Ladder Sweep（`roadmap_v14_strategy_layer.md`§7）**: §6の同一6シナリオ・同一MC出力から、以下3本の閾値でread-outを行う（**新規シナリオではない** — 仮定表・MC計算は不変。読み出し閾値もこの3本で凍結し、実行後の追加を禁止する）:
+
+```
+Tier1: CAGR≥30% ∧ Calmar≥1.5 ∧ DD≤20% ∧ RoR<1%   → GREEN/YELLOW/RED
+Tier2: CAGR≥20% ∧ Calmar≥1.3 ∧ DD≤20% ∧ RoR<1%   → GREEN/YELLOW/RED
+Tier3: CAGR≥10% ∧ Calmar≥1.0 ∧ DD≤20% ∧ RoR<1%   → GREEN/YELLOW/RED
++ feasible frontier曲線（Calmar制約別の最大到達CAGR）を主図表として出力
+```
+
+- §7自動RED境界は**Tier1判定にのみ**適用（Tier2/3はfrontier読み出しのみ）。
+- Tier1 REDでも研究は終了しない — 目標をTier2へ再アンカーし継続（Failure Tree・`roadmap_v14_strategy_layer.md`§5）。
+- **MN仮定の解釈注記（Study95反映）**: §3.2の素α8-12%は値として維持するが、この生存前提は「Clenow型1-3M短期スプレッド」に限定（12M型はStudy95でfactor-level反証気味）。Study103レポート解釈節およびStudy80起案書へ必ず引き継ぐこと。
+
 ## 10. 次アクション（ASK_FIRST）
 
 1. 本設計書のユーザー承認
