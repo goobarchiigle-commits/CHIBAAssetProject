@@ -1,7 +1,49 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-20（★Roadmap v1.4戦略層追加: Strategic Route Tree A-F・Goal Ladder・Failure Tree★）
+# Single Source of Truth / 最終更新: 2026-07-20（★Roadmap v1.5統合正典化: roadmap_v15_governance_layer.md=CURRENT CANON★）
+# ※ロードマップ参照は必ず reports/roadmap_v15_governance_layer.md から開始（他は全てANNEX/HISTORY/FROZEN/SUPERSEDED）
 # ※研究(Study)系列は2026-07-16 Study101が最新（実測ベース）。Study103は設計書段階（未実装）。
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
+
+---
+
+## ★★★★★★★★★★★★★★★★★★★★★ 2026-07-20 Roadmap v1.5 — 統合正典化（Governance Layer・乱立解消）
+
+**性格**: 文書のみ。ユーザー最終統合指示+CLD補正を`reports/roadmap_v15_governance_layer.md`
+（**CURRENT CANON・唯一の生きたロードマップ**）へ統合。成果物: 同書+旧文書群のSTATUSバナー整備+
+`study103_design.md`§9B追補。
+
+**乱立解消（Registry・v15§R）**:
+- v15=CURRENT CANON / roadmap_revision_2026-07-19=HISTORY/ANNEX（CP詳細原文・追記禁止）/
+  roadmap_v14_strategy_layer=ANNEX（Route詳細原文・追記禁止）/ complete_execution=FROZEN /
+  **final_research_roadmap_2026-07-04=SUPERSEDED**（Study01-73完結宣言・閉鎖14項・0.4ゲート原文のみ有効）/
+  fujiko_r2=PARALLEL（Study87-97採番のみ・Candidate AはRoute E1へ合流）
+- **アンチ乱立規則**: 以後の改定はv15のin-place編集+changelogのみ。ロードマップ新規ファイル作成禁止。
+  物理削除はappend-only監査文化に反するため行わず「正典指定の剥奪」で実施。
+
+**v1.5確定事項**:
+1. **Study103目的の二層化**: Primary=Attempt to falsify ambitious routes /
+   Secondary=Determine feasible ceilings and terminal states。
+2. **Tier番号を昇順体系へ反転**: Tier3=30%/1.5・Tier2=20-25%/1.3・Tier1=10-18%/1.0・
+   **Tier0=Market Return**。旧v1.4降順との対照表をv15§2に常設。
+3. **Route D=Dormant High Alpha Branch**: Study102 WHITE（ユーザー原文の「Study81」は旧称・
+   現採番Study102に読み替え）まで独立Route化禁止・工数配分ゼロ。
+4. **Route F発動4トリガー正式化**: A=CP2 RED∧Tier1 infeasible / B=全スリーブCP3 fail /
+   C=Research budget枯渇 / **D=連続2年次サイクル採用ゼロ**。既存「連続2四半期採用ゼロ→縮退」とは
+   二段階整合（四半期=減速・年次=終了）。
+5. **Planning Prior規律**: ordinal only・真実の確率ではない・証拠ではない・採用基準ではない・
+   **CP2/CP3判定文書へのprior数値引用=Study52型汚染として禁止**。
+6. **Research Budget新設**（**工数配分であって資本配分ではない**と明記）: Core reconstruction 35% /
+   Satellite 45%（Study102は休眠につき当面0%）/ Exploratory 10%（YELLOW時のみ）/ Reserve 10%。
+   **Maximum active routes=2 / Maximum concurrent studies=2**（現在Study75+103=上限充足・
+   第3のStudy起案は完了まで禁止）。
+7. **Route Transition Matrix正式図**（v15§7）。
+8. **Study103成果物7点固定**（v15§8・study103_design§9B）: Tier0-3 feasibility / Goal frontier /
+   遷移対応表 / Termination probability（機械的定義固定）/ Core retirement probability（同）/
+   Budget recommendation（advisory）/ Terminal state recommendation（advisory）。
+9. **優先順位変更**: **①Study103実装（最優先へ繰上げ）**→②Study75完了→③Study76→
+   ④Satellite再順位付け。Study83/80/82はCP2前に掘らない（予算違反）。
+10. **結語正典化**: Research exists to reject impossible routes as early as possible.
+    Success is not finding a 30% route. Success is minimizing years spent on infeasible routes.
 
 ---
 

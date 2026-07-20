@@ -261,6 +261,25 @@ Tier3: CAGR≥10% ∧ Calmar≥1.0 ∧ DD≤20% ∧ RoR<1%   → GREEN/YELLOW/RE
 - Tier1 REDでも研究は終了しない — 目標をTier2へ再アンカーし継続（Failure Tree・`roadmap_v14_strategy_layer.md`§5）。
 - **MN仮定の解釈注記（Study95反映）**: §3.2の素α8-12%は値として維持するが、この生存前提は「Clenow型1-3M短期スプレッド」に限定（12M型はStudy95でfactor-level反証気味）。Study103レポート解釈節およびStudy80起案書へ必ず引き継ぐこと。
 
+## 9B. 設計追補2（2026-07-20・v1.5統合正典による・実行前=凍結発効前の正規手続き）
+
+**目的の二層化（v15§1・本書§0を上書き）**:
+```
+Primary Objective  : Attempt to falsify ambitious routes.
+Secondary Objective: Determine feasible ceilings and terminal states.
+Failure to falsify ≠ proof.
+```
+
+**Tier番号読み替え（v15§2・昇順体系）**: §9Aの表記は旧体系。正式には
+Tier3=30%/1.5・Tier2=20%/1.3・Tier1=10%/1.0・**Tier0=Market Return（TOPIX B&H・自明成立のため
+read-out対象はTier1-3の3本のまま）**。読み出し閾値3本凍結は不変。
+
+**成果物固定（v15§8・7点）**: ①Tier0-3 feasibility ②Goal frontier ③Route transition matrix対応表
+④**Termination probability**（機械的定義: 全シナリオ×MC試行中Tier1すらinfeasibleとなる割合）
+⑤**Core retirement probability**（機械的定義: Case B frontierがCase Aより緩いシナリオの割合）
+⑥Budget recommendation（advisory）⑦Terminal state recommendation（advisory）。
+④⑤の定義は実装時の再解釈禁止。⑥⑦はゲート判定（①-③）と混同しないこと。
+
 ## 10. 次アクション（ASK_FIRST）
 
 1. 本設計書のユーザー承認

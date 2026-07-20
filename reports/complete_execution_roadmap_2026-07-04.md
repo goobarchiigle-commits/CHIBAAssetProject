@@ -1,7 +1,9 @@
 # Complete Execution Roadmap — ~~CAGR30% / Calmar1.5 達成までの完全実行計画~~
 
 > ## ★★ 2026-07-19 全面改定（正典改定・必読）
-> 本書は `reports/roadmap_revision_2026-07-19.md` により全面改定された。**改定後の正典は同レポート**。
+> **【2026-07-20更新】現行正典のエントリーポイントは `reports/roadmap_v15_governance_layer.md`（CURRENT CANON）**。
+> `roadmap_revision_2026-07-19.md`はHISTORY/ANNEXへ格下げ済み。
+> 本書は `reports/roadmap_revision_2026-07-19.md` により全面改定された。~~**改定後の正典は同レポート**。~~
 > 主要変更: ① Study74=**FINAL BLACK確定**（資本経路上限≈+1pp・恒久閉鎖） ② **Study79=CLOSED**（前提永久不成立）
 > ③ 新CP1: Core単独期待=CAGR10-15%/Stretch15-18%・18%+は新アルファ源必須 ④ Universe二層分離（A=バイアス測定/B=TOPIX500 PIT・Study76用）
 > ⑤ Study76目的=複雑性の正当化判定 ⑥ 30%到達経路=複数低相関Satellite統合のみ（Core単独30%前提削除）

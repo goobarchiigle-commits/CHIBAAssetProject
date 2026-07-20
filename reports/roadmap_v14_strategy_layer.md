@@ -1,5 +1,12 @@
 # Roadmap v1.4 — Strategic Layer（戦略目標層・代替経路）
 
+> ## ★ STATUS: ANNEX（2026-07-20〜）
+> エントリーポイントは **`reports/roadmap_v15_governance_layer.md`（CURRENT CANON）**。
+> 本書はRoute詳細仕様（各Route完全テーブル・ARCH-A〜E再評価根拠・Failure Tree原文）の参照付録。
+> **本書への新規追記は禁止**。v1.5での変更点: Tier番号昇順化（本書のTier1-4→v15のTier3/2/1/0）・
+> Route D=Dormant化（Study102 WHITEまで独立Route化禁止）・Route F発動4トリガー正式化・
+> 優先順位=Study103最優先へ。矛盾時はv15優先。
+
 **日付**: 2026-07-20
 **性格**: 文書のみ（BT・コード変更・新規仮説生成なし）。`roadmap_revision_2026-07-19.md`（v1.3=研究統治層）の**上位に載る戦略層** — v1.3のCP体系・ゲート・禁止事項は一切変更しない。v1.3が「どう研究するか（How not to fool ourselves）」なら、本書は「どこへ向かうのか（Where we go / what if it fails）」を定義する。
 **出典**: `alternative_architectures_5x_2026-07-03.md`（ARCH-A〜E原典）/ `final_research_roadmap_2026-07-04.md`（旧フォールバック体系）/ `study103_design.md`（仮定表）/ Study74/95/98/99/100/101実測。

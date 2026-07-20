@@ -1,5 +1,11 @@
 # Final Research Roadmap — Study01–73 正式完結 / Study74+ 統一研究プログラム
 
+> ## ★ STATUS: SUPERSEDED（2026-07-20・正典指定剥奪）
+> 本書の研究プログラム定義（Study74-86体系・CP1-CP4旧定義・目標30%/1.5）は
+> **`reports/roadmap_v15_governance_layer.md`（CURRENT CANON）により失効**。
+> 有効なまま残るのは **Study01-73の公式完結宣言・閉鎖14項・0.4採用ゲートの原文**のみ。
+> 研究プログラム・目標・優先順位・Route体系の参照は必ずv15から開始すること。
+
 **日付**: 2026-07-04
 **作成**: Chief Research Officer / Chief Architect
 **拘束エビデンス**: Study01〜73 / Production Comprehensive Audit (2026-07-02) / CRO Decision Memo (2026-07-03) / Design Philosophy Review (2026-07-03) / Final Architecture Review (2026-07-03) / Alternative Architectures 5x (2026-07-03) / Roadmap (2026-06-13) / research_state.md / strategy.yaml / backtest_summary.json
