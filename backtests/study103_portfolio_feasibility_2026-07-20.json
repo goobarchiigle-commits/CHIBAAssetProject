@@ -1,0 +1,502 @@
+{
+ "levels": {
+  "Conservative": {
+   "corr_clipped": false,
+   "cases": {
+    "CaseA": {
+     "frontier": {
+      "1.0": {
+       "max_med_cagr": 0.1762,
+       "weights": {
+        "MN": 0.35,
+        "PEAD": 0.4,
+        "TSMOM": 0.2,
+        "SG": 0.05
+       },
+       "med_maxdd": 0.1286,
+       "med_calmar": 1.362,
+       "ror": 0.00905
+      },
+      "1.3": {
+       "max_med_cagr": 0.1762,
+       "weights": {
+        "MN": 0.35,
+        "PEAD": 0.4,
+        "TSMOM": 0.2,
+        "SG": 0.05
+       },
+       "med_maxdd": 0.1286,
+       "med_calmar": 1.362,
+       "ror": 0.00905
+      },
+      "1.5": null
+     },
+     "tier_feasible": {
+      "Tier3": false,
+      "Tier2": false,
+      "Tier1": true
+     },
+     "auto_red_tier3": null,
+     "best_tier1_pass_rate": 0.6878,
+     "best_tier1_weights": {
+      "MN": 0.5,
+      "PEAD": 0.3,
+      "TSMOM": 0.15,
+      "SG": 0.05
+     }
+    },
+    "CaseB": {
+     "frontier": {
+      "1.0": {
+       "max_med_cagr": 0.1762,
+       "weights": {
+        "MN": 0.35,
+        "PEAD": 0.4,
+        "TSMOM": 0.2,
+        "SG": 0.05
+       },
+       "med_maxdd": 0.1286,
+       "med_calmar": 1.362,
+       "ror": 0.00905
+      },
+      "1.3": {
+       "max_med_cagr": 0.1762,
+       "weights": {
+        "MN": 0.35,
+        "PEAD": 0.4,
+        "TSMOM": 0.2,
+        "SG": 0.05
+       },
+       "med_maxdd": 0.1286,
+       "med_calmar": 1.362,
+       "ror": 0.00905
+      },
+      "1.5": null
+     },
+     "tier_feasible": {
+      "Tier3": false,
+      "Tier2": false,
+      "Tier1": true
+     },
+     "auto_red_tier3": null,
+     "best_tier1_pass_rate": 0.6878,
+     "best_tier1_weights": {
+      "MN": 0.5,
+      "PEAD": 0.3,
+      "TSMOM": 0.15,
+      "SG": 0.05
+     }
+    }
+   }
+  },
+  "Base": {
+   "corr_clipped": false,
+   "cases": {
+    "CaseA": {
+     "frontier": {
+      "1.0": {
+       "max_med_cagr": 0.2768,
+       "weights": {
+        "PEAD": 0.7,
+        "TSMOM": 0.1,
+        "SG": 0.2
+       },
+       "med_maxdd": 0.132,
+       "med_calmar": 2.082,
+       "ror": 0.00875
+      },
+      "1.3": {
+       "max_med_cagr": 0.2768,
+       "weights": {
+        "PEAD": 0.7,
+        "TSMOM": 0.1,
+        "SG": 0.2
+       },
+       "med_maxdd": 0.132,
+       "med_calmar": 2.082,
+       "ror": 0.00875
+      },
+      "1.5": {
+       "max_med_cagr": 0.2768,
+       "weights": {
+        "PEAD": 0.7,
+        "TSMOM": 0.1,
+        "SG": 0.2
+       },
+       "med_maxdd": 0.132,
+       "med_calmar": 2.082,
+       "ror": 0.00875
+      }
+     },
+     "tier_feasible": {
+      "Tier3": false,
+      "Tier2": true,
+      "Tier1": true
+     },
+     "auto_red_tier3": null,
+     "best_tier1_pass_rate": 0.9852,
+     "best_tier1_weights": {
+      "MN": 0.55,
+      "PEAD": 0.3,
+      "TSMOM": 0.1,
+      "SG": 0.05
+     }
+    },
+    "CaseB": {
+     "frontier": {
+      "1.0": {
+       "max_med_cagr": 0.2768,
+       "weights": {
+        "PEAD": 0.7,
+        "TSMOM": 0.1,
+        "SG": 0.2
+       },
+       "med_maxdd": 0.132,
+       "med_calmar": 2.082,
+       "ror": 0.00875
+      },
+      "1.3": {
+       "max_med_cagr": 0.2768,
+       "weights": {
+        "PEAD": 0.7,
+        "TSMOM": 0.1,
+        "SG": 0.2
+       },
+       "med_maxdd": 0.132,
+       "med_calmar": 2.082,
+       "ror": 0.00875
+      },
+      "1.5": {
+       "max_med_cagr": 0.2768,
+       "weights": {
+        "PEAD": 0.7,
+        "TSMOM": 0.1,
+        "SG": 0.2
+       },
+       "med_maxdd": 0.132,
+       "med_calmar": 2.082,
+       "ror": 0.00875
+      }
+     },
+     "tier_feasible": {
+      "Tier3": false,
+      "Tier2": true,
+      "Tier1": true
+     },
+     "auto_red_tier3": null,
+     "best_tier1_pass_rate": 0.9852,
+     "best_tier1_weights": {
+      "MN": 0.55,
+      "PEAD": 0.3,
+      "TSMOM": 0.1,
+      "SG": 0.05
+     }
+    }
+   }
+  },
+  "Optimistic": {
+   "corr_clipped": false,
+   "cases": {
+    "CaseA": {
+     "frontier": {
+      "1.0": {
+       "max_med_cagr": 0.3572,
+       "weights": {
+        "PEAD": 0.8,
+        "SG": 0.2
+       },
+       "med_maxdd": 0.0893,
+       "med_calmar": 3.97,
+       "ror": 0.00015
+      },
+      "1.3": {
+       "max_med_cagr": 0.3572,
+       "weights": {
+        "PEAD": 0.8,
+        "SG": 0.2
+       },
+       "med_maxdd": 0.0893,
+       "med_calmar": 3.97,
+       "ror": 0.00015
+      },
+      "1.5": {
+       "max_med_cagr": 0.3572,
+       "weights": {
+        "PEAD": 0.8,
+        "SG": 0.2
+       },
+       "med_maxdd": 0.0893,
+       "med_calmar": 3.97,
+       "ror": 0.00015
+      }
+     },
+     "tier_feasible": {
+      "Tier3": true,
+      "Tier2": true,
+      "Tier1": true
+     },
+     "auto_red_tier3": {
+      "required_sleeves_min": 1,
+      "required_avg_corr_min": 0.0,
+      "required_avg_assumed_calmar_min": 2.821,
+      "triggered": true
+     },
+     "best_tier1_pass_rate": 1.0,
+     "best_tier1_weights": {
+      "MN": 0.7,
+      "PEAD": 0.15,
+      "SG": 0.15
+     }
+    },
+    "CaseB": {
+     "frontier": {
+      "1.0": {
+       "max_med_cagr": 0.3572,
+       "weights": {
+        "PEAD": 0.8,
+        "SG": 0.2
+       },
+       "med_maxdd": 0.0893,
+       "med_calmar": 3.97,
+       "ror": 0.00015
+      },
+      "1.3": {
+       "max_med_cagr": 0.3572,
+       "weights": {
+        "PEAD": 0.8,
+        "SG": 0.2
+       },
+       "med_maxdd": 0.0893,
+       "med_calmar": 3.97,
+       "ror": 0.00015
+      },
+      "1.5": {
+       "max_med_cagr": 0.3572,
+       "weights": {
+        "PEAD": 0.8,
+        "SG": 0.2
+       },
+       "med_maxdd": 0.0893,
+       "med_calmar": 3.97,
+       "ror": 0.00015
+      }
+     },
+     "tier_feasible": {
+      "Tier3": true,
+      "Tier2": true,
+      "Tier1": true
+     },
+     "auto_red_tier3": {
+      "required_sleeves_min": 1,
+      "required_avg_corr_min": 0.0,
+      "required_avg_assumed_calmar_min": 2.821,
+      "triggered": true
+     },
+     "best_tier1_pass_rate": 1.0,
+     "best_tier1_weights": {
+      "MN": 0.7,
+      "PEAD": 0.15,
+      "SG": 0.15
+     }
+    }
+   }
+  }
+ },
+ "config": {
+  "sleeves": [
+   "Core",
+   "MN",
+   "PEAD",
+   "TSMOM",
+   "SG"
+  ],
+  "cagr": {
+   "Core": {
+    "Conservative": 0.0,
+    "Base": 0.03,
+    "Optimistic": 0.05
+   },
+   "MN": {
+    "Conservative": 0.12,
+    "Base": 0.18,
+    "Optimistic": 0.25
+   },
+   "PEAD": {
+    "Conservative": 0.2,
+    "Base": 0.275,
+    "Optimistic": 0.35
+   },
+   "TSMOM": {
+    "Conservative": 0.15,
+    "Base": 0.18,
+    "Optimistic": 0.25
+   },
+   "SG": {
+    "Conservative": 0.2,
+    "Base": 0.275,
+    "Optimistic": 0.35
+   }
+  },
+  "vol": {
+   "Core": {
+    "Conservative": 0.18,
+    "Base": 0.15,
+    "Optimistic": 0.13
+   },
+   "MN": {
+    "Conservative": 0.14,
+    "Base": 0.11,
+    "Optimistic": 0.09
+   },
+   "PEAD": {
+    "Conservative": 0.22,
+    "Base": 0.18,
+    "Optimistic": 0.15
+   },
+   "TSMOM": {
+    "Conservative": 0.25,
+    "Base": 0.225,
+    "Optimistic": 0.2
+   },
+   "SG": {
+    "Conservative": 0.35,
+    "Base": 0.3,
+    "Optimistic": 0.26
+   }
+  },
+  "maxdd_assumed": {
+   "Core": {
+    "Conservative": 0.25,
+    "Base": 0.18,
+    "Optimistic": 0.14
+   },
+   "MN": {
+    "Conservative": 0.15,
+    "Base": 0.1,
+    "Optimistic": 0.06
+   },
+   "PEAD": {
+    "Conservative": 0.2,
+    "Base": 0.14,
+    "Optimistic": 0.1
+   },
+   "TSMOM": {
+    "Conservative": 0.2,
+    "Base": 0.15,
+    "Optimistic": 0.12
+   },
+   "SG": {
+    "Conservative": 0.5,
+    "Base": 0.4,
+    "Optimistic": 0.3
+   }
+  },
+  "pair_corr": {
+   "Core-MN": {
+    "Conservative": 0.1,
+    "Base": 0.0,
+    "Optimistic": -0.15
+   },
+   "Core-PEAD": {
+    "Conservative": 0.2,
+    "Base": 0.1,
+    "Optimistic": 0.0
+   },
+   "Core-TSMOM": {
+    "Conservative": 0.35,
+    "Base": 0.25,
+    "Optimistic": 0.15
+   },
+   "Core-SG": {
+    "Conservative": 0.7,
+    "Base": 0.55,
+    "Optimistic": 0.4
+   },
+   "MN-PEAD": {
+    "Conservative": 0.1,
+    "Base": 0.05,
+    "Optimistic": 0.0
+   },
+   "MN-TSMOM": {
+    "Conservative": 0.1,
+    "Base": 0.05,
+    "Optimistic": 0.0
+   },
+   "MN-SG": {
+    "Conservative": 0.15,
+    "Base": 0.05,
+    "Optimistic": 0.0
+   },
+   "PEAD-TSMOM": {
+    "Conservative": 0.25,
+    "Base": 0.15,
+    "Optimistic": 0.05
+   },
+   "PEAD-SG": {
+    "Conservative": 0.45,
+    "Base": 0.35,
+    "Optimistic": 0.25
+   },
+   "TSMOM-SG": {
+    "Conservative": 0.35,
+    "Base": 0.25,
+    "Optimistic": 0.15
+   }
+  },
+  "n_scan": 3000,
+  "n_final": 20000,
+  "seeds": [
+   42,
+   4242
+  ],
+  "horizon_months": 60,
+  "weight_step": 0.05,
+  "sg_cap": 0.2,
+  "dd_limit": 0.2,
+  "ror_limit": 0.01,
+  "tiers": {
+   "Tier3": {
+    "cagr": 0.3,
+    "calmar": 1.5
+   },
+   "Tier2": {
+    "cagr": 0.2,
+    "calmar": 1.3
+   },
+   "Tier1": {
+    "cagr": 0.1,
+    "calmar": 1.0
+   }
+  },
+  "auto_red": {
+   "sleeves_min": 5,
+   "avg_corr_max": 0.1,
+   "avg_calmar_min": 2.0
+  },
+  "model": "monthly lognormal MVN (thin tails => optimistic side => RED is a fortiori valid)"
+ },
+ "verdicts": {
+  "Tier3": {
+   "CaseA": "RED(auto)",
+   "CaseB": "RED(auto)"
+  },
+  "Tier2": {
+   "CaseA": "GREEN",
+   "CaseB": "GREEN"
+  },
+  "Tier1": {
+   "CaseA": "GREEN",
+   "CaseB": "GREEN"
+  },
+  "Tier0": {
+   "CaseA": "GREEN (trivially feasible: market return)",
+   "CaseB": "GREEN (trivially feasible: market return)"
+  }
+ },
+ "termination_probability": 0.109,
+ "core_retirement_probability": 1.0,
+ "meta": {
+  "run_at": "2026-07-20T06:59:18.275357+00:00",
+  "elapsed_sec": 96.7
+ }
+}

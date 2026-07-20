@@ -1,8 +1,43 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-20（★Roadmap v1.5統合正典化: roadmap_v15_governance_layer.md=CURRENT CANON★）
+# Single Source of Truth / 最終更新: 2026-07-20（★Study103実行完了・CP2=RED確定・Route B正式起動★）
 # ※ロードマップ参照は必ず reports/roadmap_v15_governance_layer.md から開始（他は全てANNEX/HISTORY/FROZEN/SUPERSEDED）
-# ※研究(Study)系列は2026-07-16 Study101が最新（実測ベース）。Study103は設計書段階（未実装）。
+# ※研究(Study)系列は2026-07-16 Study101が最新（実測ベース）。Study103はMC完了（Study82/83が次点・未着手）。
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
+
+---
+
+## ★★★★★★★★★★★★★★★★★★★★★★ 2026-07-20 Study103実行完了 — CP2=RED確定・Route B正式起動
+
+**性格**: fresh run実施（Monte Carlo・仮定表ベース・実トレードデータのBTではない）。
+`study103_design.md`§9C凍結仕様通りに実装・実行。成果物: `src/backtest/study103_portfolio_feasibility.py`
+（新規スクリプト・実行済み）/ `backtests/study103_portfolio_feasibility_2026-07-20.json` /
+`reports/study103_portfolio_feasibility.md`。
+
+**Goal Ladder Sweep結果**:
+| Tier | 目標 | 判定 |
+|---|---|---|
+| Tier3 | 30%/Calmar≥1.5 | **RED**（Base到達27.7%で僅差不成立・Optimisticは自動RED境界=avg Calmar>2.0抵触） |
+| Tier2 | 20-25%/Calmar≥1.3 | **GREEN**（Base到達27.7%） |
+| Tier1 | 10-18%/Calmar≥1.0 | **GREEN**（Conservativeでも部分成立17.6%） |
+| Tier0 | Market Return | GREEN（自明） |
+
+**CP2 = RED**（Tier3判定そのもの）。`roadmap_v15`§1A決定木を機械適用:
+`CP2 RED → Tier2 feasible(YES) → Route B`。**Route B（Core+PEAD+TSMOM・20-25%/1.3-1.5）正式起動**。
+
+**自動RED境界の実動作確認**: Optimistic水準でTier3は名目上成立するが、最適解が単一スリーブ
+（PEAD100% or SG100%）への集中というBase設計思想に反する退化解であり、`required_avg_calmar>2.0`
+境界が正しくこれを捕捉しRED化。境界設計が意図通り機能した実例として記録。
+
+**副次所見（弱い証拠・要注意）**: Core Retirement Probability=**100%**（全水準で最適配分に
+Core重み0%）。これは仮定表がCore CAGRをPIT観測値（Base3%）で低く固定した設計上の当然の帰結
+であり、**Core CP3審査（実測）の結果を先取りしない**。Falsification原則3を数値の解釈にも
+適用すること — 「Coreを含める最適解が0%だった」は「Coreを退役すべき」の証明ではない。
+
+**Termination Probability=10.9%**（主因=Conservative水準のパス失敗率31.2%）。
+
+**優先順位更新**: Study103完了により優先順位から除外。**次点=Study82（PEAD発表日時精度監査・
+第一関門）→Study83（TSMOM）**。いずれも新規スクリプトにつき個別ASK_FIRST。
+Study80(MN)は本MC最適配分にほぼ非登場・優先度維持のみ。Study102(ARCH-E)はRoute D=Dormant継続。
 
 ---
 

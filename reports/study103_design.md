@@ -280,6 +280,65 @@ read-out対象はTier1-3の3本のまま）**。読み出し閾値3本凍結は�
 ⑥Budget recommendation（advisory）⑦Terminal state recommendation（advisory）。
 ④⑤の定義は実装時の再解釈禁止。⑥⑦はゲート判定（①-③）と混同しないこと。
 
+## 9C. 実装最終仕様（2026-07-20・実行直前固定 — 本節確定をもってシナリオ凍結発効）
+
+**位置づけ**: §3仮定表はCAGR/MaxDD/Core相関を定義したが、MC実装に必要な (a)全ペア相関 (b)MN/PEAD/SmallGrowthのVol (c)乱数モデル (d)配分グリッド (e)判定統計量 が未定義だった。本節で**実行前に**固定する。本節確定後の変更は一切禁止（変更=Study103B採番+full rerun）。
+
+### (a) 全ペア相関行列（Conservative / Base / Optimistic）
+
+| ペア | Cons | Base | Opt | 根拠 |
+|---|---|---|---|---|
+| Core-MN | 0.10 | 0.00 | -0.15 | §3.2既定 |
+| Core-PEAD | 0.20 | 0.10 | 0.00 | §3.3既定 |
+| Core-TSMOM | 0.35 | 0.25 | 0.15 | §3.4既定 |
+| Core-SG | 0.70 | 0.55 | 0.40 | §3.5既定 |
+| MN-PEAD | 0.10 | 0.05 | 0.00 | MN=β≈0のため低 |
+| MN-TSMOM | 0.10 | 0.05 | 0.00 | 同上 |
+| MN-SG | 0.15 | 0.05 | 0.00 | SGはlongモメンタム・MNのlong脚と部分共通 |
+| PEAD-TSMOM | 0.25 | 0.15 | 0.05 | 両者ともbull期にlongエクスポージャ |
+| PEAD-SG | 0.45 | 0.35 | 0.25 | 両者ともlong現物（equity β共有） |
+| TSMOM-SG | 0.35 | 0.25 | 0.15 | trend期のequity β共有 |
+
+原則: long現物系（Core/PEAD/SG）同士は高め・MNは全対で低。行列は正定値性を実行時検証（非PSDなら固有値クリップ+再正規化し、その旨をJSONへ記録）。
+
+### (b) 欠落Vol（年率・Cons/Base/Opt）
+
+| スリーブ | Vol | 整合チェック |
+|---|---|---|
+| MN（レバ後） | 14% / 11% / 9% | Sharpe≈0.9/1.6/2.8（Optは楽観として許容） |
+| PEAD | 22% / 18% / 15% | Sharpe≈0.9/1.5/2.3 |
+| SmallGrowth | 35% / 30% / 26% | MaxDD -50/-40/-30と整合 |
+| Core / TSMOM | §3既定（18/15/13・25/22.5/20） | — |
+
+### (c) 乱数モデル（固定）
+
+- 月次log-return多変量正規: μ_log=ln(1+CAGR)/12・σ_log=Vol/√12・相関=(a)行列。ホライゾン5年（60ヶ月）。seed=42（粗scan）/4242（精査）。
+- **⚠ 正規尾部の含意（設計上の意図）**: 正規分布はfat tailを過小評価→MaxDD/RoRは**楽観側**に歪む。従って**本MCで不成立（RED側）なら現実ではa fortioriで不成立** — 反証目的（Primary Objective）と整合する保守設計。逆にGREENは弱い証拠にしかならない（Failure to falsify ≠ proof の数値的実装）。
+
+### (d) 配分グリッド（固定）
+
+- weight 5%刻み・合計100%・long-only・ポートフォリオレバなし（レバはスリーブ内CAGRに織込済み）。
+- **SG weight ≤ 20%**（Route D overlay上限・統治制約）。
+- 2段階: 粗scan N=4,000パス→上位200配分をN=20,000で精査。最終判定は精査値のみ使用。
+- 自動RED境界「required leverage>2.0x」の適用解釈（事前固定）: ポートフォリオ追加レバを指す（本MCは常に1.0x→本境界は発火し得ない）。MNスリーブ内レバ2.0-2.5xはRoute C仕様（v1.4）で許容済み・Study80/86の管轄。
+
+### (e) 判定統計量（固定）
+
+- 各配分の判定値: **median CAGR / median Calmar / median MaxDD / RoR=P(MaxDD>30%)**（全てN=20,000精査値）。
+- Tier feasible ⇔ ∃配分: medCAGR≥X ∧ medCalmar≥c ∧ |medMaxDD|≤20% ∧ RoR<1%。
+- Goal frontier: c∈{1.0, 1.3, 1.5}の各Calmar制約下でDD/RoR条件を満たす配分のmedCAGR最大値。
+- Tier verdict: GREEN=Baseで成立 / YELLOW=Optimisticのみ成立 / RED=Optimisticでも不成立 or 自動RED境界該当（Tier3のみ）。シナリオ3水準の梯子自体が感度規則の実装（水準間で反転→1段階悪い側を機械採用）。
+- 自動RED境界の機械評価（Tier3のみ）: required sleeves=成立配分の最小スリーブ数 / required avg corr=成立配分の加重平均ペア相関の最小値 / required avg Calmar=成立配分の仮定Calmar加重平均の最小値。
+- Termination Probability = 6シナリオ等重み平均の「最良Tier1配分でもTier1条件(medベース各パス判定)を満たさないパス割合」。Core Retirement Probability = 3水準中Case B frontier(c=1.3)≥Case Aとなる水準の割合。
+
+## 9D. 実行結果（2026-07-20・確定）
+
+**Study103実行完了**。CP2=**RED**（Tier3=30%/1.5・Base到達27.7%で僅差不成立）。Tier2=GREEN・
+Tier1=GREEN → §1A決定木によりRoute B（Core+PEAD+TSMOM・20-25%/1.3-1.5）が正式起動。
+詳細結果・自動RED境界の発動経緯・Core Retirement Probability=100%の解釈注意は
+`reports/study103_portfolio_feasibility.md`を参照。本設計書（§1-9C）はシナリオ凍結対象として
+このまま保存し、以後の変更は行わない（変更が必要な場合はStudy103B新版）。
+
 ## 10. 次アクション（ASK_FIRST）
 
 1. 本設計書のユーザー承認
