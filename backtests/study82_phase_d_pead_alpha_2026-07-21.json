@@ -1,0 +1,62 @@
+{
+ "config": {
+  "holding_days": 40,
+  "round_trip_cost_pct": 0.31000000000000005,
+  "slot_cycles_per_year": 6.3,
+  "corp_action_guard_abs_ret": 0.4,
+  "yoy_gap_days": [
+   330,
+   400
+  ],
+  "universe_source": "C:\\ai-trading\\backtests\\study75_rule_universe.json"
+ },
+ "universe_stats": {
+  "n_months": 120,
+  "n_unique_codes": 3020,
+  "n_codes_with_disclosure_data": 2914
+ },
+ "event_counts": {
+  "n_surprise_events_total": 31698,
+  "n_valid_priced_events": 30952,
+  "date_span_years": 9.24
+ },
+ "group_stats": {
+  "Positive": {
+   "n_events": 17959,
+   "n_events_per_year": 1943.6,
+   "mean_raw_return_pct": 0.929,
+   "mean_cost_adj_return_pct": 0.619,
+   "se_cost_adj_pct": 0.117,
+   "t_stat": 5.3,
+   "win_rate": 0.494
+  },
+  "Negative": {
+   "n_events": 12993,
+   "n_events_per_year": 1406.1,
+   "mean_raw_return_pct": 1.467,
+   "mean_cost_adj_return_pct": 1.157,
+   "se_cost_adj_pct": 0.147,
+   "t_stat": 7.9,
+   "win_rate": 0.516
+  }
+ },
+ "pead_spread_cost_adj_pct": -0.538,
+ "cagr_estimate_single_slot": 0.0396,
+ "topix_baseline_cagr": 0.1276,
+ "capacity_estimate": {
+  "available": true,
+  "n_matched": 30952,
+  "median_adv20_jpy": 999274024.6228448,
+  "p25_adv20_jpy": 504872361.5147783,
+  "note": "ADV20の中央値・p25。10%participation上限を仮定した場合の1イベントあたり執行可能額の目安=ADV20×10%（既存Study75A資産の再利用・新規計算なし）。",
+  "implied_per_event_capacity_jpy_at_10pct_participation": 99927402.46228449
+ },
+ "pass_fail_gates": {
+  "A_events_per_year_ge_30": true,
+  "B_positive_car_ge_1.5pct": false,
+  "C_pead_spread_positive": false,
+  "D_cagr_beats_topix": false
+ },
+ "final_verdict": "FAIL",
+ "run_at": "2026-07-21T01:27:00.411987+00:00"
+}

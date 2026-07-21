@@ -510,6 +510,26 @@ CP3 最終まとめ
 
 ---
 
+## §8A-9 PEAD FAIL後の統治判断（2026-07-21・重要・実行保留のまま記録）
+
+Study82 Phase D（PEAD Alpha Study）の結果はFAILだった。実行タスクの決定木は
+「FAIL: Freeze PEAD research and promote Cross-sectional Momentum Proposal」を指示していたが、
+**この指示は機械実行せず停止した**。理由:
+
+```
+Cross-sectional Momentum は Study95（2026-07-14）で既にKill判定済み
+（12-1モメンタム・Clenow slope×R²とも FAIL_ZERO_SPREAD）。
+統治原則3「REJECTされた領域を新しいアイデアとして再提案しないこと」に直接抵触するため、
+CSモメンタムへの昇格は実行しない。
+```
+
+**代わりに提案する次ステップ（未実行・ユーザー決裁待ち）**: PEAD assumptions downgraded →
+Study103 assumptions rerun（§8A-4A規則=1回のみ）→ Route B frontier re-estimation。
+Study83（TSMOM=REJECT）と合わせ、Route Bの3構成要素中2つが実測で否定されている——
+Route B自体の存続可否を再検証すべき局面。詳細→`reports/study82_phase_d_pead_alpha.md`§8。
+
+---
+
 ## §9 Research Status（現在地・2026-07-20 Study103実行後）
 
 ```
@@ -523,15 +543,21 @@ Route Status : B=Candidate(Mission=Assumption validation) / A=Standby(Graceful D
                / C=DORMANT / F=TERMINAL
 30% Route    : Optional Upside — DORMANT（§8A-1 Route C再起動条件A/B/C成立まで）
 Freeze Rule  : No new alpha impl/BT until Study82完了（§8A-2）
-Study82      : Phase0 = PASS（実データ検証・n=83・2026-07-20実行完了）
+Study82Ph0   : Phase0 = PASS（実データ検証・n=83・2026-07-20実行完了）
+Study82PhD   : **PEAD Alpha Study完了（2026-07-21）= FAIL**。全銘柄実データ（n=30,952イベント・
+               Study75 PIT全ユニバース）。PEADスプレッド逆転（-0.538%・Negative群がPositive群を
+               上回る）。両群ともt=5.3/7.9で統計的に強く有意——「シグナルなし」ではなく
+               「方向が逆」。CAGR推定3.96%<TOPIX12.76%。詳細→`reports/study82_phase_d_pead_alpha.md`
 Study83      : **実装+実測完了（2026-07-21）= REJECT（本実装スコープ）**。3アーム
                （N=20/60/120d）全てcanon成功ゲート不通過。TSMOM仮定は楽観的だったと判明
                （最良アームCAGR+2.47% vs 仮定Conservative15%）。Core相関のみ仮定より良好
                （実測-0.26〜+0.18 vs 仮定0.15-0.35）。詳細→`reports/study83_tsmom_sleeve.md`
 Freeze Rule  : Study82完了で一部解除。Study83は完了済み（結果=REJECT）
-Completion   : Research OS Design ≈99% / Research Execution ≈25-30%（Study82+83完了で上振れ）
-Unknown解消  : #1 PEAD PIT研究可能=PASS(解消) / #2 TSMOM実測=楽観的と判明(解消) /
-               #3 Core真の能力=CP3待ち（未解消）
+Completion   : Research OS Design ≈99% / Research Execution ≈30-35%（Study82Ph0+PhD+83完了で上振れ）
+Unknown解消  : #1 PEAD PIT研究可能=PASS(解消) / #1b PEADアルファ=FAIL・方向逆転(解消) /
+               #2 TSMOM実測=楽観的と判明(解消) / #3 Core真の能力=CP3待ち（唯一の未解消）
+⚠ Route B     : 3構成要素中2つ（PEAD・TSMOM）が実測で否定された。存続可否の再検証が必要
+               （§8A-9参照・ユーザー決裁待ち）
 ```
 
 ### §9A CP2判定確定（Study103実行結果・2026-07-20）
@@ -588,6 +614,7 @@ Study95でMN期待値が低下した結果、PEAD/TSMOMの相対順位が上が�
 | 版 | 日付 | 内容 |
 |---|---|---|
 | v1.0-v1.4 | 2026-07-19/20 | `roadmap_revision_2026-07-19.md`§改版履歴参照（HISTORY） |
+| v1.6.0 | 2026-07-21 | **Study82 Phase D（PEAD Alpha Study）実装+全銘柄実測完了**: `src/backtest/study82_phase_d_pead_alpha.py`新規実装（Study75 PIT全ユニバース3,020銘柄・`/v2/fins/summary`実データ・YoY EPSサプライズ符号2群・40d固定保有・PARAMS_LOCKEDコスト）。**結果=FAIL**（30,952イベント・両群t=5.3/7.9で強く有意だが**PEADスプレッドが符号逆転**=Negative群がPositive群を上回る。CAGR推定3.96%<TOPIX12.76%。Capacity非拘束=ADV20中央値約¥10億）。実装中にAPIレート制限による キャッシュ汚染バグを発見・修正（84件破棄・スロットリング導入・失敗と空データの区別を実装）。**§8A-9新設**: タスク指定の決定木「FAIL→CSモメンタム昇格」はStudy95 Kill判定（2026-07-14）との統治原則3抵触のため実行せず保留——Route B rerun要否の決裁を代替提案。詳細→`reports/study82_phase_d_pead_alpha.md` |
 | v1.5.9 | 2026-07-21 | **Study83実装+実測完了（実測反映）**: `src/backtest/study83_tsmom_sleeve.py`新規実装（TOPIX単一指数・vol-target22.5%・レバ上限2.0x・固定グリッド20/60/120d・Study78trade帰属近似によるCore相関測定）。**結果=REJECT**（0/3アームがcanon成功ゲート通過・全アームCAGR仮定Conservative未達・MaxDD仮定を最大+55pp超過）。機序確認: 2020年COVID前後の低ボラ局面でレバ上限張り付き→後方参照型vol-target特有のラグ+高turnover(13-25回/年)によるwhipsawコストが主因（実装バグでないことを確認済み）。Core相関のみ仮定より良好（実測-0.26〜+0.18）。PEAD相関はN/A（Phase D未実施のため測定禁止・意図的未測定）。Study103仮定は「楽観的だった」と判定。Unknown#2解消。次段階=Study103 rerun要否の決裁（§8A-4A規則適用・未実行のまま提案のみ）→Core実測→CP3。詳細→`reports/study83_tsmom_sleeve.md` |
 | v1.5.8 | 2026-07-20 | **Study82 Phase0実行完了（実測反映・governance許容改定）**: `src/jquants/provider.py::get_fins_summary()`新規実装+`src/scripts/study82_phase0_audit.py`実行（n=83・`/v2/fins/summary`）。Audit1-6全PASS（DiscTime実測12種の時刻分布で場中/引後判別可能・DocType+DiscNoで訂正開示区別可能かつ実データにも修正開示13件実在・廃止銘柄29件取得）。**Study82 = PASS確定**。実データでv1想定フィールド名`TypeOfDocument`/`DisclosureNumber`は実在せず実際は`DocType`/`DiscNo`と判明（他エンドポイントと同型のv1/v2乖離）。留保: `from`/`to`パラメータ不機能の疑い（1コードで全履歴約10年分が返る）・Audit4は業績予想修正のみ確認（決算数値自体の訂正は本サンプル未確認）。§8A-1A決定木適用: Study103 rerun不要→Study83 Proposalへ進行可（実装着手は別途判断）。詳細→`reports/study82_phase0_report.md` |
 | **v1.5.7** | 2026-07-20 | **最終自己整合化（ユーザー補正・Execution Phase定着）**: Primary/Secondary/Optional Upside三層に研究目的を再表現（Primary=Study103仮定が現実データで生存するか検証・Secondary=Route B現実的上限測定・Optional Upside=30%/1.5はDormant） / 唯一の未確定事項を単一命題化（`Do Study103 assumptions survive real-world data constraints?`） / **§8A-4A Study52再発防止規則新設**（Study103 rerunはmajor assumption downgrade毎に1回のみ・段階的すり合わせ型rerun禁止・materially new evidence必須） / §8A-6完成度評価（Design≈99%/Execution≈10-15%・完了チェックリスト） / §8A-7現時点禁止事項の明示列挙（7項） / §8A-8 CP3までのフローチャート / Study82目的を"PEAD works?"から**"Can PEAD be researched without leakage?"**へ再定義・監査項目をAudit1-6体系へ再編（`study82_phase0_design.md`v1.3で反映）/ 優先順位の文言をPASS/FAIL決定木の機械適用として明確化・「PEAD FAIL≠Route B FAIL」を再強調 / 最終一文確定: `Freeze roadmap. Execute Study82. Attempt to falsify Route B assumptions.` |

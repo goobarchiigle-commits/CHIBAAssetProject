@@ -1,9 +1,56 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-21（★Study83実装+実測完了 = REJECT確定（TSMOM仮定は楽観的だったと判明）★）
+# Single Source of Truth / 最終更新: 2026-07-21（★Study82 Phase D(PEAD Alpha)実装+全銘柄実測完了 = FAIL・スプレッド符号逆転★）
 # ※ロードマップ参照は必ず reports/roadmap_v15_governance_layer.md から開始（他は全てANNEX/HISTORY/FROZEN/SUPERSEDED）
-# ※研究フェーズ = Program Phase3 Route B Assumption Validation。Study82(PASS)+Study83(REJECT)完了→
-#   次点=Study103 rerun要否の決裁 or Core実測。
+# ※研究フェーズ = Program Phase3 Route B Assumption Validation。Study82Ph0(PASS)+Study82PhD(FAIL)+
+#   Study83(REJECT)完了→Route B 3要素中2つが実測で否定。次点=Study103 rerun要否の決裁（ユーザー）。
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
+
+---
+
+## ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ 2026-07-21 Study82 Phase D（PEAD Alpha Study）実装+全銘柄実測完了 — FAIL確定
+
+**性格**: fresh run実施（実データ・Study75 PIT全ユニバース3,020銘柄・単一パス・
+最適化/スイープ/ポートフォリオ構築/overlay/ML/CSモメンタム昇格ゼロ）。ユーザーASK_FIRST承認済み
+タスクに従い実装・実行。成果物: `src/backtest/study82_phase_d_pead_alpha.py`（新規） /
+`backtests/study82_phase_d_pead_alpha_2026-07-21.json` /
+`backtests/study82_phase_d_pead_events_2026-07-21.csv`（30,952件イベント台帳） /
+`reports/study82_phase_d_pead_alpha.md`。
+
+**実装**: `/v2/fins/summary`から全銘柄決算開示を収集（2,914/3,020銘柄でデータ取得）。
+YoY EPS変化の符号のみでPositive/Negative2群分類（最適化なし）。Study75 PIT所属月フィルタで
+hindsight排除。40日固定保有・翌営業日始値エントリー・PARAMS_LOCKEDコスト往復適用。
+
+**⚠実装中に発見・修正した実バグ**: 初回実行がJ-Quants APIレート制限（429）に持続的に抵触し、
+リトライ失敗を空リストとして誤ってキャッシュする欠陥があった（84銘柄分の汚染疑いキャッシュを
+削除）。スロットリング（1.2秒/リクエスト）導入・失敗と空データの区別を実装して全銘柄再収集
+（3,020/3,020・失敗0件で完走）。
+
+**最終判定 = FAIL**:
+| 指標 | Positive群(n=17,959) | Negative群(n=12,993) |
+|---|---|---|
+| コスト後平均return(40d) | +0.619% | +1.157% |
+| t統計量 | 5.3 | 7.9 |
+
+**PEADスプレッド（Positive-Negative）= -0.538%（符号逆転）**。両群ともt=5.3/7.9で強く有意——
+「シグナルなし」ではなく「古典的PEAD理論と逆方向」。単一スロットCAGR推定3.96%（Positive群）
+<TOPIX基準12.76%。判定ゲート4項目中Aのみ充足（B/C/D不成立）→FAIL。
+
+**重要な副次所見（既存知見との整合性）**: Study95（12-1モメンタム6M/12M有意に負）・Study99
+（RS高パーセンタイル群単調悪化）・Study83（TSMOMトレンドフォローで負のリターン）と方向性が
+完全に一致——継続型シグナルが軒並み逆転するという頑健な傾向として記録。
+
+**Capacity**: 非拘束（ADV20中央値約¥10億・プロジェクト資本規模の数十〜百倍）。FAILの原因は
+capacityではなくアルファの不在（想定方向の不在）。
+
+**§8A-9統治判断（重要）**: タスク指定の決定木「FAIL→Cross-sectional Momentum Proposal昇格」は
+**実行せず保留**。理由=CSモメンタムはStudy95（2026-07-14）で既にKill判定済み
+（FAIL_ZERO_SPREAD）——統治原則3「REJECT領域の再提案禁止」に直接抵触するため。
+代替提案（未実行）: PEAD assumptions downgraded→Study103 assumptions rerun（§8A-4A規則=1回のみ）
+→Route B frontier re-estimation。
+
+**Route Bの位置づけ**: 3構成要素（Core+PEAD+TSMOM）中2つ（PEAD・TSMOM）が実測で否定された。
+残るCoreも Study100/101 で厳しい結果（UNKNOWN・観測≈0-5%）。**Route B存続可否の再検証が
+必要な局面** — ユーザー決裁待ち。
 
 ---
 
