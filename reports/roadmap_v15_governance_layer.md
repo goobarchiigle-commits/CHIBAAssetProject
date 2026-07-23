@@ -1,6 +1,6 @@
 # Roadmap v1.5 — Governance Layer（統合正典・唯一の生きたロードマップ）
 
-**日付**: 2026-07-20
+**日付**: 2026-07-20（最終更新: 2026-07-22・v1.7.0）
 **STATUS**: ★★ **CURRENT CANON（現行正典・唯一のエントリーポイント）** ★★
 **性格**: 文書のみ（BT・コード変更・新規仮説生成なし）。v1.3統治層+v1.4戦略層+ユーザー最終統合指示を単一文書へ統合。以後、ロードマップ参照は**本書から開始する**こと。
 
@@ -530,6 +530,122 @@ Route B自体の存続可否を再検証すべき局面。詳細→`reports/stud
 
 ---
 
+## §8B PEAD Reversal Root Cause + Generalization Test（2026-07-22・Study82E/95E）
+
+Study82 Phase D（FAIL・スプレッド逆転）を受け、post-mortem decomposition studyを2件実行した
+（Freeze Rule対象外——新規alpha実装・BT・データ取得を伴わない既存台帳の再分析のため）。
+
+### Study82E — PEAD Reverse Root Cause Audit（実行完了・2026-07-22）
+
+既存30,952件イベント台帳（Study82 Phase D）をSize/Liquidity/Time period/Market regime/
+Gap absorption(0-1d/2-5d/6-20d/21-40d)の5軸で分解。
+
+```
+Root cause ranking: Size(1.06pp) > Time period(0.48pp) > Liquidity(0.37pp) > Regime(0.01pp)
+Large-capでスプレッドほぼゼロ・非有意（t=0.34）→ 逆転はSmall/Mid-cap集中
+Gap分解: r0_1〜r6_20で逆転最大 → r21_40で符号が古典的PEAD方向に反転（非有意）
+Regime分解: spread_range=0.009pp（実質ゼロ）→ regime-invariant
+```
+
+**判定: CONDITIONAL SURVIVAL**（Case1/3/4/5いずれも厳密には不成立）。
+
+**Meta Question回答（A寄り・B要素を伴う）**: 逆転は主に(A)日本Small/Mid-cap株の決算後
+短期オーバーリアクション訂正という実在の市場現象（regime-invariance・サプライズ強度への
+強い比例=Top1%でspread-7.7%が根拠）であり、(B)Study82 Phase Dの粗い二値YoY符号分類
+（全イベントの70%が実質無情報のまま強サプライズ群と混合）がその解釈解像度を悪化させていた、
+という二層構造。詳細→`reports/study82e_root_cause_audit.md`
+
+### Study95E — Momentum Reverse Decomposition（実行完了・2026-07-22）
+
+Study82E型の分解フレーム（Size/Liquidity/Time period/Market regime/Holding horizon）を
+Study95（cross-sectional momentum・FAIL_ZERO_SPREAD）に適用し、PEAD逆転の構造が
+momentumにも一般化するかを検証。
+
+```
+Size依存性: Study82とほぼ正反対（Largeが最も負・Smallが最も浅い）
+Liquidity依存性: Study82とほぼ正反対（低流動性のみ唯一の正スプレッド）
+統計的強度: 全bucket・全horizonで非有意（Study82は個別群t=5.3/7.9）
+共通点: Regime-invarianceのみ（両StudyともRegime分解でspread_range≈0）
+```
+
+**判定: Otherwise（構造不一致）——PEAD逆転はevent-specific phenomenonとして扱う**。
+「winner-buying family全体を説明する統一理論」（当初仮説）は**この実測では支持されない**。
+詳細→`reports/study95e_momentum_reverse_decomposition.md`
+
+---
+
+## §11 Winner Ontology Research Thread（2026-07-22・Study100→110A→110B・TERMINAL確定）
+
+Study95E後の「統一理論探索」の代わりに、Study100（静的RSR42=hindsight selection・FATAL）
+以来の未解決問題——**「そもそも未来勝者とは何か」が未定義のままUniverse研究を進めていた**
+——を独立した研究スレッドとして正式着手した。本スレッドは§1-§10のRoute B資産検証ライン
+（Core/PEAD/TSMOM）とは直交する——Universe構築方法論そのものを問う別軸である。
+
+### Study110A — Future Winner Definition Audit（実行完了・2026-07-22）
+
+Phase1=7ラベル（3M/6M/12M×Top10%・Top5%(raw) + 12M Calmar調整Top10%）でwinner定義間の
+overlap・persistence・concentrationを記述統計のみで検証（Universe C・108,895パネル行）。
+
+```
+Overlap（3M/6M/12M Top10 Jaccard平均）= 28.2% → Case2（20-50%）
+  ただし3M vs 12Mは19.66%——Case3境界（<20%）のほぼ真上
+Persistence（strict）= 8.3-14.9%（random baseline比lift 1.2-2.1倍・弱い）
+  12M_calmar_top10のloose persistence=17.9%はrandom baseline(20%)を下回る
+Concentration: Top10%銘柄が総プラスリターンの55-56%を占める（極端な集中ではない）
+```
+
+Decision TreeがCase2（Overlap）とCase3（Persistence弱い）の同時成立を示し優先順位が
+未規定だったため、Persistence軸を一次制約として厳密検定に回すStudy110Bへ進行した。
+詳細→`reports/study110a_future_winner_definition_audit.md`
+
+### Study110B — Future Winner Predictability Audit（実行完了・2026-07-22・TERMINAL確定）
+
+Study110A panelを再利用し、Transition Entropy + Permutation Null(N=1000) + Economic Lift
+Threshold（事前固定ルール）で決着させた。
+
+```
+事前固定ルール: if p>=0.05 or lift<1.5: TERMINAL else: PROCEED_TO_STUDY112
+
+3M: lift=1.304・p=0.001 → lift<1.5でTERMINAL
+6M: lift=1.287・p=0.001 → lift<1.5でTERMINAL
+12M: lift=1.208・p=0.001 → lift<1.5でTERMINAL
+```
+
+**統計的には非random（p=0.001・null分布から約15-20σ乖離）だが経済的閾値未達**——
+「構造は存在するが実務投入には小さすぎる」という最も判定の難しいケースがそのまま出た。
+Tier2診断（判定には不使用）: Regime間でほぼ差なし（4件連続のregime-invariance確認）・
+敗者(Q1)の方が勝者(Q10)より翌期維持率が高いという非対称性を観測。
+
+**Overall verdict: TERMINAL**。事前登録済み決定木（ユーザー2026-07-22指示）により
+以下を機械的に停止する:
+
+```
+✗ Study112（Promotion Survival Study）— HALTED
+✗ Study113（Leadership Emergence Study）— HALTED
+✗ Universe Generator v3 design — HALTED（Study110B PROCEED判定が前提条件のため）
+```
+
+詳細→`reports/study110b_future_winner_predictability_audit.md`
+
+### §11A 研究軸の転換（ユーザー事前合意済み・2026-07-22）
+
+```
+旧軸: winner prediction（未来のスター銘柄を探す）
+新軸: market inefficiency prediction（短期的な歪み・イベント・需給・制度要因）
+```
+
+Study110B TERMINALはこの転換の発火条件そのもの（ユーザー事前指示: 「Study110Bで
+persistence≈randomになった場合、研究対象をwinner prediction→market inefficiency
+predictionへ切り替えるべき」）。**Study82E（§8B）が既にこの新軸の実例を提示済み**——
+「日本Small/Mid-cap株の決算後短期オーバーリアクション訂正」はwinner予測ではなく
+market inefficiency（イベント起因の一時的歪み）そのものであり、Study82F
+（Holding Horizon Decomposition・40-120d古典的PEAD存否）はこの新軸の直接の延長として
+自然に接続する。Universe Generator系（旧軸）とStudy82F（新軸）は、当初は別カテゴリの
+タスクとして起案されたが、Study110B確定後は**新軸研究の中で唯一稼働中のスレッド**という
+位置づけに収斂した。
+
+---
+
 ## §9 Research Status（現在地・2026-07-20 Study103実行後）
 
 ```
@@ -558,6 +674,20 @@ Unknown解消  : #1 PEAD PIT研究可能=PASS(解消) / #1b PEADアルファ=FAI
                #2 TSMOM実測=楽観的と判明(解消) / #3 Core真の能力=CP3待ち（唯一の未解消）
 ⚠ Route B     : 3構成要素中2つ（PEAD・TSMOM）が実測で否定された。存続可否の再検証が必要
                （§8A-9参照・ユーザー決裁待ち）
+Study82E     : **PEAD逆転Root Cause Audit完了（2026-07-22）= CONDITIONAL SURVIVAL**。
+               Root cause=Size(1.06pp)>Time period(0.48pp)>Liquidity(0.37pp)>Regime(0.01pp)。
+               Large-capで逆転消失（非有意）・Gap分解でr21_40のみ符号が古典的方向へ反転。
+               Meta Question=A寄り（Small/Mid-cap短期オーバーリアクション訂正が実在の市場現象・
+               Phase Dの粗い二値信号定義が解釈解像度を悪化）。詳細→§8B
+Study95E     : **Momentum Reverse Decomposition完了（2026-07-22）= Otherwise（構造不一致）**。
+               Size/Liquidity依存性がStudy82と正反対・全bucket非有意。「winner-buying統一理論」
+               仮説は不成立——PEAD逆転はevent-specific phenomenon。詳細→§8B
+Winner Ontology: **Study110A/110B完了（2026-07-22）= TERMINAL確定**。Overlap=Case2境界
+               （3M-12M=19.66%）・Persistence=random baseline比lift1.2-2.1倍（弱い）。
+               Study110B機械判定=TERMINAL（全horizon lift<1.5・p=0.001で統計的有意だが
+               経済的閾値未達）。Study112/113/Universe Generator v3=HALTED。
+               研究軸をwinner prediction→market inefficiency predictionへ転換
+               （Study82Fが新軸の唯一の稼働中スレッド）。詳細→§11
 ```
 
 ### §9A CP2判定確定（Study103実行結果・2026-07-20）
@@ -581,17 +711,28 @@ Tier1 = GREEN（10-18%/Calmar1.0・Conservativeでも部分成立17.6%）
 
 ---
 
-## §10 戦略優先順位（2026-07-20 CP2確定後・更新）
+## §10 戦略優先順位（2026-07-22 Study110B TERMINAL確定後・更新）
+
+**2トラック構成（v1.7.0で正式分離）**: Route B資産検証トラック（§1-§10本流・Core/PEAD/TSMOM）
+と、market inefficiency predictionトラック（§11で新設・Study82E由来）は独立に進行する。
+Winner Ontologyトラック（Study110A/B・Universe Generator v3系）はTERMINAL確定により停止済み。
 
 ```
-第1優先: Study82（PEAD発表日時精度監査・第一関門）— Route B頂点の前提
-第2優先: Study83（TSMOM CP3）— Route Bもう一方の構成要素・実装最易
-第3優先: Study75 completion（Universe-B生成）— Study76/E1分岐に必要
-第4優先: Study76（複雑性判定・E1分岐点）
+第1優先: Study82F（Holding Horizon Decomposition・40-120d古典的PEAD存否）
+         — market inefficiency predictionトラックの唯一の稼働中スレッド（§11A）
+         判定: 40-120dにPEADなし→Classical PEAD REJECT
+               40-120dにPEAD存在→Short-term reversal masks PEAD
+第2優先: Study100 decomposition refinement（+11-12pp FATALバイアスのさらなる分解・
+         selection/sector/listing age/survival）— 情報価値はP0/P1より低い（既にFATAL判定は充分）
+第3優先: Core CP3本体（Unknown#3・唯一未解消の主軸課題）— 急がない（§8A-4確定方針のまま）
+第4優先: Study75 completion（Universe-B生成）／ Study76（複雑性判定・E1分岐点）
+
+停止中: Study112（Promotion Survival）/ Study113（Leadership Emergence）/
+        Universe Generator v3 design — いずれもStudy110B TERMINAL判定によりHALTED（§11）
+```
 
 Study80（MN）は本MCで最適配分にほぼ非登場（Conservativeでのみ出現）— 優先度は暫定順位表の
 3位から維持しつつ、Study82/83完了後に再評価。Study102（ARCH-E）はRoute D=Dormantのまま。
-```
 
 （~~v1.1-v1.4の「75→76→103」順~~ → v1.5.1「103最優先」 → **v1.5.1確定後は結果に従いCP2完了・
 Route B起動。Study103自体は完了済みのため優先順位から外れ、次点のStudy82/83へ移行**。）
@@ -613,6 +754,7 @@ Study95でMN期待値が低下した結果、PEAD/TSMOMの相対順位が上が�
 
 | 版 | 日付 | 内容 |
 |---|---|---|
+| **v1.7.0** | 2026-07-22 | **Winner Ontology Research Thread新設・TERMINAL確定 + PEAD逆転root cause/generalization test完了**: **§8B新設**（Study82E=PEAD逆転Root Cause Audit実行完了・判定CONDITIONAL SURVIVAL。Root cause ranking=Size>Time period>Liquidity>Regime、Large-capで逆転消失・Gap分解r21_40で符号反転の兆候。Meta Question回答=A寄り（Small/Mid-cap短期オーバーリアクション訂正が実在の市場現象）。Study95E=Momentum Reverse Decomposition実行完了・判定Otherwise——Size/Liquidity依存性がStudy82と正反対・全bucket非有意。「winner-buying統一理論」仮説を棄却）／ **§11新設**（Study100のhindsight selection FATAL判定を起点に、Route B資産検証ラインと直交する新研究スレッド「未来勝者とは何か」を正式着手。Study110A=Future Winner Definition Audit実行完了・Overlap=Case2境界(3M-12M=19.66%)・Persistence=random比lift1.2-2.1倍で弱い。Study110B=Future Winner Predictability Audit実行完了・Transition Entropy+Permutation Null(N=1000)+Economic Lift Thresholdの事前固定ルール適用・**全horizonでlift<1.5によりTERMINAL確定**（統計的有意性p=0.001は充分だが経済的閾値未達）。Study112/113/Universe Generator v3design=HALTED）／ **§11A新設**（研究軸をwinner prediction→market inefficiency predictionへ転換・Study82Fが新軸の唯一の稼働中スレッドとして自然接続）／ §9 Research Status・§10優先順位を実測反映（2トラック構成へ再編・Study82F第1優先・Study100分解精緻化第2優先・Winner Ontology系全停止を明記）。詳細→`reports/study82e_root_cause_audit.md` / `reports/study95e_momentum_reverse_decomposition.md` / `reports/study110a_future_winner_definition_audit.md` / `reports/study110b_future_winner_predictability_audit.md` |
 | v1.0-v1.4 | 2026-07-19/20 | `roadmap_revision_2026-07-19.md`§改版履歴参照（HISTORY） |
 | v1.6.0 | 2026-07-21 | **Study82 Phase D（PEAD Alpha Study）実装+全銘柄実測完了**: `src/backtest/study82_phase_d_pead_alpha.py`新規実装（Study75 PIT全ユニバース3,020銘柄・`/v2/fins/summary`実データ・YoY EPSサプライズ符号2群・40d固定保有・PARAMS_LOCKEDコスト）。**結果=FAIL**（30,952イベント・両群t=5.3/7.9で強く有意だが**PEADスプレッドが符号逆転**=Negative群がPositive群を上回る。CAGR推定3.96%<TOPIX12.76%。Capacity非拘束=ADV20中央値約¥10億）。実装中にAPIレート制限による キャッシュ汚染バグを発見・修正（84件破棄・スロットリング導入・失敗と空データの区別を実装）。**§8A-9新設**: タスク指定の決定木「FAIL→CSモメンタム昇格」はStudy95 Kill判定（2026-07-14）との統治原則3抵触のため実行せず保留——Route B rerun要否の決裁を代替提案。詳細→`reports/study82_phase_d_pead_alpha.md` |
 | v1.5.9 | 2026-07-21 | **Study83実装+実測完了（実測反映）**: `src/backtest/study83_tsmom_sleeve.py`新規実装（TOPIX単一指数・vol-target22.5%・レバ上限2.0x・固定グリッド20/60/120d・Study78trade帰属近似によるCore相関測定）。**結果=REJECT**（0/3アームがcanon成功ゲート通過・全アームCAGR仮定Conservative未達・MaxDD仮定を最大+55pp超過）。機序確認: 2020年COVID前後の低ボラ局面でレバ上限張り付き→後方参照型vol-target特有のラグ+高turnover(13-25回/年)によるwhipsawコストが主因（実装バグでないことを確認済み）。Core相関のみ仮定より良好（実測-0.26〜+0.18）。PEAD相関はN/A（Phase D未実施のため測定禁止・意図的未測定）。Study103仮定は「楽観的だった」と判定。Unknown#2解消。次段階=Study103 rerun要否の決裁（§8A-4A規則適用・未実行のまま提案のみ）→Core実測→CP3。詳細→`reports/study83_tsmom_sleeve.md` |
