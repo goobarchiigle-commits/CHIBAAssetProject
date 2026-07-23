@@ -7,10 +7,15 @@ database/market/index/README.md で「設計のみ・未実装」とされてい
 ギャップの解消）。DIY等ウェイトproxyではなく公式指数を使うことで、セクターモメンタム
 研究（Study98等）の精度を向上させる。
 
-指数コード対応（2026-07-15 実測確認済み・全17件が個別に有効な価格データを返すことを確認）:
-  companies.parquet の Sector17Code（1〜17）と J-Quants指数コード（"00XX"）は
-  index_code = f"{39 + sector17_code:04d}" の関係（0040=食品(1) 〜 0056=不動産(17)）。
-  TOPIX全体は code="0000"。
+指数コード対応（2026-07-23 訂正・実測確認済み）:
+  2026-07-15時点の実装は index_code = f"{39 + sector17_code:04d}"（0040-0056）としていたが、
+  これは誤り（0040-0056は東証33業種指数側のコード帯・TOPIX-17ではない）。J-Quants公式
+  配信対象指数コード一覧（https://jpx-jquants.com/ja/spec/idx-bars-daily/indexcodes）および
+  実データでの相関検証（Sector17Code別バスケットとの日次リターン相関・銀行/医薬品で対照実験）
+  により、正しいコード帯は 0080-0090（16進表記）であることを実測確認した
+  （0080=食品(1) 〜 0090=不動産(17)）。companies.parquet の Sector17Code（1〜17）との対応は
+  index_code = format(0x80 + sector17_code - 1, "04X")。TOPIX全体は code="0000"。
+  旧コード帯(0040-0056)は東証33業種指数（別データセット・v1では未実装）。
 
 保存先: database/market/index/prices/{IndexCode}.parquet（README想定スキーマに準拠）。
 書き込み境界: data/jquants/ には一切書き込まない（database/market 専用・既存の
@@ -42,12 +47,26 @@ SECTOR17_NAMES: dict[int, str] = {
     13: "商社・卸売", 14: "小売", 15: "銀行", 16: "金融（除く銀行）", 17: "不動産",
 }
 
+# その他主要指数（2026-07-23実測確認・Standardプランで取得可能）。
+# 日経225はJ-Quants非提供（Nikkei Inc独自ライセンスのため。公式配信対象指数コード一覧に
+# 存在しないことを確認済み）。JPX日経400は配当込み・終値のみのB507が唯一の入手可能な系列。
+OTHER_INDEX_CODES: dict[str, str] = {
+    "0070": "東証グロース市場250指数（旧東証マザーズ指数）",
+    "0075": "東証REIT指数",
+    "0500": "東証プライム市場指数",
+    "0501": "東証スタンダード市場指数",
+    "0502": "東証グロース市場指数",
+    "0503": "JPXプライム150指数",
+    "0504": "JPXスタートアップ急成長100指数",
+    "B507": "配当込みJPX日経インデックス400（終値のみ）",
+}
+
 
 def sector17_to_index_code(sector17_code: int) -> str:
-    """companies.parquet の Sector17Code（1-17）→ J-Quants TOPIX-17指数コード（'0040'-'0056'）。"""
+    """companies.parquet の Sector17Code（1-17）→ J-Quants TOPIX-17指数コード（'0080'-'0090'・16進）。"""
     if not (1 <= sector17_code <= 17):
         raise ValueError(f"Sector17Code must be 1-17 (TOPIX-17 official sectors only): {sector17_code}")
-    return f"{39 + sector17_code:04d}"
+    return f"{0x80 + sector17_code - 1:04X}"
 
 
 def fetch_index_series(index_code: str, start: str, end: str,
@@ -90,6 +109,20 @@ def fetch_and_save_all_topix17(start: str, end: str, *, include_topix: bool = Tr
     return result
 
 
+def fetch_and_save_other_indices(start: str, end: str) -> dict[str, int]:
+    """OTHER_INDEX_CODES（Growth250/REIT/Prime/Standard/Growth市場/JPXプライム150等）を取得・保存する。"""
+    INDEX_PRICES_DIR.mkdir(parents=True, exist_ok=True)
+    provider = JQuantsProvider()
+    result: dict[str, int] = {}
+    for code in OTHER_INDEX_CODES:
+        df = fetch_index_series(code, start, end, provider=provider)
+        out_path = INDEX_PRICES_DIR / f"{code}.parquet"
+        df.to_parquet(out_path)
+        result[code] = len(df)
+        logger.info("[INDEX_PRICES] code=%s (%s) rows=%d saved=%s", code, OTHER_INDEX_CODES[code], len(df), out_path)
+    return result
+
+
 def load_index_series(index_code: str) -> pd.DataFrame:
     """保存済みの指数価格系列を読み込む（Date index・Open/High/Low/Close列）。"""
     path = INDEX_PRICES_DIR / f"{index_code}.parquet"
@@ -119,7 +152,7 @@ def main() -> int:
 
     result = fetch_and_save_all_topix17(args.start, args.end)
     for code, n in result.items():
-        sector_n = int(code) - 39 if code != "0000" else 0
+        sector_n = int(code, 16) - 0x80 + 1 if code != "0000" else 0
         name = "TOPIX" if code == "0000" else SECTOR17_NAMES.get(sector_n, "?")
         print(f"  {code} ({name}): {n} rows")
     return 0

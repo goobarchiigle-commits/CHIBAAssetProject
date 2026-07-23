@@ -637,6 +637,14 @@ DATABASE_MARGIN_DIR:       Path = DATABASE_MARKET_DIR / "margin"
 DATABASE_SHORTSELLING_DIR: Path = DATABASE_MARKET_DIR / "shortselling"
 DATABASE_METADATA_DIR:     Path = DATABASE_MARKET_DIR / "metadata"
 DATABASE_CACHE_DIR:        Path = DATABASE_MARKET_DIR / "cache"
+DATABASE_MINUTE_DIR:       Path = DATABASE_MARKET_DIR / "minute"
+DATABASE_TICK_DIR:         Path = DATABASE_MARKET_DIR / "tick"
+
+# ── Bulk API 原本CSV.GZ 永久保存領域（database/market・dataとは独立・絶対コミット禁止） ──
+# J-Quants Bulk API（/v2/bulk/list, /v2/bulk/get）のKeyパスをそのままミラーする。
+# Parquet（database/market/配下）はこの原本からの派生データという位置付け（解約後もこれが一次データ）。
+ARCHIVE_DIR:      Path = BASE_DIR / "archive"
+ARCHIVE_BULK_DIR: Path = ARCHIVE_DIR / "bulk"
 
 
 def ensure_database_market_dirs() -> None:
@@ -645,8 +653,14 @@ def ensure_database_market_dirs() -> None:
         DATABASE_OHLCV_DIR, DATABASE_MASTER_DIR, DATABASE_FUNDAMENTALS_DIR, DATABASE_ETF_DIR,
         DATABASE_INDEX_DIR, DATABASE_FACTOR_DIR, DATABASE_MACRO_DIR, DATABASE_MARGIN_DIR,
         DATABASE_SHORTSELLING_DIR, DATABASE_METADATA_DIR, DATABASE_CACHE_DIR,
+        DATABASE_MINUTE_DIR, DATABASE_TICK_DIR,
     ):
         path.mkdir(parents=True, exist_ok=True)
+
+
+def ensure_archive_dirs() -> None:
+    """archive/bulk/ 配下（Bulk API原本CSV.GZ永久保存領域）を事前作成する。"""
+    ARCHIVE_BULK_DIR.mkdir(parents=True, exist_ok=True)
 
 
 # ── Study75/76 research pipeline ─────────────────────────────────────────────

@@ -44,7 +44,7 @@ def optimize_dtypes(df: pd.DataFrame, table_name: str) -> pd.DataFrame:
             continue
         out[col_spec.name] = _cast_column(out[col_spec.name], col_spec)
 
-    if table_name == "ohlcv" and "Code" in out.columns:
+    if table_name in ("ohlcv", "minute_bars", "tick", "fundamentals_summary") and "Code" in out.columns:
         out["Code"] = out["Code"].astype("string").astype("category")
 
     return out

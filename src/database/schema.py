@@ -12,6 +12,11 @@ from dataclasses import dataclass, field
 
 from src.database.exceptions import SchemaValidationError
 
+# database/market スキーマバージョン（破壊的変更時のみ手動bump。bulk_ingest_state.parquet等の
+# トレーサビリティ台帳に記録し、生成物がどのスキーマ世代のコードで作られたか追跡できるようにする）。
+DATABASE_SCHEMA_VERSION = "1.1.0"
+JQUANTS_API_VERSION = "v2"
+
 
 @dataclass(frozen=True)
 class ColumnSpec:
@@ -125,12 +130,58 @@ UNIVERSE_SCHEMA = TableSpec(
     ],
 )
 
+# ── minute/{year}/{yyyymm}.parquet（J-Quants Bulk API equities/bars/minute） ──
+MINUTE_BARS_SCHEMA = TableSpec(
+    table_name="minute_bars",
+    columns=[
+        ColumnSpec("Date", "datetime", False, "取引日"),
+        ColumnSpec("Time", "string", False, "分足時刻（HH:MM・取引所ローカル）"),
+        ColumnSpec("Code", "string", False, "銘柄コード"),
+        ColumnSpec("Open", "float", True, "分足始値"),
+        ColumnSpec("High", "float", True, "分足高値"),
+        ColumnSpec("Low", "float", True, "分足安値"),
+        ColumnSpec("Close", "float", True, "分足終値"),
+        ColumnSpec("Volume", "float", True, "分足出来高"),
+        ColumnSpec("TurnoverValue", "float", True, "分足売買代金"),
+    ],
+)
+
+# ── tick/{year}/{yyyymm}.parquet（J-Quants Bulk API equities/trades） ────────
+TICK_SCHEMA = TableSpec(
+    table_name="tick",
+    columns=[
+        ColumnSpec("Date", "datetime", False, "取引日"),
+        ColumnSpec("Code", "string", False, "銘柄コード"),
+        ColumnSpec("Time", "string", False, "約定時刻（HH:MM:SS.ffffff・マイクロ秒精度・文字列で精度保持）"),
+        ColumnSpec("SessionDistinction", "string", True, "セッション区分（前場/後場等の原コード）"),
+        ColumnSpec("Price", "float", True, "約定価格"),
+        ColumnSpec("TradingVolume", "float", True, "約定出来高"),
+        ColumnSpec("TransactionId", "int", True, "約定ID（当日内での識別子）"),
+    ],
+)
+
+# ── fundamentals/summary/{year}.parquet（J-Quants Bulk API fins/summary） ────
+# 実測列数=約90列（決算短信サマリの全項目）。全列を手動定義せず、識別に必須の列のみ
+# nullable=Falseで固定し、残りはBulk CSVの列をそのまま透過させる（schema.pyのvalidate_schemaは
+# 未知の追加列をエラーにしない設計のため・数値実務項目の追加/変更に追随しやすくする狙い）。
+FUNDAMENTALS_SUMMARY_SCHEMA = TableSpec(
+    table_name="fundamentals_summary",
+    columns=[
+        ColumnSpec("DiscDate", "datetime", False, "開示日"),
+        ColumnSpec("DiscTime", "string", True, "開示時刻"),
+        ColumnSpec("Code", "string", False, "銘柄コード"),
+        ColumnSpec("DiscNo", "string", False, "開示番号（一意識別子）"),
+        ColumnSpec("DocType", "string", True, "開示書類種別"),
+    ],
+)
+
 # ── master/indices.parquet ────────────────────────────────────────────────
 INDICES_SCHEMA = TableSpec(
     table_name="indices",
     columns=[
         ColumnSpec("IndexCode", "string", False, "指数コード"),
         ColumnSpec("IndexName", "string", True, "指数名"),
+        ColumnSpec("Category", "string", True, "指数カテゴリ（TOPIX/TOPIX_SECTOR/REIT/GROWTH/JPX_MARKET_SEGMENT/JPX等）"),
         ColumnSpec("Provider", "string", True, "算出主体（JPX/日本経済新聞社等）"),
         ColumnSpec("AssetClass", "string", True, "資産クラス"),
         ColumnSpec("Description", "string", True, "説明"),
@@ -148,6 +199,9 @@ TABLE_SCHEMAS: dict[str, TableSpec] = {
     "classifications": CLASSIFICATIONS_SCHEMA,
     "universe": UNIVERSE_SCHEMA,
     "indices": INDICES_SCHEMA,
+    "minute_bars": MINUTE_BARS_SCHEMA,
+    "tick": TICK_SCHEMA,
+    "fundamentals_summary": FUNDAMENTALS_SUMMARY_SCHEMA,
 }
 
 

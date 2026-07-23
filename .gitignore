@@ -31,6 +31,10 @@ src/.env
 # 先頭 / でリポジトリ直下の database/ のみに限定する（src/database/ のソースコードを保護）。
 /database/
 
+# Bulk API 原本CSV.GZ 永久保存領域（大容量・J-Quants Bulk APIダウンロード原本）
+# 先頭 / でリポジトリ直下の archive/ のみに限定する。
+/archive/
+
 # IDE
 .vscode/
 .idea/
