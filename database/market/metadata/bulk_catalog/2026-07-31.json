@@ -1,0 +1,58 @@
+{
+  "queried_date": "20260731",
+  "retrieved_at": "2026-07-31T20:31:47.008992+09:00",
+  "endpoint": "/v2/bulk/list",
+  "file_count": 10,
+  "files": [
+    {
+      "key": "equities/bars/daily/live/equities_bars_daily_20260731.csv.gz",
+      "size_bytes": 85353,
+      "last_modified": "2026-07-31T06:53:00+00:00"
+    },
+    {
+      "key": "equities/bars/minute/live/equities_bars_minute_20260731.csv.gz",
+      "size_bytes": 5287018,
+      "last_modified": "2026-07-31T07:40:57+00:00"
+    },
+    {
+      "key": "equities/master/live/equities_master_20260731.csv.gz",
+      "size_bytes": 116866,
+      "last_modified": "2026-07-31T08:16:26+00:00"
+    },
+    {
+      "key": "equities/trades/live/equities_trades_20260731.csv.gz",
+      "size_bytes": 62999704,
+      "last_modified": "2026-07-31T07:34:22+00:00"
+    },
+    {
+      "key": "fins/summary/live/fins_summary_20260731.csv.gz",
+      "size_bytes": 28156,
+      "last_modified": "2026-07-31T09:02:19+00:00"
+    },
+    {
+      "key": "indices/bars/daily/live/indices_bars_daily_20260731.csv.gz",
+      "size_bytes": 1459,
+      "last_modified": "2026-07-31T07:11:59+00:00"
+    },
+    {
+      "key": "indices/bars/daily/topix/live/indices_bars_daily_topix_20260731.csv.gz",
+      "size_bytes": 108,
+      "last_modified": "2026-07-31T07:31:21+00:00"
+    },
+    {
+      "key": "markets/margin-alert/live/markets_margin-alert_20260731.csv.gz",
+      "size_bytes": 8363,
+      "last_modified": "2026-07-31T07:26:29+00:00"
+    },
+    {
+      "key": "markets/short-ratio/live/markets_short-ratio_20260731.csv.gz",
+      "size_bytes": 864,
+      "last_modified": "2026-07-31T07:30:56+00:00"
+    },
+    {
+      "key": "markets/short-sale-report/live/markets_short-sale-report_20260731.csv.gz",
+      "size_bytes": 24564,
+      "last_modified": "2026-07-31T08:16:08+00:00"
+    }
+  ]
+}

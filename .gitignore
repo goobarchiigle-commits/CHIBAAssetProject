@@ -19,21 +19,43 @@ src/.env
 /runtime/
 *.jsonl
 *.log
+*.tmp
 
 # データ・バックテスト結果（大容量）
 # 先頭 / でリポジトリ直下の data/ のみに限定する（src/data/・tests/data/ のソースコードを保護）。
 /data/
 *.pkl
 *.parquet
-*.csv
+cache/*.csv
+
+# 全面 *.csv 除外は reports/・research/ 配下のStudy結果CSVまでgit管理外にしていたため
+# 2026-07-23 是正（reports/asset_audit_2026-07-23/参照）。生成物（cache/）のみ除外し、
+# 意味のある研究成果物CSVは追跡対象とする。
+!reports/**/*.csv
+!research/**/*.csv
 
 # 日本株分析データベース（大容量・Single Source of Truth生成物）
 # 先頭 / でリポジトリ直下の database/ のみに限定する（src/database/ のソースコードを保護）。
-/database/
+# ただし解約後に再現不可能な一次資料・監査証跡（README/bulk_catalog/verify_report/snapshot）は
+# 個別に例外化して追跡する（2026-07-31 ユーザー決裁）。coverage_report.json等の再生成可能な
+# ファイルは対象外のまま（/archive/legacy_pathsと同じ「親を*除外→個別に!で再導入」パターン）。
+/database/*
+!/database/market/
+/database/market/*
+!/database/market/README.md
+!/database/market/metadata/
+/database/market/metadata/*
+!/database/market/metadata/bulk_catalog/
+!/database/market/metadata/verify_report_*.json
+!/database/market/metadata/snapshot_*.json
 
 # Bulk API 原本CSV.GZ 永久保存領域（大容量・J-Quants Bulk APIダウンロード原本）
 # 先頭 / でリポジトリ直下の archive/ のみに限定する。
-/archive/
+# ただし archive/legacy_paths/（廃止確定コードの退避先・git履歴を維持したい）は例外的に追跡する。
+# 注: 親ディレクトリ丸ごと除外(/archive/)だとgitが配下を一切走査せず否定パターンが効かないため、
+# 直下の * のみ除外し archive/legacy_paths/ を個別に否定する形にする。
+/archive/*
+!/archive/legacy_paths/
 
 # IDE
 .vscode/

@@ -1,0 +1,63 @@
+{
+  "queried_date": "20260722",
+  "retrieved_at": "2026-07-23T13:34:35.498131+09:00",
+  "endpoint": "/v2/bulk/list",
+  "file_count": 11,
+  "files": [
+    {
+      "key": "derivatives/bars/daily/options/225/live/derivatives_bars_daily_options_225_20260722.csv.gz",
+      "size_bytes": 228238,
+      "last_modified": "2026-07-22T12:31:19+00:00"
+    },
+    {
+      "key": "equities/bars/daily/live/equities_bars_daily_20260722.csv.gz",
+      "size_bytes": 84636,
+      "last_modified": "2026-07-22T13:22:59+00:00"
+    },
+    {
+      "key": "equities/bars/minute/live/equities_bars_minute_20260722.csv.gz",
+      "size_bytes": 4658153,
+      "last_modified": "2026-07-22T07:29:27+00:00"
+    },
+    {
+      "key": "equities/master/live/equities_master_20260722.csv.gz",
+      "size_bytes": 116738,
+      "last_modified": "2026-07-22T23:06:53+00:00"
+    },
+    {
+      "key": "equities/trades/live/equities_trades_20260722.csv.gz",
+      "size_bytes": 47801781,
+      "last_modified": "2026-07-22T07:23:23+00:00"
+    },
+    {
+      "key": "fins/summary/live/fins_summary_20260722.csv.gz",
+      "size_bytes": 1749,
+      "last_modified": "2026-07-22T15:30:23+00:00"
+    },
+    {
+      "key": "indices/bars/daily/live/indices_bars_daily_20260722.csv.gz",
+      "size_bytes": 1465,
+      "last_modified": "2026-07-22T07:12:02+00:00"
+    },
+    {
+      "key": "indices/bars/daily/topix/live/indices_bars_daily_topix_20260722.csv.gz",
+      "size_bytes": 108,
+      "last_modified": "2026-07-22T07:31:25+00:00"
+    },
+    {
+      "key": "markets/margin-alert/live/markets_margin-alert_20260722.csv.gz",
+      "size_bytes": 8288,
+      "last_modified": "2026-07-22T07:26:29+00:00"
+    },
+    {
+      "key": "markets/short-ratio/live/markets_short-ratio_20260722.csv.gz",
+      "size_bytes": 842,
+      "last_modified": "2026-07-22T13:20:56+00:00"
+    },
+    {
+      "key": "markets/short-sale-report/live/markets_short-sale-report_20260722.csv.gz",
+      "size_bytes": 19275,
+      "last_modified": "2026-07-22T08:16:07+00:00"
+    }
+  ]
+}

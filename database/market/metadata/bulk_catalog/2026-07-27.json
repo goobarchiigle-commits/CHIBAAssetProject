@@ -1,0 +1,13 @@
+{
+  "queried_date": "20260727",
+  "retrieved_at": "2026-07-27T12:51:44.020626+09:00",
+  "endpoint": "/v2/bulk/list",
+  "file_count": 1,
+  "files": [
+    {
+      "key": "equities/master/live/equities_master_20260727.csv.gz",
+      "size_bytes": 116707,
+      "last_modified": "2026-07-26T23:06:41+00:00"
+    }
+  ]
+}
