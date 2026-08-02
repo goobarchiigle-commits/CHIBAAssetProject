@@ -1,0 +1,1000 @@
+{
+ "study": "Study110B_Sector_Conditioned_Formalization",
+ "title": "Study110B Tier2 sector persistenceの正式permutation検定（follow-up・新規Study番号なし）",
+ "run_at": "2026-08-02T00:11:06.948532+00:00",
+ "hypothesis": "同一Sector17分類内に限定したwinner subsetは全市場winner subsetより持続性が高い",
+ "not_a_test_of": "Economic Causal Graphそのもの（Sector17は粗いproxy・classification非PIT）",
+ "params": {
+  "n_deciles": 10,
+  "n_permutations": 1000,
+  "perm_seed": 42,
+  "lift_threshold": 1.5,
+  "p_threshold": 0.05,
+  "min_cross_section_n": 30,
+  "discovery": [
+   "2016-01-01",
+   "2022-12-31"
+  ],
+  "validation": [
+   "2023-01-01",
+   "2026-07-31"
+  ],
+  "permutation_block": "rebalance_date x Sector17CodeName（Tier1のrebalance_date単独から修正）",
+  "aggregation": "sector-weighted-average lift = sum(n_sector*lift_sector)/sum(n_sector)・cherry-pick禁止"
+ },
+ "full_market_baseline_reference_study110b_tier1": {
+  "3M": 1.3038,
+  "6M": 1.2867,
+  "12M": 1.208,
+  "note": "Study110B Tier1既存結果の再掲（再計算なし）"
+ },
+ "results": {
+  "3M": {
+   "full": {
+    "observed_weighted_lift": 1.3281,
+    "observed_weighted_entropy_ratio": 0.9536,
+    "null_lift_mean": 1.0697,
+    "null_lift_std": 0.0229,
+    "p_value_lift": 0.001,
+    "n_sectors_included": 18,
+    "median_sector_lift_diagnostic_only": 1.3056,
+    "n_permutations": 1000,
+    "verdict": "TERMINAL",
+    "decision_rule": "if p>=0.05 or weighted_lift<1.5: TERMINAL else: PROCEED",
+    "per_sector_diagnostic_not_used_for_verdict": {
+     "その他": {
+      "n": 580,
+      "entropy_ratio": 0.8788,
+      "lift": 2.1207
+     },
+     "エネルギー資源": {
+      "n": 146,
+      "entropy_ratio": 0.8476,
+      "lift": 1.3014
+     },
+     "不動産": {
+      "n": 531,
+      "entropy_ratio": 0.9513,
+      "lift": 1.1111
+     },
+     "医薬品": {
+      "n": 621,
+      "entropy_ratio": 0.9474,
+      "lift": 1.3366
+     },
+     "商社・卸売": {
+      "n": 833,
+      "entropy_ratio": 0.9513,
+      "lift": 1.4166
+     },
+     "小売": {
+      "n": 1411,
+      "entropy_ratio": 0.9723,
+      "lift": 1.2899
+     },
+     "建設・資材": {
+      "n": 1191,
+      "entropy_ratio": 0.9482,
+      "lift": 1.3098
+     },
+     "情報通信・サービスその他": {
+      "n": 3546,
+      "entropy_ratio": 0.9778,
+      "lift": 1.2465
+     },
+     "機械": {
+      "n": 1179,
+      "entropy_ratio": 0.9624,
+      "lift": 1.3656
+     },
+     "素材・化学": {
+      "n": 1499,
+      "entropy_ratio": 0.9543,
+      "lift": 1.5143
+     },
+     "自動車・輸送機": {
+      "n": 662,
+      "entropy_ratio": 0.9426,
+      "lift": 1.2689
+     },
+     "運輸・物流": {
+      "n": 867,
+      "entropy_ratio": 0.9412,
+      "lift": 1.0496
+     },
+     "金融（除く銀行）": {
+      "n": 725,
+      "entropy_ratio": 0.9432,
+      "lift": 1.4069
+     },
+     "鉄鋼・非鉄": {
+      "n": 562,
+      "entropy_ratio": 0.9439,
+      "lift": 1.2811
+     },
+     "銀行": {
+      "n": 848,
+      "entropy_ratio": 0.8878,
+      "lift": 1.2736
+     },
+     "電機・精密": {
+      "n": 1903,
+      "entropy_ratio": 0.974,
+      "lift": 1.3347
+     },
+     "電気・ガス": {
+      "n": 362,
+      "entropy_ratio": 0.9296,
+      "lift": 1.4917
+     },
+     "食品": {
+      "n": 786,
+      "entropy_ratio": 0.9593,
+      "lift": 1.1323
+     }
+    },
+    "n_pairs": 18252,
+    "n_blocks_date_x_sector": 430
+   },
+   "discovery": {
+    "observed_weighted_lift": 1.1791,
+    "observed_weighted_entropy_ratio": 0.71,
+    "null_lift_mean": 1.0072,
+    "null_lift_std": 0.0874,
+    "p_value_lift": 0.032,
+    "n_sectors_included": 15,
+    "median_sector_lift_diagnostic_only": 1.2676,
+    "n_permutations": 1000,
+    "verdict": "TERMINAL",
+    "decision_rule": "if p>=0.05 or weighted_lift<1.5: TERMINAL else: PROCEED",
+    "per_sector_diagnostic_not_used_for_verdict": {
+     "その他": {
+      "n": 23,
+      "note": "insufficient_n"
+     },
+     "エネルギー資源": {
+      "n": 9,
+      "note": "insufficient_n"
+     },
+     "不動産": {
+      "n": 34,
+      "entropy_ratio": 0.4962,
+      "lift": 0.2941
+     },
+     "医薬品": {
+      "n": 48,
+      "entropy_ratio": 0.699,
+      "lift": 1.6667
+     },
+     "商社・卸売": {
+      "n": 52,
+      "entropy_ratio": 0.5284,
+      "lift": 1.7308
+     },
+     "小売": {
+      "n": 82,
+      "entropy_ratio": 0.6703,
+      "lift": 0.9756
+     },
+     "建設・資材": {
+      "n": 57,
+      "entropy_ratio": 0.6238,
+      "lift": 1.7544
+     },
+     "情報通信・サービスその他": {
+      "n": 254,
+      "entropy_ratio": 0.8988,
+      "lift": 1.2992
+     },
+     "機械": {
+      "n": 78,
+      "entropy_ratio": 0.6869,
+      "lift": 0.641
+     },
+     "素材・化学": {
+      "n": 100,
+      "entropy_ratio": 0.7618,
+      "lift": 1.8
+     },
+     "自動車・輸送機": {
+      "n": 42,
+      "entropy_ratio": 0.5272,
+      "lift": 1.4286
+     },
+     "運輸・物流": {
+      "n": 68,
+      "entropy_ratio": 0.5929,
+      "lift": 0.1471
+     },
+     "金融（除く銀行）": {
+      "n": 50,
+      "entropy_ratio": 0.6158,
+      "lift": 1.2
+     },
+     "鉄鋼・非鉄": {
+      "n": 43,
+      "entropy_ratio": 0.6117,
+      "lift": 0.4651
+     },
+     "銀行": {
+      "n": 46,
+      "entropy_ratio": 0.5371,
+      "lift": 0.2174
+     },
+     "電機・精密": {
+      "n": 142,
+      "entropy_ratio": 0.8277,
+      "lift": 1.2676
+     },
+     "電気・ガス": {
+      "n": 32,
+      "entropy_ratio": 0.3939,
+      "lift": 2.1875
+     },
+     "食品": {
+      "n": 29,
+      "note": "insufficient_n"
+     }
+    },
+    "n_pairs": 1189,
+    "n_blocks_date_x_sector": 34
+   },
+   "validation": {
+    "observed_weighted_lift": 1.3392,
+    "observed_weighted_entropy_ratio": 0.9508,
+    "null_lift_mean": 1.0735,
+    "null_lift_std": 0.0229,
+    "p_value_lift": 0.001,
+    "n_sectors_included": 18,
+    "median_sector_lift_diagnostic_only": 1.3372,
+    "n_permutations": 1000,
+    "verdict": "TERMINAL",
+    "decision_rule": "if p>=0.05 or weighted_lift<1.5: TERMINAL else: PROCEED",
+    "per_sector_diagnostic_not_used_for_verdict": {
+     "その他": {
+      "n": 557,
+      "entropy_ratio": 0.8778,
+      "lift": 2.1724
+     },
+     "エネルギー資源": {
+      "n": 137,
+      "entropy_ratio": 0.8334,
+      "lift": 1.3869
+     },
+     "不動産": {
+      "n": 497,
+      "entropy_ratio": 0.9468,
+      "lift": 1.167
+     },
+     "医薬品": {
+      "n": 573,
+      "entropy_ratio": 0.9421,
+      "lift": 1.3089
+     },
+     "商社・卸売": {
+      "n": 781,
+      "entropy_ratio": 0.9533,
+      "lift": 1.3956
+     },
+     "小売": {
+      "n": 1329,
+      "entropy_ratio": 0.9709,
+      "lift": 1.3093
+     },
+     "建設・資材": {
+      "n": 1134,
+      "entropy_ratio": 0.9459,
+      "lift": 1.2875
+     },
+     "情報通信・サービスその他": {
+      "n": 3292,
+      "entropy_ratio": 0.9758,
+      "lift": 1.2424
+     },
+     "機械": {
+      "n": 1101,
+      "entropy_ratio": 0.9628,
+      "lift": 1.4169
+     },
+     "素材・化学": {
+      "n": 1399,
+      "entropy_ratio": 0.9551,
+      "lift": 1.4939
+     },
+     "自動車・輸送機": {
+      "n": 620,
+      "entropy_ratio": 0.9438,
+      "lift": 1.2581
+     },
+     "運輸・物流": {
+      "n": 799,
+      "entropy_ratio": 0.9291,
+      "lift": 1.1264
+     },
+     "金融（除く銀行）": {
+      "n": 675,
+      "entropy_ratio": 0.9361,
+      "lift": 1.4222
+     },
+     "鉄鋼・非鉄": {
+      "n": 519,
+      "entropy_ratio": 0.9339,
+      "lift": 1.3487
+     },
+     "銀行": {
+      "n": 802,
+      "entropy_ratio": 0.8735,
+      "lift": 1.3342
+     },
+     "電機・精密": {
+      "n": 1761,
+      "entropy_ratio": 0.9737,
+      "lift": 1.3401
+     },
+     "電気・ガス": {
+      "n": 330,
+      "entropy_ratio": 0.9341,
+      "lift": 1.4242
+     },
+     "食品": {
+      "n": 757,
+      "entropy_ratio": 0.959,
+      "lift": 1.1229
+     }
+    },
+    "n_pairs": 17063,
+    "n_blocks_date_x_sector": 396
+   },
+   "combined_discovery_validation_verdict": "FAIL"
+  },
+  "6M": {
+   "full": {
+    "observed_weighted_lift": 1.314,
+    "observed_weighted_entropy_ratio": 0.9392,
+    "null_lift_mean": 1.0635,
+    "null_lift_std": 0.023,
+    "p_value_lift": 0.001,
+    "n_sectors_included": 18,
+    "median_sector_lift_diagnostic_only": 1.2681,
+    "n_permutations": 1000,
+    "verdict": "TERMINAL",
+    "decision_rule": "if p>=0.05 or weighted_lift<1.5: TERMINAL else: PROCEED",
+    "per_sector_diagnostic_not_used_for_verdict": {
+     "その他": {
+      "n": 468,
+      "entropy_ratio": 0.7734,
+      "lift": 2.0299
+     },
+     "エネルギー資源": {
+      "n": 122,
+      "entropy_ratio": 0.7487,
+      "lift": 0.9016
+     },
+     "不動産": {
+      "n": 435,
+      "entropy_ratio": 0.9208,
+      "lift": 1.3563
+     },
+     "医薬品": {
+      "n": 514,
+      "entropy_ratio": 0.9207,
+      "lift": 1.2257
+     },
+     "商社・卸売": {
+      "n": 734,
+      "entropy_ratio": 0.9447,
+      "lift": 1.1444
+     },
+     "小売": {
+      "n": 1250,
+      "entropy_ratio": 0.9643,
+      "lift": 1.216
+     },
+     "建設・資材": {
+      "n": 985,
+      "entropy_ratio": 0.9343,
+      "lift": 1.4619
+     },
+     "情報通信・サービスその他": {
+      "n": 2925,
+      "entropy_ratio": 0.9713,
+      "lift": 1.2684
+     },
+     "機械": {
+      "n": 990,
+      "entropy_ratio": 0.9598,
+      "lift": 1.404
+     },
+     "素材・化学": {
+      "n": 1268,
+      "entropy_ratio": 0.953,
+      "lift": 1.2224
+     },
+     "自動車・輸送機": {
+      "n": 560,
+      "entropy_ratio": 0.932,
+      "lift": 1.2679
+     },
+     "運輸・物流": {
+      "n": 755,
+      "entropy_ratio": 0.9348,
+      "lift": 1.3245
+     },
+     "金融（除く銀行）": {
+      "n": 625,
+      "entropy_ratio": 0.9285,
+      "lift": 1.2
+     },
+     "鉄鋼・非鉄": {
+      "n": 481,
+      "entropy_ratio": 0.9128,
+      "lift": 1.6424
+     },
+     "銀行": {
+      "n": 705,
+      "entropy_ratio": 0.8573,
+      "lift": 1.5177
+     },
+     "電機・精密": {
+      "n": 1580,
+      "entropy_ratio": 0.9706,
+      "lift": 1.3544
+     },
+     "電気・ガス": {
+      "n": 315,
+      "entropy_ratio": 0.9063,
+      "lift": 1.1111
+     },
+     "食品": {
+      "n": 676,
+      "entropy_ratio": 0.9405,
+      "lift": 1.0059
+     }
+    },
+    "n_pairs": 15388,
+    "n_blocks_date_x_sector": 376
+   },
+   "discovery": {
+    "observed_weighted_lift": 1.4595,
+    "observed_weighted_entropy_ratio": 0.682,
+    "null_lift_mean": 1.0863,
+    "null_lift_std": 0.088,
+    "p_value_lift": 0.001,
+    "n_sectors_included": 16,
+    "median_sector_lift_diagnostic_only": 1.519,
+    "n_permutations": 1000,
+    "verdict": "TERMINAL",
+    "decision_rule": "if p>=0.05 or weighted_lift<1.5: TERMINAL else: PROCEED",
+    "per_sector_diagnostic_not_used_for_verdict": {
+     "その他": {
+      "n": 21,
+      "note": "insufficient_n"
+     },
+     "エネルギー資源": {
+      "n": 9,
+      "note": "insufficient_n"
+     },
+     "不動産": {
+      "n": 33,
+      "entropy_ratio": 0.465,
+      "lift": 1.2121
+     },
+     "医薬品": {
+      "n": 44,
+      "entropy_ratio": 0.498,
+      "lift": 2.2727
+     },
+     "商社・卸売": {
+      "n": 62,
+      "entropy_ratio": 0.5866,
+      "lift": 2.0968
+     },
+     "小売": {
+      "n": 91,
+      "entropy_ratio": 0.7374,
+      "lift": 1.6484
+     },
+     "建設・資材": {
+      "n": 61,
+      "entropy_ratio": 0.6412,
+      "lift": 1.4754
+     },
+     "情報通信・サービスその他": {
+      "n": 252,
+      "entropy_ratio": 0.8379,
+      "lift": 1.1508
+     },
+     "機械": {
+      "n": 83,
+      "entropy_ratio": 0.6523,
+      "lift": 1.5663
+     },
+     "素材・化学": {
+      "n": 112,
+      "entropy_ratio": 0.788,
+      "lift": 1.3393
+     },
+     "自動車・輸送機": {
+      "n": 46,
+      "entropy_ratio": 0.5542,
+      "lift": 1.087
+     },
+     "運輸・物流": {
+      "n": 72,
+      "entropy_ratio": 0.6479,
+      "lift": 1.6667
+     },
+     "金融（除く銀行）": {
+      "n": 52,
+      "entropy_ratio": 0.4828,
+      "lift": 1.1538
+     },
+     "鉄鋼・非鉄": {
+      "n": 45,
+      "entropy_ratio": 0.5685,
+      "lift": 1.7778
+     },
+     "銀行": {
+      "n": 44,
+      "entropy_ratio": 0.4667,
+      "lift": 2.7273
+     },
+     "電機・精密": {
+      "n": 139,
+      "entropy_ratio": 0.801,
+      "lift": 1.0791
+     },
+     "電気・ガス": {
+      "n": 32,
+      "entropy_ratio": 0.4081,
+      "lift": 1.5625
+     },
+     "食品": {
+      "n": 31,
+      "entropy_ratio": 0.5352,
+      "lift": 1.2903
+     }
+    },
+    "n_pairs": 1229,
+    "n_blocks_date_x_sector": 34
+   },
+   "validation": {
+    "observed_weighted_lift": 1.3009,
+    "observed_weighted_entropy_ratio": 0.9366,
+    "null_lift_mean": 1.0602,
+    "null_lift_std": 0.0248,
+    "p_value_lift": 0.001,
+    "n_sectors_included": 18,
+    "median_sector_lift_diagnostic_only": 1.2818,
+    "n_permutations": 1000,
+    "verdict": "TERMINAL",
+    "decision_rule": "if p>=0.05 or weighted_lift<1.5: TERMINAL else: PROCEED",
+    "per_sector_diagnostic_not_used_for_verdict": {
+     "その他": {
+      "n": 447,
+      "entropy_ratio": 0.7727,
+      "lift": 2.0358
+     },
+     "エネルギー資源": {
+      "n": 113,
+      "entropy_ratio": 0.7402,
+      "lift": 0.885
+     },
+     "不動産": {
+      "n": 402,
+      "entropy_ratio": 0.9124,
+      "lift": 1.3682
+     },
+     "医薬品": {
+      "n": 470,
+      "entropy_ratio": 0.9132,
+      "lift": 1.1277
+     },
+     "商社・卸売": {
+      "n": 672,
+      "entropy_ratio": 0.9418,
+      "lift": 1.0565
+     },
+     "小売": {
+      "n": 1159,
+      "entropy_ratio": 0.9612,
+      "lift": 1.1821
+     },
+     "建設・資材": {
+      "n": 924,
+      "entropy_ratio": 0.9343,
+      "lift": 1.461
+     },
+     "情報通信・サービスその他": {
+      "n": 2673,
+      "entropy_ratio": 0.9726,
+      "lift": 1.2795
+     },
+     "機械": {
+      "n": 907,
+      "entropy_ratio": 0.9577,
+      "lift": 1.3892
+     },
+     "素材・化学": {
+      "n": 1156,
+      "entropy_ratio": 0.9529,
+      "lift": 1.2111
+     },
+     "自動車・輸送機": {
+      "n": 514,
+      "entropy_ratio": 0.9252,
+      "lift": 1.284
+     },
+     "運輸・物流": {
+      "n": 683,
+      "entropy_ratio": 0.93,
+      "lift": 1.2884
+     },
+     "金融（除く銀行）": {
+      "n": 573,
+      "entropy_ratio": 0.9218,
+      "lift": 1.2042
+     },
+     "鉄鋼・非鉄": {
+      "n": 436,
+      "entropy_ratio": 0.9063,
+      "lift": 1.6284
+     },
+     "銀行": {
+      "n": 661,
+      "entropy_ratio": 0.8611,
+      "lift": 1.4372
+     },
+     "電機・精密": {
+      "n": 1441,
+      "entropy_ratio": 0.9646,
+      "lift": 1.381
+     },
+     "電気・ガス": {
+      "n": 283,
+      "entropy_ratio": 0.9047,
+      "lift": 1.0601
+     },
+     "食品": {
+      "n": 645,
+      "entropy_ratio": 0.9405,
+      "lift": 0.9922
+     }
+    },
+    "n_pairs": 14159,
+    "n_blocks_date_x_sector": 342
+   },
+   "combined_discovery_validation_verdict": "FAIL"
+  },
+  "12M": {
+   "full": {
+    "observed_weighted_lift": 1.2755,
+    "observed_weighted_entropy_ratio": 0.9047,
+    "null_lift_mean": 1.0308,
+    "null_lift_std": 0.0313,
+    "p_value_lift": 0.001,
+    "n_sectors_included": 18,
+    "median_sector_lift_diagnostic_only": 1.2472,
+    "n_permutations": 1000,
+    "verdict": "TERMINAL",
+    "decision_rule": "if p>=0.05 or weighted_lift<1.5: TERMINAL else: PROCEED",
+    "per_sector_diagnostic_not_used_for_verdict": {
+     "その他": {
+      "n": 233,
+      "entropy_ratio": 0.7197,
+      "lift": 1.9742
+     },
+     "エネルギー資源": {
+      "n": 68,
+      "entropy_ratio": 0.6174,
+      "lift": 0.4412
+     },
+     "不動産": {
+      "n": 233,
+      "entropy_ratio": 0.7938,
+      "lift": 1.2446
+     },
+     "医薬品": {
+      "n": 267,
+      "entropy_ratio": 0.8523,
+      "lift": 1.6479
+     },
+     "商社・卸売": {
+      "n": 401,
+      "entropy_ratio": 0.8986,
+      "lift": 1.2469
+     },
+     "小売": {
+      "n": 681,
+      "entropy_ratio": 0.9424,
+      "lift": 1.0132
+     },
+     "建設・資材": {
+      "n": 529,
+      "entropy_ratio": 0.9396,
+      "lift": 1.2476
+     },
+     "情報通信・サービスその他": {
+      "n": 1535,
+      "entropy_ratio": 0.9726,
+      "lift": 1.1336
+     },
+     "機械": {
+      "n": 538,
+      "entropy_ratio": 0.9183,
+      "lift": 1.2268
+     },
+     "素材・化学": {
+      "n": 681,
+      "entropy_ratio": 0.9221,
+      "lift": 1.1894
+     },
+     "自動車・輸送機": {
+      "n": 299,
+      "entropy_ratio": 0.9135,
+      "lift": 1.0702
+     },
+     "運輸・物流": {
+      "n": 426,
+      "entropy_ratio": 0.8986,
+      "lift": 1.3146
+     },
+     "金融（除く銀行）": {
+      "n": 345,
+      "entropy_ratio": 0.8808,
+      "lift": 1.3333
+     },
+     "鉄鋼・非鉄": {
+      "n": 276,
+      "entropy_ratio": 0.8431,
+      "lift": 1.8116
+     },
+     "銀行": {
+      "n": 379,
+      "entropy_ratio": 0.7803,
+      "lift": 1.8206
+     },
+     "電機・精密": {
+      "n": 817,
+      "entropy_ratio": 0.9578,
+      "lift": 1.2607
+     },
+     "電気・ガス": {
+      "n": 182,
+      "entropy_ratio": 0.8288,
+      "lift": 0.6593
+     },
+     "食品": {
+      "n": 350,
+      "entropy_ratio": 0.8481,
+      "lift": 1.5714
+     }
+    },
+    "n_pairs": 8240,
+    "n_blocks_date_x_sector": 214
+   },
+   "discovery": {
+    "observed_weighted_lift": 1.2996,
+    "observed_weighted_entropy_ratio": 0.7176,
+    "null_lift_mean": 1.0377,
+    "null_lift_std": 0.0855,
+    "p_value_lift": 0.002,
+    "n_sectors_included": 16,
+    "median_sector_lift_diagnostic_only": 1.2702,
+    "n_permutations": 1000,
+    "verdict": "TERMINAL",
+    "decision_rule": "if p>=0.05 or weighted_lift<1.5: TERMINAL else: PROCEED",
+    "per_sector_diagnostic_not_used_for_verdict": {
+     "その他": {
+      "n": 20,
+      "note": "insufficient_n"
+     },
+     "エネルギー資源": {
+      "n": 9,
+      "note": "insufficient_n"
+     },
+     "不動産": {
+      "n": 35,
+      "entropy_ratio": 0.464,
+      "lift": 1.1429
+     },
+     "医薬品": {
+      "n": 44,
+      "entropy_ratio": 0.5351,
+      "lift": 2.7273
+     },
+     "商社・卸売": {
+      "n": 63,
+      "entropy_ratio": 0.7025,
+      "lift": 1.5873
+     },
+     "小売": {
+      "n": 86,
+      "entropy_ratio": 0.7041,
+      "lift": 0.4651
+     },
+     "建設・資材": {
+      "n": 64,
+      "entropy_ratio": 0.6562,
+      "lift": 1.0938
+     },
+     "情報通信・サービスその他": {
+      "n": 232,
+      "entropy_ratio": 0.8836,
+      "lift": 1.25
+     },
+     "機械": {
+      "n": 83,
+      "entropy_ratio": 0.7351,
+      "lift": 1.2048
+     },
+     "素材・化学": {
+      "n": 111,
+      "entropy_ratio": 0.7351,
+      "lift": 1.4414
+     },
+     "自動車・輸送機": {
+      "n": 46,
+      "entropy_ratio": 0.5966,
+      "lift": 0.6522
+     },
+     "運輸・物流": {
+      "n": 74,
+      "entropy_ratio": 0.7298,
+      "lift": 1.4865
+     },
+     "金融（除く銀行）": {
+      "n": 51,
+      "entropy_ratio": 0.645,
+      "lift": 0.9804
+     },
+     "鉄鋼・非鉄": {
+      "n": 42,
+      "entropy_ratio": 0.4795,
+      "lift": 0.7143
+     },
+     "銀行": {
+      "n": 46,
+      "entropy_ratio": 0.6753,
+      "lift": 1.5217
+     },
+     "電機・精密": {
+      "n": 146,
+      "entropy_ratio": 0.8101,
+      "lift": 1.5068
+     },
+     "電気・ガス": {
+      "n": 31,
+      "entropy_ratio": 0.5531,
+      "lift": 1.2903
+     },
+     "食品": {
+      "n": 31,
+      "entropy_ratio": 0.4879,
+      "lift": 2.2581
+     }
+    },
+    "n_pairs": 1214,
+    "n_blocks_date_x_sector": 34
+   },
+   "validation": {
+    "observed_weighted_lift": 1.2667,
+    "observed_weighted_entropy_ratio": 0.8925,
+    "null_lift_mean": 1.0305,
+    "null_lift_std": 0.0365,
+    "p_value_lift": 0.001,
+    "n_sectors_included": 18,
+    "median_sector_lift_diagnostic_only": 1.2467,
+    "n_permutations": 1000,
+    "verdict": "TERMINAL",
+    "decision_rule": "if p>=0.05 or weighted_lift<1.5: TERMINAL else: PROCEED",
+    "per_sector_diagnostic_not_used_for_verdict": {
+     "その他": {
+      "n": 213,
+      "entropy_ratio": 0.7158,
+      "lift": 1.831
+     },
+     "エネルギー資源": {
+      "n": 59,
+      "entropy_ratio": 0.6234,
+      "lift": 0.5085
+     },
+     "不動産": {
+      "n": 198,
+      "entropy_ratio": 0.7754,
+      "lift": 1.2626
+     },
+     "医薬品": {
+      "n": 223,
+      "entropy_ratio": 0.8215,
+      "lift": 1.435
+     },
+     "商社・卸売": {
+      "n": 338,
+      "entropy_ratio": 0.8808,
+      "lift": 1.1834
+     },
+     "小売": {
+      "n": 595,
+      "entropy_ratio": 0.9427,
+      "lift": 1.0924
+     },
+     "建設・資材": {
+      "n": 465,
+      "entropy_ratio": 0.9312,
+      "lift": 1.2688
+     },
+     "情報通信・サービスその他": {
+      "n": 1303,
+      "entropy_ratio": 0.9652,
+      "lift": 1.1128
+     },
+     "機械": {
+      "n": 455,
+      "entropy_ratio": 0.9038,
+      "lift": 1.2308
+     },
+     "素材・化学": {
+      "n": 570,
+      "entropy_ratio": 0.9085,
+      "lift": 1.1404
+     },
+     "自動車・輸送機": {
+      "n": 253,
+      "entropy_ratio": 0.9013,
+      "lift": 1.1462
+     },
+     "運輸・物流": {
+      "n": 352,
+      "entropy_ratio": 0.8778,
+      "lift": 1.2784
+     },
+     "金融（除く銀行）": {
+      "n": 294,
+      "entropy_ratio": 0.8516,
+      "lift": 1.3946
+     },
+     "鉄鋼・非鉄": {
+      "n": 234,
+      "entropy_ratio": 0.8287,
+      "lift": 2.0085
+     },
+     "銀行": {
+      "n": 333,
+      "entropy_ratio": 0.7596,
+      "lift": 1.8619
+     },
+     "電機・精密": {
+      "n": 671,
+      "entropy_ratio": 0.956,
+      "lift": 1.2072
+     },
+     "電気・ガス": {
+      "n": 151,
+      "entropy_ratio": 0.8059,
+      "lift": 0.5298
+     },
+     "食品": {
+      "n": 319,
+      "entropy_ratio": 0.8443,
+      "lift": 1.5047
+     }
+    },
+    "n_pairs": 7026,
+    "n_blocks_date_x_sector": 180
+   },
+   "combined_discovery_validation_verdict": "FAIL"
+  }
+ },
+ "final_case_classification": "CASE_B",
+ "prohibited_confirmed": {
+  "bt_engine_used": false,
+  "strategy_backtest": false,
+  "new_jquants_calls": false,
+  "sector33_used": false,
+  "sector_cherry_picked": false,
+  "new_study_number_assigned": false,
+  "production_code_changed": false,
+  "threshold_changed_from_study110b": false
+ }
+}
