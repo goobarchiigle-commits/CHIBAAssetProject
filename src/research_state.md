@@ -1,9 +1,141 @@
 # research_state.md — CHIBAAssetProject 研究状態
-# Single Source of Truth / 最終更新: 2026-07-21（★Study82 Phase D(PEAD Alpha)実装+全銘柄実測完了 = FAIL・スプレッド符号逆転★）
+# Single Source of Truth / 最終更新: 2026-07-24（★Study82F実行完了・Case C=Event-driven Mean Reversion確定★）
 # ※ロードマップ参照は必ず reports/roadmap_v15_governance_layer.md から開始（他は全てANNEX/HISTORY/FROZEN/SUPERSEDED）
 # ※研究フェーズ = Program Phase3 Route B Assumption Validation。Study82Ph0(PASS)+Study82PhD(FAIL)+
 #   Study83(REJECT)完了→Route B 3要素中2つが実測で否定。次点=Study103 rerun要否の決裁（ユーザー）。
+# ※2026-07-22: 2トラック構成に分離（roadmap v1.7.0 §10）。Route B資産検証トラック（本流）は上記のまま次点=Study103 rerun決裁。
+#   market inefficiency predictionトラック（§11由来）新設・第1優先=Study82F（Holding Horizon Decomposition）。
+#   Winner Ontology系（Study110A/110B・Universe Generator v3）はStudy110B TERMINAL確定によりHALTED。
+# ※2026-07-24: Study82F実行完了。Primary=Case C（Event-driven Mean Reversion）確定・古典的PEAD(40-120d)存在の証拠なし。
+#   Type2研究（market inefficiency predictionトラック）は継続（TERMINALではない）。次点=Event-driven Mean Reversion独立研究の起案（ASK_FIRST・未着手）。
 # ⚠ 会話メモリは信用しない。必ずこのファイルから状態を復元すること。
+
+---
+
+## ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ 2026-07-24 Strategy Specification Governance制定 + PEAD/EDMR仕様書v1.0 Frozen発行
+
+**性格**: 統治層の新設+仕様書発行のみ（実装/BT未実行・Freeze Rule非抵触・ASK_FIRST未消化）。研究の中心をStudyからStrategy Specificationへ移行（Study=仕様書改善実験・仕様書=タグ付きリリース不変・Study101教訓のプロセス化）。
+
+**新設ファイル**:
+- `research/governance/strategy_specification_governance.md` — 統治規則（status/verdict二軸・単一変数原則・Version Upフロー・不変性規則）
+- `research/strategies/REGISTRY.md` — 戦略台帳（唯一の索引・系譜図つき）
+- `research/strategies/common_conventions_v1.0.md` — 共通執行/検証規約（Frozen）
+- `research/strategies/pead/pead_classic_v1.0.md` — Frozen/UNTESTED・**事前予測=FAIL登録**（82F根拠・較正原点用途）
+- `research/strategies/pead/pead_practical_v1.0.md` — Frozen/UNTESTED・会社予想修正ΔFOP≥+10%+EAR型初動確認
+- `research/strategies/edmr/edmr_v1.0.md` — Frozen/UNTESTED・**「Event-driven MR独立研究起案（下記82F次アクション）」の実体**・逆張り20d・事前登録効果量つき
+- 起案原本=`research/studies/Study082/pead_v1_spec_3proposals_2026-07-24.md`（文献抽出: book.pdf/02_PEAD_Event 8本）
+
+**次アクション**: 3仕様書の実装承認（ASK_FIRST・未消化3点=起案原本§6）。検証推奨順=EDMR→Practical→Classic（EDMRは既存台帳30,952件再利用で最軽量）。
+
+**同日追加（Quality Multi-Factor 3仕様書Frozen発行・ユーザー指示）**: `book.pdf/03_Quality_MultiFactor`書籍10冊+02所収論文（Novy-Marx/Piotroski/Sloan/HXZ）から定量抽出→`research/strategies/quality/`に3仕様発行（実装・BT禁止のまま仕様のみ固定）:
+- `quality_mf_classic_v1.0.md` — GP/A+ACC+F-Scoreコンポジット・年次8月末・VW D10−D1。**データ留保: GP/長期負債/流動比率は/v2/fins/summary非提供**（再現に補助データソース要）
+- `quality_mf_practical_v1.0.md` — OP/TA(RMW系)+ACC+F-Score-J 8項目（全フィールド実在=完全再現可能）・四半期・EW上位五分位
+- `quality_value_smallmid_v1.0.md`（初版名"SmallMid"から改名） — 時価総額50-1,000億×高B/M tercile×F-Score-J≥6・半期・N≥30・momentum複合禁止条項。quality直接実測は本プロジェクト未実施（間接証拠のみ）を明記
+- 起案原本=`quality/literature_evidence_2026-07-24.md`（フィールド可用性表つき）。REGISTRY更新済み（Frozen 6本/Planned 2本）。
+
+**同日追加4（RGP Taxonomy v1.0 Frozen化・ユーザー決裁）**:
+`research/governance/rgp_taxonomy_v1.0.md` を **Frozen化**（例外: RGP-7 Growth CompoundingとSmall Growth分類のみPROVISIONAL・v1.1で再評価）。反映した3修正:
+1. Taxonomy本文から「否定」「死んでいる」等の研究日誌調表現を排除し、各RGPに`Evidence Source`（Literature/Internal/Literature+Internal）・`Current Internal Evidence`（Study番号のみ）・`Internal Verdict`（定型語: ADOPTED/SUPPORTED/REJECT/UNTESTED/NEGATIVE-INDIRECT）の3欄に統一
+2. RGP-7 Growth Compoundingを★PROVISIONAL指定（Study110「Winner=複数種類・Jaccard重複28.2%」との整合性未確認のため機構の単一性が未確定）。関連するSmall Growth分類・§5独立性マトリクスの該当ペア・§3文献マッピングにも★PROVISIONAL/注記を波及
+3. Small Growth分類文言を「Current Classification: Non-independent」に統一（将来の独立RGP化の可能性を閉ざさない表現）
+Family層（RGP→Family→Specification三層構造）・REGISTRYのRGP-first構造は同日承認済み。governance文書・REGISTRY.mdの参照を Draft→Frozen に更新。
+
+**同日追加3（RGP Taxonomy v1.0起案・ユーザー指示「研究のOS」タスク）**:
+- `research/governance/rgp_taxonomy_v1.0.md` 新設（**status=Draft・Frozen化はユーザーレビュー決裁待ち**）。全仕様書の親文書。
+- 内容: RGP-0〜9の10分類（Market β/Underreaction/Overreaction Correction/CS Momentum/TSMOM/Quality/Value/Growth Compounding/Defensive/Microstructure）・各RGPの13項目定義（機構/非効率仮説/典型保有・Universe/データ要件/日本再現性/J-Quants可否/既存Study関係）・文献60ファイル→RGPマッピング・境界整理8問・**独立性評価マトリクス13ペア**・三層構造提案（RGP→Strategy Family→Spec）。
+- 主要判定: Turnaround=独立RGPでなくRGP-6×RGP-5交差族／Small Growth=独立RGPでない（O'Shaughnessy実測で小型グロース単独は最悪級）／日本実測でRGP-3/4は否定済み・RGP-2のみ内部支持——現実の候補空間=RGP-2/5/6/8+RGP-1変種。
+- 01_Momentumフォルダの既存3分類（Absolute/Cross-sectional/TrendFollowing）はユーザー分類として尊重・RGP-3/4に対応付け。
+- 禁止事項遵守: 新規売買ルール/AI独自仮説/仕様書/BT条件/コードは一切含まず（文献主張+内部実測の要約のみ）。
+
+**同日追加2（ユーザーレビュー反映・Registry構造強化）**:
+- governance文書に `role` フィールド新設（Calibration Benchmark / Production Candidate / Research Hypothesis の3値固定）— 全6仕様書に付与
+- governance §9「RGP越境禁止」新設（RSRランキング/決算イベント条件/テーマ株/出来高急増/ブレイクアウトの混入を明示禁止。Study95/99/83/82D根拠・Study101再発防止の恒久化）
+- "Quality MF SmallMid" → **"Quality Value SmallMid"に改名**（内容の核心=Piotroski原典のB/M条件でありSmallMidのみでは曖昧との指摘）
+- `REGISTRY.md`をRGP-first構造+Role列に再編（Underreaction/Overreaction correction/Quality premiumの3RGP見出し下にStrategy配置）
+
+---
+
+## ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ 2026-07-24 Study82F（Holding Horizon Decomposition）実行完了 — Case C確定（Event-driven Mean Reversion）
+
+**性格**: 実行結果（既存Study82Eイベント台帳30,952件の再利用のみ・新規データ取得ゼロ）。起案書=`research/studies/Study082/study82f_design.md`（ユーザー決裁反映済み：判定木5-case化・CAR曲線必須化・Right-censoring 70%ルール・Multiple Testing Control三層分離・Effect Size(Spread/95%CI/NW-t/n)必須化・終了条件事前固定）。
+
+**Primary判定（ALL・full-sample限定）**:
+```
+0-20d   spread -0.687% 95%CI[-0.991,-0.384] NW-t=-4.44  reversal
+21-40d  spread +0.133% 95%CI[-0.115, 0.380] NW-t= 1.05  zero
+41-60d  spread -0.183% 95%CI[-0.447, 0.082] NW-t=-1.35  zero
+61-80d  spread -0.688% 95%CI[-0.993,-0.383] NW-t=-4.42  reversal ← 再出現
+81-120d spread -0.201% 95%CI[-0.543, 0.141] NW-t=-1.15  zero
+```
+**判定: Case C — Event-driven Mean Reversion**（0-20d reversal・後続にclassical出現ゼロ・61-80dで同規模reversalが再出現し全zeroでもない）。古典的PEAD（40-120dで正スプレッドへ回復）はこのイベント群に存在しない。
+
+**CAR曲線（診断専用・累積スプレッド）**: Day0=-0.15%→Day120=-1.60%（全時点で95%CIが0を含まない・一貫して負）。区間平均では41-60d/81-120dが非有意（zero）でも、累積では悪化が持続——CAR曲線必須化の指示が単純な区間平均では見えない非単調構造（61-80d再出現）の検出に寄与。
+
+**Secondary（Large-cap/FY軸）**: Case D/E不成立。Large/non-Largeは同型（61-80dのみreversal）。FYはむしろ81-120dでより強いreversal（-1.137%）——「情報量最大の開示ほど古典的方向へ回復」仮説とは逆方向。
+
+**Right-censoring**: 全bucket有効標本比率≥70%（最低81-120dで94.0%）・打ち切り前後のSize/Surprise分布差<1pp——セレクションバイアスなし。
+
+**次アクション（§5.3事前固定）**: Case C → Event-driven Mean Reversionとして独立研究へ（新規Study番号・61-80d再出現の構造解明が第一候補・ASK_FIRST起案・未着手）。Type2研究（market inefficiency predictionトラック）はTERMINALではなく継続。詳細→`research/studies/Study082/study82f_holding_horizon_audit.md`
+
+---
+
+## ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ 2026-07-22 Study82E/95E（PEAD逆転Root Cause+Generalization）+ Study110A/110B（Winner Ontology）+ 研究軸転換 — commit c40e68c（roadmap v1.7.0）
+
+**性格**: Freeze Rule対象外（新規alpha実装・BT・データ取得を伴わない既存台帳の再分析）。出典=`reports/roadmap_v15_governance_layer.md` §8B/§11/§11A（v1.7.0）。
+
+**Study82E — PEAD Reverse Root Cause Audit（実行完了）**
+既存30,952件イベント台帳（Study82 Phase D）をSize/Liquidity/Time period/Market regime/Gap absorption(0-1d/2-5d/6-20d/21-40d)の5軸で分解。
+```
+Root cause ranking: Size(1.06pp) > Time period(0.48pp) > Liquidity(0.37pp) > Regime(0.01pp)
+Large-capでスプレッドほぼゼロ・非有意（t=0.34）→ 逆転はSmall/Mid-cap集中
+Gap分解: r0_1〜r6_20で逆転最大 → r21_40で符号が古典的PEAD方向に反転（非有意）
+Regime分解: spread_range=0.009pp（実質ゼロ）→ regime-invariant
+```
+**判定: CONDITIONAL SURVIVAL**（Case1/3/4/5いずれも厳密には不成立）。Meta Question回答=A寄り（Small/Mid-cap短期オーバーリアクション訂正が実在の市場現象・Study82 Phase Dの粗い二値YoY符号分類が解釈解像度を悪化）。詳細→`reports/study82e_root_cause_audit.md`
+
+**Study95E — Momentum Reverse Decomposition（実行完了）**
+Study82E型の分解フレームをStudy95（cross-sectional momentum・FAIL_ZERO_SPREAD）に適用し、PEAD逆転の構造がmomentumに一般化するか検証。
+```
+Size依存性: Study82とほぼ正反対（Largeが最も負・Smallが最も浅い）
+Liquidity依存性: Study82とほぼ正反対（低流動性のみ唯一の正スプレッド）
+統計的強度: 全bucket・全horizonで非有意（Study82は個別群t=5.3/7.9）
+共通点: Regime-invarianceのみ
+```
+**判定: Otherwise（構造不一致）**——PEAD逆転はevent-specific phenomenon。「winner-buying統一理論」仮説はこの実測では支持されない。詳細→`reports/study95e_momentum_reverse_decomposition.md`
+
+**Winner Ontology Research Thread — Study110A/110B（実行完了・TERMINAL確定）**
+Study100（静的RSR42=hindsight selection・FATAL）以来の未解決問題「未来勝者とは何か」を独立研究スレッドとして正式着手。Route B資産検証ライン（Core/PEAD/TSMOM）とは直交する軸。
+
+Study110A — Future Winner Definition Audit（Universe C・108,895パネル行）:
+```
+Overlap（3M/6M/12M Top10 Jaccard平均）= 28.2% → Case2（20-50%）。ただし3M vs 12Mは19.66%——Case3境界のほぼ真上
+Persistence（strict）= 8.3-14.9%（random baseline比lift 1.2-2.1倍・弱い）
+Concentration: Top10%銘柄が総プラスリターンの55-56%
+```
+
+Study110B — Future Winner Predictability Audit（Transition Entropy + Permutation Null(N=1000) + Economic Lift Threshold・事前固定ルール）:
+```
+事前固定ルール: if p>=0.05 or lift<1.5: TERMINAL else: PROCEED_TO_STUDY112
+3M: lift=1.304・p=0.001 → TERMINAL
+6M: lift=1.287・p=0.001 → TERMINAL
+12M: lift=1.208・p=0.001 → TERMINAL
+```
+**Overall verdict: TERMINAL**（統計的有意性p=0.001は充分だが経済的閾値lift<1.5未達）。事前登録済み決定木により機械的停止:
+```
+✗ Study112（Promotion Survival Study）— HALTED
+✗ Study113（Leadership Emergence Study）— HALTED
+✗ Universe Generator v3 design — HALTED
+```
+詳細→`reports/study110a_future_winner_definition_audit.md` / `reports/study110b_future_winner_predictability_audit.md`
+
+**§11A 研究軸の転換（ユーザー事前合意済み）**
+```
+旧軸: winner prediction（未来のスター銘柄を探す）
+新軸: market inefficiency prediction（短期的な歪み・イベント・需給・制度要因）
+```
+Study110B TERMINALがこの転換の発火条件（ユーザー事前指示適用）。Study82E（上記）が新軸の実例——「日本Small/Mid-cap株の決算後短期オーバーリアクション訂正」はmarket inefficiencyそのもの。**Study82F（Holding Horizon Decomposition・40-120d古典的PEAD存否）が新軸の唯一の稼働中スレッド**として接続（roadmap §10 第1優先）。
+
+**2トラック構成（v1.7.0で正式分離）**: Route B資産検証トラック（Core/PEAD/TSMOM・本流）と、market inefficiency predictionトラック（Study82E由来）は独立に進行。優先順位（roadmap §10）: 第1=Study82F／第2=Study100 decomposition refinement／第3=Core CP3本体／第4=Study75 completion・Study76。
 
 ---
 
@@ -7101,13 +7233,70 @@ asset_simulation/
 
 ---
 
-## セッション復元手順
+---
+
+## ⚠ SSOT鮮度に関する注記（2026-08-02追記）
+
+本ファイルは2026-05-02時点で実質更新が止まっていた（この注記の直前セクションまで）。
+2026-05〜2026-08の間に発生した重要な決定・結果は以下に集約する。それ以前の本文（〜2026-05-02）
+は歴史的経緯として残すが、**現状把握には以下のセクションを優先すること**。
+
+## 現状サマリ（2026-08-02時点）
+
+### Production / Core
+
+**Entry Freeze継続中（2026-07-17発動、解除条件未充足でデフォルト継続）。**
+新規BUY全面停止。SELL/exit/signal generation/diagnosticsは無停止。
+
+**Gate 0 = CLOSED**（現行Core/PEAD/TSMOMは資本投入価値なしと判定確定・再監査しない）:
+- Study95（2026-07-14）: CS Momentum KILL
+- Study100（2026-07-16）: Universe hindsight bias FATAL（+11-12pp過大評価）
+- Study101（2026-07-16）: 現行構成がTOPIX B&Hに劣後（RED）
+- Study82（2026-07-21）: PEAD Alpha FAIL
+- Study83（2026-07-21）: TSMOM REJECT
+- Study103（2026-07-20）: Core Retirement Prob=100%
+
+Freeze解除は「Productionを再開すれば儲かる」という前提では判断しない。新しい独立Edgeの
+証拠（後述Capital Flow Generator等）が積み上がるまでデフォルトで継続する。
+
+`backtests/backtest_summary.json`も2026-03-27時点で更新停止・Study40以降の結果は未反映。
+最新結果は必ず `docs/research/` の日付付きファイルおよび `research/governance/` を参照すること。
+
+### Sector研究（CLOSED）
+
+Study110B（2026-08-02, Sector-Conditioned Persistence Formalization）にて、Sector17
+conditioningは全horizonでTERMINAL・Discovery/Validationとも不採用（CASE_B）確定。
+経済的閾値1.5未達（観測1.18-1.46）。Sector17→33粒度変更・A〜F組み合わせ探索は今後も
+優先度を上げない（Study111 CFLM Phase1 Sector Layer Gate CLOSED, 2026-08-01）。
+
+### 新Edge研究: Capital Flow Generator（進行中）
+
+`research/governance/capital_flow_generator_research_contract_v1.0.md`（2026-08-02制定）が
+本研究の正式契約。目的は「既存Productionでは拾えない、PITで再現可能なCapital Flow由来の
+投資機会を、300万円口座で反復生成できるか」の検証。Candidate Generatorの完成自体は目的にしない。
+
+進捗:
+- Phase0（Mechanism Feasibility）: 半導体=CONDITIONAL PASS／防衛=CONDITIONAL PASS／GX=FAIL
+  （`docs/research/capital_flow_generator_mechanism_feasibility_2026-08-02.md`）
+- Phase1（Candidate Generation, 半導体型）: **STOP**。Level0（JASM出資組: トヨタ7203.T等）が
+  既存Core Universe（rsr_universe_42.csv）と構造的に重複しており、独立Edgeとして成立しない
+  ことが判明。Level1（METI補助金採択企業）も同様のリスクありと判断しSTOP。
+  Pipeline Rehearsalとしての目的（Mechanism定義→Trigger検出→Candidate Rule固定の一連の
+  手順が実行可能なことの確認）は達成
+  （`docs/research/capital_flow_generator_candidate_feasibility_2026-08-02.md`）
+- 次候補: 防衛装備庁契約データ型Trigger（Phase0時点で既にランク付け済みの次点候補として
+  事前登録・半導体の結果を見た選び直しではない）。未着手
+
+---
+
+## セッション復元手順（2026-08-02改訂）
 
 新しい会話でプロジェクトを再開する場合:
 ```
-1. このファイル（research_state.md）を読む
-2. configs/strategy.yaml と configs/universe.yaml を読む
-3. results/backtest_summary.json で最新結果を確認
-4. research_log/ の最新日付のログを読む
+1. このファイルの「現状サマリ（2026-08-02時点）」を読む（本文の〜2026-05-02部分は歴史的経緯）
+2. configs/strategy.yaml で entry_freeze.enabled 等の現在値を確認
+3. research/governance/ 配下の制定済み契約（capital_flow_generator, strategy_specification,
+   rgp_taxonomy）を確認
+4. docs/research/ の最新日付ファイルを確認
 5. 作業開始
 ```
