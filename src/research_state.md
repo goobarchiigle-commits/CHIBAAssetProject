@@ -7289,14 +7289,182 @@ conditioningは全horizonでTERMINAL・Discovery/Validationとも不採用（CAS
 
 ---
 
-## セッション復元手順（2026-08-02改訂）
+## 現状サマリ追記（2026-08-08時点）: Simple Trend Edge Study v1.0 + G Baseline Candidate
+
+Capital Flow Generator研究（防衛装備庁契約データ型Trigger）着手前に、ユーザー指示で
+「単純トレンド構造だけでTOPIXに対するエッジがあるか」の事前登録研究を実施
+（`research/strategies/simple_trend/simple_trend_study_v1_spec.md`）。
+
+**Study本体の結論**: 仮説A〜G（MA25>MA75>MA200を起点に段階的追加）はPortfolio Layer基準で
+全てTOPIX Buy&Hold CAGR(12.11%)を下回る（最良G=6.30%）。仕様書§9の事前登録判定ルールに
+従えば REJECT（RS/セクター/PEAD/VCP等の新規要素追加には進まない）。
+E〜G（MA25乖離15%除外・RSI70除外）はD比で独立した正の効果（ΔCAGR+3.7〜+4.5pp・
+MaxDD改善+6.4〜+6.9pp）を示し、「過熱除外が効かなかった」という結果にはならなかった。
+
+**ユーザー判断（2026-08-08）**: 上記REJECTを「Gに実運用価値が無い」とは解釈しない。
+GのMaxDD(-13.66%)はTOPIX(-35.31%)の約6割で、「明確な条件→機械的エントリー→明確なExit→
+低DD」という運用可能な骨格が初めて得られた点を評価し、**Gを「Baseline Candidate」として
+凍結**（TOPIX超え戦略としては不採用、低DDトレンド・タイミングエンジンとしては採用検討）。
+Entry/Exitパラメータは一切変更しない。次段は「新規研究」ではなく「実運用設計」と位置づけ。
+
+**G Baseline Candidate 実運用ポートフォリオ検証**
+（`research/strategies/simple_trend/g_baseline_candidate/`）: 実口座資本
+（`runtime/capital_state.json` actual_equity=¥3,642,786・2026-07-30時点）・
+max_positions等の固定上限は導入せずPortfolio Layerを再実行。
+
+結果: CAGR=5.54%・MaxDD=-14.82%・Sharpe=0.807。**「Gはシグナルが絞られているので
+A/Bで見られた資金不足問題は軽いはず」という想定は実測で否定された**——同時保有数
+平均29.95銘柄（p95=67・最大97）・capital_exhausted率87.68%（見送り率9割弱、
+研究時capital¥3,000,000版でも89.19%とほぼ同水準。資本を+21%増やしても改善は僅か）。
+TSE_ALL規模のブレイクアウト系シグナルは強いトレンド相場日に大量同時発生するため、
+「10年で19,091件」という総数の少なさは同時集中度の低さを意味しない。
+
+**未決事項（実運用設計マター・ユーザー判断待ち）**: 同時保有数に実務的な上限を設けるか、
+シグナル発生時の優先順位付けをどうするか。本検証はASK_FIRST対象のこれら意思決定への
+判断材料を提供したのみで、数値上限は一切導入していない。
+
+### G Adjustment Study v1.0（2026-08-08・同日追加実施）
+
+ユーザー判断: 上記REJECTを「単純戦略だからダメ」と解釈せず、Gを実運用骨格の土台として
+凍結。Entry絞り込み2種（H=G+直近20営業日以内ゴールデンクロス／I=G+MA25[t]>MA25[t-5]）×
+Exit幅3種（trailing 5%/7%/10%）=9ケースを事前登録・一括検証
+（`research/strategies/simple_trend/g_adjustment_v1/`）。RCI80等の追加指標は不採用（明示）。
+主目的KPI=同時保有数（avg/p95/max）とcapital_exhausted率、CAGR最大化は目的にしない方針。
+
+結果: **9ケース中、仕様書§7の事前固定基準（p95同時保有数が実務的水準=目安10台程度まで
+低下し、かつCAGR/MaxDD/Calmarが悪化しない）を満たすものは0件**。
+- H: 同時保有数を劇的削減（平均29.95→8.05・p95 67→24、trail=5%同士）したが、
+  MaxDDが-14.82%→**-37.57%**（TOPIX-35.31%より悪い）へ激しく悪化。CAGR5.54%→3.82%。
+  同時保有数低下→1銘柄あたり建玉サイズ拡大→分散低下、が示唆されるメカニズム。
+- I: 事前登録時の想定通りGにほぼ冗長。同時保有数はG比でほぼ不変（平均28.42・p95 69）。
+  リターンはG比でわずかに改善（CAGR6.26%）するが主目的KPIには寄与せず。
+- Exit幅拡大（5→7→10%）はG/IでCAGR/Calmar/Sharpeを単調改善するが、保有日数が伸びる分
+  同時保有数はむしろ悪化（G: p95 67→87.9→103）。単独の解決策にならない。
+
+**判定（仕様書§7ルールに従い決定）**: Entry条件のさらなる追加ではなく、次の研究として
+**「銘柄選択・優先順位付け（同時多数シグナル時にどの銘柄を優先するか）」に進むべき**。
+参考値としてG-10（CAGR9.05%・MaxDD-14.14%・Calmar0.64）とI-10（CAGR7.85%・
+MaxDD-15.14%・Calmar0.518）をリスク調整後最良の組み合わせとして記録（採用決定ではない・
+次の優先順位付け研究のベースパラメータ候補）。
+
+`run_portfolio_layer()`/`run_signal_edge_layer()`にcapital/trail_pct/record_diagnostics
+引数を後方互換で追加（既存A〜G研究結果・G Baseline Candidate結果は無傷）。
+テスト計17件PASS（`tests/test_simple_trend_study_v1.py` 11件 +
+`tests/test_simple_trend_g_adjustment_v1.py` 6件）。
+
+**次の未決事項**: 「銘柄選択・優先順位付け」研究の設計（ランキング指標・優先順位付け
+ロジック）はユーザー決裁待ち・未着手。
+
+### G-10 Simple Filter Adjustment Study v1.0（2026-08-08・同日3件目）
+
+ユーザー指示によりG-10（trail=10%）を完全固定Baselineとし、一般投資家にも意味が明確な
+単純フィルター3種（E3=Bollinger%B<1.0・E5=52週高値距離15%・E6=Momentum Failure Exit）を
+G-10から独立に1個ずつ検証（`research/strategies/simple_trend/g_filter_study_v1/`）。
+E1（MA25乖離15%未満）・E2（RSI14<70）は**実行前の仕様確認でG-10の既存式と完全一致と判明**
+（ユーザー起案書はE2のみ重複と想定していたが、E1も同様に完全重複——事前登録仕様書§0で
+明記の上、実行対象から除外）。E4（20日ブレイクアウト）も既存条件と同一のため不実行。
+
+結果: **E3・E5・E6とも仕様書§7の5成功基準（密度明確減少・exhausted率大幅改善・
+CAGR維持・MaxDD非悪化・Calmar≥0.64）を全て満たさず（0/3）**。
+- E3: 同時保有数削減（avg48.06→35.01・p95 103→89）に成功したがMaxDD-14.14%→-18.25%へ悪化
+- E5: 同時保有数にほぼ寄与せず（p95はむしろ103→106へ悪化）。密度問題を解決しない
+- E6: 同時保有数を最大削減（avg48.06→27.34・p95 103→60）したがCAGR4.65%へ激減・
+  MaxDD-30.68%（TOPIXの-35.31%に迫る）へ激しく悪化
+
+`g_adjustment_v1`のH（ゴールデンクロス絞り込み）と同型の構造的トレードオフを再確認:
+**同時保有数削減→動的等ウェイトで1銘柄あたり建玉サイズ拡大→分散低下→MaxDD拡大**。
+
+**結論（ユーザー事前登録フォールバック§13に従う）**: 「単純なトレンド・モメンタム条件
+だけでは、実口座資本規模で実用的な保有密度まで候補を絞り込みながら、TOPIX級以上の
+リターンと低DDを両立することは困難」。Simple Trend/Momentum系のEntry/Exitフィルター
+単純追加による条件探索は本研究で完結。RSRランキング・セクター強度・出来高ランキング・
+複合銘柄スコア等の次系統研究へは、ユーザー決裁の上でのみ進む（現時点で自動的には進まない）。
+
+エンジン拡張: `run_signal_edge_layer`/`run_portfolio_layer`に
+`momentum_failure_check`引数を後方互換で追加（既存A〜G・G Baseline・G Adjustment結果は
+無傷。G-10のfresh run再実行値が既存`g_adjustment_v1`のG-10ケースと完全一致することを確認
+＝リグレッション無し）。テスト計26件PASS。
+
+**次の未決事項**: 「銘柄選択・優先順位付け」研究（既存の別未決事項）に加え、
+今回判明した構造的トレードオフ（密度↓→分散↓→DD↑）をその設計に組み込む必要がある。
+ユーザー決裁待ち・未着手。
+
+### E5 Candidate Ranking Study v1.0（2026-08-08・同日4件目）
+
+`g_filter_study_v1`の否定結果を受け、ユーザー指示により「銘柄選択・優先順位付け」研究の
+第一弾として、E5（trail=10%）を完全固定Baselineとし、E5候補群内（同日発生シグナル間）で
+単純指標3種（R20=20日リターン・D52=52週高値距離・VR20=出来高倍率）が将来リターンを
+順位付けできるかを検証（`research/strategies/simple_trend/e5_candidate_ranking_v1/`）。
+判定基準を事前固定（Spearman相関>0 かつ p<0.05 かつ Decile単調性Spearman≥0.5）し、
+合格した指標のみPortfolio Layerへ進む設計。
+
+結果: **3指標とも事前固定基準に不合格（0/3）。Portfolio Layerは実行せず。**
+- R20: Spearman=-0.0583（n≈12,600で統計的有意だが**符号が逆**）。Decile単調性=-0.673
+  （強い逆相関——E5候補群内で直近20日上昇率が高い銘柄ほど平均Forward Returnがやや
+  低い傾向。ただし中央値は全Decileでマイナスの歪んだ分布であり、符号反転による
+  新戦略化は行わない＝結果を見た後の指標追加禁止のルールを遵守）
+- D52: Spearman=+0.0212（統計的有意だが実務的に無視できる大きさ）。Decile単調性=-0.164
+  で単調性なし。E5自身の「52週高値に近いほど良い」という設計思想は、E5通過後の
+  候補間ではほぼ識別力を持たないと判明
+- VR20: Spearman=-0.0031・p=0.730（非有意）。3指標中もっとも明確に識別力なし
+
+**結論**: 「E5候補群の中から、一般投資家にも説明可能な単純価格・出来高指標だけで
+資金配分対象を選別することは困難」という否定結果で研究終了。`g_filter_study_v1`
+（Entry/Exitフィルター単純追加）に続き、本研究（候補群内単純ランキング）でも
+E5の同時保有数過多問題（平均44.33・p95=106・exhausted率92.61%）を単純な手法で
+解決する試みは2件連続で否定結果となった。
+
+エンジン拡張: `run_portfolio_layer`に`priority_scores`引数を後方互換で追加
+（`None`時は既存コード昇順ロジックと完全一致・regression testで確認、今回は
+合格指標が無かったため実際には未使用）。テスト計34件PASS。
+
+**次の未決事項**: Simple Trend/Momentum系統でのシグナル密度制御（Entry/Exit単純
+フィルター・候補群内単純ランキングの両方とも否定）は行き詰まった。次に進む方向性
+（①別の優先順位付けアプローチを試すか、②Simple Trend系統をここで一区切りとし
+Capital Flow Generator等の別系統研究へ注力するか）はユーザー決裁待ち。
+
+**Git状態**: 上記一連のファイル（spec/results/report/script/test/g_baseline_candidate/
+g_adjustment_v1/g_filter_study_v1/e5_candidate_ranking_v1/本追記含む）は未commit。
+ユーザーの明示指示待ち。
+
+---
+
+## ★★ 2026-08-08追記: J-Quants解約前（8/9）最終差分取得 完了
+
+研究（Simple Trend Edge等）とは別系統・データ基盤側の作業。詳細は
+`docs/research/jquants_final_sync_2026-08-08.md`。
+
+**実施内容**: 前回同期（2026-07-31）以降の全データセット差分取得（OHLCV/分足/Tick/財務
+summary/信用/空売り/投資部門別/ETF/指数）+ 新規API 2件（決算発表予定日・財務追加項目
+ShEq/ROE/NCShEq/NCROE）+ ISSUE-001（`index_prices.py`上書きバグ）の恒久修正
+（`fetch_and_save_index_safe()`新設・fail-closed設計）。
+
+**結果**: 全11データセットで行数単調増加・date_min不変・date_max前進を確認（データ消失ゼロ）。
+`verify_database.py --full-archive-check`含め全PASS。財務追加4項目は2016-07〜2026-08の
+全期間へ遡及統合済み。決算発表予定日は前方参照専用API仕様のため2026-08-08時点の
+1スナップショット（186銘柄）のみ取得（過去分は原理的に取得不可）。
+
+**未実施（時間的制約・今回スコープ外）**: 日経225オプション・EDINET系（大株主/政策保有/
+大量保有報告）— Standard+で取得可能だが未実装のまま解約を迎える。ユーザー判断待ち。
+
+**Git状態**: `database/market/KNOWN_ISSUES.md`・`README.md`・`src/database/index_prices.py`
+（ISSUE-001修正）・`src/database/earnings_calendar.py`（新規）・`src/database/reports.py`
+（source_catalog更新）・`docs/research/jquants_final_sync_2026-08-08.md`・
+本追記・metadata配下の新規JSON（snapshot/bulk_catalog/verify_report）。未commit・
+ユーザーの明示指示待ち。
+
+---
+
+## セッション復元手順（2026-08-08改訂）
 
 新しい会話でプロジェクトを再開する場合:
 ```
-1. このファイルの「現状サマリ（2026-08-02時点）」を読む（本文の〜2026-05-02部分は歴史的経緯）
+1. このファイルの「現状サマリ（2026-08-02時点）」および直上の
+   「現状サマリ追記（2026-08-08時点）」を読む（本文の〜2026-05-02部分は歴史的経緯）
 2. configs/strategy.yaml で entry_freeze.enabled 等の現在値を確認
 3. research/governance/ 配下の制定済み契約（capital_flow_generator, strategy_specification,
    rgp_taxonomy）を確認
 4. docs/research/ の最新日付ファイルを確認
-5. 作業開始
+5. research/strategies/simple_trend/ の進行状況を確認（G Baseline Candidate実運用設計フェーズ）
+6. 作業開始
 ```

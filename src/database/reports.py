@@ -26,6 +26,7 @@ from src.market.jpx_calendar import JPXCalendar
 from src.paths import (
     DATABASE_ETF_DIR,
     DATABASE_FUNDAMENTALS_DIR,
+    DATABASE_INVESTOR_TYPES_DIR,
     DATABASE_MARGIN_DIR,
     DATABASE_MASTER_DIR,
     DATABASE_METADATA_DIR,
@@ -50,9 +51,9 @@ SOURCE_CATALOG: list[dict] = [
     {"endpoint": "/fins/details (statements)", "name": "財務諸表(BS/PL/CF)", "plan": "Premium限定", "status": "premium_locked", "local_path": "fundamentals/statements/（空）"},
     {"endpoint": "/fins/dividend", "name": "配当金情報", "plan": "Premium限定", "status": "premium_locked", "local_path": "fundamentals/dividend/（空）"},
     {"endpoint": "/equities/bars/daily/am", "name": "前場四本値", "plan": "Premium限定・直近のみ", "status": "premium_locked", "local_path": "-"},
-    {"endpoint": "/equities/earnings-calendar", "name": "決算発表予定日", "plan": "Free+・直近のみ", "status": "not_implemented", "local_path": "-"},
+    {"endpoint": "/equities/earnings-calendar", "name": "決算発表予定日", "plan": "Free+・直近のみ", "status": "implemented", "local_path": "fundamentals/earnings_calendar/（2026-08-08実装・前方参照専用のため取得時点の1スナップショットのみ）"},
     {"endpoint": "/markets/calendar", "name": "取引カレンダー", "plan": "Free+", "status": "not_implemented", "local_path": "-（src/market/jpx_calendar.pyで代替）"},
-    {"endpoint": "/equities/investor-types", "name": "投資部門別情報", "plan": "Light+", "status": "not_implemented", "local_path": "-"},
+    {"endpoint": "/equities/investor-types", "name": "投資部門別情報", "plan": "Light+", "status": "implemented", "local_path": "investor_types/"},
     {"endpoint": "/indices/bars/daily?code=0000", "name": "TOPIX四本値", "plan": "Light+", "status": "implemented", "local_path": "index/prices/0000.parquet"},
     {"endpoint": "/indices/bars/daily?code=0080-0090", "name": "TOPIX-17業種別指数", "plan": "Standard+", "status": "implemented", "local_path": "index/prices/0080-0090.parquet"},
     {"endpoint": "/indices/bars/daily?code=0070,0075,0500-0504,B507", "name": "Growth250/REIT/市場区分別/JPXプライム150等", "plan": "Standard+", "status": "implemented", "local_path": "index/prices/"},
@@ -145,6 +146,7 @@ def build_coverage_report() -> dict:
         "margin_alert": _describe_partitioned_dir(DATABASE_MARGIN_DIR / "margin_alert", ("PubDate",)),
         "short_ratio": _describe_partitioned_dir(DATABASE_SHORTSELLING_DIR / "short_ratio"),
         "short_sale_report": _describe_partitioned_dir(DATABASE_SHORTSELLING_DIR / "short_sale_report", ("DiscDate",)),
+        "investor_types": _describe_partitioned_dir(DATABASE_INVESTOR_TYPES_DIR, ("PubDate",)),
         "etf_prices": _describe_partitioned_dir(DATABASE_ETF_DIR / "prices"),
         "index_prices": _describe_partitioned_dir(DATABASE_MASTER_DIR.parent / "index" / "prices"),
     }

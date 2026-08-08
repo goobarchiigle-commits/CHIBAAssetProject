@@ -86,6 +86,10 @@ def fetch_index_series(index_code: str, start: str, end: str,
 
 def fetch_and_save_all_topix17(start: str, end: str, *, include_topix: bool = True) -> dict[str, int]:
     """
+    ⚠ KNOWN_ISSUES.md ISSUE-001: 既存Parquetを無条件上書きする（狭いstartで実行すると
+    既存履歴が消失する）。新規コードから呼び出さないこと。安全な差分更新には
+    fetch_and_save_all_topix17_safe() を使う。後方互換のため残置のみ。
+
     TOPIX-17全17業種指数（+ 任意でTOPIX本体）を取得し
     database/market/index/prices/{IndexCode}.parquet へ保存する。
 
@@ -110,7 +114,12 @@ def fetch_and_save_all_topix17(start: str, end: str, *, include_topix: bool = Tr
 
 
 def fetch_and_save_other_indices(start: str, end: str) -> dict[str, int]:
-    """OTHER_INDEX_CODES（Growth250/REIT/Prime/Standard/Growth市場/JPXプライム150等）を取得・保存する。"""
+    """
+    ⚠ KNOWN_ISSUES.md ISSUE-001: 既存Parquetを無条件上書きする。新規コードから呼び出さないこと。
+    安全な差分更新には fetch_and_save_other_indices_safe() を使う。後方互換のため残置のみ。
+
+    OTHER_INDEX_CODES（Growth250/REIT/Prime/Standard/Growth市場/JPXプライム150等）を取得・保存する。
+    """
     INDEX_PRICES_DIR.mkdir(parents=True, exist_ok=True)
     provider = JQuantsProvider()
     result: dict[str, int] = {}
@@ -121,6 +130,102 @@ def fetch_and_save_other_indices(start: str, end: str) -> dict[str, int]:
         result[code] = len(df)
         logger.info("[INDEX_PRICES] code=%s (%s) rows=%d saved=%s", code, OTHER_INDEX_CODES[code], len(df), out_path)
     return result
+
+
+class IndexPricesShrinkError(RuntimeError):
+    """新規取得後のマージ結果が既存データより縮小する場合に送出する（fail-closed）。"""
+
+
+def fetch_and_save_index_safe(
+    code: str, start: str | None, end: str,
+    *, provider: "JQuantsProvider | None" = None, label: str = "",
+) -> dict:
+    """
+    ISSUE-001の恒久対策版: 既存Parquetを必ず読み込み、新規分をappendしてから重複除去して
+    保存する（既存ファイルへの単純上書きは一切行わない）。
+
+    - startを省略した場合、既存ファイルの最終日+1日を自動的に開始日とする（真の差分更新）。
+      既存ファイルが無い場合のみ、呼び出し元が渡したstart（省略時は全期間相当のデフォルト）を使う。
+    - マージ後の行数が既存より減った場合、またはdate_minが既存より後退した場合は
+      IndexPricesShrinkErrorを送出し、書き込みを一切行わない（fail-closed）。
+
+    Returns: {"code", "status", "existing_rows", "new_rows", "combined_rows",
+              "date_min", "date_max", "fetch_start"}
+    """
+    provider = provider or JQuantsProvider()
+    out_path = INDEX_PRICES_DIR / f"{code}.parquet"
+
+    existing = pd.DataFrame(columns=["Open", "High", "Low", "Close"])
+    existing.index.name = "Date"
+    if out_path.exists():
+        existing = pd.read_parquet(out_path)
+
+    existing_rows = len(existing)
+    existing_date_min = existing.index.min() if existing_rows else None
+    existing_date_max = existing.index.max() if existing_rows else None
+
+    if existing_rows and start is None:
+        fetch_start = (existing_date_max + pd.Timedelta(days=1)).strftime("%Y-%m-%d")
+    else:
+        fetch_start = start or "2016-07-01"
+
+    if pd.Timestamp(fetch_start) > pd.Timestamp(end):
+        return {
+            "code": code, "label": label, "status": "up_to_date",
+            "existing_rows": existing_rows, "new_rows": 0, "combined_rows": existing_rows,
+            "date_min": str(existing_date_min) if existing_date_min is not None else None,
+            "date_max": str(existing_date_max) if existing_date_max is not None else None,
+            "fetch_start": fetch_start,
+        }
+
+    new_df = fetch_index_series(code, fetch_start, end, provider=provider)
+
+    combined = pd.concat([existing, new_df])
+    combined = combined[~combined.index.duplicated(keep="last")].sort_index()
+
+    if len(combined) < existing_rows:
+        raise IndexPricesShrinkError(
+            f"code={code}: マージ後の行数({len(combined)})が既存({existing_rows})より少ない・書き込み中止"
+        )
+    if existing_date_min is not None and (
+        combined.index.min() is None or combined.index.min() > existing_date_min
+    ):
+        raise IndexPricesShrinkError(
+            f"code={code}: マージ後のdate_min({combined.index.min()})が既存({existing_date_min})より後退・書き込み中止"
+        )
+
+    combined.to_parquet(out_path)
+    logger.info(
+        "[INDEX_PRICES_SAFE] code=%s(%s) existing=%d new=%d combined=%d fetch_start=%s date_range=%s..%s",
+        code, label, existing_rows, len(new_df), len(combined), fetch_start,
+        combined.index.min(), combined.index.max(),
+    )
+    return {
+        "code": code, "label": label, "status": "ok",
+        "existing_rows": existing_rows, "new_rows": len(new_df), "combined_rows": len(combined),
+        "date_min": str(combined.index.min()), "date_max": str(combined.index.max()),
+        "fetch_start": fetch_start,
+    }
+
+
+def fetch_and_save_all_topix17_safe(end: str, *, start: str | None = None, include_topix: bool = True) -> list[dict]:
+    """TOPIX本体+TOPIX-17業種指数を安全な差分マージ方式で更新する（ISSUE-001対策版）。"""
+    INDEX_PRICES_DIR.mkdir(parents=True, exist_ok=True)
+    provider = JQuantsProvider()
+    codes = [(sector17_to_index_code(n), SECTOR17_NAMES[n]) for n in range(1, 18)]
+    if include_topix:
+        codes = [("0000", "TOPIX")] + codes
+    return [fetch_and_save_index_safe(code, start, end, provider=provider, label=name) for code, name in codes]
+
+
+def fetch_and_save_other_indices_safe(end: str, *, start: str | None = None) -> list[dict]:
+    """OTHER_INDEX_CODESを安全な差分マージ方式で更新する（ISSUE-001対策版）。"""
+    INDEX_PRICES_DIR.mkdir(parents=True, exist_ok=True)
+    provider = JQuantsProvider()
+    return [
+        fetch_and_save_index_safe(code, start, end, provider=provider, label=name)
+        for code, name in OTHER_INDEX_CODES.items()
+    ]
 
 
 def load_index_series(index_code: str) -> pd.DataFrame:
@@ -146,10 +251,26 @@ def main() -> int:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
     parser = argparse.ArgumentParser(description="TOPIX-17業種別指数の取得・保存")
-    parser.add_argument("--start", default="2016-07-01")
+    parser.add_argument("--start", default=None, help="省略時・--safe指定時は既存ファイルの最終日+1日から自動差分取得")
     parser.add_argument("--end", required=True)
+    parser.add_argument(
+        "--safe", action="store_true",
+        help="ISSUE-001対策版（既存ファイルを読み込みappend→重複除去→保存・縮小時はfail-closed）を使う。新規実行では常にこちらを推奨",
+    )
+    parser.add_argument("--other", action="store_true", help="OTHER_INDEX_CODES（Growth250/REIT等）も併せて処理する")
     args = parser.parse_args()
 
+    if args.safe:
+        results = fetch_and_save_all_topix17_safe(args.end, start=args.start)
+        if args.other:
+            results += fetch_and_save_other_indices_safe(args.end, start=args.start)
+        for r in results:
+            print(f"  {r['code']} ({r['label']}): status={r['status']} existing={r['existing_rows']} "
+                  f"new={r['new_rows']} combined={r['combined_rows']} range={r['date_min']}..{r['date_max']}")
+        return 0
+
+    if args.start is None:
+        args.start = "2016-07-01"
     result = fetch_and_save_all_topix17(args.start, args.end)
     for code, n in result.items():
         sector_n = int(code, 16) - 0x80 + 1 if code != "0000" else 0

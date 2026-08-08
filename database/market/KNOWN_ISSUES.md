@@ -4,10 +4,21 @@
 
 ---
 
-## ISSUE-001: `index_prices.py` が既存Parquetを無条件上書きする（データ消失リスク）
+## ISSUE-001: `index_prices.py` が既存Parquetを無条件上書きする（データ消失リスク）— 2026-08-08 修正済み
 
 - **発見日**: 2026-08-01（Study111 CFLM Phase1実行中に発覚）
-- **深刻度**: High（J-Quants解約後は再取得不能なデータの永久消失に直結）
+- **修正日**: 2026-08-08（J-Quants解約前最終差分取得の一環・ASK_FIRST不要と判断——本Issueの
+  「推奨される修正方針」節で起案していた対策そのものをユーザーが明示的に指示したため）
+- **修正内容**: `fetch_and_save_index_safe()` / `fetch_and_save_all_topix17_safe()` /
+  `fetch_and_save_other_indices_safe()` を新設（既存関数`fetch_and_save_all_topix17()`/
+  `fetch_and_save_other_indices()`は後方互換のため残置・ただし新規呼び出し禁止と明記）。
+  既存Parquetを必ず読み込み→`--start`省略時は最終日+1日を自動起点に差分取得→
+  `pd.concat`で重複除去→マージ後の行数が既存より減った場合・date_minが後退した場合は
+  `IndexPricesShrinkError`を送出しfail-closed（書き込み自体を行わない）。
+  `python -m src.database.index_prices --safe --other --end YYYY-MM-DD` で実行。
+  2026-08-08実行時点で26ファイル全てstatus=ok・shrink検知ゼロを確認済み
+  （`docs/research/jquants_final_sync_2026-08-08.md`参照）。
+- **深刻度（修正前）**: High（J-Quants解約後は再取得不能なデータの永久消失に直結）
 - **対象コード**: `src/database/index_prices.py` の `fetch_and_save_all_topix17()` および
   `fetch_and_save_other_indices()`
 

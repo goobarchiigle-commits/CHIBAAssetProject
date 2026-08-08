@@ -1,0 +1,68 @@
+{
+  "queried_date": "20260807",
+  "retrieved_at": "2026-08-08T19:16:48.774773+09:00",
+  "endpoint": "/v2/bulk/list",
+  "file_count": 12,
+  "files": [
+    {
+      "key": "derivatives/bars/daily/options/225/live/derivatives_bars_daily_options_225_20260807.csv.gz",
+      "size_bytes": 229521,
+      "last_modified": "2026-08-07T12:31:21+00:00"
+    },
+    {
+      "key": "equities/bars/daily/live/equities_bars_daily_20260807.csv.gz",
+      "size_bytes": 84948,
+      "last_modified": "2026-08-07T13:21:07+00:00"
+    },
+    {
+      "key": "equities/bars/minute/live/equities_bars_minute_20260807.csv.gz",
+      "size_bytes": 5042564,
+      "last_modified": "2026-08-07T07:41:04+00:00"
+    },
+    {
+      "key": "equities/master/live/equities_master_20260807.csv.gz",
+      "size_bytes": 116923,
+      "last_modified": "2026-08-07T13:26:35+00:00"
+    },
+    {
+      "key": "equities/trades/live/equities_trades_20260807.csv.gz",
+      "size_bytes": 60159177,
+      "last_modified": "2026-08-07T07:34:05+00:00"
+    },
+    {
+      "key": "fins/earnings-date/live/fins_earnings-date_20260807.csv.gz",
+      "size_bytes": 1209,
+      "last_modified": "2026-08-07T01:01:46+00:00"
+    },
+    {
+      "key": "fins/summary/live/fins_summary_20260807.csv.gz",
+      "size_bytes": 67031,
+      "last_modified": "2026-08-07T15:30:25+00:00"
+    },
+    {
+      "key": "indices/bars/daily/live/indices_bars_daily_20260807.csv.gz",
+      "size_bytes": 1458,
+      "last_modified": "2026-08-07T07:11:58+00:00"
+    },
+    {
+      "key": "indices/bars/daily/topix/live/indices_bars_daily_topix_20260807.csv.gz",
+      "size_bytes": 108,
+      "last_modified": "2026-08-07T07:31:22+00:00"
+    },
+    {
+      "key": "markets/margin-alert/live/markets_margin-alert_20260807.csv.gz",
+      "size_bytes": 8424,
+      "last_modified": "2026-08-07T07:26:28+00:00"
+    },
+    {
+      "key": "markets/short-ratio/live/markets_short-ratio_20260807.csv.gz",
+      "size_bytes": 849,
+      "last_modified": "2026-08-07T13:20:55+00:00"
+    },
+    {
+      "key": "markets/short-sale-report/live/markets_short-sale-report_20260807.csv.gz",
+      "size_bytes": 26128,
+      "last_modified": "2026-08-07T08:16:08+00:00"
+    }
+  ]
+}
