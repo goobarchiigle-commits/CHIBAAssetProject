@@ -661,26 +661,65 @@ def evaluate_and_execute_replacements(
     return synthetic_results, decision_log, cash
 
 
+def _fetch_actual_fill(client, order_id: str) -> tuple[str | None, float | None]:
+    """
+    Queries kabu API GET /orders for the confirmed broker execution (RecType=8
+    detail record) of order_id. Returns (execution_date "YYYY-MM-DD",
+    execution_price) or (None, None) if the order isn't found, isn't filled
+    yet, or the API call fails. Never raises — callers must fail closed on
+    (None, None) rather than substitute an estimate.
+    """
+    try:
+        orders = client.get_orders(only_open=False)
+    except Exception as exc:
+        logger.warning("[F4_TP50][FILL_LOOKUP] get_orders失敗 order_id=%s: %s", order_id, exc)
+        return None, None
+    for o in orders:
+        if o.get("ID") != order_id:
+            continue
+        for d in o.get("Details", []) or []:
+            if d.get("RecType") == 8 and d.get("ExecutionDay") and d.get("Price"):
+                price = float(d["Price"])
+                if price > 0.0:
+                    return str(d["ExecutionDay"])[:10], price
+    return None, None
+
+
 def apply_fill_metadata_updates(
     results: list[dict],
     entry_dates: dict[str, str],
     entry_prices: dict[str, float],
     strategy_types: dict[str, str],
     as_of: pd.Timestamp,
+    client=None,
 ) -> tuple[dict[str, str], dict[str, float], dict[str, str], bool]:
     """
-    Entry-metadata persistence — byte-identical logic to TP30's
-    apply_fill_metadata_updates(). Only touches EXISTING portfolio_state.json
+    Entry-metadata persistence. Only touches EXISTING portfolio_state.json
     schema fields (position_entry_dates/position_entry_prices/
     position_strategy_types) — no new top-level keys are introduced.
 
-    On a successful BUY fill: records entry_date=as_of and entry_price (only if
-    not already present, so a retry/duplicate result never clobbers the true
-    original entry). On a successful SELL fill: removes all three fields for that
-    symbol. Failed orders (success=False) never touch metadata.
+    On a successful BUY fill: records entry_date/entry_price from the actual
+    kabu API broker execution (Details[].ExecutionDay/.Price for the order's
+    order_id via _fetch_actual_fill()), NOT from as_of/estimated_price (those
+    are signal-theoretical values computed before submission and can diverge
+    from the real fill date/price whenever the order executes later than the
+    signal's assumed as_of — see 2026-08-20 9344 incident: a delayed fill was
+    recorded under the signal's stale as_of/estimated_price, which pulled a
+    pre-entry OHLC bar into highest_since_entry and caused a spurious
+    trailing-stop SELL the next day).
+
+    FAIL CLOSED: if the actual fill cannot be confirmed via the broker (API
+    error, order not found, no execution detail yet), entry metadata for that
+    symbol is NOT written this run (logged as METADATA_FAIL_CLOSED) rather than
+    falling back to estimated_price/as_of. The next run will retry since the
+    symbol still won't be in entry_dates.
+
+    Only writes if not already present, so a retry/duplicate result never
+    clobbers the true original entry. On a successful SELL fill: removes all
+    three fields for that symbol. Failed orders (success=False) never touch
+    metadata.
 
     Returns (new_entry_dates, new_entry_prices, new_strategy_types, changed).
-    Pure function — does not call save_portfolio_state() itself.
     """
     entry_dates = dict(entry_dates)
     entry_prices = dict(entry_prices)
@@ -692,12 +731,25 @@ def apply_fill_metadata_updates(
             continue
         sym = r.get("symbol")
         if r.get("side") == "BUY":
-            if sym not in entry_dates:
-                entry_dates[sym] = as_of.strftime("%Y-%m-%d")
-                changed = True
-            if sym not in entry_prices:
-                entry_prices[sym] = float(r.get("estimated_price") or 0.0)
-                changed = True
+            if sym not in entry_dates or sym not in entry_prices:
+                order_id = r.get("order_id")
+                exec_date, exec_price = (
+                    _fetch_actual_fill(client, order_id) if client is not None and order_id else (None, None)
+                )
+                if exec_date is None or exec_price is None:
+                    logger.error(
+                        "[F4_TP50][METADATA_FAIL_CLOSED] BUY約定確認不能 symbol=%s order_id=%s — "
+                        "entry_date/entry_priceを推測値(estimated_price/as_of)で代用せず、"
+                        "今回はmetadata未記録（次回run再試行）。",
+                        sym, order_id,
+                    )
+                else:
+                    if sym not in entry_dates:
+                        entry_dates[sym] = exec_date
+                        changed = True
+                    if sym not in entry_prices:
+                        entry_prices[sym] = exec_price
+                        changed = True
             if strategy_types.get(sym) != STRATEGY_TYPE:
                 strategy_types[sym] = STRATEGY_TYPE
                 changed = True
@@ -757,6 +809,25 @@ def main() -> int:
     data = load_live_data()
     as_of = data.calendar[-1]
     print(f"  最新営業日={as_of.date()}  銘柄数={len(data.codes)}")
+
+    # ── Signal Freshness Guard（2026-08-20 9344インシデント再発防止）──
+    # as_of(=最新読込済み営業日)が実カレンダー日から大きく乖離している場合は警告する。
+    # 「前営業日のシグナルを翌営業日に発注する」こと自体は正当なPIT運用のため無条件に
+    # ブロックはしない（週末を挟む3日乖離は通常運用の範囲）。ただし、たとえ乖離があっても
+    # entry_date/entry_priceは必ずbroker実約定(kabu API)から記録される（Phase5修正、
+    # apply_fill_metadata_updates()参照）ため、このstaleness自体がposition metadata
+    # 汚染の原因になることはもう無い。
+    _staleness_days = (datetime.now(_JST).date() - as_of.date()).days
+    if _staleness_days > 3:
+        logger.warning(
+            "[F4_TP50][SIGNAL_FRESHNESS] as_of(最新営業日)=%s が実カレンダー日=%sから%d日乖離。"
+            "signal_date/entry_dateが想定より古いデータに基づいている可能性あり。"
+            "発注は継続するが、entry metadataはbroker実約定からのみ記録されるため"
+            "(estimated_price/as_ofは使用されない)、metadata汚染のリスクは無い。",
+            as_of.date(), datetime.now(_JST).date(), _staleness_days,
+        )
+        print(f"[SIGNAL_FRESHNESS][WARNING] as_of={as_of.date()} 実カレンダー日={datetime.now(_JST).date()} "
+              f"staleness={_staleness_days}日 — 発注は継続（entry metadataはbroker実約定ベースのため安全）")
 
     # ── Score計算（SCORE_REPLACEMENT_ENABLED=Trueの場合のみ。02/03準拠） ──
     score_map: dict | None = None
@@ -1039,7 +1110,7 @@ def main() -> int:
 
     # ── entry metadata persistence（既存フィールドのみ更新、新規トップレベルキー無し） ──
     entry_dates, entry_prices, strategy_types, metadata_changed = apply_fill_metadata_updates(
-        results, entry_dates, entry_prices, strategy_types, as_of,
+        results, entry_dates, entry_prices, strategy_types, as_of, client=client,
     )
 
     # 2026-08-19 gap fix: NORMAL (non-Replacement) BUY fills must ALSO record
@@ -1070,7 +1141,7 @@ def main() -> int:
         # replacement_live guards this: when False, replacement_synthetic_results (if any)
         # are DRY_RUN_SIMULATED entries and must NEVER be persisted as if they were real fills.
         entry_dates, entry_prices, strategy_types, repl_changed = apply_fill_metadata_updates(
-            replacement_synthetic_results, entry_dates, entry_prices, strategy_types, as_of,
+            replacement_synthetic_results, entry_dates, entry_prices, strategy_types, as_of, client=client,
         )
         metadata_changed = metadata_changed or repl_changed
 
