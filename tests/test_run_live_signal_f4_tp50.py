@@ -32,6 +32,18 @@ def _import_tp50_module():
 
 
 _tp50 = _import_tp50_module()
+
+
+@pytest.fixture(autouse=True)
+def _isolate_audit_sidecar(tmp_path, monkeypatch):
+    """apply_fill_metadata_updates() は _append_entry_fill_audit() 経由で
+    AUDIT_DIR/entry_fill_audit.jsonl に追記する。AUDIT_DIRを本番runtime/f4_tp50への
+    参照のまま放置すると、テスト実行のたびに本番監査サイドカーへfixtureデータ
+    (symbol=1301, broker_order_id=ORDER-1等)が混入する
+    (2026-08-20 Production Gate監査で発見)。全テストでtmp_pathへ隔離する。"""
+    monkeypatch.setattr(_tp50, "AUDIT_DIR", tmp_path)
+
+
 FIXED_LOT_SIZE = _tp50.FIXED_LOT_SIZE
 STRATEGY_TYPE = _tp50.STRATEGY_TYPE
 OrderInstruction = _tp50.OrderInstruction
@@ -39,6 +51,8 @@ evaluate_buy_sizing = _tp50.evaluate_buy_sizing
 evaluate_exits = _tp50.evaluate_exits
 apply_fill_metadata_updates = _tp50.apply_fill_metadata_updates
 compute_order_submission_timeout_sec = _tp50.compute_order_submission_timeout_sec
+compute_asof_staleness_bdays = _tp50.compute_asof_staleness_bdays
+should_block_buy_for_stale_asof = _tp50.should_block_buy_for_stale_asof
 
 from src.f4_tp50 import exit_engine as ee
 from src.f4_tp50.entry_pipeline import TP50LiveData
@@ -522,6 +536,60 @@ def test_apply_fill_metadata_fails_closed_on_partial_fill():
     ed, ep_, st, changed = apply_fill_metadata_updates(results, {}, {}, {}, as_of, client=client)
     assert "1301" not in ed
     assert "1301" not in ep_
+
+
+class _MissingFieldKabuClient:
+    """ExecutionDayまたはPriceが欠落したDetails[]を返すスタブ（API応答異常の再現）。"""
+
+    def __init__(self, order_id: str, missing_field: str, qty: float = 100.0):
+        self._order_id = order_id
+        self._missing_field = missing_field
+        self._qty = qty
+
+    def get_orders(self, only_open: bool = False, updtime=None):
+        detail = {"SeqNum": 1, "RecType": 8, "Price": 1000.0, "Qty": self._qty,
+                  "ExecutionDay": "2026-08-17T09:30:00+09:00"}
+        detail.pop(self._missing_field, None)
+        return [{"ID": self._order_id, "Details": [detail]}]
+
+
+def test_apply_fill_metadata_fails_closed_when_execution_day_missing():
+    as_of = pd.Timestamp("2026-08-17")
+    results = [{"symbol": "1301", "side": "BUY", "qty": 100, "success": True,
+                "estimated_price": 1000.0, "order_id": "ORDER-NO-DAY"}]
+    client = _MissingFieldKabuClient("ORDER-NO-DAY", "ExecutionDay")
+    ed, ep_, st, changed = apply_fill_metadata_updates(results, {}, {}, {}, as_of, client=client)
+    assert "1301" not in ed
+    assert "1301" not in ep_
+
+
+def test_apply_fill_metadata_fails_closed_when_price_missing():
+    as_of = pd.Timestamp("2026-08-17")
+    results = [{"symbol": "1301", "side": "BUY", "qty": 100, "success": True,
+                "estimated_price": 1000.0, "order_id": "ORDER-NO-PRICE"}]
+    client = _MissingFieldKabuClient("ORDER-NO-PRICE", "Price")
+    ed, ep_, st, changed = apply_fill_metadata_updates(results, {}, {}, {}, as_of, client=client)
+    assert "1301" not in ed
+    assert "1301" not in ep_
+
+
+def test_apply_fill_metadata_holding_truth_is_broker_snapshot_not_state():
+    """entry_date/entry_priceがfail-closedで未記録でも、strategy_typeタグ付けにより
+    保有中として扱われ得るが、evaluate_exits()はentry_date/entry_price欠落時に
+    安全にスキップする（Broker-as-Sole-SSOT: 保有数量の真実は常にbroker snapshot、
+    stateは補助metadataに過ぎない — 「約定確認前にportfolio_stateを保有済みと
+    確定させる経路」が存在しないことの回帰テスト）。"""
+    as_of = pd.Timestamp("2026-08-17")
+    results = [{"symbol": "1301", "side": "BUY", "qty": 100, "success": True,
+                "estimated_price": 1000.0, "order_id": "ORDER-UNCONFIRMED"}]
+    ed, ep_, st, changed = apply_fill_metadata_updates(
+        results, {}, {}, {}, as_of, client=_EmptyKabuClient(),
+    )
+    assert "1301" not in ed and "1301" not in ep_
+    # strategy_typeは付くが、evaluate_exits側の "entry_date is None -> continue" ガード
+    # （src/run_live_signal_f4_tp50.py evaluate_exits()参照）により
+    # entry_date/entry_price不在のこのシンボルはExit判定から安全に除外される。
+    assert st.get("1301") == STRATEGY_TYPE
 
 
 def test_apply_fill_metadata_aggregates_multiple_execution_details():
@@ -1051,6 +1119,46 @@ def test_previous_live_run_lookup_returns_most_recent_live_run(tmp_path, monkeyp
     )
     result = _find_previous_live_run()
     assert result["run_id"] == "f4_tp50_20260819_090000"
+
+
+# ======================================================================
+# Signal Freshness Guard（2026-08-20夜 Production Gate監査で追加）:
+# as_of(市場データ最終営業日)が実カレンダー日から著しく乖離した場合、
+# 新規BUYのみblockする（Exit/リスク管理は常に継続）。
+# ======================================================================
+def test_asof_staleness_normal_weekend_gap_does_not_block():
+    # 金曜のas_ofを月曜に評価 -> busday_count=1営業日
+    fri = pd.Timestamp("2026-08-14").date()
+    mon = pd.Timestamp("2026-08-17").date()
+    bdays = compute_asof_staleness_bdays(fri, mon)
+    assert bdays == 1
+    assert should_block_buy_for_stale_asof(bdays) is False
+
+
+def test_asof_staleness_severe_gap_blocks_buy():
+    # 市場データパイプラインが1週間停止していたケース
+    stale_asof = pd.Timestamp("2026-08-10").date()
+    real_today = pd.Timestamp("2026-08-20").date()
+    bdays = compute_asof_staleness_bdays(stale_asof, real_today)
+    assert bdays > 4
+    assert should_block_buy_for_stale_asof(bdays) is True
+
+
+def test_notification_shows_asof_stale_block_warning():
+    rs = _base_result_summary(live=True, order_submission_results=[],
+                               asof_stale_block=True, asof_staleness_bdays=6)
+    assert _classify_tp50_notification(rs) == "warning"
+    body = _build_tp50_notification_body(rs, [], [])
+    assert "市場データ鮮度異常" in body
+    assert "6営業日" in body
+
+
+def test_notification_no_asof_warning_when_not_blocked():
+    rs = _base_result_summary(live=True, order_submission_results=[],
+                               asof_stale_block=False, asof_staleness_bdays=1)
+    assert _classify_tp50_notification(rs) == "success"
+    body = _build_tp50_notification_body(rs, [], [])
+    assert "市場データ鮮度異常" not in body
 
 
 if __name__ == "__main__":

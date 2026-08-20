@@ -128,6 +128,23 @@ AUDIT_LOG_FILE = AUDIT_DIR / "order_audit_log.jsonl"
 _TP50_SCHEDULED_TRIGGER_HHMM = "08:49"
 _TP50_MANUAL_DELAYED_THRESHOLD_MIN = 20  # スケジュール時刻からこれ以上遅れていれば「手動遅延実行」とみなす
 
+# Signal Freshness Guard（2026-08-20夜 Production Gate監査で追加）: as_of(最新読込済み
+# 営業日)が実カレンダー日からこの営業日数を超えて乖離した場合、新規BUYのみblockする
+# （Exit/リスク管理は常に継続。check_fundamentals_freshness()のis_stale判定と同一方針・
+# 同一のnp.busday_count手法）。WARN閾値は通常の週末/祝日乖離では発火しない水準。
+MAX_ASOF_STALENESS_BDAYS_WARN = 2
+MAX_ASOF_STALENESS_BDAYS_BLOCK = 4
+
+
+def compute_asof_staleness_bdays(as_of_date, real_today_date) -> int:
+    """np.busday_count(as_of_date, real_today_date) — check_fundamentals_freshness()と
+    同一手法。純関数として切り出し、テスト容易性を確保する（2026-08-20 Production Gate監査）。"""
+    return int(np.busday_count(as_of_date, real_today_date))
+
+
+def should_block_buy_for_stale_asof(staleness_bdays: int) -> bool:
+    return staleness_bdays > MAX_ASOF_STALENESS_BDAYS_BLOCK
+
 
 def score_replacement_enabled() -> bool:
     """
@@ -253,6 +270,7 @@ def _classify_tp50_notification(result_summary: dict) -> str:
         or (result_summary.get("risk_gate") or {}).get("recommendation") in ("CB_ACTIVE",)
         or _is_manual_delayed_run(result_summary)
         or bool(result_summary.get("metadata_warnings"))
+        or bool(result_summary.get("asof_stale_block"))
     )
     return "warning" if blocked else "success"
 
@@ -537,6 +555,11 @@ def _build_warnings_section(result_summary: dict) -> list[str]:
         warnings.append(f"API接続異常: cash_source={result_summary.get('cash_source')}")
     if fr.get("is_stale"):
         warnings.append(f"ファンダメンタルズ鮮度異常: {fr.get('reason')}")
+    if result_summary.get("asof_stale_block"):
+        warnings.append(
+            f"市場データ鮮度異常: as_ofが実カレンダー日から{result_summary.get('asof_staleness_bdays')}"
+            f"営業日乖離 — 新規BUYをブロック（Exit/リスク管理は継続）"
+        )
     ca_blocked = (result_summary.get("ca_guard") or {}).get("buy_candidates_blocked_by_ca_pending") or []
     if ca_blocked:
         warnings.append(f"CA_PENDING銘柄のためBUY除外: {ca_blocked}")
@@ -1267,15 +1290,16 @@ def apply_fill_metadata_updates(
                         warnings_sink.append(f"metadata mismatch: {sym} 約定確認不能（order_id={order_id}）")
                 else:
                     expected_qty = float(r.get("qty") or 0.0)
-                    if expected_qty and fill["filled_qty"] < expected_qty:
+                    if expected_qty and fill["filled_qty"] != expected_qty:
+                        _fill_relation = "部分約定" if fill["filled_qty"] < expected_qty else "約定数量超過"
                         logger.error(
-                            "[F4_TP50][METADATA_FAIL_CLOSED] PARTIAL FILL symbol=%s order_id=%s "
-                            "filled=%s/%s — 全数約定確認までentry metadataを保留（次回run再試行）。",
-                            sym, order_id, fill["filled_qty"], expected_qty,
+                            "[F4_TP50][METADATA_FAIL_CLOSED] QTY MISMATCH(%s) symbol=%s order_id=%s "
+                            "filled=%s/%s — 数量一致確認までentry metadataを保留（次回run再試行）。",
+                            _fill_relation, sym, order_id, fill["filled_qty"], expected_qty,
                         )
                         if warnings_sink is not None:
                             warnings_sink.append(
-                                f"metadata mismatch: {sym} 部分約定のみ（{fill['filled_qty']}/{expected_qty}株）"
+                                f"metadata mismatch: {sym} {_fill_relation}（{fill['filled_qty']}/{expected_qty}株）"
                             )
                     else:
                         problems = _validate_fill_sanity(fill["earliest_execution_date"], fill["avg_price"])
@@ -1356,24 +1380,31 @@ def main() -> int:
     as_of = data.calendar[-1]
     print(f"  最新営業日={as_of.date()}  銘柄数={len(data.codes)}")
 
-    # ── Signal Freshness Guard（2026-08-20 9344インシデント再発防止）──
-    # as_of(=最新読込済み営業日)が実カレンダー日から大きく乖離している場合は警告する。
-    # 「前営業日のシグナルを翌営業日に発注する」こと自体は正当なPIT運用のため無条件に
-    # ブロックはしない（週末を挟む3日乖離は通常運用の範囲）。ただし、たとえ乖離があっても
-    # entry_date/entry_priceは必ずbroker実約定(kabu API)から記録される（Phase5修正、
-    # apply_fill_metadata_updates()参照）ため、このstaleness自体がposition metadata
-    # 汚染の原因になることはもう無い。
-    _staleness_days = (datetime.now(_JST).date() - as_of.date()).days
-    if _staleness_days > 3:
+    # ── Signal Freshness Guard（2026-08-20 9344インシデント再発防止、同日夜 Production Gate監査で強化）──
+    # as_of(=最新読込済み営業日)が実カレンダー日から大きく乖離している場合の二段階ガード。
+    # 「前営業日のシグナルを翌営業日に発注する」こと自体は正当なPIT運用のため、通常の
+    # 週末/祝日を挟む1-2営業日の乖離では無条件にブロックしない。ただし、market data
+    # パイプライン自体が数営業日単位で停止しているような異常乖離は、たとえentry
+    # metadataがbroker実約定ベース(Phase5修正、apply_fill_metadata_updates()参照)で
+    # 汚染耐性を持つようになった後も、「著しく古い市場データに基づく新規Entry判断」
+    # という別種のリスク（価格が実勢から乖離した状態でのBUY）を防げないため、
+    # BUYのみblock（Exit/リスク管理は常に通常通り動作させる — freshness.is_staleと
+    # 同一方針）。np.busday_countはcheck_fundamentals_freshness()と同一手法。
+    _asof_staleness_bdays = compute_asof_staleness_bdays(as_of.date(), datetime.now(_JST).date())
+    asof_stale_block = should_block_buy_for_stale_asof(_asof_staleness_bdays)
+    if _asof_staleness_bdays > MAX_ASOF_STALENESS_BDAYS_WARN:
         logger.warning(
-            "[F4_TP50][SIGNAL_FRESHNESS] as_of(最新営業日)=%s が実カレンダー日=%sから%d日乖離。"
-            "signal_date/entry_dateが想定より古いデータに基づいている可能性あり。"
-            "発注は継続するが、entry metadataはbroker実約定からのみ記録されるため"
-            "(estimated_price/as_ofは使用されない)、metadata汚染のリスクは無い。",
-            as_of.date(), datetime.now(_JST).date(), _staleness_days,
+            "[F4_TP50][SIGNAL_FRESHNESS] as_of(最新営業日)=%s が実カレンダー日=%sから%d営業日乖離"
+            "（block閾値=%d営業日、現在%s）。entry metadataはbroker実約定からのみ記録されるため"
+            "metadata汚染リスクは無いが、市場データ自体の陳腐化リスクは別途残る。",
+            as_of.date(), datetime.now(_JST).date(), _asof_staleness_bdays,
+            MAX_ASOF_STALENESS_BDAYS_BLOCK, "BLOCK" if asof_stale_block else "WARN継続",
         )
-        print(f"[SIGNAL_FRESHNESS][WARNING] as_of={as_of.date()} 実カレンダー日={datetime.now(_JST).date()} "
-              f"staleness={_staleness_days}日 — 発注は継続（entry metadataはbroker実約定ベースのため安全）")
+        print(f"[SIGNAL_FRESHNESS][{'BLOCK' if asof_stale_block else 'WARNING'}] "
+              f"as_of={as_of.date()} 実カレンダー日={datetime.now(_JST).date()} "
+              f"staleness={_asof_staleness_bdays}営業日"
+              + ("（新規BUYをブロック・Exit/リスク管理は継続）" if asof_stale_block
+                 else "（発注は継続・entry metadataはbroker実約定ベースのため汚染リスクなし）"))
 
     # ── Score計算（SCORE_REPLACEMENT_ENABLED=Trueの場合のみ。02/03準拠） ──
     score_map: dict | None = None
@@ -1521,6 +1552,11 @@ def main() -> int:
         print(f"[GUARD] {freshness.reason} — BUY候補 {len(candidates_raw)}件を全ブロック"
               "（新規シグナル判定を停止。0件を'シグナルなし'として扱わない）")
         buy_candidates = []
+    elif asof_stale_block:
+        print(f"[GUARD] Signal Freshness(as_of {_asof_staleness_bdays}営業日乖離 > "
+              f"{MAX_ASOF_STALENESS_BDAYS_BLOCK}営業日) — BUY候補 {len(candidates_raw)}件を全ブロック"
+              "（市場データが著しく陳腐化・Exit/リスク管理は継続）")
+        buy_candidates = []
     else:
         buy_candidates = candidates_raw
 
@@ -1628,6 +1664,8 @@ def main() -> int:
         "positions_count": len(broker_positions),
         "run_started_at": run_started_at.strftime("%Y-%m-%d %H:%M:%S"),
         "scheduled_trigger_hhmm": _TP50_SCHEDULED_TRIGGER_HHMM,
+        "asof_staleness_bdays": _asof_staleness_bdays,
+        "asof_stale_block": asof_stale_block,
     }
     LIVE_LOG_DIR.mkdir(parents=True, exist_ok=True)
     _log_path = LIVE_LOG_DIR / f"f4_tp50_{run_id}.json"
