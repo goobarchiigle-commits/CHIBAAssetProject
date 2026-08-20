@@ -365,12 +365,13 @@ def test_order_timeout_monotonic():
 # 実態と乖離する。以下のテストは実約定を返すfakeクライアントを用いる。
 # ======================================================================
 class _FakeKabuClient:
-    """get_orders()のみ実装するテスト用スタブ。RecType=8(約定明細)を1件返す。"""
+    """get_orders()のみ実装するテスト用スタブ。RecType=8(約定明細)を1件返す(単一約定・全数)。"""
 
-    def __init__(self, order_id: str, execution_day: str, price: float):
+    def __init__(self, order_id: str, execution_day: str, price: float, qty: float = 100.0):
         self._order_id = order_id
         self._execution_day = execution_day
         self._price = price
+        self._qty = qty
 
     def get_orders(self, only_open: bool = False, updtime=None):
         return [{
@@ -378,9 +379,25 @@ class _FakeKabuClient:
             "Details": [
                 {"SeqNum": 1, "RecType": 1, "Price": 0.0},
                 {"SeqNum": 4, "RecType": 4, "Price": 0.0},
-                {"SeqNum": 5, "RecType": 8, "Price": self._price, "ExecutionDay": self._execution_day},
+                {"SeqNum": 5, "RecType": 8, "Price": self._price, "Qty": self._qty,
+                 "ExecutionDay": self._execution_day},
             ],
         }]
+
+
+class _MultiFillKabuClient:
+    """複数RecType=8明細(分割約定)を返すスタブ。加重平均価格・最早約定日を検証するために使う。"""
+
+    def __init__(self, order_id: str, fills: list[tuple[str, float, float]]):
+        """fills: [(execution_day, price, qty), ...]"""
+        self._order_id = order_id
+        self._fills = fills
+
+    def get_orders(self, only_open: bool = False, updtime=None):
+        details = [{"SeqNum": 1, "RecType": 1, "Price": 0.0}]
+        for i, (day, price, qty) in enumerate(self._fills):
+            details.append({"SeqNum": 10 + i, "RecType": 8, "Price": price, "Qty": qty, "ExecutionDay": day})
+        return [{"ID": self._order_id, "Details": details}]
 
 
 class _EmptyKabuClient:
@@ -492,6 +509,94 @@ def test_apply_fill_metadata_does_not_touch_other_strategy_symbols():
     )
     assert ed["9999"] == "2026-01-01"
     assert st["9999"] == "f4_tp30"  # TP30's own tag untouched
+
+
+def test_apply_fill_metadata_fails_closed_on_partial_fill():
+    """発注qty=100に対しbroker約定が60株のみの場合、部分約定を全数約定として
+    metadata記録してはならない（全数約定確認までentry_date/entry_priceを保留）。"""
+    as_of = pd.Timestamp("2026-08-17")
+    results = [{"symbol": "1301", "side": "BUY", "qty": 100, "success": True,
+                "estimated_price": 1000.0, "order_id": "ORDER-PARTIAL"}]
+    client = _FakeKabuClient("ORDER-PARTIAL", "2026-08-17T09:30:00+09:00", 1000.0, qty=60.0)
+    ed, ep_, st, changed = apply_fill_metadata_updates(results, {}, {}, {}, as_of, client=client)
+    assert "1301" not in ed
+    assert "1301" not in ep_
+
+
+def test_apply_fill_metadata_aggregates_multiple_execution_details():
+    """kabu APIが1注文に対し複数のRecType=8明細(分割約定)を返す場合、
+    合計数量が発注数量を満たせば、数量加重平均価格・最早約定日を用いて記録する。"""
+    as_of = pd.Timestamp("2026-08-17")
+    results = [{"symbol": "1301", "side": "BUY", "qty": 100, "success": True,
+                "estimated_price": 1000.0, "order_id": "ORDER-MULTI"}]
+    # 60株@1200円(先着) + 40株@1210円 → 加重平均 = (60*1200+40*1210)/100 = 1204円
+    client = _MultiFillKabuClient("ORDER-MULTI", [
+        ("2026-08-17T09:30:05+09:00", 1200.0, 60.0),
+        ("2026-08-17T09:30:07+09:00", 1210.0, 40.0),
+    ])
+    ed, ep_, st, changed = apply_fill_metadata_updates(results, {}, {}, {}, as_of, client=client)
+    assert ed["1301"] == "2026-08-17"
+    assert ep_["1301"] == pytest.approx(1204.0)
+
+
+def test_apply_fill_metadata_multi_fill_uses_earliest_execution_date():
+    """分割約定が日をまたぐ場合(通常は同日内だが仕様として)、最早の約定日を採用する。"""
+    as_of = pd.Timestamp("2026-08-17")
+    results = [{"symbol": "1301", "side": "BUY", "qty": 100, "success": True,
+                "estimated_price": 1000.0, "order_id": "ORDER-MULTI2"}]
+    client = _MultiFillKabuClient("ORDER-MULTI2", [
+        ("2026-08-18T09:00:00+09:00", 1000.0, 50.0),
+        ("2026-08-17T09:00:00+09:00", 1000.0, 50.0),  # こちらが最早
+    ])
+    ed, ep_, st, changed = apply_fill_metadata_updates(results, {}, {}, {}, as_of, client=client)
+    assert ed["1301"] == "2026-08-17"
+
+
+def test_apply_fill_metadata_idempotent_when_same_order_processed_twice():
+    """同一order_idの結果を2回(例: リトライ/再実行で)処理しても、
+    2回目はbroker参照すら行わず既存値を保持し、二重加算・上書きが起きない。"""
+    as_of = pd.Timestamp("2026-08-17")
+    results = [{"symbol": "1301", "side": "BUY", "qty": 100, "success": True,
+                "estimated_price": 1000.0, "order_id": "ORDER-DUP"}]
+    client = _FakeKabuClient("ORDER-DUP", "2026-08-17T09:30:00+09:00", 1224.0)
+
+    ed1, ep1, st1, changed1 = apply_fill_metadata_updates(results, {}, {}, {}, as_of, client=client)
+    assert changed1 is True
+    assert ep1["1301"] == 1224.0
+
+    # 2回目: 同じresultsを再度処理（client は呼ばれれば別値を返す設定にして、
+    # 呼ばれていない＝既存値保持であることを検証する）
+    client2 = _FakeKabuClient("ORDER-DUP", "2026-08-19T09:30:00+09:00", 9999.0)
+    ed2, ep2, st2, changed2 = apply_fill_metadata_updates(results, ed1, ep1, st1, as_of, client=client2)
+    assert ed2["1301"] == "2026-08-17"  # 変化なし
+    assert ep2["1301"] == 1224.0        # 変化なし（9999.0で上書きされていない）
+
+
+def test_apply_fill_metadata_fails_closed_on_future_execution_date():
+    """kabu APIが返す約定日が未来日(API異常/パース不良を示唆)の場合、
+    sanityチェックで弾き、entry metadataを記録しない。"""
+    as_of = pd.Timestamp("2026-08-17")
+    results = [{"symbol": "1301", "side": "BUY", "qty": 100, "success": True,
+                "estimated_price": 1000.0, "order_id": "ORDER-FUTURE"}]
+    client = _FakeKabuClient("ORDER-FUTURE", "2099-01-01T09:30:00+09:00", 1000.0)
+    ed, ep_, st, changed = apply_fill_metadata_updates(results, {}, {}, {}, as_of, client=client)
+    assert "1301" not in ed
+    assert "1301" not in ep_
+
+
+def test_apply_fill_metadata_9344_incident_reproduction_new_implementation_passes():
+    """9344インシデントの実測値そのものを用いた再現テスト。
+    旧実装(as_of/estimated_price使用)ならentry_date=2026-08-18・price=1379.0を
+    記録して本テストはFAILしていたはずだが、新実装(broker実約定ベース)ではPASSする。"""
+    as_of = pd.Timestamp("2026-08-18")  # 汚染の原因だった、シグナル理論上のentry_date
+    results = [{"symbol": "93440", "side": "BUY", "qty": 100, "success": True,
+                "estimated_price": 1379.0, "order_id": "20260819A02N88827536"}]
+    client = _FakeKabuClient("20260819A02N88827536", "2026-08-19T14:28:51+09:00", 1224.0)
+    ed, ep_, st, changed = apply_fill_metadata_updates(results, {}, {}, {}, as_of, client=client)
+    assert ed["93440"] == "2026-08-19"
+    assert ep_["93440"] == 1224.0
+    assert ed["93440"] != "2026-08-18"
+    assert ep_["93440"] != 1379.0
 
 
 # ======================================================================

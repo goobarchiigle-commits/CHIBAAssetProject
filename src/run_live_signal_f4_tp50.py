@@ -661,28 +661,103 @@ def evaluate_and_execute_replacements(
     return synthetic_results, decision_log, cash
 
 
-def _fetch_actual_fill(client, order_id: str) -> tuple[str | None, float | None]:
+def _fetch_actual_fill_details(client, order_id: str) -> dict | None:
     """
-    Queries kabu API GET /orders for the confirmed broker execution (RecType=8
-    detail record) of order_id. Returns (execution_date "YYYY-MM-DD",
-    execution_price) or (None, None) if the order isn't found, isn't filled
-    yet, or the API call fails. Never raises — callers must fail closed on
-    (None, None) rather than substitute an estimate.
+    Queries kabu API GET /orders for the confirmed broker execution of
+    order_id — the SOLE Source of Truth for F4 TP50 entry metadata (never
+    as_of/estimated_price/signal_date; see apply_fill_metadata_updates()
+    docstring and docs/research/2026-08-20_f4_tp50_9344_position_metadata_
+    incident_and_audit.md).
+
+    Aggregates ALL RecType=8 (約定明細) detail records for the order — kabu
+    API can return a single BUY as multiple partial executions — into:
+        filled_qty:             sum of all execution quantities
+        avg_price:              quantity-weighted average execution price
+        earliest_execution_date: "YYYY-MM-DD" of the first execution
+        execution_count:        number of individual fills aggregated
+
+    Returns None if the order isn't found, has no execution detail yet, or
+    the API call fails. Never raises — callers must fail closed on None
+    rather than substitute an estimate.
     """
     try:
         orders = client.get_orders(only_open=False)
     except Exception as exc:
         logger.warning("[F4_TP50][FILL_LOOKUP] get_orders失敗 order_id=%s: %s", order_id, exc)
-        return None, None
+        return None
     for o in orders:
         if o.get("ID") != order_id:
             continue
+        fills = []
         for d in o.get("Details", []) or []:
-            if d.get("RecType") == 8 and d.get("ExecutionDay") and d.get("Price"):
-                price = float(d["Price"])
-                if price > 0.0:
-                    return str(d["ExecutionDay"])[:10], price
-    return None, None
+            if d.get("RecType") != 8:
+                continue
+            price = d.get("Price")
+            qty = d.get("Qty")
+            exec_day = d.get("ExecutionDay")
+            if not (price and qty and exec_day) or float(price) <= 0.0 or float(qty) <= 0.0:
+                continue
+            fills.append({"price": float(price), "qty": float(qty), "execution_day": str(exec_day)})
+        if not fills:
+            return None
+        total_qty = sum(f["qty"] for f in fills)
+        weighted_price = sum(f["price"] * f["qty"] for f in fills) / total_qty
+        earliest_date = min(f["execution_day"] for f in fills)[:10]
+        return {
+            "filled_qty": total_qty,
+            "avg_price": weighted_price,
+            "earliest_execution_date": earliest_date,
+            "execution_count": len(fills),
+        }
+    return None
+
+
+def _validate_fill_sanity(exec_date_str: str, exec_price: float) -> list[str]:
+    """
+    Lightweight sanity checks on a confirmed broker fill before it is trusted
+    as entry metadata. Not a market-data validator — just catches API/parsing
+    corruption (e.g. a nonsense future date, a zero/negative price slipping
+    through). Returns a list of problem descriptions (empty = OK).
+    """
+    problems: list[str] = []
+    if exec_price is None or exec_price <= 0.0:
+        problems.append(f"exec_price<=0: {exec_price}")
+    try:
+        exec_dt = datetime.strptime(exec_date_str, "%Y-%m-%d").date()
+        today = datetime.now(_JST).date()
+        if exec_dt > today:
+            problems.append(f"exec_date is in the future: {exec_date_str} > {today}")
+    except (ValueError, TypeError):
+        problems.append(f"unparseable exec_date: {exec_date_str!r}")
+    return problems
+
+
+def _append_entry_fill_audit(
+    symbol: str, order_id: str | None, estimated_price: float | None,
+    as_of: pd.Timestamp, fill: dict,
+) -> None:
+    """
+    SSOT audit trail (Phase2 design, 2026-08-20 9344インシデント対応):
+    theoretical(signal-side: as_of/estimated_price) と actual(broker fill) を
+    同一レコード内で明示的に分離して記録する。将来の監査(本インシデントの
+    ような「stored値とbroker実約定の突合」)をログの断片から再構築する必要が
+    ないようにするための追記専用サイドカー。portfolio_state.jsonのスキーマは
+    一切変更しない（既存フィールドはactual値のみを保持し続ける）。
+    """
+    try:
+        record = {
+            "symbol": symbol,
+            "broker_order_id": order_id,
+            "theoretical": {"signal_as_of": as_of.strftime("%Y-%m-%d"), "estimated_price": estimated_price},
+            "actual": fill,
+            "recorded_at": datetime.now(_JST).isoformat(),
+        }
+        path = AUDIT_DIR / "entry_fill_audit.jsonl"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(record, ensure_ascii=False) + "\n")
+    except Exception as exc:
+        logger.warning("[F4_TP50][AUDIT_WRITE_FAILED] symbol=%s: %s", symbol, exc)
 
 
 def apply_fill_metadata_updates(
@@ -699,25 +774,42 @@ def apply_fill_metadata_updates(
     position_strategy_types) — no new top-level keys are introduced.
 
     On a successful BUY fill: records entry_date/entry_price from the actual
-    kabu API broker execution (Details[].ExecutionDay/.Price for the order's
-    order_id via _fetch_actual_fill()), NOT from as_of/estimated_price (those
-    are signal-theoretical values computed before submission and can diverge
-    from the real fill date/price whenever the order executes later than the
-    signal's assumed as_of — see 2026-08-20 9344 incident: a delayed fill was
-    recorded under the signal's stale as_of/estimated_price, which pulled a
-    pre-entry OHLC bar into highest_since_entry and caused a spurious
-    trailing-stop SELL the next day).
+    kabu API broker execution (Details[] RecType=8 records for the order's
+    order_id, aggregated across partial fills via _fetch_actual_fill_details()),
+    NOT from as_of/estimated_price (those are signal-theoretical values
+    computed before submission and can diverge from the real fill date/price
+    whenever the order executes later than the signal's assumed as_of — see
+    2026-08-20 9344 incident: a delayed fill was recorded under the signal's
+    stale as_of/estimated_price, which pulled a pre-entry OHLC bar into
+    highest_since_entry and caused a spurious trailing-stop SELL the next
+    day). estimated_price/as_of are never written into position_entry_dates/
+    position_entry_prices under any code path in this function — the broker
+    fill (via _fetch_actual_fill_details) is the sole source for both.
 
-    FAIL CLOSED: if the actual fill cannot be confirmed via the broker (API
-    error, order not found, no execution detail yet), entry metadata for that
-    symbol is NOT written this run (logged as METADATA_FAIL_CLOSED) rather than
-    falling back to estimated_price/as_of. The next run will retry since the
-    symbol still won't be in entry_dates.
+    FAIL CLOSED — entry metadata for a symbol is NOT written this run
+    (logged as METADATA_FAIL_CLOSED, so the next run retries since the symbol
+    still won't be in entry_dates) when any of:
+      - the actual fill cannot be confirmed via the broker (API error, order
+        not found, no execution detail yet);
+      - the order is only PARTIALLY filled (aggregated Details qty < the
+        order's requested qty) — a partial fill is not yet a confirmed
+        FIXED_LOT_SIZE entry;
+      - the confirmed fill fails a basic sanity check (_validate_fill_sanity:
+        non-positive price, execution date in the future/unparseable).
+    In every case, estimated_price/as_of are never substituted.
+
+    On every successful, fully-confirmed BUY, an audit record pairing the
+    theoretical (as_of/estimated_price) and actual (broker fill) values is
+    appended to runtime/f4_tp50/entry_fill_audit.jsonl — an additive sidecar,
+    not a portfolio_state.json schema change — so theoretical and actual
+    values are never conflated and remain independently reconstructable.
 
     Only writes if not already present, so a retry/duplicate result never
-    clobbers the true original entry. On a successful SELL fill: removes all
-    three fields for that symbol. Failed orders (success=False) never touch
-    metadata.
+    clobbers the true original entry (this also makes re-processing the same
+    order_id across runs idempotent: the second run finds the symbol already
+    populated and skips straight to the strategy_type check). On a successful
+    SELL fill: removes all three fields for that symbol. Failed orders
+    (success=False) never touch metadata.
 
     Returns (new_entry_dates, new_entry_prices, new_strategy_types, changed).
     """
@@ -733,10 +825,10 @@ def apply_fill_metadata_updates(
         if r.get("side") == "BUY":
             if sym not in entry_dates or sym not in entry_prices:
                 order_id = r.get("order_id")
-                exec_date, exec_price = (
-                    _fetch_actual_fill(client, order_id) if client is not None and order_id else (None, None)
+                fill = (
+                    _fetch_actual_fill_details(client, order_id) if client is not None and order_id else None
                 )
-                if exec_date is None or exec_price is None:
+                if fill is None:
                     logger.error(
                         "[F4_TP50][METADATA_FAIL_CLOSED] BUY約定確認不能 symbol=%s order_id=%s — "
                         "entry_date/entry_priceを推測値(estimated_price/as_of)で代用せず、"
@@ -744,12 +836,29 @@ def apply_fill_metadata_updates(
                         sym, order_id,
                     )
                 else:
-                    if sym not in entry_dates:
-                        entry_dates[sym] = exec_date
-                        changed = True
-                    if sym not in entry_prices:
-                        entry_prices[sym] = exec_price
-                        changed = True
+                    expected_qty = float(r.get("qty") or 0.0)
+                    if expected_qty and fill["filled_qty"] < expected_qty:
+                        logger.error(
+                            "[F4_TP50][METADATA_FAIL_CLOSED] PARTIAL FILL symbol=%s order_id=%s "
+                            "filled=%s/%s — 全数約定確認までentry metadataを保留（次回run再試行）。",
+                            sym, order_id, fill["filled_qty"], expected_qty,
+                        )
+                    else:
+                        problems = _validate_fill_sanity(fill["earliest_execution_date"], fill["avg_price"])
+                        if problems:
+                            logger.error(
+                                "[F4_TP50][METADATA_FAIL_CLOSED] VALIDATION symbol=%s order_id=%s "
+                                "problems=%s — entry metadata未記録。",
+                                sym, order_id, problems,
+                            )
+                        else:
+                            if sym not in entry_dates:
+                                entry_dates[sym] = fill["earliest_execution_date"]
+                                changed = True
+                            if sym not in entry_prices:
+                                entry_prices[sym] = fill["avg_price"]
+                                changed = True
+                            _append_entry_fill_audit(sym, order_id, r.get("estimated_price"), as_of, fill)
             if strategy_types.get(sym) != STRATEGY_TYPE:
                 strategy_types[sym] = STRATEGY_TYPE
                 changed = True
