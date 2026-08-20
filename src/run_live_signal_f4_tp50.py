@@ -122,6 +122,12 @@ FIXED_LOT_SIZE = ee.FIXED_LOT  # = 100
 AUDIT_DIR = RUNTIME_DIR / "f4_tp50"
 AUDIT_LOG_FILE = AUDIT_DIR / "order_audit_log.jsonl"
 
+# CHIBATrading_TP50_Live タスクスケジューラの登録トリガー時刻（scripts/setup_task_scheduler.ps1
+# 参照）。通知本文の【EXECUTION】ブロックで実行時刻と比較し、遅延手動実行を検知する表示にのみ
+# 使う（発注可否のロジックには一切影響しない — 2026-08-20 9344インシデント対応）。
+_TP50_SCHEDULED_TRIGGER_HHMM = "08:49"
+_TP50_MANUAL_DELAYED_THRESHOLD_MIN = 20  # スケジュール時刻からこれ以上遅れていれば「手動遅延実行」とみなす
+
 
 def score_replacement_enabled() -> bool:
     """
@@ -211,8 +217,28 @@ _TP50_NOTIFY_SUBJECT_SUFFIX = {
 }
 
 
+def _is_manual_delayed_run(result_summary: dict) -> bool:
+    """run_started_atがscheduled_trigger_hhmm(08:49)より_TP50_MANUAL_DELAYED_THRESHOLD_MIN分
+    以上遅い場合、Task Schedulerが自動発火しなかった手動遅延実行とみなす（ヒューリスティック。
+    Task Scheduler自体からの直接シグナルではなく時刻比較のみ——2026-08-20 9344インシデント
+    調査時に実際に起きた事象を検知できるようにするための実用的な近似）。"""
+    started_at = result_summary.get("run_started_at")
+    scheduled_hhmm = result_summary.get("scheduled_trigger_hhmm")
+    if not started_at or not scheduled_hhmm:
+        return False
+    try:
+        started = datetime.strptime(started_at, "%Y-%m-%d %H:%M:%S")
+        sched_h, sched_m = (int(x) for x in scheduled_hhmm.split(":"))
+        scheduled = started.replace(hour=sched_h, minute=sched_m, second=0, microsecond=0)
+        return (started - scheduled).total_seconds() / 60.0 > _TP50_MANUAL_DELAYED_THRESHOLD_MIN
+    except (ValueError, TypeError):
+        return False
+
+
 def _classify_tp50_notification(result_summary: dict) -> str:
-    """dry_run/error/warning/success のいずれかを判定する（優先順位: dry_run > error > warning > success）。"""
+    """dry_run/error/warning/success のいずれかを判定する（優先順位: dry_run > error > warning > success）。
+    2026-08-20追加: Scheduler未発火（手動遅延実行）検知時もwarningへ格上げする
+    （9344インシデントの背景となった「本来SUCCESSに見えるが実は異常」を隠さないため）。"""
     if not result_summary.get("live"):
         return "dry_run"
     results = result_summary.get("order_submission_results")
@@ -225,77 +251,466 @@ def _classify_tp50_notification(result_summary: dict) -> str:
         or bool(ca.get("buy_candidates_blocked_by_ca_pending"))
         or int(result_summary.get("buys_blocked_by_entry_freeze") or 0) > 0
         or (result_summary.get("risk_gate") or {}).get("recommendation") in ("CB_ACTIVE",)
+        or _is_manual_delayed_run(result_summary)
+        or bool(result_summary.get("metadata_warnings"))
     )
     return "warning" if blocked else "success"
 
 
-def _format_intended_order_line(o) -> str:
-    return f"  {o.side} {o.symbol} (kabu_symbol={o.symbol_4digit}) qty={o.qty} reason={o.reason}"
+# ── 表示ヘルパー ──────────────────────────────────────────────────────────
+_EXIT_REASON_LABEL = {
+    "trailing_gap_open": "T15トレーリングSTOP（寄付gap）",
+    "trailing_touch": "T15トレーリングSTOP",
+    "target_gap_open": "TP50利確（寄付gap）",
+    "target_touch": "TP50利確",
+}
 
 
-def _format_submitted_order_line(r: dict) -> str:
-    http = f" http_status={r.get('http_status')}" if r.get("http_status") is not None else ""
-    return (f"  {r.get('side')} {r.get('symbol')} (kabu_symbol={r.get('symbol_4digit')}) "
-            f"qty={r.get('qty')} success={r.get('success')} order_id={r.get('order_id')} "
-            f"error={r.get('error')}{http}")
+def _exit_reason_category(exit_reason: str) -> str:
+    if exit_reason in ("trailing_gap_open", "trailing_touch"):
+        return "T15_TRAILING_STOP"
+    if exit_reason in ("target_gap_open", "target_touch"):
+        return "TP50_TARGET"
+    return "OTHER"
+
+
+def _lookup_symbol_display(client, code5: str) -> tuple[str, float | None]:
+    """(SymbolName, CurrentPrice) をkabu API board(実勢気配)から取得する。
+    client未指定・API失敗時は (code5, None) を返し、呼び出し側は"N/A"表示にfallbackする。"""
+    if client is None:
+        return code5, None
+    try:
+        code4 = to_kabu_symbol(code5)
+        board = client.get_board(code4)
+        name = board.symbol_name or code5
+        price = board.current_price if board.current_price else None
+        return name, price
+    except Exception:
+        return code5, None
+
+
+def _symbol_line(client, code5: str) -> str:
+    """通知本文の「銘柄コード 銘柄名」行を作る。名前が取得できない場合はコードの
+    重複表示（"93440 93440"のような無意味な行）を避け、コード単独で表示する。"""
+    name, _ = _lookup_symbol_display(client, code5)
+    return code5 if name == code5 else f"{code5} {name}"
+
+
+def _lookup_actual_fill_price(client, order_id: str | None) -> float | None:
+    if client is None or not order_id or order_id == "DRY_RUN_SIMULATED":
+        return None
+    fill = _fetch_actual_fill_details(client, order_id)
+    return fill["avg_price"] if fill else None
+
+
+def _fmt_yen(x, signed: bool = False) -> str:
+    if x is None:
+        return "N/A"
+    sign = "+" if (signed and x >= 0) else ""
+    return f"{sign}¥{x:,.0f}"
+
+
+def _fmt_pct(x, signed: bool = True) -> str:
+    if x is None:
+        return "N/A"
+    sign = "+" if (signed and x >= 0) else ""
+    return f"{sign}{x:.2%}"
+
+
+def _fmt_signed_num(x, decimals: int = 1) -> str:
+    if x is None:
+        return "N/A"
+    sign = "+" if x >= 0 else ""
+    return f"{sign}{x:.{decimals}f}"
+
+
+def _fmt_score(score_map, code5: str) -> str:
+    if not score_map:
+        return "N/A"
+    try:
+        from src.f4_tp50 import score as f4_score
+        v = f4_score.score_of(score_map, code5)
+        if v is None or not np.isfinite(v):
+            return "N/A"
+        return f"{v:.1f}"
+    except Exception:
+        return "N/A"
+
+
+def _order_for_symbol(results: list[dict] | None, symbol: str, side: str) -> dict | None:
+    if not results:
+        return None
+    for r in results:
+        if r.get("symbol") == symbol and r.get("side") == side:
+            return r
+    return None
+
+
+def _find_previous_live_run(exclude_run_id: str | None = None) -> dict | None:
+    """LIVE_LOG_DIR(logs/live/)から最も新しい"live":true のresult_summaryを探す。
+    Dry Run通知の【前日の実績】セクションのデータ源（2026-08-20 9344インシデント対応:
+    「前日のkabu API実約定結果」を毎朝のDry Runで必ず確認できるようにする）。
+    ファイル名 f4_tp50_f4_tp50_YYYYMMDD_HHMMSS.json はrun_id昇順=時系列昇順なので
+    降順ソートの先頭が最新。見つからなければNone（初回実行時等）。"""
+    try:
+        candidates = sorted(LIVE_LOG_DIR.glob("f4_tp50_f4_tp50_*.json"), reverse=True)
+    except Exception as exc:
+        logger.warning("[F4_TP50][PREV_RUN_LOOKUP] ディレクトリ走査失敗: %s", exc)
+        return None
+    for p in candidates:
+        try:
+            data = json.loads(p.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        if data.get("live") and data.get("run_id") != exclude_run_id:
+            return data
+    return None
+
+
+def _render_sell_item(e: dict, order: dict | None, client, score_map, mode: str) -> list[str]:
+    """mode: "today_preview"(Dry Runの本日の判断・未発注) /
+             "actual_result"(Dry Runの前日の実績・broker実約定) /
+             "order_slip"(Liveの発注書・約定価格は示さない)"""
+    code = e["code"]
+    entry_price = e.get("entry_price")
+    category = _exit_reason_category(e["exit_reason"])
+    reason_label = _EXIT_REASON_LABEL.get(e["exit_reason"], e["exit_reason"])
+    order_id = order.get("order_id") if order else None
+
+    lines = [_symbol_line(client, code), f"Score {_fmt_score(score_map, code)}", "", reason_label]
+    lines.append(f"Entry       {_fmt_yen(entry_price)}")
+    if category == "T15_TRAILING_STOP":
+        lines.append(f"最高値      {_fmt_yen(e.get('highest_since_entry'))}")
+        lines.append(f"STOP        {_fmt_yen(e.get('stop_level'))}")
+    elif category == "TP50_TARGET":
+        lines.append(f"Target      {_fmt_yen(e.get('target_price'))}")
+
+    if mode == "actual_result":
+        fill = _fetch_actual_fill_details(client, order_id) if client is not None and order_id else None
+        fill_price = fill["avg_price"] if fill else None
+        lines.append(f"約定価格    {_fmt_yen(fill_price)}")
+        lines.append(f"数量        {e.get('qty')}株")
+        lines.append("")
+        if entry_price and fill_price:
+            pnl = (fill_price - entry_price) * e.get("qty", 0)
+            pnl_pct = (fill_price - entry_price) / entry_price
+            lines.append(f"実現損益    {_fmt_yen(pnl, signed=True)}")
+            lines.append(f"損益率      {_fmt_pct(pnl_pct)}")
+        lines.append("")
+        lines.append(f"注文ID      {order_id or 'N/A'}")
+        if fill and fill.get("earliest_execution_timestamp"):
+            lines.append(f"約定時刻    {fill['earliest_execution_timestamp'][11:19]}")
+    elif mode == "order_slip":
+        lines.append(f"判定価格    {_fmt_yen(e.get('exit_fill_price'))}")
+        lines.append("")
+        lines.append(f"数量        {e.get('qty')}株")
+        lines.append("注文        成行SELL")
+        lines.append(f"注文ID      {order_id or 'N/A'}")
+        if order is not None and not order.get("success"):
+            lines.append(f"⚠ 発注失敗  error={order.get('error')}")
+    else:  # today_preview
+        lines.append(f"判定価格    {_fmt_yen(e.get('exit_fill_price'))}")
+        lines.append(f"数量        {e.get('qty')}株")
+        lines.append("")
+        lines.append("→ LIVEならSELL")
+    lines.append("")
+    return lines
+
+
+def _render_buy_item(f: dict, order: dict | None, client, score_map, mode: str) -> list[str]:
+    code = f["code"]
+    order_id = order.get("order_id") if order else None
+    lines = [_symbol_line(client, code), f"Score {_fmt_score(score_map, code)}", "", "新規Entry"]
+
+    if mode == "actual_result":
+        fill = _fetch_actual_fill_details(client, order_id) if client is not None and order_id else None
+        fill_price = fill["avg_price"] if fill else None
+        lines.append(f"約定価格    {_fmt_yen(fill_price)}")
+        lines.append(f"数量        {FIXED_LOT_SIZE}株")
+        lines.append(f"注文ID      {order_id or 'N/A'}")
+        if fill and fill.get("earliest_execution_timestamp"):
+            lines.append(f"約定時刻    {fill['earliest_execution_timestamp'][11:19]}")
+    elif mode == "order_slip":
+        lines.append(f"予定数量    {FIXED_LOT_SIZE}株")
+        lines.append(f"基準価格    {_fmt_yen(f.get('estimated_fill_price'))}")
+        lines.append("注文        成行BUY")
+        lines.append(f"注文ID      {order_id or 'N/A'}")
+        if order is not None and not order.get("success"):
+            lines.append(f"⚠ 発注失敗  error={order.get('error')}")
+    else:  # today_preview
+        lines.append(f"予定数量    {FIXED_LOT_SIZE}株")
+        lines.append(f"基準価格    {_fmt_yen(f.get('estimated_fill_price'))}")
+        lines.append("")
+        lines.append("→ LIVEならBUY")
+    lines.append("")
+    return lines
+
+
+def _render_replacement_item(d: dict, client, mode: str) -> list[str]:
+    old_code = d.get("sold_code")
+    new_code = d.get("candidate_code")
+    old_score = d.get("holding_score")
+    new_score = d.get("candidate_score")
+    score_delta = d.get("score_delta")
+    if score_delta is None and old_score is not None and new_score is not None:
+        score_delta = new_score - old_score
+
+    lines = ["SELL", _symbol_line(client, old_code),
+             f"Score {old_score if old_score is not None else 'N/A'}"]
+    if mode in ("actual_result", "order_slip") and d.get("sell_order_id"):
+        lines.append(f"OrderID {d.get('sell_order_id')}")
+    lines += ["", "↓", "", "BUY", _symbol_line(client, new_code),
+              f"Score {new_score if new_score is not None else 'N/A'}"]
+    if mode in ("actual_result", "order_slip") and d.get("buy_order_id"):
+        lines.append(f"OrderID {d.get('buy_order_id')}")
+    lines += ["", f"Score差     {_fmt_signed_num(score_delta)}"]
+    if mode == "today_preview":
+        lines.append("→ LIVEなら入替")
+    lines.append("")
+    return lines
+
+
+def _build_previous_day_actuals_section(prev: dict, client, score_map) -> list[str]:
+    """【前日の実績】: 直近のLIVE実行結果を、broker実約定(kabu API再取得)ベースで表示する。"""
+    prev_date = (prev.get("run_started_at") or "")[:10].replace("-", "/")
+    results = prev.get("order_submission_results") or []
+    exits_detail = prev.get("exits_detail") or []
+    funded_detail = prev.get("funded_detail") or []
+    decisions = (prev.get("score_replacement") or {}).get("decisions") or []
+    replace_decisions = [d for d in decisions if d.get("decision") in ("REPLACE_SIMULATED", "BUY_FILLED")]
+
+    lines = ["【前日の実績】", prev_date or "(日付不明)", ""]
+    lines.append("■ SELL")
+    if not exits_detail:
+        lines.append("なし")
+    else:
+        for e in exits_detail:
+            order = _order_for_symbol(results, e["code"], "SELL")
+            lines += _render_sell_item(e, order, client, score_map, mode="actual_result")
+    lines.append("")
+    lines.append("■ BUY")
+    if not funded_detail:
+        lines.append("なし")
+    else:
+        for f in funded_detail:
+            order = _order_for_symbol(results, f["code"], "BUY")
+            lines += _render_buy_item(f, order, client, score_map, mode="actual_result")
+    lines.append("")
+    lines.append("■ SCORE REPLACEMENT")
+    if not replace_decisions:
+        lines.append("なし")
+    else:
+        for d in replace_decisions:
+            lines += _render_replacement_item(d, client, mode="actual_result")
+    lines.append("")
+    return lines
+
+
+def _build_system_block(result_summary: dict, live: bool) -> list[str]:
+    fr = result_summary.get("fundamentals_freshness") or {}
+    results = result_summary.get("order_submission_results")
+    lines = ["【SYSTEM】", ""]
+    lines.append(f"Market Data       {'OK' if fr.get('is_stale') is False else '異常'}")
+    lines.append(f"Fundamentals      {'OK' if not fr.get('is_stale') else 'STALE'}")
+    lines.append(f"Kabu API          {'OK' if result_summary.get('cash_source') == 'broker_live' else '異常/未接続'}")
+    if results is not None:
+        n_fail = sum(1 for r in results if not r.get("success"))
+        lines.append(f"Order Submission  {'OK' if n_fail == 0 else f'異常（失敗{n_fail}件）'}")
+    lines.append(f"Metadata          {'OK' if not result_summary.get('metadata_warnings') else '異常'}")
+    lines.append(f"Scheduler         {'異常（手動遅延実行）' if _is_manual_delayed_run(result_summary) else 'OK'}")
+    lines.append("Notification      送信中")
+    lines.append("")
+    return lines
+
+
+def _build_warnings_section(result_summary: dict) -> list[str]:
+    """スケジューラ未発火・API異常・metadata mismatch等をヘッダ直下に目立たせる。"""
+    fr = result_summary.get("fundamentals_freshness") or {}
+    risk = result_summary.get("risk_gate") or {}
+    results = result_summary.get("order_submission_results")
+    warnings: list[str] = []
+    if _is_manual_delayed_run(result_summary):
+        warnings.append(f"{result_summary.get('scheduled_trigger_hhmm')} 自動実行されず")
+        started_hhmm = (result_summary.get("run_started_at") or "")[11:16]
+        warnings.append(f"{started_hhmm} 手動遅延実行")
+    if result_summary.get("cash_source") not in ("broker_live", None) and result_summary.get("live"):
+        warnings.append(f"API接続異常: cash_source={result_summary.get('cash_source')}")
+    if fr.get("is_stale"):
+        warnings.append(f"ファンダメンタルズ鮮度異常: {fr.get('reason')}")
+    ca_blocked = (result_summary.get("ca_guard") or {}).get("buy_candidates_blocked_by_ca_pending") or []
+    if ca_blocked:
+        warnings.append(f"CA_PENDING銘柄のためBUY除外: {ca_blocked}")
+    if risk.get("recommendation") in ("CB_ACTIVE",):
+        warnings.append(f"Circuit Breaker発動中: {risk.get('message')}")
+    if results and any(not r.get("success") for r in results):
+        failed = [f"{r.get('symbol')}({r.get('error')})" for r in results if not r.get("success")]
+        warnings.append(f"発注失敗: {failed}")
+    warnings += list(result_summary.get("metadata_warnings") or [])
+    if not warnings:
+        return []
+    lines = ["【警告】"]
+    lines += warnings
+    lines.append("")
+    return lines
+
+
+def _build_dry_run_notification_body(result_summary: dict, client, score_map) -> str:
+    sep = "━" * 22
+    today_date = (result_summary.get("run_started_at") or "")[:10].replace("-", "/")
+    today_time = (result_summary.get("run_started_at") or "")[11:16]
+    exits_detail = result_summary.get("exits_detail") or []
+    funded_detail = result_summary.get("funded_detail") or []
+    decisions = (result_summary.get("score_replacement") or {}).get("decisions") or []
+    replace_decisions = [d for d in decisions if d.get("decision") in ("REPLACE_SIMULATED", "BUY_FILLED")]
+    risk = result_summary.get("risk_gate") or {}
+
+    lines = [sep, "CHIBA F4 TP50", "DAILY DRY RUN", f"{today_date} {today_time}", sep, ""]
+    lines += _build_warnings_section(result_summary)
+
+    prev = _find_previous_live_run(exclude_run_id=result_summary.get("run_id"))
+    if prev is not None:
+        lines += _build_previous_day_actuals_section(prev, client, score_map)
+
+    lines.append(sep)
+    lines.append("【本日の判断】")
+    lines.append(today_date)
+    lines.append(sep)
+    lines.append("")
+    lines.append(f"SELL       {len(exits_detail)}")
+    lines.append(f"BUY        {len(funded_detail)}")
+    lines.append(f"REPLACEMENT {len(replace_decisions)}")
+    lines.append("")
+
+    lines.append("■ SELL")
+    lines.append("")
+    if not exits_detail:
+        lines.append("なし")
+    else:
+        for e in exits_detail:
+            lines += _render_sell_item(e, None, client, score_map, mode="today_preview")
+    lines.append("")
+    lines.append("■ BUY")
+    lines.append("")
+    if not funded_detail:
+        lines.append("なし")
+    else:
+        for f in funded_detail:
+            lines += _render_buy_item(f, None, client, score_map, mode="today_preview")
+    lines.append("")
+    lines.append("■ SCORE REPLACEMENT")
+    lines.append("")
+    if not replace_decisions:
+        lines.append("なし")
+    else:
+        for d in replace_decisions:
+            lines += _render_replacement_item(d, client, mode="today_preview")
+    lines.append("")
+
+    lines.append(sep)
+    lines.append("【PORTFOLIO】")
+    lines.append(sep)
+    lines.append("")
+    lines.append(f"Cash        {_fmt_yen(result_summary.get('available_cash'))}")
+    lines.append(f"評価額      {_fmt_yen(result_summary.get('market_value'))}")
+    lines.append(f"総資産      {_fmt_yen(result_summary.get('last_equity'))}")
+    lines.append(f"DD          {_fmt_pct(risk.get('dd'))}")
+    lines.append(f"保有銘柄    {result_summary.get('positions_count')}")
+    lines.append("")
+
+    lines.append(sep)
+    lines += _build_system_block(result_summary, live=False)
+
+    lines.append(sep)
+    lines.append("※本日の判断はDRY RUNです")
+    lines.append("※本日の注文は発注していません")
+    lines.append(sep)
+    return "\n".join(lines)
+
+
+def _build_live_notification_body(result_summary: dict, client, score_map) -> str:
+    sep = "━" * 22
+    today_date = (result_summary.get("run_started_at") or "")[:10].replace("-", "/")
+    today_time = (result_summary.get("run_started_at") or "")[11:16]
+    results = result_summary.get("order_submission_results")
+    exits_detail = result_summary.get("exits_detail") or []
+    funded_detail = result_summary.get("funded_detail") or []
+    decisions = (result_summary.get("score_replacement") or {}).get("decisions") or []
+    replace_decisions = [d for d in decisions if d.get("decision") in ("REPLACE_SIMULATED", "BUY_FILLED")]
+    kind = _classify_tp50_notification(result_summary)
+    status_label = {"success": "SUCCESS", "warning": "WARNING", "error": "ERROR"}.get(kind, kind.upper())
+
+    lines = [sep, "CHIBA F4 TP50", "LIVE ORDER REPORT", f"{today_date} {today_time}", sep, ""]
+    lines += _build_warnings_section(result_summary)
+
+    lines.append("【ORDER RESULT】")
+    lines.append("")
+    lines.append(f"SELL          {len(exits_detail)}")
+    lines.append(f"BUY           {len(funded_detail)}")
+    lines.append(f"REPLACEMENT   {len(replace_decisions)}")
+    lines.append("")
+    lines.append(f"STATUS        {status_label}")
+    lines.append("")
+
+    if exits_detail:
+        lines.append(sep)
+        lines.append("【SELL ORDER】")
+        lines.append(sep)
+        lines.append("")
+        for e in exits_detail:
+            order = _order_for_symbol(results, e["code"], "SELL")
+            lines += _render_sell_item(e, order, client, score_map, mode="order_slip")
+
+    if funded_detail:
+        lines.append(sep)
+        lines.append("【BUY ORDER】")
+        lines.append(sep)
+        lines.append("")
+        for f in funded_detail:
+            order = _order_for_symbol(results, f["code"], "BUY")
+            lines += _render_buy_item(f, order, client, score_map, mode="order_slip")
+
+    if replace_decisions:
+        lines.append(sep)
+        lines.append("【SCORE REPLACEMENT】")
+        lines.append(sep)
+        lines.append("")
+        for d in replace_decisions:
+            lines += _render_replacement_item(d, client, mode="order_slip")
+
+    lines.append(sep)
+    lines += _build_system_block(result_summary, live=True)
+
+    lines.append(sep)
+    lines.append("※約定価格は注文時点では未確定")
+    lines.append("※翌営業日のDRY RUNで実約定結果を確認します")
+    lines.append(sep)
+    return "\n".join(lines)
 
 
 def _build_tp50_notification_body(
     result_summary: dict, buy_orders_intended: list, sell_orders_intended: list,
+    client=None, score_map=None,
 ) -> str:
-    fr = result_summary.get("fundamentals_freshness") or {}
-    ca = result_summary.get("ca_guard") or {}
-    sb = result_summary.get("sizing_breakdown") or {}
-    results = result_summary.get("order_submission_results")
-
-    lines = [
-        "strategy: f4_tp50 (TP50)",
-        f"run_id: {result_summary.get('run_id')}",
-        f"signal_date: {result_summary.get('signal_date')}  entry_date: {result_summary.get('entry_date')}",
-        f"live: {result_summary.get('live')}",
-        "",
-        f"fundamentals_freshness: max_disc_date={fr.get('max_disc_date')} "
-        f"is_stale={fr.get('is_stale')} reason={fr.get('reason')}",
-        f"CA_PENDING: {len(ca.get('ca_pending_codes') or [])}件 "
-        f"codes={ca.get('ca_pending_codes')}",
-        f"entry_freeze_enabled: {result_summary.get('entry_freeze_enabled')}  "
-        f"buys_blocked_by_entry_freeze: {result_summary.get('buys_blocked_by_entry_freeze')}",
-        f"risk_gate: {(result_summary.get('risk_gate') or {}).get('recommendation')}",
-        "",
-        f"intended BUY: {len(buy_orders_intended)}件  intended SELL: {len(sell_orders_intended)}件",
-    ]
-    if buy_orders_intended or sell_orders_intended:
-        lines.append("--- intended orders (internal symbol / kabu 4-digit symbol) ---")
-        lines += [_format_intended_order_line(o) for o in sell_orders_intended]
-        lines += [_format_intended_order_line(o) for o in buy_orders_intended]
-
-    lines.append("")
-    if results is None:
-        lines.append("order submission results: NONE — dry-run（発注は一切送信していません）。")
-    else:
-        n_success = sum(1 for r in results if r.get("success"))
-        lines.append(f"order submission results（実発注結果・{len(results)}件、成功{n_success}件）:")
-        lines += [_format_submitted_order_line(r) for r in results]
-
-    lines += [
-        "",
-        "sizing（SIMULATED FUNDING / INTERNAL SIZING — 実注文ではありません。資金充当の内部計算のみ）:",
-        f"  cash_start={sb.get('cash_start')} cash_remaining={sb.get('cash_remaining')} "
-        f"funded_total={sb.get('funded_total')} capital_exhausted_skip={sb.get('capital_exhausted_skip')}",
-    ]
-
-    real_order_count = len(results) if results else 0
-    lines.append("")
-    lines.append(f"実発注件数（real broker order attempts）: {real_order_count}")
-    return "\n".join(lines)
+    """
+    通知本文の入口。2026-08-20 全面刷新（9344誤売却事故対応）:
+    DRY RUNは「前日の実績（broker実約定）」+「本日の判断」の2部構成、
+    LIVEは「発注書」（約定価格は翌日のDry Runで確認する設計・注文時点では未確定のため
+    本文には出さない）——役割を完全分離する。buy_orders_intended/sell_orders_intendedは
+    後方互換のため引数として残すが、本文生成にはresult_summary["exits_detail"]/
+    ["funded_detail"]（entry_price/highest/stop/target込みの詳細データ）を使う。
+    """
+    if bool(result_summary.get("live")):
+        return _build_live_notification_body(result_summary, client, score_map)
+    return _build_dry_run_notification_body(result_summary, client, score_map)
 
 
 def _send_tp50_notification(
     result_summary: dict, buy_orders_intended: list, sell_orders_intended: list,
+    client=None, score_map=None,
 ) -> None:
     """
-    Fire-and-forget（src.notifier既存仕様を尊重）。通知処理内の例外は必ずここで
-    握りつぶし、main()の戻り値・scheduler taskの成否には一切影響させない。
+    Fire-and-forget（既存src.notifier再利用のみ・新規SMTP実装なし）。通知処理内の例外は必ず
+    ここで握りつぶし、main()の戻り値・scheduler taskの成否には一切影響させない。
     notifier.py自体は変更しない・subject文言はsubject_suffixでのみ調整する
     （notify_*()のsubject prefixは"✅ CHIBA 発注完了"等の固定形式のため、要求された
     "[TP50][SUCCESS] ..."はsubject_suffixとして末尾に付与する — notifier.py本体を
@@ -305,7 +720,9 @@ def _send_tp50_notification(
         from src.notifier import notify_dry_run, notify_error, notify_success, notify_warning, wait_pending
 
         kind = _classify_tp50_notification(result_summary)
-        body = _build_tp50_notification_body(result_summary, buy_orders_intended, sell_orders_intended)
+        body = _build_tp50_notification_body(
+            result_summary, buy_orders_intended, sell_orders_intended, client=client, score_map=score_map,
+        )
         suffix = _TP50_NOTIFY_SUBJECT_SUFFIX[kind]
 
         if kind == "dry_run":
@@ -408,6 +825,10 @@ def evaluate_exits(
                 "exit_reason": decision.exit_reason, "exit_fill_price": decision.exit_fill_price,
                 "stop_level": decision.stop_level, "target_price": decision.target_price,
                 "highest_since_entry": decision.highest_since_entry,
+                # 2026-08-20 通知監査証跡強化: entry_price(broker実約定ベース、
+                # position_entry_pricesから取得済みの値をそのまま伝播)を通知本文の
+                # 「Entry」表示に使う。追加フィールドのみで既存consumerへの影響なし。
+                "entry_price": float(entry_price),
             })
     return exits
 
@@ -702,11 +1123,12 @@ def _fetch_actual_fill_details(client, order_id: str) -> dict | None:
             return None
         total_qty = sum(f["qty"] for f in fills)
         weighted_price = sum(f["price"] * f["qty"] for f in fills) / total_qty
-        earliest_date = min(f["execution_day"] for f in fills)[:10]
+        earliest_ts = min(f["execution_day"] for f in fills)
         return {
             "filled_qty": total_qty,
             "avg_price": weighted_price,
-            "earliest_execution_date": earliest_date,
+            "earliest_execution_date": earliest_ts[:10],
+            "earliest_execution_timestamp": earliest_ts,
             "execution_count": len(fills),
         }
     return None
@@ -767,6 +1189,7 @@ def apply_fill_metadata_updates(
     strategy_types: dict[str, str],
     as_of: pd.Timestamp,
     client=None,
+    warnings_sink: list[str] | None = None,
 ) -> tuple[dict[str, str], dict[str, float], dict[str, str], bool]:
     """
     Entry-metadata persistence. Only touches EXISTING portfolio_state.json
@@ -811,6 +1234,11 @@ def apply_fill_metadata_updates(
     SELL fill: removes all three fields for that symbol. Failed orders
     (success=False) never touch metadata.
 
+    warnings_sink: optional list. When provided, every FAIL CLOSED event
+    appends a short human-readable string (for surfacing in the notification
+    email's 【警告】block — 2026-08-20, so "metadata mismatch/unconfirmed" is
+    visible to a human within the run's own notification, not just logs).
+
     Returns (new_entry_dates, new_entry_prices, new_strategy_types, changed).
     """
     entry_dates = dict(entry_dates)
@@ -835,6 +1263,8 @@ def apply_fill_metadata_updates(
                         "今回はmetadata未記録（次回run再試行）。",
                         sym, order_id,
                     )
+                    if warnings_sink is not None:
+                        warnings_sink.append(f"metadata mismatch: {sym} 約定確認不能（order_id={order_id}）")
                 else:
                     expected_qty = float(r.get("qty") or 0.0)
                     if expected_qty and fill["filled_qty"] < expected_qty:
@@ -843,6 +1273,10 @@ def apply_fill_metadata_updates(
                             "filled=%s/%s — 全数約定確認までentry metadataを保留（次回run再試行）。",
                             sym, order_id, fill["filled_qty"], expected_qty,
                         )
+                        if warnings_sink is not None:
+                            warnings_sink.append(
+                                f"metadata mismatch: {sym} 部分約定のみ（{fill['filled_qty']}/{expected_qty}株）"
+                            )
                     else:
                         problems = _validate_fill_sanity(fill["earliest_execution_date"], fill["avg_price"])
                         if problems:
@@ -851,6 +1285,8 @@ def apply_fill_metadata_updates(
                                 "problems=%s — entry metadata未記録。",
                                 sym, order_id, problems,
                             )
+                            if warnings_sink is not None:
+                                warnings_sink.append(f"metadata mismatch: {sym} 約定データ異常（{problems}）")
                         else:
                             if sym not in entry_dates:
                                 entry_dates[sym] = fill["earliest_execution_date"]
@@ -911,7 +1347,8 @@ def main() -> int:
     print(f"[SCORE_REPLACEMENT] enabled={sr_enabled}"
          + ("" if sr_enabled else "（既定値。コード昇順・従来Frozen path）"))
 
-    run_id = f"f4_tp50_{datetime.now(_JST).strftime('%Y%m%d_%H%M%S')}"
+    run_started_at = datetime.now(_JST)
+    run_id = f"f4_tp50_{run_started_at.strftime('%Y%m%d_%H%M%S')}"
     audit_log: list[dict] = []
 
     print("[LOAD] 市場データ・PITファンダメンタル読込中（数分かかります）...")
@@ -999,6 +1436,22 @@ def main() -> int:
         logger.warning("[F4_TP50] broker snapshot取得失敗: %s", exc)
         if args.live:
             print("[ABORT] --live 指定時にbroker snapshot取得失敗 — EMERGENCY_STOP（api_unreachable=abort）")
+            # 2026-08-20追加: この早期abort経路は従来notificationを一切送っておらず、
+            # 「メールが来ない＝異常」を発見する手段が無かった。result_summary構築前の
+            # 最小限の情報でも必ず1通送る（notifier例外はここでも握りつぶす）。
+            try:
+                from src.notifier import notify_error, wait_pending
+                notify_error(
+                    f"CHIBA F4 TP50 — EMERGENCY_STOP\n\n"
+                    f"broker snapshot取得失敗のため--live実行を中断しました。\n"
+                    f"run_id: {run_id}\n実行時刻: {run_started_at.strftime('%Y-%m-%d %H:%M:%S')}\n"
+                    f"error: {exc}\n\n"
+                    f"kabuステーション起動・ログイン状態・APIパスワードを確認してください。",
+                    subject_suffix="[TP50][ERROR] EMERGENCY_STOP api_unreachable",
+                )
+                wait_pending(timeout=15.0)
+            except Exception:
+                logger.warning("[F4_TP50][NOTIFY] EMERGENCY_STOP通知失敗: %s", traceback.format_exc(limit=3))
             return 1
         cash_source = "unavailable_dry_run_degraded"
 
@@ -1163,6 +1616,18 @@ def main() -> int:
             "candidates_evaluated": len(replacement_decision_log),
             "decisions": replacement_decision_log,
         },
+        # 2026-08-20 通知監査証跡強化（9344誤売却事故対応）: メール本文生成に必要な
+        # 詳細情報。exits/fundedはevaluate_exits()/evaluate_buy_sizing()が返す
+        # 追加フィールド込みの生データ（entry_price/stop_level/target_price/
+        # highest_since_entry等）をそのまま保持する。
+        "exits_detail": exits,
+        "funded_detail": funded,
+        "available_cash": available_cash,
+        "last_equity": last_equity,
+        "market_value": last_equity - available_cash,
+        "positions_count": len(broker_positions),
+        "run_started_at": run_started_at.strftime("%Y-%m-%d %H:%M:%S"),
+        "scheduled_trigger_hhmm": _TP50_SCHEDULED_TRIGGER_HHMM,
     }
     LIVE_LOG_DIR.mkdir(parents=True, exist_ok=True)
     _log_path = LIVE_LOG_DIR / f"f4_tp50_{run_id}.json"
@@ -1174,14 +1639,14 @@ def main() -> int:
               f"BUY(freeze/staleness考慮後)={len(orders_to_submit) - len(sell_orders_intended)}")
         print(json.dumps(result_summary, ensure_ascii=False, indent=2, default=str))
         _try_generate_reports()
-        _send_tp50_notification(result_summary, buy_orders_intended, sell_orders_intended)
+        _send_tp50_notification(result_summary, buy_orders_intended, sell_orders_intended, client=client, score_map=score_map)
         return 0
 
     # ── --live 経路（entry_freeze/staleness中はBUYが事前に除外済み） ──
     if not orders_to_submit:
         print("[LIVE] 送信対象の注文なし。")
         _try_generate_reports()
-        _send_tp50_notification(result_summary, buy_orders_intended, sell_orders_intended)
+        _send_tp50_notification(result_summary, buy_orders_intended, sell_orders_intended, client=client, score_map=score_map)
         return 0
 
     from src.live.process_supervisor import BrokerProcessSupervisor
@@ -1203,7 +1668,7 @@ def main() -> int:
         result_summary["order_submission_results"] = results
         _log_path.write_text(json.dumps(result_summary, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
         _try_generate_reports()
-        _send_tp50_notification(result_summary, buy_orders_intended, sell_orders_intended)
+        _send_tp50_notification(result_summary, buy_orders_intended, sell_orders_intended, client=client, score_map=score_map)
         return 1
 
     print(f"[LIVE] 発注結果: {len(results)}件処理")
@@ -1218,8 +1683,12 @@ def main() -> int:
     _try_generate_reports()
 
     # ── entry metadata persistence（既存フィールドのみ更新、新規トップレベルキー無し） ──
+    # metadata_warnings: 通知【警告】ブロックに表示するfail-closedイベントの収集先
+    # （2026-08-20、metadata mismatch可視化）。
+    metadata_warnings: list[str] = []
     entry_dates, entry_prices, strategy_types, metadata_changed = apply_fill_metadata_updates(
         results, entry_dates, entry_prices, strategy_types, as_of, client=client,
+        warnings_sink=metadata_warnings,
     )
 
     # 2026-08-19 gap fix: NORMAL (non-Replacement) BUY fills must ALSO record
@@ -1251,8 +1720,11 @@ def main() -> int:
         # are DRY_RUN_SIMULATED entries and must NEVER be persisted as if they were real fills.
         entry_dates, entry_prices, strategy_types, repl_changed = apply_fill_metadata_updates(
             replacement_synthetic_results, entry_dates, entry_prices, strategy_types, as_of, client=client,
+            warnings_sink=metadata_warnings,
         )
         metadata_changed = metadata_changed or repl_changed
+
+    result_summary["metadata_warnings"] = metadata_warnings
 
     if metadata_changed:
         state["position_entry_dates"] = entry_dates
@@ -1262,7 +1734,7 @@ def main() -> int:
         print("[STATE] TP50 entry metadata (position_entry_dates/position_entry_prices/"
               "position_strategy_types) を更新しました。")
 
-    _send_tp50_notification(result_summary, buy_orders_intended, sell_orders_intended)
+    _send_tp50_notification(result_summary, buy_orders_intended, sell_orders_intended, client=client, score_map=score_map)
     return 0
 
 

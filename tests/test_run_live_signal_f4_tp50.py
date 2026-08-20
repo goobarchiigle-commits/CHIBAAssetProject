@@ -11,6 +11,7 @@ NOTE: src/run_live_signal_f4_tp50.py はモジュールトップレベルで ass
 """
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
@@ -745,43 +746,6 @@ def test_notification_exception_in_body_building_does_not_propagate():
     _send_tp50_notification({"live": False}, None, None)  # missing keys, wrong types for lists
 
 
-# --- test 6: FUNDED / sizing must be labeled as simulated, not a real order
-def test_notification_body_labels_funded_as_simulated_not_real_order():
-    rs = _base_result_summary(live=False)
-    body = _build_tp50_notification_body(rs, [], [])
-    assert "SIMULATED FUNDING" in body
-    assert "実注文ではありません" in body
-    assert "order submission results: NONE" in body
-
-
-def test_notification_body_dry_run_reports_zero_real_orders():
-    rs = _base_result_summary(live=False)
-    body = _build_tp50_notification_body(rs, [], [])
-    assert "実発注件数（real broker order attempts）: 0" in body
-
-
-# --- test 7: 5-digit code 48260 -> symbol_4digit 4826 appears in the body -
-def test_notification_body_shows_4digit_kabu_symbol_for_incident_code():
-    o = OrderInstruction(symbol="48260", side="BUY", qty=FIXED_LOT_SIZE,
-                          estimated_price=521.0, reason="F4_TP50_entry_signal",
-                          symbol_4digit=_tp50.to_kabu_symbol("48260"))
-    rs = _base_result_summary(live=False)
-    body = _build_tp50_notification_body(rs, [o], [])
-    assert "48260" in body
-    assert "kabu_symbol=4826" in body
-    assert "kabu_symbol=48260" not in body  # must never show the unconverted 5-digit form as the kabu symbol
-
-
-def test_notification_body_shows_4digit_kabu_symbol_in_submitted_results():
-    rs = _base_result_summary(live=True, order_submission_results=[
-        {"symbol": "48260", "symbol_4digit": "4826", "side": "BUY", "qty": 100,
-         "success": False, "order_id": None, "error": "HTTP 400: symbol not found",
-         "http_status": 400},
-    ])
-    body = _build_tp50_notification_body(rs, [], [])
-    assert "kabu_symbol=4826" in body
-
-
 # --- classification matrix (belt-and-suspenders on the pure function) -----
 @pytest.mark.parametrize("live,results,fresh_stale,ca_blocked,freeze_blocked,cb_active,expected", [
     (False, None, False, False, 0, False, "dry_run"),
@@ -805,6 +769,288 @@ def test_notification_classification_matrix(live, results, fresh_stale, ca_block
         risk_gate={"recommendation": "CB_ACTIVE" if cb_active else "NORMAL"},
     )
     assert _classify_tp50_notification(rs) == expected
+
+
+# ======================================================================
+# 2026-08-20 通知フォーマット全面刷新（9344誤売却事故対応）:
+# DRY RUN=「前日の実績（broker実約定）」+「本日の判断」の2部構成、
+# LIVE=「発注書」（約定価格は翌日のDry Runで確認——注文時点では未確定のため
+# 本文に出さない）。「なぜ売買したのか」「どの価格を基準にしたのか」
+# 「現在のスコアはいくつか」が一目で分かる監査証跡としての本文を検証する。
+# _find_previous_live_run()は実ディスク(logs/live/)を読むため、内容を
+# 制御したいテストは明示的にpatchする（未patch時はNone=前日実績なし、を期待）。
+# 実注文は一切行わない（_FakeKabuClient等のstubのみ使用）。
+# ======================================================================
+_find_previous_live_run = _tp50._find_previous_live_run
+
+
+def _sell_item(code="93440", reason="trailing_touch", entry_price=1224.0,
+                highest=1309.0, stop=1112.65, target=1836.0, fill=1204.09, qty=100):
+    return {
+        "code": code, "qty": qty, "exit_reason": reason, "exit_fill_price": fill,
+        "stop_level": stop, "target_price": target, "highest_since_entry": highest,
+        "entry_price": entry_price,
+    }
+
+
+def _buy_item(code="48260", theoretical=521.0):
+    return {"code": code, "entry_price_adjusted_open": theoretical, "estimated_fill_price": theoretical}
+
+
+def _no_prev_run():
+    """_find_previous_live_run()をNoneに固定するpatchコンテキスト（前日実績セクションを
+    テスト対象から除外し、実ディスクのlogs/live/内容に依存しないようにする）。"""
+    return patch("src.run_live_signal_f4_tp50._find_previous_live_run", return_value=None)
+
+
+# --- 1. 通常T15 SELL（DRY RUN・本日の判断）: 理由ラベル・Entry/最高値/STOP --
+def test_scenario_1_normal_t15_trailing_sell_dry_run():
+    rs = _base_result_summary(live=False, exits_intended=1,
+                               exits_detail=[_sell_item(reason="trailing_touch")])
+    with _no_prev_run():
+        body = _build_tp50_notification_body(rs, [], [])
+    assert "T15トレーリングSTOP" in body
+    assert "Entry       ¥1,224" in body
+    assert "最高値      ¥1,309" in body
+    assert "STOP        ¥1,113" in body
+    assert "→ LIVEならSELL" in body
+    today_block = body.split("【本日の判断】")[1]
+    assert "Target" not in today_block.split("STOP")[-1][:60]  # trailingではTarget行を出さない
+
+
+# --- 2. TP50 SELL（target_touch）: Target表示・最高値/STOPは表示しない ------
+def test_scenario_2_tp50_target_sell():
+    rs = _base_result_summary(live=False, exits_intended=1,
+                               exits_detail=[_sell_item(reason="target_touch", fill=1836.0)])
+    with _no_prev_run():
+        body = _build_tp50_notification_body(rs, [], [])
+    assert "TP50利確" in body
+    assert "Target      ¥1,836" in body
+    today_block = body.split("【本日の判断】")[1]
+    assert "最高値" not in today_block
+    assert "STOP        " not in today_block
+
+
+# --- 3. Score Replacement（DRY RUN・本日の判断） ----------------------------
+def test_scenario_3_score_replacement_dry_run():
+    rs = _base_result_summary(live=False, score_replacement={
+        "enabled": True, "candidates_evaluated": 1,
+        "decisions": [{
+            "candidate_code": "48260", "candidate_score": 71.5, "decision": "REPLACE_SIMULATED",
+            "sold_code": "93440", "holding_score": 48.2, "sell_price": 1204.09, "buy_price": 521.0,
+        }],
+    })
+    with _no_prev_run():
+        body = _build_tp50_notification_body(rs, [], [])
+    assert "SCORE REPLACEMENT" in body
+    assert "48260" in body and "93440" in body
+    assert "Score差     +23.3" in body
+    assert "→ LIVEなら入替" in body
+
+
+# --- 4. BUY（LIVE発注書、約定価格は表示しない） -----------------------------
+def test_scenario_4_buy_live():
+    rs = _base_result_summary(live=True, funded_detail=[_buy_item()],
+                               order_submission_results=[
+                                   {"symbol": "48260", "symbol_4digit": "4826", "side": "BUY", "qty": 100,
+                                    "success": True, "order_id": "ORDER-BUY-1", "error": None},
+                               ])
+    body = _build_tp50_notification_body(rs, [], [])
+    assert "新規Entry" in body
+    assert "基準価格    ¥521" in body
+    assert "注文        成行BUY" in body
+    assert "注文ID      ORDER-BUY-1" in body
+    order_block = body.split("【BUY ORDER】")[1].split("【SYSTEM】")[0]
+    assert "実約定" not in order_block  # LIVEの発注書ブロックには約定価格を出さない（翌日Dry Runで確認）
+
+
+# --- 5. BUY + Replacement 混在（DRY RUN・本日の判断） -----------------------
+def test_scenario_5_buy_and_replacement_together():
+    rs = _base_result_summary(live=False, funded_detail=[_buy_item(code="34570", theoretical=926.0)],
+                               score_replacement={
+                                   "enabled": True, "candidates_evaluated": 1,
+                                   "decisions": [{
+                                       "candidate_code": "48260", "candidate_score": 71.5,
+                                       "decision": "REPLACE_SIMULATED", "sold_code": "93440",
+                                       "holding_score": 48.2, "sell_price": 1204.09, "buy_price": 521.0,
+                                   }],
+                               })
+    with _no_prev_run():
+        body = _build_tp50_notification_body(rs, [], [])
+    today_block = body.split("【本日の判断】")[1]
+    replacement_block = today_block.split("SCORE REPLACEMENT")[1]
+    assert "34570" in today_block.split("SCORE REPLACEMENT")[0]  # 通常BUYブロック側
+    assert "48260" in replacement_block  # 入替ブロック側
+
+
+# --- 6. 複数SELL（DRY RUN・本日の判断） -------------------------------------
+def test_scenario_6_multiple_sells():
+    rs = _base_result_summary(live=False, exits_intended=2, exits_detail=[
+        _sell_item(code="93440", reason="trailing_touch"),
+        _sell_item(code="48260", reason="target_touch", entry_price=521.0, fill=781.5),
+    ])
+    with _no_prev_run():
+        body = _build_tp50_notification_body(rs, [], [])
+    assert "SELL       2" in body
+    assert "93440" in body and "48260" in body
+    today_block = body.split("【本日の判断】")[1]
+    assert today_block.count("T15トレーリングSTOP") + today_block.count("TP50利確") == 2
+
+
+# --- 7. 複数BUY（DRY RUN・本日の判断） --------------------------------------
+def test_scenario_7_multiple_buys():
+    rs = _base_result_summary(live=False, funded_detail=[
+        _buy_item(code="17880", theoretical=4285.0), _buy_item(code="17160", theoretical=1420.0),
+    ])
+    with _no_prev_run():
+        body = _build_tp50_notification_body(rs, [], [])
+    assert "BUY        2" in body
+    assert "17880" in body and "17160" in body
+
+
+# --- 8. 0件（全ブロック"なし"） ----------------------------------------------
+def test_scenario_8_zero_activity():
+    rs = _base_result_summary(live=False)
+    with _no_prev_run():
+        body = _build_tp50_notification_body(rs, [], [])
+    assert "SELL       0" in body
+    assert "BUY        0" in body
+    assert "REPLACEMENT 0" in body
+    today_block = body.split("【本日の判断】")[1]
+    assert today_block.count("なし") >= 3  # SELL/BUY/SCORE REPLACEMENTの各ブロック
+
+
+# --- 9. Scheduler未発火（手動遅延実行） -------------------------------------
+def test_scenario_9_scheduler_not_fired_shows_warning():
+    rs = _base_result_summary(
+        live=True, order_submission_results=[],
+        run_started_at="2026-08-20 09:36:11", scheduled_trigger_hhmm="08:49",
+    )
+    assert _classify_tp50_notification(rs) == "warning"
+    body = _build_tp50_notification_body(rs, [], [])
+    assert "08:49 自動実行されず" in body
+    assert "09:36 手動遅延実行" in body
+
+
+def test_scenario_9b_on_time_run_does_not_warn():
+    rs = _base_result_summary(
+        live=True, order_submission_results=[],
+        run_started_at="2026-08-20 08:50:00", scheduled_trigger_hhmm="08:49",
+    )
+    assert _classify_tp50_notification(rs) == "success"
+    body = _build_tp50_notification_body(rs, [], [])
+    assert "自動実行されず" not in body
+
+
+# --- 10. API error（broker snapshot取得不可） -------------------------------
+def test_scenario_10_api_error_shown_in_data_status():
+    rs = _base_result_summary(live=True, order_submission_results=[],
+                               cash_source="unavailable_dry_run_degraded")
+    body = _build_tp50_notification_body(rs, [], [])
+    assert "Kabu API          異常/未接続" in body
+    assert "API接続異常" in body  # 【警告】ブロックにも表示
+
+
+# --- 11. metadata mismatch（fail-closedイベントが【警告】に表示される） ----
+def test_scenario_11_metadata_mismatch_warning():
+    rs = _base_result_summary(
+        live=True, order_submission_results=[],
+        metadata_warnings=["metadata mismatch: 93440 約定確認不能（order_id=ORDER-X）"],
+    )
+    assert _classify_tp50_notification(rs) == "warning"
+    body = _build_tp50_notification_body(rs, [], [])
+    assert "【警告】" in body
+    assert "metadata mismatch: 93440" in body
+    assert "Metadata          異常" in body
+
+
+def test_apply_fill_metadata_warnings_sink_receives_fail_closed_event():
+    as_of = pd.Timestamp("2026-08-17")
+    results = [{"symbol": "1301", "side": "BUY", "qty": 100, "success": True,
+                "estimated_price": 1000.0, "order_id": "ORDER-MISSING"}]
+    sink: list[str] = []
+    apply_fill_metadata_updates(results, {}, {}, {}, as_of, client=_EmptyKabuClient(), warnings_sink=sink)
+    assert len(sink) == 1
+    assert "1301" in sink[0]
+
+
+# --- 12/13. DRY RUN と LIVE の見出しが明確に区別される -----------------------
+def test_scenario_12_13_dry_run_vs_live_header():
+    rs_dry = _base_result_summary(live=False)
+    rs_live = _base_result_summary(live=True, order_submission_results=[])
+    with _no_prev_run():
+        dry_body = _build_tp50_notification_body(rs_dry, [], [])
+    live_body = _build_tp50_notification_body(rs_live, [], [])
+    assert "DAILY DRY RUN" in dry_body
+    assert "LIVE ORDER REPORT" in live_body
+    assert "DRY RUN" not in live_body.split("【")[0]
+
+
+# --- 14. 実約定価格と理論価格が異なるケース（9344実例、DRY RUNの前日実績） --
+def test_scenario_14_prev_day_sell_actual_fill_differs_from_theoretical_price():
+    prev_run = {
+        "run_id": "f4_tp50_20260820_093611", "live": True,
+        "run_started_at": "2026-08-20 09:36:11",
+        "exits_detail": [_sell_item(code="93440", reason="trailing_touch", fill=1204.09)],
+        "funded_detail": [], "score_replacement": {"decisions": []},
+        "order_submission_results": [
+            {"symbol": "93440", "symbol_4digit": "9344", "side": "SELL", "qty": 100,
+             "success": True, "order_id": "20260820A02N90347371", "error": None},
+        ],
+    }
+    client = _FakeKabuClient("20260820A02N90347371", "2026-08-20T09:38:17+09:00", 1232.0)
+    rs = _base_result_summary(live=False)
+    with patch("src.run_live_signal_f4_tp50._find_previous_live_run", return_value=prev_run):
+        body = _build_tp50_notification_body(rs, [], [], client=client)
+    prev_block = body.split("【前日の実績】")[1].split("【本日の判断】")[0]
+    assert "約定価格    ¥1,232" in prev_block   # broker実約定（理論値1204とは異なる）
+    # 実現損益は実約定ベースで計算される（理論値ではない）: (1232-1224)*100 = +800
+    assert "実現損益    +¥800" in prev_block
+    assert "約定時刻    09:38:17" in prev_block
+
+
+def test_scenario_14b_prev_day_buy_actual_fill_differs_from_theoretical():
+    prev_run = {
+        "run_id": "f4_tp50_20260819_142609", "live": True,
+        "run_started_at": "2026-08-19 14:26:09",
+        "exits_detail": [], "funded_detail": [_buy_item(code="93440", theoretical=1379.0)],
+        "score_replacement": {"decisions": []},
+        "order_submission_results": [
+            {"symbol": "93440", "symbol_4digit": "9344", "side": "BUY", "qty": 100,
+             "success": True, "order_id": "20260819A02N88827536", "error": None},
+        ],
+    }
+    client = _FakeKabuClient("20260819A02N88827536", "2026-08-19T14:28:51+09:00", 1224.0)
+    rs = _base_result_summary(live=False)
+    with patch("src.run_live_signal_f4_tp50._find_previous_live_run", return_value=prev_run):
+        body = _build_tp50_notification_body(rs, [], [], client=client)
+    prev_block = body.split("【前日の実績】")[1].split("【本日の判断】")[0]
+    assert "約定価格    ¥1,224" in prev_block  # broker実約定（理論値1379とは異なる）
+
+
+def test_previous_live_run_lookup_returns_none_when_no_log_matches(tmp_path, monkeypatch):
+    monkeypatch.setattr(_tp50, "LIVE_LOG_DIR", tmp_path)
+    assert _find_previous_live_run() is None
+
+
+def test_previous_live_run_lookup_skips_dry_run_logs(tmp_path, monkeypatch):
+    monkeypatch.setattr(_tp50, "LIVE_LOG_DIR", tmp_path)
+    (tmp_path / "f4_tp50_f4_tp50_20260819_090000.json").write_text(
+        json.dumps({"run_id": "f4_tp50_20260819_090000", "live": False}), encoding="utf-8",
+    )
+    assert _find_previous_live_run() is None
+
+
+def test_previous_live_run_lookup_returns_most_recent_live_run(tmp_path, monkeypatch):
+    monkeypatch.setattr(_tp50, "LIVE_LOG_DIR", tmp_path)
+    (tmp_path / "f4_tp50_f4_tp50_20260818_090000.json").write_text(
+        json.dumps({"run_id": "f4_tp50_20260818_090000", "live": True}), encoding="utf-8",
+    )
+    (tmp_path / "f4_tp50_f4_tp50_20260819_090000.json").write_text(
+        json.dumps({"run_id": "f4_tp50_20260819_090000", "live": True}), encoding="utf-8",
+    )
+    result = _find_previous_live_run()
+    assert result["run_id"] == "f4_tp50_20260819_090000"
 
 
 if __name__ == "__main__":
