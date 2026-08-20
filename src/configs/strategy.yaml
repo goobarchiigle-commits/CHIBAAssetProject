@@ -63,8 +63,20 @@ fraction:
 # 緊急上書き: 環境変数 ENTRY_FREEZE_ENABLED=1/0 がここの値より優先される。
 # 解除にはユーザーの明示指示が必要（ASK_FIRST）。
 entry_freeze:
-  enabled: true
-  reason: "Research Freeze"
+  enabled: false
+  reason: "2026-08-14 E5 100株固定版 実ライブ実行のためユーザー明示指示により解除"
+
+# F4 TP50_T15 Score Replacement（docs/f4_tp50_t15_spec.md sec.5.2、2026-08-19追加）
+# enabled: true で候補順=score降順+現金不足時Replacementを有効化。既定=false（従来Frozen path）。
+# 環境変数 SCORE_REPLACEMENT_ENABLED=1/0 がここの値より優先される
+# （src.run_live_signal_f4_tp50.score_replacement_enabled()参照）。
+# 完全に別物: run_live_signal.py の QUALITY_REPLACEMENT_ENABLED (Study57/58A,
+# RSR向けQuality Replacement Engine) とは無関係。相互import・state共有・flag共有なし。
+# True化はcutoverとは独立の別途ユーザー明示承認が必要（ASK_FIRST）。
+f4_tp50:
+  score_replacement:
+    enabled: true
+    reason: "2026-08-20 ユーザー明示承認により初回Canary稼働開始（canary_go_no_go.md CANARY_GO判定に基づく）"
 
 # リスク制御フラグ（feature flag で切替可能）
 # 変更時は必ず WF再検証 → CLAUDE.md ルールに従い確認を取ること
