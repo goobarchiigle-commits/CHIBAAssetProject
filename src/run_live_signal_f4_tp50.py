@@ -262,7 +262,7 @@ def _classify_tp50_notification(result_summary: dict) -> str:
     results = result_summary.get("order_submission_results")
     if results and any(not r.get("success") for r in results):
         return "error"
-    if _missing_critical_fields(result_summary):
+    if _data_integrity_issues(result_summary):
         return "error"
     fr = result_summary.get("fundamentals_freshness") or {}
     ca = result_summary.get("ca_guard") or {}
@@ -573,8 +573,30 @@ def _missing_critical_fields(result_summary: dict) -> list[str]:
     2026-08-21朝 通知監査で発見: Cash=N/A（available_cashがNone）でもMetadata=OKと
     表示される等、個別フィールドが取得失敗時に「異常」ではなく暗黙にOK/N/A表示へ
     フォールバックしていたため、レポート全体の信頼性を見た目からは判断できなかった。
-    このチェックはレポート全体を DRY RUN INVALID として明示するためのゲート。"""
+    このチェックはレポート全体を DRY RUN INVALID として明示するためのゲート。
+    注意: 実運用コードではavailable_cash/positions_count/cash_sourceは常に何らかの
+    フォールバック値(0.0・"unavailable"等)が入りNoneにはならない
+    （2026-08-22朝 実インシデント調査で判明——ここがNoneになるのは不正な
+    テストfixtureのみ）。実際のbroker取得失敗を検知するには
+    _data_integrity_issues()のcash_source判定を使うこと。"""
     return [f for f in _CRITICAL_REPORT_FIELDS if result_summary.get(f) is None]
+
+
+def _data_integrity_issues(result_summary: dict) -> list[str]:
+    """本日の判断・現在ポートフォリオの信頼性を損なう実運用上の問題を日本語で列挙する。
+    空リスト=問題なし。DRY RUN/REPORT INVALID判定および【本日の判断】の
+    「判定不能」表示・【現在ポートフォリオ】のPrevious Known Stateフォールバック
+    表示、いずれもこの関数を単一の判定源とする（2026-08-22朝 通知監査）。"""
+    issues: list[str] = []
+    missing = _missing_critical_fields(result_summary)
+    if missing:
+        issues.append(f"必須フィールド欠落: {', '.join(missing)}")
+    cash_source = result_summary.get("cash_source")
+    if cash_source is not None and cash_source != "broker_live":
+        issues.append(f"Kabu APIから現在ポートフォリオを取得できませんでした（cash_source={cash_source}）")
+    if result_summary.get("fundamentals_freshness") is None:
+        issues.append("Fundamentalsデータを取得できませんでした")
+    return issues
 
 
 def _build_system_block(result_summary: dict, live: bool) -> list[str]:
@@ -645,10 +667,12 @@ def _build_dry_run_notification_body(result_summary: dict, client, score_map) ->
 
     lines = [sep, "CHIBA F4 TP50", "DAILY DRY RUN", f"{today_date} {today_time}", sep, ""]
 
-    missing = _missing_critical_fields(result_summary)
-    if missing:
+    issues = _data_integrity_issues(result_summary)
+    if issues:
         lines.append("⚠⚠⚠ DRY RUN INVALID ⚠⚠⚠")
-        lines.append(f"データ取得失敗のためこの判断内容は信頼できません（不足: {', '.join(missing)}）")
+        lines.append("データ取得失敗のため本日の判断は信頼できません:")
+        for issue in issues:
+            lines.append(f"  ・{issue}")
         lines.append("")
 
     lines += _build_warnings_section(result_summary)
@@ -667,45 +691,72 @@ def _build_dry_run_notification_body(result_summary: dict, client, score_map) ->
     lines.append(today_date)
     lines.append(sep)
     lines.append("")
-    lines.append(f"SELL       {len(exits_detail)}")
-    lines.append(f"BUY        {len(funded_detail)}")
-    lines.append(f"REPLACEMENT {len(replace_decisions)}")
-    lines.append("")
+    if issues:
+        lines.append("実行結果：INVALID")
+        lines.append("")
+        lines.append("SELL        判定不能")
+        lines.append("BUY         判定不能")
+        lines.append("REPLACEMENT 判定不能")
+        lines.append("")
+        lines.append("※データ取得失敗のため売買判断を採用しません")
+    else:
+        lines.append(f"SELL       {len(exits_detail)}")
+        lines.append(f"BUY        {len(funded_detail)}")
+        lines.append(f"REPLACEMENT {len(replace_decisions)}")
+        lines.append("")
 
-    lines.append("■ SELL")
-    lines.append("")
-    if not exits_detail:
-        lines.append("0件")
-    else:
-        for e in exits_detail:
-            lines += _render_sell_item(e, None, client, score_map, mode="today_preview")
-    lines.append("")
-    lines.append("■ BUY")
-    lines.append("")
-    if not funded_detail:
-        lines.append("0件")
-    else:
-        for f in funded_detail:
-            lines += _render_buy_item(f, None, client, score_map, mode="today_preview")
-    lines.append("")
-    lines.append("■ SCORE REPLACEMENT")
-    lines.append("")
-    if not replace_decisions:
-        lines.append("0件")
-    else:
-        for d in replace_decisions:
-            lines += _render_replacement_item(d, client, mode="today_preview")
+        lines.append("■ SELL")
+        lines.append("")
+        if not exits_detail:
+            lines.append("0件")
+        else:
+            for e in exits_detail:
+                lines += _render_sell_item(e, None, client, score_map, mode="today_preview")
+        lines.append("")
+        lines.append("■ BUY")
+        lines.append("")
+        if not funded_detail:
+            lines.append("0件")
+        else:
+            for f in funded_detail:
+                lines += _render_buy_item(f, None, client, score_map, mode="today_preview")
+        lines.append("")
+        lines.append("■ SCORE REPLACEMENT")
+        lines.append("")
+        if not replace_decisions:
+            lines.append("0件")
+        else:
+            for d in replace_decisions:
+                lines += _render_replacement_item(d, client, mode="today_preview")
     lines.append("")
 
     lines.append(sep)
-    lines.append("【PORTFOLIO】")
+    lines.append("【現在ポートフォリオ】")
     lines.append(sep)
     lines.append("")
-    lines.append(f"Cash        {_fmt_yen(result_summary.get('available_cash'))}")
-    lines.append(f"評価額      {_fmt_yen(result_summary.get('market_value'))}")
-    lines.append(f"総資産      {_fmt_yen(result_summary.get('last_equity'))}")
-    lines.append(f"DD          {_fmt_pct(risk.get('dd'))}")
-    lines.append(f"保有銘柄    {result_summary.get('positions_count')}")
+    if result_summary.get("cash_source") == "broker_live":
+        lines.append(f"Cash        {_fmt_yen(result_summary.get('available_cash'))}")
+        lines.append(f"評価額      {_fmt_yen(result_summary.get('market_value'))}")
+        lines.append(f"総資産      {_fmt_yen(result_summary.get('last_equity'))}")
+        lines.append(f"DD          {_fmt_pct(risk.get('dd'))}")
+        lines.append(f"保有銘柄    {result_summary.get('positions_count')}件")
+    else:
+        lines.append("⚠ Kabu APIから現在の証券口座状態を取得できませんでした")
+        lines.append("")
+        lines.append("以下は前回確定状態（参考情報）です。")
+        lines.append("現在の実際の口座残高を保証するものではありません。")
+        lines.append("")
+        prev_positions = result_summary.get("previous_known_positions") or []
+        if not prev_positions:
+            lines.append("前回確定時点の保有銘柄記録なし（0銘柄）")
+        else:
+            for p in prev_positions:
+                lines.append(
+                    f"{_symbol_line(client, p['code'])} / Score {_fmt_score(score_map, p['code'])} "
+                    f"/ Entry {_fmt_yen(p.get('entry_price'))} ({p.get('entry_date') or '日付不明'}) "
+                    f"/ {p.get('qty')}株"
+                )
+            lines.append(f"合計 {len(prev_positions)}銘柄")
     lines.append("")
 
     lines.append(sep)
@@ -732,10 +783,12 @@ def _build_live_notification_body(result_summary: dict, client, score_map) -> st
 
     lines = [sep, "CHIBA F4 TP50", "LIVE ORDER REPORT", f"{today_date} {today_time}", sep, ""]
 
-    missing = _missing_critical_fields(result_summary)
-    if missing:
+    issues = _data_integrity_issues(result_summary)
+    if issues:
         lines.append("⚠⚠⚠ REPORT INVALID ⚠⚠⚠")
-        lines.append(f"データ取得失敗のためこのレポート内容は信頼できません（不足: {', '.join(missing)}）")
+        lines.append("データ取得失敗のためこのレポート内容は信頼できません:")
+        for issue in issues:
+            lines.append(f"  ・{issue}")
         lines.append("")
 
     lines += _build_warnings_section(result_summary)
@@ -1523,6 +1576,19 @@ def main() -> int:
     strategy_types: dict = dict(state.get("position_strategy_types", {}))
     entry_dates: dict = dict(state.get("position_entry_dates", {}))
     entry_prices: dict = dict(state.get("position_entry_prices", {}))
+    # 前回確定ポートフォリオ（ローカルportfolio_state.json由来・broker API不要）。
+    # Kabu API障害でbroker snapshotが取得できない日でも、直近に記録されたTP50保有
+    # 銘柄の一覧だけは提示できる（2026-08-22朝 通知監査: broker snapshot失敗時に
+    # 保有銘柄情報が完全に消える問題への対応）。「現在の実際の残高」ではなく
+    # 「前回確定した参考情報」であることを通知本文側で必ず明示する。
+    previous_known_positions = sorted(
+        (
+            {"code": code, "entry_date": entry_dates.get(code), "entry_price": entry_prices.get(code),
+             "qty": FIXED_LOT_SIZE}
+            for code, stype in strategy_types.items() if stype == STRATEGY_TYPE
+        ),
+        key=lambda p: p["code"],
+    )
     equity_peak = float(state.get("equity_peak", 0.0))
     cb_state = str(state.get("cb_state", "NORMAL"))
     safe_warn_count = int(state.get("safe_warn_count", 0))
@@ -1737,6 +1803,7 @@ def main() -> int:
         "last_equity": last_equity,
         "market_value": last_equity - available_cash,
         "positions_count": len(broker_positions),
+        "previous_known_positions": previous_known_positions,
         "run_started_at": run_started_at.strftime("%Y-%m-%d %H:%M:%S"),
         "scheduled_trigger_hhmm": _TP50_SCHEDULED_TRIGGER_HHMM,
         "asof_staleness_bdays": _asof_staleness_bdays,

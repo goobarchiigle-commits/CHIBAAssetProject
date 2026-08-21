@@ -812,8 +812,22 @@ def test_notification_exception_does_not_propagate():
 
 
 def test_notification_exception_in_body_building_does_not_propagate():
-    """Even a malformed result_summary must not crash the caller (fire-and-forget)."""
-    _send_tp50_notification({"live": False}, None, None)  # missing keys, wrong types for lists
+    """Even a malformed result_summary must not crash the caller (fire-and-forget).
+
+    2026-08-21/22 実インシデント回帰テスト: この関数は notify_dry_run() をmockして
+    いなかったため、このテストをpytestで実行するたびに実SMTP経由で本番宛てへ
+    「DRY RUN INVALID」の空データメールが送信されていた（"9:48の謎メール"と
+    2026-08-22朝のINVALIDメールの真因はKabu API障害ではなく、この未mockテストの
+    副作用だった）。他の同種テストと同じく4関数すべてをmockする。"""
+    with patch("src.notifier.notify_dry_run") as m_dry, \
+         patch("src.notifier.notify_success") as m_succ, \
+         patch("src.notifier.notify_error") as m_err, \
+         patch("src.notifier.notify_warning") as m_warn:
+        _send_tp50_notification({"live": False}, None, None)  # missing keys, wrong types for lists
+    assert m_dry.call_count == 1
+    assert m_succ.call_count == 0
+    assert m_err.call_count == 0
+    assert m_warn.call_count == 0
 
 
 # --- classification matrix (belt-and-suspenders on the pure function) -----
@@ -1212,6 +1226,117 @@ def test_live_body_shows_invalid_banner_when_positions_count_missing():
 def test_classify_notification_error_when_critical_fields_missing():
     rs = _base_result_summary(live=True, order_submission_results=[], available_cash=None)
     assert _classify_tp50_notification(rs) == "error"
+
+
+# ======================================================================
+# 2026-08-22朝 通知監査: Kabu API障害時にCurrent Portfolio(broker snapshot)を
+# UNAVAILABLE表示しつつ、ローカルportfolio_state.json由来のPrevious Known State
+# (前回確定保有銘柄)は消さずに参考表示する。実運用ではavailable_cash/
+# positions_count/cash_sourceは常に何らかのフォールバック値が入りNoneには
+# ならない（Noneになるのは不正なfixtureのみ）ため、cash_source!="broker_live"を
+# 実際のbroker取得失敗の判定に使う。
+# ======================================================================
+
+def _prev_positions_fixture():
+    return [
+        {"code": "93440", "entry_date": "2026-08-19", "entry_price": 1224.0, "qty": 100},
+        {"code": "48260", "entry_date": "2026-08-18", "entry_price": 534.2, "qty": 100},
+    ]
+
+
+# --- B. Kabu APIだけ失敗 -----------------------------------------------
+def test_scenario_b_kabu_api_failure_shows_previous_known_state():
+    rs = _base_result_summary(
+        live=False, cash_source="unavailable_dry_run_degraded",
+        available_cash=0.0, positions_count=0,
+        previous_known_positions=_prev_positions_fixture(),
+    )
+    with _no_prev_run():
+        body = _build_tp50_notification_body(rs, [], [])
+    assert "DRY RUN INVALID" in body
+    assert "Kabu APIから現在ポートフォリオを取得できませんでした" in body
+    portfolio_block = body.split("【現在ポートフォリオ】")[1].split("【SYSTEM】")[0]
+    assert "現在の実際の口座残高を保証するものではありません" in portfolio_block
+    assert "93440" in portfolio_block
+    assert "48260" in portfolio_block
+    assert "合計 2銘柄" in portfolio_block
+    # 今日の判断はINVALIDのため判定不能表示になり、0件と混同しない
+    today_block = body.split("【本日の判断】")[1].split("【現在ポートフォリオ】")[0]
+    assert "判定不能" in today_block
+    assert "実行結果：INVALID" in today_block
+
+
+# --- C/D. Market Data / Fundamentals 取得失敗 ---------------------------
+def test_scenario_cd_fundamentals_missing_marks_invalid():
+    rs = _base_result_summary(live=False, fundamentals_freshness=None)
+    with _no_prev_run():
+        body = _build_tp50_notification_body(rs, [], [])
+    assert "DRY RUN INVALID" in body
+    assert "Fundamentalsデータを取得できませんでした" in body
+    assert "取得不可" in body  # SYSTEM欄 Market Data/Fundamentals
+
+
+# --- E. 全部失敗 ----------------------------------------------------------
+def test_scenario_e_all_failed_shows_invalid_and_previous_known_state():
+    rs = _base_result_summary(
+        live=False, cash_source="unavailable", available_cash=0.0, positions_count=0,
+        fundamentals_freshness=None, previous_known_positions=_prev_positions_fixture(),
+    )
+    with _no_prev_run():
+        body = _build_tp50_notification_body(rs, [], [])
+    assert "DRY RUN INVALID" in body
+    assert "Kabu APIから現在ポートフォリオを取得できませんでした" in body
+    assert "Fundamentalsデータを取得できませんでした" in body
+    assert "93440" in body
+
+
+# --- F. 取得成功で保有11銘柄 -----------------------------------------------
+def test_scenario_f_healthy_run_shows_current_portfolio_count():
+    rs = _base_result_summary(live=False, cash_source="broker_live", positions_count=11)
+    with _no_prev_run():
+        body = _build_tp50_notification_body(rs, [], [])
+    assert "DRY RUN INVALID" not in body
+    portfolio_block = body.split("【現在ポートフォリオ】")[1].split("【SYSTEM】")[0]
+    assert "保有銘柄    11件" in portfolio_block
+
+
+# --- G. 0保有は0件、None/N/Aにしない ---------------------------------------
+def test_scenario_g_zero_holdings_shows_explicit_zero_not_na():
+    rs = _base_result_summary(
+        live=False, cash_source="broker_live", positions_count=0,
+        market_value=0.0, last_equity=3000000.0,
+    )
+    with _no_prev_run():
+        body = _build_tp50_notification_body(rs, [], [])
+    portfolio_block = body.split("【現在ポートフォリオ】")[1].split("【SYSTEM】")[0]
+    assert "保有銘柄    0件" in portfolio_block
+    assert "None" not in portfolio_block
+
+
+def test_scenario_g_no_previous_known_positions_shows_explicit_zero():
+    rs = _base_result_summary(
+        live=False, cash_source="unavailable_dry_run_degraded",
+        available_cash=0.0, positions_count=0, previous_known_positions=[],
+    )
+    with _no_prev_run():
+        body = _build_tp50_notification_body(rs, [], [])
+    portfolio_block = body.split("【現在ポートフォリオ】")[1].split("【SYSTEM】")[0]
+    assert "0銘柄" in portfolio_block
+    assert "None" not in portfolio_block
+
+
+def test_degraded_cash_source_triggers_invalid_even_when_no_field_is_none():
+    """available_cash/positions_count/cash_sourceが全て非None(実運用の実際の
+    フォールバック値)でも、cash_source!="broker_live"ならinvalid判定する
+    （2026-08-22朝 実インシデント: 実運用コードのフィールドは決してNoneにならない
+    ため、_missing_critical_fields単独では実際のbroker障害を検知できなかった）。"""
+    rs = _base_result_summary(
+        live=True, order_submission_results=[],
+        cash_source="capital_state_fallback_dry_run_only",
+        available_cash=1000000.0, positions_count=0,
+    )
+    assert _tp50._missing_critical_fields(rs) == []  # 全フィールド非None
+    assert _classify_tp50_notification(rs) == "error"  # だがcash_source degraded → error
 
 
 def test_notification_body_never_contains_static_sending_label():
