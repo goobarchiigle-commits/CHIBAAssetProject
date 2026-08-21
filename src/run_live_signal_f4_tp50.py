@@ -75,6 +75,7 @@ import argparse
 import json
 import logging
 import os
+import re
 import sys
 import traceback
 from dataclasses import dataclass
@@ -261,6 +262,8 @@ def _classify_tp50_notification(result_summary: dict) -> str:
     results = result_summary.get("order_submission_results")
     if results and any(not r.get("success") for r in results):
         return "error"
+    if _missing_critical_fields(result_summary):
+        return "error"
     fr = result_summary.get("fundamentals_freshness") or {}
     ca = result_summary.get("ca_guard") or {}
     blocked = (
@@ -364,12 +367,35 @@ def _order_for_symbol(results: list[dict] | None, symbol: str, side: str) -> dic
     return None
 
 
-def _find_previous_live_run(exclude_run_id: str | None = None) -> dict | None:
-    """LIVE_LOG_DIR(logs/live/)から最も新しい"live":true のresult_summaryを探す。
+_RUN_ID_DATE_RE = re.compile(r"(\d{4})(\d{2})(\d{2})_\d{6}$")
+
+
+def _run_summary_date(data: dict) -> str:
+    """result_summaryの実行日を"YYYY-MM-DD"で返す。run_started_atを優先し、
+    欠落時（2026-08-20 09:36手動遅延run等、run_started_atフィールド追加前の
+    旧スキーマ記録）はrun_id（f4_tp50_YYYYMMDD_HHMMSS）から復元する。
+    どちらも得られなければ空文字列（呼び出し側は「日付不明」として扱う）。"""
+    started = (data.get("run_started_at") or "")[:10]
+    if started:
+        return started
+    m = _RUN_ID_DATE_RE.search(data.get("run_id") or "")
+    if m:
+        return f"{m.group(1)}-{m.group(2)}-{m.group(3)}"
+    return ""
+
+
+def _find_previous_live_run(exclude_run_id: str | None = None, before_date: str | None = None) -> dict | None:
+    """LIVE_LOG_DIR(logs/live/)から、before_date（"YYYY-MM-DD"）より前の日付の
+    最も新しい"live":true のresult_summaryを探す。
     Dry Run通知の【前日の実績】セクションのデータ源（2026-08-20 9344インシデント対応:
     「前日のkabu API実約定結果」を毎朝のDry Runで必ず確認できるようにする）。
     ファイル名 f4_tp50_f4_tp50_YYYYMMDD_HHMMSS.json はrun_id昇順=時系列昇順なので
-    降順ソートの先頭が最新。見つからなければNone（初回実行時等）。"""
+    降順ソートの先頭が最新。見つからなければNone（初回実行時・記録なし等）。
+
+    2026-08-21朝 通知監査で発見・修正: before_date未指定（従来仕様）では、Live実行
+    直後にDry Runを手動実行すると「本日自身のLive run」が「前日の実績」として誤って
+    表示される事故が発生した（本日Live 08:49実行→本日Dry Run 09:45実行時、前日の
+    実績欄に本日の日付が出た）。before_dateで厳密に「当日より前」の記録のみに限定する。"""
     try:
         candidates = sorted(LIVE_LOG_DIR.glob("f4_tp50_f4_tp50_*.json"), reverse=True)
     except Exception as exc:
@@ -380,8 +406,12 @@ def _find_previous_live_run(exclude_run_id: str | None = None) -> dict | None:
             data = json.loads(p.read_text(encoding="utf-8"))
         except Exception:
             continue
-        if data.get("live") and data.get("run_id") != exclude_run_id:
-            return data
+        if not data.get("live") or data.get("run_id") == exclude_run_id:
+            continue
+        run_date = _run_summary_date(data)
+        if before_date and run_date and run_date >= before_date:
+            continue
+        return data
     return None
 
 
@@ -490,7 +520,7 @@ def _render_replacement_item(d: dict, client, mode: str) -> list[str]:
 
 def _build_previous_day_actuals_section(prev: dict, client, score_map) -> list[str]:
     """【前日の実績】: 直近のLIVE実行結果を、broker実約定(kabu API再取得)ベースで表示する。"""
-    prev_date = (prev.get("run_started_at") or "")[:10].replace("-", "/")
+    prev_date = _run_summary_date(prev).replace("-", "/")
     results = prev.get("order_submission_results") or []
     exits_detail = prev.get("exits_detail") or []
     funded_detail = prev.get("funded_detail") or []
@@ -498,9 +528,13 @@ def _build_previous_day_actuals_section(prev: dict, client, score_map) -> list[s
     replace_decisions = [d for d in decisions if d.get("decision") in ("REPLACE_SIMULATED", "BUY_FILLED")]
 
     lines = ["【前日の実績】", prev_date or "(日付不明)", ""]
+    lines.append(f"SELL       {len(exits_detail)}件")
+    lines.append(f"BUY        {len(funded_detail)}件")
+    lines.append(f"REPLACEMENT {len(replace_decisions)}件")
+    lines.append("")
     lines.append("■ SELL")
     if not exits_detail:
-        lines.append("なし")
+        lines.append("0件")
     else:
         for e in exits_detail:
             order = _order_for_symbol(results, e["code"], "SELL")
@@ -508,7 +542,7 @@ def _build_previous_day_actuals_section(prev: dict, client, score_map) -> list[s
     lines.append("")
     lines.append("■ BUY")
     if not funded_detail:
-        lines.append("なし")
+        lines.append("0件")
     else:
         for f in funded_detail:
             order = _order_for_symbol(results, f["code"], "BUY")
@@ -516,7 +550,7 @@ def _build_previous_day_actuals_section(prev: dict, client, score_map) -> list[s
     lines.append("")
     lines.append("■ SCORE REPLACEMENT")
     if not replace_decisions:
-        lines.append("なし")
+        lines.append("0件")
     else:
         for d in replace_decisions:
             lines += _render_replacement_item(d, client, mode="actual_result")
@@ -524,12 +558,35 @@ def _build_previous_day_actuals_section(prev: dict, client, score_map) -> list[s
     return lines
 
 
+def _build_previous_day_unavailable_section() -> list[str]:
+    """前日LIVE実行記録が見つからない場合の明示表示。無言でセクションを省略すると
+    「前日データ取得済みだが取引がなかった(0件)」と「前日データそのものが存在しない」
+    を区別できない（2026-08-21朝 通知監査: ユーザー指摘「0件とN/Aを区別」）。"""
+    return ["【前日の実績】", "N/A（前回LIVE実行記録が見つかりません）", ""]
+
+
+_CRITICAL_REPORT_FIELDS = ("available_cash", "positions_count", "cash_source")
+
+
+def _missing_critical_fields(result_summary: dict) -> list[str]:
+    """レポートの信頼性を左右する必須フィールドのうち、未取得(None/欠落)のものを返す。
+    2026-08-21朝 通知監査で発見: Cash=N/A（available_cashがNone）でもMetadata=OKと
+    表示される等、個別フィールドが取得失敗時に「異常」ではなく暗黙にOK/N/A表示へ
+    フォールバックしていたため、レポート全体の信頼性を見た目からは判断できなかった。
+    このチェックはレポート全体を DRY RUN INVALID として明示するためのゲート。"""
+    return [f for f in _CRITICAL_REPORT_FIELDS if result_summary.get(f) is None]
+
+
 def _build_system_block(result_summary: dict, live: bool) -> list[str]:
-    fr = result_summary.get("fundamentals_freshness") or {}
+    fr = result_summary.get("fundamentals_freshness")
     results = result_summary.get("order_submission_results")
     lines = ["【SYSTEM】", ""]
-    lines.append(f"Market Data       {'OK' if fr.get('is_stale') is False else '異常'}")
-    lines.append(f"Fundamentals      {'OK' if not fr.get('is_stale') else 'STALE'}")
+    if fr is None:
+        lines.append("Market Data       取得不可")
+        lines.append("Fundamentals      取得不可")
+    else:
+        lines.append(f"Market Data       {'OK' if fr.get('is_stale') is False else '異常'}")
+        lines.append(f"Fundamentals      {'OK' if fr.get('is_stale') is False else ('STALE' if fr.get('is_stale') else '取得不可')}")
     lines.append(f"Kabu API          {'OK' if result_summary.get('cash_source') == 'broker_live' else '異常/未接続'}")
     if results is not None:
         n_fail = sum(1 for r in results if not r.get("success"))
@@ -587,11 +644,23 @@ def _build_dry_run_notification_body(result_summary: dict, client, score_map) ->
     risk = result_summary.get("risk_gate") or {}
 
     lines = [sep, "CHIBA F4 TP50", "DAILY DRY RUN", f"{today_date} {today_time}", sep, ""]
+
+    missing = _missing_critical_fields(result_summary)
+    if missing:
+        lines.append("⚠⚠⚠ DRY RUN INVALID ⚠⚠⚠")
+        lines.append(f"データ取得失敗のためこの判断内容は信頼できません（不足: {', '.join(missing)}）")
+        lines.append("")
+
     lines += _build_warnings_section(result_summary)
 
-    prev = _find_previous_live_run(exclude_run_id=result_summary.get("run_id"))
+    prev = _find_previous_live_run(
+        exclude_run_id=result_summary.get("run_id"),
+        before_date=(result_summary.get("run_started_at") or "")[:10],
+    )
     if prev is not None:
         lines += _build_previous_day_actuals_section(prev, client, score_map)
+    else:
+        lines += _build_previous_day_unavailable_section()
 
     lines.append(sep)
     lines.append("【本日の判断】")
@@ -606,7 +675,7 @@ def _build_dry_run_notification_body(result_summary: dict, client, score_map) ->
     lines.append("■ SELL")
     lines.append("")
     if not exits_detail:
-        lines.append("なし")
+        lines.append("0件")
     else:
         for e in exits_detail:
             lines += _render_sell_item(e, None, client, score_map, mode="today_preview")
@@ -614,7 +683,7 @@ def _build_dry_run_notification_body(result_summary: dict, client, score_map) ->
     lines.append("■ BUY")
     lines.append("")
     if not funded_detail:
-        lines.append("なし")
+        lines.append("0件")
     else:
         for f in funded_detail:
             lines += _render_buy_item(f, None, client, score_map, mode="today_preview")
@@ -622,7 +691,7 @@ def _build_dry_run_notification_body(result_summary: dict, client, score_map) ->
     lines.append("■ SCORE REPLACEMENT")
     lines.append("")
     if not replace_decisions:
-        lines.append("なし")
+        lines.append("0件")
     else:
         for d in replace_decisions:
             lines += _render_replacement_item(d, client, mode="today_preview")
@@ -662,6 +731,13 @@ def _build_live_notification_body(result_summary: dict, client, score_map) -> st
     status_label = {"success": "SUCCESS", "warning": "WARNING", "error": "ERROR"}.get(kind, kind.upper())
 
     lines = [sep, "CHIBA F4 TP50", "LIVE ORDER REPORT", f"{today_date} {today_time}", sep, ""]
+
+    missing = _missing_critical_fields(result_summary)
+    if missing:
+        lines.append("⚠⚠⚠ REPORT INVALID ⚠⚠⚠")
+        lines.append(f"データ取得失敗のためこのレポート内容は信頼できません（不足: {', '.join(missing)}）")
+        lines.append("")
+
     lines += _build_warnings_section(result_summary)
 
     lines.append("【ORDER RESULT】")

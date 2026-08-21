@@ -713,6 +713,8 @@ def _base_result_summary(**overrides) -> dict:
             "staleness_bdays_vs_real_today": 1, "is_stale": False, "reason": "FRESH",
         },
         "cash_source": "broker_live",
+        "available_cash": 2900000.0,
+        "positions_count": 3,
         "ca_guard": {"ca_pending_codes": [], "buy_candidates_blocked_by_ca_pending": []},
         "risk_gate": {"recommendation": "NORMAL", "dd": -0.01},
         "exits_intended": 0,
@@ -985,7 +987,7 @@ def test_scenario_8_zero_activity():
     assert "BUY        0" in body
     assert "REPLACEMENT 0" in body
     today_block = body.split("【本日の判断】")[1]
-    assert today_block.count("なし") >= 3  # SELL/BUY/SCORE REPLACEMENTの各ブロック
+    assert today_block.count("0件") >= 3  # SELL/BUY/SCORE REPLACEMENTの各ブロック（0件とN/Aを区別するため"なし"から変更）
 
 
 # --- 9. Scheduler未発火（手動遅延実行） -------------------------------------
@@ -1119,6 +1121,128 @@ def test_previous_live_run_lookup_returns_most_recent_live_run(tmp_path, monkeyp
     )
     result = _find_previous_live_run()
     assert result["run_id"] == "f4_tp50_20260819_090000"
+
+
+# ======================================================================
+# 2026-08-21朝 通知全面監査: 【前日の実績】が本日自身のLive runを誤って
+# 表示していたバグ（Live 08:49実行後にDry Run 09:45実行 → 前日欄に本日の
+# 日付が出た）の回帰テスト、およびデータ取得失敗時のINVALID明示。
+# ======================================================================
+def test_previous_live_run_lookup_excludes_same_day_run(tmp_path, monkeypatch):
+    """同一日のLive runは「前日の実績」として絶対に採用してはならない
+    （2026-08-21 09:46 実インシデントの回帰テスト）。"""
+    monkeypatch.setattr(_tp50, "LIVE_LOG_DIR", tmp_path)
+    (tmp_path / "f4_tp50_f4_tp50_20260820_084900.json").write_text(
+        json.dumps({"run_id": "f4_tp50_20260820_084900", "live": True,
+                    "run_started_at": "2026-08-20 08:49:05"}), encoding="utf-8",
+    )
+    (tmp_path / "f4_tp50_f4_tp50_20260821_084900.json").write_text(
+        json.dumps({"run_id": "f4_tp50_20260821_084900", "live": True,
+                    "run_started_at": "2026-08-21 08:49:05"}), encoding="utf-8",
+    )
+    result = _find_previous_live_run(before_date="2026-08-21")
+    assert result["run_id"] == "f4_tp50_20260820_084900"
+
+
+def test_previous_live_run_lookup_returns_none_when_only_same_day_run_exists(tmp_path, monkeypatch):
+    monkeypatch.setattr(_tp50, "LIVE_LOG_DIR", tmp_path)
+    (tmp_path / "f4_tp50_f4_tp50_20260821_084900.json").write_text(
+        json.dumps({"run_id": "f4_tp50_20260821_084900", "live": True,
+                    "run_started_at": "2026-08-21 08:49:05"}), encoding="utf-8",
+    )
+    assert _find_previous_live_run(before_date="2026-08-21") is None
+
+
+def test_previous_live_run_date_falls_back_to_run_id_when_run_started_at_missing():
+    """2026-08-20 09:36手動遅延Live run（run_started_atフィールド追加前の旧スキーマ
+    記録）のような、run_started_at欠落レコードでも日付表示・同日除外フィルタが
+    正しく機能することの回帰テスト。"""
+    prev_run = {"run_id": "f4_tp50_20260820_093611", "live": True,
+                "order_submission_results": [], "exits_detail": [], "funded_detail": [],
+                "score_replacement": {"decisions": []}}
+    with patch("src.run_live_signal_f4_tp50._find_previous_live_run", return_value=prev_run):
+        rs = _base_result_summary(live=False)
+        body = _build_tp50_notification_body(rs, [], [])
+    prev_block = body.split("【前日の実績】")[1].split("【本日の判断】")[0]
+    assert "2026/08/20" in prev_block
+    assert "日付不明" not in prev_block
+
+
+def test_find_previous_live_run_same_day_exclusion_uses_run_id_fallback(tmp_path, monkeypatch):
+    monkeypatch.setattr(_tp50, "LIVE_LOG_DIR", tmp_path)
+    (tmp_path / "f4_tp50_f4_tp50_20260821_093611.json").write_text(
+        json.dumps({"run_id": "f4_tp50_20260821_093611", "live": True}), encoding="utf-8",
+    )
+    assert _find_previous_live_run(before_date="2026-08-21") is None
+
+
+def test_dry_run_shows_previous_day_unavailable_when_no_prior_live_run():
+    """0件（前日実行あり・取引なし）とN/A（前日実行記録自体がない）を明確に区別する。"""
+    rs = _base_result_summary(live=False)
+    with _no_prev_run():
+        body = _build_tp50_notification_body(rs, [], [])
+    assert "【前日の実績】" in body
+    assert "N/A（前回LIVE実行記録が見つかりません）" in body
+
+
+def test_missing_critical_fields_detects_none_values():
+    rs = _base_result_summary(live=False, available_cash=None)
+    assert _tp50._missing_critical_fields(rs) == ["available_cash"]
+    rs2 = _base_result_summary(live=False)
+    assert _tp50._missing_critical_fields(rs2) == []
+
+
+def test_dry_run_body_shows_invalid_banner_when_cash_missing():
+    """Cash取得失敗時、Metadata等の他フィールドが独立にOKを名乗っても、
+    レポート全体がINVALIDだと明示する（2026-08-21朝 実インシデント: Cash=N/Aなのに
+    Metadata=OKと出て矛盾していた問題への対応）。"""
+    rs = _base_result_summary(live=False, available_cash=None)
+    with _no_prev_run():
+        body = _build_tp50_notification_body(rs, [], [])
+    assert "DRY RUN INVALID" in body
+    assert "available_cash" in body
+
+
+def test_live_body_shows_invalid_banner_when_positions_count_missing():
+    rs = _base_result_summary(live=True, order_submission_results=[], positions_count=None)
+    body = _build_tp50_notification_body(rs, [], [])
+    assert "REPORT INVALID" in body
+
+
+def test_classify_notification_error_when_critical_fields_missing():
+    rs = _base_result_summary(live=True, order_submission_results=[], available_cash=None)
+    assert _classify_tp50_notification(rs) == "error"
+
+
+def test_notification_body_never_contains_static_sending_label():
+    """"Notification 送信中"は送信前に固定で書かれる自己言及的な誤表示のため撤去済み
+    （2026-08-21朝 ユーザー指摘の回帰テスト）。"""
+    rs = _base_result_summary(live=False)
+    with _no_prev_run():
+        body = _build_tp50_notification_body(rs, [], [])
+    assert "送信中" not in body
+    rs_live = _base_result_summary(live=True, order_submission_results=[])
+    body_live = _build_tp50_notification_body(rs_live, [], [])
+    assert "送信中" not in body_live
+
+
+def test_same_day_multiple_dry_runs_do_not_contradict_each_other():
+    """同一日に複数回Dry Runを実行しても、【前日の実績】は常に同じ（前営業日の）
+    Live runを指し続け、実行のたびに内容が変わらないこと。"""
+    rs1 = _base_result_summary(live=False, run_id="f4_tp50_20260821_094500",
+                                run_started_at="2026-08-21 09:45:00")
+    rs2 = _base_result_summary(live=False, run_id="f4_tp50_20260821_104500",
+                                run_started_at="2026-08-21 10:45:00")
+    prev_run = {"run_id": "f4_tp50_20260820_084900", "live": True,
+                "run_started_at": "2026-08-20 08:49:05", "order_submission_results": [],
+                "exits_detail": [], "funded_detail": [], "score_replacement": {"decisions": []}}
+    with patch("src.run_live_signal_f4_tp50._find_previous_live_run", return_value=prev_run):
+        body1 = _build_tp50_notification_body(rs1, [], [])
+        body2 = _build_tp50_notification_body(rs2, [], [])
+    prev1 = body1.split("【前日の実績】")[1].split("【本日の判断】")[0]
+    prev2 = body2.split("【前日の実績】")[1].split("【本日の判断】")[0]
+    assert prev1 == prev2
+    assert "2026/08/20" in prev1
 
 
 # ======================================================================
