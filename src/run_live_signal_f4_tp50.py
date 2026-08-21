@@ -536,7 +536,6 @@ def _build_system_block(result_summary: dict, live: bool) -> list[str]:
         lines.append(f"Order Submission  {'OK' if n_fail == 0 else f'異常（失敗{n_fail}件）'}")
     lines.append(f"Metadata          {'OK' if not result_summary.get('metadata_warnings') else '異常'}")
     lines.append(f"Scheduler         {'異常（手動遅延実行）' if _is_manual_delayed_run(result_summary) else 'OK'}")
-    lines.append("Notification      送信中")
     lines.append("")
     return lines
 
