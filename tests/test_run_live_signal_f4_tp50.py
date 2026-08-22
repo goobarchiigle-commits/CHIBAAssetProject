@@ -1347,15 +1347,20 @@ def test_degraded_cash_source_triggers_invalid_even_when_no_field_is_none():
 class _BoardKabuClient:
     """get_board()のみ実装するテスト用スタブ。板情報(銘柄名/現在値)取得用。"""
 
-    def __init__(self, board_map: dict):
+    def __init__(self, board_map: dict, raise_error: bool = False, prev_close_map: dict | None = None):
         self._board_map = board_map  # {code4: (name, price)}
+        self._raise_error = raise_error
+        self._prev_close_map = prev_close_map or {}
 
     def get_board(self, code4: str):
+        if self._raise_error:
+            raise ConnectionError("kabu API unreachable (test)")
         name, price = self._board_map.get(code4, (code4, None))
 
         class _Board:
             symbol_name = name
             current_price = price
+            raw = {"PreviousClose": self._prev_close_map.get(code4)} if code4 in self._prev_close_map else {}
 
         return _Board()
 
@@ -1376,24 +1381,119 @@ def _board_map_for(holdings, price_fn=lambda entry: entry * 1.10):
 
 
 # --- A/B/C/D. 保有全件表示・コード+名前+Score・Entry=actual・損益率計算 -----
-def test_scenario_abcd_full_holdings_table_with_pnl():
+def _write_holding_scores_fixture(monkeypatch, tmp_path, holdings, score=55.0):
+    """保有銘柄ScoreのSource of TruthはScore Replacementのentry_score sidecar
+    （runtime/f4_tp50/score_replacement_holdings.json）— 本番ファイルを汚染しない
+    よう、STATE_FILEをtmp_pathへ隔離してfixtureを書き込む。"""
+    from src.f4_tp50 import replacement_state as repl_state
+    p = tmp_path / "score_replacement_holdings.json"
+    p.write_text(json.dumps({
+        h["code"]: {"entry_score": score, "entry_date": h["entry_date"], "entry_price": h["entry_price"]}
+        for h in holdings
+    }), encoding="utf-8")
+    monkeypatch.setattr(repl_state, "STATE_FILE", p)
+
+
+def test_scenario_abcd_full_holdings_table_with_pnl(monkeypatch, tmp_path):
     holdings = _eleven_holdings()
     board = _board_map_for(holdings)  # 現在値 = entry * 1.10 (+10%)
     client = _BoardKabuClient(board)
-    score_map = {p["code"]: 55.0 for p in holdings}
+    _write_holding_scores_fixture(monkeypatch, tmp_path, holdings, score=55.0)
     rs = _base_result_summary(
         live=False, cash_source="broker_live", positions_count=len(holdings),
         current_holdings=holdings, market_value=1000000.0, last_equity=3000000.0,
     )
     with _no_prev_run():
-        body = _build_tp50_notification_body(rs, [], [], client=client, score_map=score_map)
+        body = _build_tp50_notification_body(rs, [], [], client=client)
     portfolio_block = body.split("【現在ポートフォリオ】")[1].split("【SYSTEM】")[0]
     for p in holdings:
         assert p["code"] in portfolio_block  # A: 全件表示
         assert f"銘柄{p['code']}" in portfolio_block  # B: 銘柄名
-    assert "Score:55.0" in portfolio_block  # B: Score
+        assert f"数量:{p['qty']}株" in portfolio_block  # 数量
+    assert "Score:55.0" in portfolio_block  # B: Score(entry_score sidecarから取得)
     assert f"Entry:{_tp50._fmt_yen(holdings[0]['entry_price'])}" in portfolio_block  # C: actual entry
     assert "損益:+10.0" in portfolio_block or "損益:+9.9" in portfolio_block  # D: 概ね+10%
+
+
+def test_holdings_score_uses_replacement_entry_score_not_candidate_score_map(monkeypatch, tmp_path):
+    """2026-08-22朝 実インシデント回帰テスト: 保有銘柄のScoreは当日candidate
+    cross-section score_map（今日のBUY候補専用・保有銘柄は原理上含まれない）
+    ではなく、Score Replacementのentry_score sidecarから取得する。候補用
+    score_mapに同じコードでダミー値を入れても、保有Score表示には影響しない
+    ことを確認する。"""
+    holdings = [{"code": "93440", "entry_date": "2026-08-19", "entry_price": 1224.0, "qty": 100}]
+    board = {"9344": ("アクシスコンサルティング", 1300.0)}
+    client = _BoardKabuClient(board)
+    _write_holding_scores_fixture(monkeypatch, tmp_path, holdings, score=46.3)
+    rs = _base_result_summary(
+        live=False, cash_source="broker_live", positions_count=1, current_holdings=holdings,
+        market_value=100000.0, last_equity=3000000.0,
+    )
+    # candidate score_map（本日のBUY候補用、無関係な別ロジック）に同じコードで
+    # 別のダミー値を混入させても、保有Score表示は影響を受けない。
+    misleading_candidate_score_map = {"93440": 999.9}
+    with _no_prev_run():
+        body = _build_tp50_notification_body(
+            rs, [], [], client=client, score_map=misleading_candidate_score_map,
+        )
+    portfolio_block = body.split("【現在ポートフォリオ】")[1].split("【SYSTEM】")[0]
+    assert "Score:46.3" in portfolio_block
+    assert "Score:999.9" not in portfolio_block
+
+
+def test_holdings_score_na_when_not_recorded_in_replacement_sidecar(monkeypatch, tmp_path):
+    """Score Replacement Canary稼働開始前にEntryした銘柄等、sidecarに記録が
+    無い銘柄はScore:N/Aのまま——推測しない。"""
+    from src.f4_tp50 import replacement_state as repl_state
+    monkeypatch.setattr(repl_state, "STATE_FILE", tmp_path / "empty.json")
+    holdings = [{"code": "93440", "entry_date": "2026-08-19", "entry_price": 1224.0, "qty": 100}]
+    client = _BoardKabuClient({"9344": ("アクシスコンサルティング", 1300.0)})
+    rs = _base_result_summary(
+        live=False, cash_source="broker_live", positions_count=1, current_holdings=holdings,
+        market_value=100000.0, last_equity=3000000.0,
+    )
+    with _no_prev_run():
+        body = _build_tp50_notification_body(rs, [], [], client=client)
+    portfolio_block = body.split("【現在ポートフォリオ】")[1].split("【SYSTEM】")[0]
+    assert "Score:N/A" in portfolio_block
+
+
+# --- 現在値: board応答はあるがCurrentPrice未確定 -> PreviousCloseへ限定fallback ---
+def test_current_price_falls_back_to_previous_close_when_no_trade_yet(monkeypatch, tmp_path):
+    """kabu API board応答は正常だが、その日まだ約定が無い薄商い銘柄では
+    CurrentPriceが0/None（2026-08-22朝 実インシデント: 17880で発生）。
+    PreviousClose（実データ）へfallbackし、"前日終値"であることを明記する。"""
+    holdings = [{"code": "17880", "entry_date": "2026-08-18", "entry_price": 4285.0, "qty": 100}]
+    client = _BoardKabuClient(
+        {"1788": ("三東工業社", 0.0)}, prev_close_map={"1788": 4310.0},
+    )
+    _write_holding_scores_fixture(monkeypatch, tmp_path, holdings, score=59.4)
+    rs = _base_result_summary(
+        live=False, cash_source="broker_live", positions_count=1, current_holdings=holdings,
+        market_value=100000.0, last_equity=3000000.0,
+    )
+    with _no_prev_run():
+        body = _build_tp50_notification_body(rs, [], [], client=client)
+    portfolio_block = body.split("【現在ポートフォリオ】")[1].split("【SYSTEM】")[0]
+    assert "現在値:¥4,310(前日終値)" in portfolio_block
+    assert "取得不可" not in portfolio_block
+    assert "(前日終値ベース)" in portfolio_block  # 損益率も前日終値ベースと明記
+
+
+def test_board_lookup_retries_once_on_transient_exception_then_gives_up():
+    """一時的な例外（ネットワーク等）は1回だけ限定的にretryする。過剰なretryは
+    しない——2試行しても失敗すれば素直に取得不可として諦める。"""
+    calls = {"n": 0}
+
+    class _FlakyClient:
+        def get_board(self, code4):
+            calls["n"] += 1
+            raise ConnectionError("transient (test)")
+
+    name, price, is_live = _tp50._lookup_symbol_display(_FlakyClient(), "17880")
+    assert price is None
+    assert is_live is False
+    assert calls["n"] == 2  # 通常1回 + 限定的retry1回 = 最大2回、それ以上は叩かない
 
 
 # --- E. 現在値取得失敗 -----------------------------------------------------

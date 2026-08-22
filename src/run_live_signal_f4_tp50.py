@@ -295,25 +295,42 @@ def _exit_reason_category(exit_reason: str) -> str:
     return "OTHER"
 
 
-def _lookup_symbol_display(client, code5: str) -> tuple[str, float | None]:
-    """(SymbolName, CurrentPrice) をkabu API board(実勢気配)から取得する。
-    client未指定・API失敗時は (code5, None) を返し、呼び出し側は"N/A"表示にfallbackする。"""
+def _lookup_symbol_display(client, code5: str) -> tuple[str, float | None, bool]:
+    """(SymbolName, Price, price_is_live) をkabu API board(実勢気配)から取得する。
+    client未指定・API失敗時は (code5, None, False) を返し、呼び出し側は"取得不可"
+    表示にfallbackする。
+
+    2026-08-22 通知監査で判明: kabu API board応答のCurrentPriceは、その日まだ
+    約定が一度も無い銘柄（薄商い銘柄等）では0/Noneになる（board自体の取得や
+    気配値(Bid/Ask)は正常）。この場合、raw.PreviousClose（前営業日終値・実データ・
+    捏造ではない）にfallbackし、price_is_live=Falseで呼び出し側に「現在値では
+    ないこと」を明示させる。一時的な例外（ネットワーク等）のみ1回だけ再試行し、
+    過剰なAPIアクセスは行わない（それでも失敗すれば取得不可として諦める）。"""
     if client is None:
-        return code5, None
-    try:
-        code4 = to_kabu_symbol(code5)
-        board = client.get_board(code4)
-        name = board.symbol_name or code5
-        price = board.current_price if board.current_price else None
-        return name, price
-    except Exception:
-        return code5, None
+        return code5, None, False
+    code4 = to_kabu_symbol(code5)
+    last_exc = None
+    for _attempt in range(2):  # 通常1回 + 一時的失敗時のみ1回だけ限定的retry
+        try:
+            board = client.get_board(code4)
+            name = board.symbol_name or code5
+            if board.current_price:
+                return name, board.current_price, True
+            prev_close = (board.raw or {}).get("PreviousClose")
+            if prev_close:
+                return name, float(prev_close), False
+            return name, None, False
+        except Exception as exc:
+            last_exc = exc
+            continue
+    logger.warning("[F4_TP50][BOARD_LOOKUP_FAILED] code=%s: %s", code5, last_exc)
+    return code5, None, False
 
 
 def _symbol_line(client, code5: str) -> str:
     """通知本文の「銘柄コード 銘柄名」行を作る。名前が取得できない場合はコードの
     重複表示（"93440 93440"のような無意味な行）を避け、コード単独で表示する。"""
-    name, _ = _lookup_symbol_display(client, code5)
+    name, _, _ = _lookup_symbol_display(client, code5)
     return code5 if name == code5 else f"{code5} {name}"
 
 
@@ -358,26 +375,41 @@ def _fmt_score(score_map, code5: str) -> str:
         return "N/A"
 
 
-def _render_holdings_table(positions: list[dict], client, score_map, *, reference_only: bool) -> list[str]:
-    """保有銘柄一覧を1銘柄1行で描画する: コード/銘柄名/Score/Entry価格/現在値/損益率。
+def _render_holdings_table(positions: list[dict], client) -> list[str]:
+    """保有銘柄一覧を1銘柄1行で描画する: コード/銘柄名/Score/Entry価格/現在値/損益率/数量。
     2026-08-22朝 通知全面仕様化: 現在ポートフォリオ・Previous Known Stateの両方で
     共有する（区別が必要な場合は呼び出し側が見出し・注意書きで明示する）。
+
+    Score: 本日のcandidate cross-section score_map（compute_today_score_map）は
+    「今日のBUY候補」だけをスコアする設計であり、既存保有銘柄は原理上ほぼ含まれない
+    （2026-08-22朝の実インシデントで11銘柄全件がScore:N/Aになった真因）。
+    保有銘柄のScoreはScore Replacementが記録するentry_score
+    （runtime/f4_tp50/score_replacement_holdings.json、docs/f4_score_replacement/
+    03_score_pit_contract.md sec.4により「Entry時点で固定・以後リフレッシュしない」
+    PIT契約）をSource of Truthとする——別のスコア計算ロジックは新設しない。
+    このファイルに記録の無い銘柄（Score Replacement Canary稼働開始前にEntryした
+    銘柄等）はScore:N/Aのまま——推測しない。
+
     Entry価格はpositions[i]["entry_price"]（呼び出し側でbroker実約定metadataから
     構築済み——estimated_price/as_of由来の理論値を混ぜてはならない）をそのまま使い、
-    ここでは一切の推測を行わない。現在値はreference_only時も含め毎回board取得を
-    試みる（client切断時はNone・"現在値取得不可"に自然にフォールバックする）。"""
+    ここでは一切の推測を行わない。現在値は毎回board取得を試みる
+    （_lookup_symbol_display内で例外時のみ1回限定retry。前日終値fallback時は
+    その旨を明記し、生の現在値と混同させない）。"""
     if not positions:
         return ["0銘柄"]
+    from src.f4_tp50 import replacement_state as repl_state
+    holding_scores = repl_state.load_holding_scores()
     lines = []
     for p in positions:
         code = p["code"]
-        name, current_price = _lookup_symbol_display(client, code)
+        name, current_price, price_is_live = _lookup_symbol_display(client, code)
         name_part = code if name == code else f"{code} {name}"
-        score_part = f"Score:{_fmt_score(score_map, code)}"
+        h_score = (holding_scores.get(code) or {}).get("entry_score")
+        score_part = f"Score:{h_score:.1f}" if isinstance(h_score, (int, float)) else "Score:N/A"
         entry_price = p.get("entry_price")
         entry_part = f"Entry:{_fmt_yen(entry_price) if entry_price is not None else '取得不可'}"
         if current_price is not None:
-            current_part = f"現在値:{_fmt_yen(current_price)}"
+            current_part = f"現在値:{_fmt_yen(current_price)}" + ("" if price_is_live else "(前日終値)")
         else:
             current_part = "現在値:取得不可"
         if entry_price is None:
@@ -386,12 +418,9 @@ def _render_holdings_table(positions: list[dict], client, score_map, *, referenc
             pnl_part = "損益:現在値取得不可のため計算不可"
         else:
             pnl_pct = (current_price / entry_price) - 1.0
-            pnl_part = f"損益:{_fmt_pct(pnl_pct)}"
-        qty_part = f"{p.get('qty')}株" if reference_only else None
-        parts = [name_part, score_part, entry_part, current_part, pnl_part]
-        if qty_part:
-            parts.append(qty_part)
-        lines.append("  ".join(parts))
+            pnl_part = f"損益:{_fmt_pct(pnl_pct)}" + ("" if price_is_live else "(前日終値ベース)")
+        qty_part = f"数量:{p.get('qty')}株"
+        lines.append("  ".join([name_part, score_part, entry_part, current_part, pnl_part, qty_part]))
     return lines
 
 
@@ -779,9 +808,7 @@ def _build_dry_run_notification_body(result_summary: dict, client, score_map) ->
         lines.append(f"DD          {_fmt_pct(risk.get('dd'))}")
         lines.append(f"保有銘柄    {result_summary.get('positions_count')}件")
         lines.append("")
-        lines += _render_holdings_table(
-            result_summary.get("current_holdings") or [], client, score_map, reference_only=False,
-        )
+        lines += _render_holdings_table(result_summary.get("current_holdings") or [], client)
     else:
         lines.append("⚠ Kabu APIから現在の証券口座状態を取得できませんでした")
         lines.append("")
@@ -792,7 +819,7 @@ def _build_dry_run_notification_body(result_summary: dict, client, score_map) ->
         lines.append("現在の実際の口座残高を保証するものではありません。")
         lines.append("")
         prev_positions = result_summary.get("previous_known_positions") or []
-        lines += _render_holdings_table(prev_positions, client, score_map, reference_only=True)
+        lines += _render_holdings_table(prev_positions, client)
         if prev_positions:
             lines.append(f"合計 {len(prev_positions)}銘柄")
     lines.append("")
