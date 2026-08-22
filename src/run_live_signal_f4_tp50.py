@@ -295,36 +295,88 @@ def _exit_reason_category(exit_reason: str) -> str:
     return "OTHER"
 
 
-def _lookup_symbol_display(client, code5: str) -> tuple[str, float | None, bool]:
+def _new_board_source(client):
+    """保有銘柄一覧のような複数銘柄の連続board取得で共有する
+    KabuBoardSource（src.market_snapshot.source、既存の実運用実装・
+    tests/market_snapshot/test_source.pyで独立検証済み）を1つ構築する。
+
+    2026-08-22朝 通知監査で発覚: _render_holdings_table()が11銘柄のboard APIを
+    銘柄間の待機なしで連続GETしており、実ログでHTTP 429を確認した
+    （93440/94500）。この関数を介して常に同一のKabuBoardSourceインスタンスを
+    ループ全体で共有することで、レート制限（5件/秒——CLAUDE.md記載の
+    kabu API rate_limit=5/s、src/deployment/connectors/kabus_api_adapter.py
+    の_RATE_LIMIT_CALLS_PER_SEC=5と同一根拠）・429時の追加backoff・
+    有限retry（1回、計2試行）を全呼び出しに適用する。
+    新規のスロットリング実装は作らず、既存の実運用クラスをそのまま再利用する
+    （market_snapshot/source.pyへの変更は一切行っていない）。"""
+    if client is None:
+        return None
+    from src.market_snapshot.source import KabuBoardSource
+    return KabuBoardSource(client=client, rate_limit_per_sec=5.0, max_retries=1)
+
+
+def _append_board_lookup_failure(
+    code5: str, http_status: int | None, exc_type: str | None, exc_message: str | None,
+    attempts: int, final_result: str,
+) -> None:
+    """board API取得失敗の追跡情報を追記専用サイドカーへ永続化する
+    （2026-08-22朝の実インシデント再発防止: 標準出力をtailしていたために
+    77810/78120の正確な失敗理由が事後確認できなかった。stdout/stderrの
+    リダイレクト有無に関わらず必ずファイルへ残す）。レスポンス本文は保存しない
+    （kabu APIのboard応答自体に認証情報等は含まれないが、将来の変更で
+    混入するリスクを避けるため、例外メッセージも200文字に切り詰める）。"""
+    try:
+        record = {
+            "symbol": code5, "http_status": http_status,
+            "exception_type": exc_type, "exception_message": (exc_message or "")[:200],
+            "attempts": attempts, "final_result": final_result,
+            "recorded_at": datetime.now(_JST).isoformat(),
+        }
+        path = AUDIT_DIR / "board_lookup_failures.jsonl"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(record, ensure_ascii=False) + "\n")
+    except Exception:
+        logger.warning("[F4_TP50][BOARD_LOOKUP_FAILURE_LOG_FAILED] code=%s", code5)
+
+
+def _lookup_symbol_display(client, code5: str, board_source=None) -> tuple[str, float | None, bool]:
     """(SymbolName, Price, price_is_live) をkabu API board(実勢気配)から取得する。
     client未指定・API失敗時は (code5, None, False) を返し、呼び出し側は"取得不可"
     表示にfallbackする。
+
+    board_source（KabuBoardSource、_new_board_source()参照）を複数銘柄の
+    連続取得元から共有で渡すことで、レート制限・429 backoff・有限retryが
+    ループ全体に一貫して適用される。単発呼び出し（board_source省略時）は
+    その場で1回分のインスタンスを作る——スロットリング対象がこの1呼び出し
+    しかないため実害はない。
 
     2026-08-22 通知監査で判明: kabu API board応答のCurrentPriceは、その日まだ
     約定が一度も無い銘柄（薄商い銘柄等）では0/Noneになる（board自体の取得や
     気配値(Bid/Ask)は正常）。この場合、raw.PreviousClose（前営業日終値・実データ・
     捏造ではない）にfallbackし、price_is_live=Falseで呼び出し側に「現在値では
-    ないこと」を明示させる。一時的な例外（ネットワーク等）のみ1回だけ再試行し、
-    過剰なAPIアクセスは行わない（それでも失敗すれば取得不可として諦める）。"""
+    ないこと」を明示させる。"""
     if client is None:
         return code5, None, False
     code4 = to_kabu_symbol(code5)
-    last_exc = None
-    for _attempt in range(2):  # 通常1回 + 一時的失敗時のみ1回だけ限定的retry
-        try:
-            board = client.get_board(code4)
-            name = board.symbol_name or code5
-            if board.current_price:
-                return name, board.current_price, True
-            prev_close = (board.raw or {}).get("PreviousClose")
-            if prev_close:
-                return name, float(prev_close), False
-            return name, None, False
-        except Exception as exc:
-            last_exc = exc
-            continue
-    logger.warning("[F4_TP50][BOARD_LOOKUP_FAILED] code=%s: %s", code5, last_exc)
-    return code5, None, False
+    source = board_source or _new_board_source(client)
+    raw, status, body = source._fetch_one(code4)
+    attempts = source._max_retries + 1
+    if raw is None:
+        _append_board_lookup_failure(
+            code5, status, "HTTPError" if status else "Exception", body,
+            attempts, "取得不可",
+        )
+        return code5, None, False
+    name = raw.get("SymbolName") or code5
+    current_price = raw.get("CurrentPrice")
+    if current_price:
+        return name, float(current_price), True
+    prev_close = raw.get("PreviousClose")
+    if prev_close:
+        return name, float(prev_close), False
+    _append_board_lookup_failure(code5, status, None, None, attempts, "現在値・前日終値ともに取得不可")
+    return name, None, False
 
 
 def _symbol_line(client, code5: str) -> str:
@@ -399,10 +451,14 @@ def _render_holdings_table(positions: list[dict], client) -> list[str]:
         return ["0銘柄"]
     from src.f4_tp50 import replacement_state as repl_state
     holding_scores = repl_state.load_holding_scores()
+    board_source = _new_board_source(client)  # ループ全体で共有 → レート制限を全呼び出しに適用
+    price_cache: dict[str, tuple[str, float | None, bool]] = {}  # 同一銘柄の重複board取得を防止
     lines = []
     for p in positions:
         code = p["code"]
-        name, current_price, price_is_live = _lookup_symbol_display(client, code)
+        if code not in price_cache:
+            price_cache[code] = _lookup_symbol_display(client, code, board_source=board_source)
+        name, current_price, price_is_live = price_cache[code]
         name_part = code if name == code else f"{code} {name}"
         h_score = (holding_scores.get(code) or {}).get("entry_score")
         score_part = f"Score:{h_score:.1f}" if isinstance(h_score, (int, float)) else "Score:N/A"

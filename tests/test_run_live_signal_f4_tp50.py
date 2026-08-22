@@ -694,7 +694,7 @@ def test_handle_order_submission_stage_failure_is_reused_from_e5_module(tmp_path
 # ======================================================================
 # 実行結果メール通知（2026-08-18追加、src.notifier既存基盤の再利用のみ）
 # ======================================================================
-from unittest.mock import patch  # noqa: E402
+from unittest.mock import MagicMock, patch  # noqa: E402
 
 _classify_tp50_notification = _tp50._classify_tp50_notification
 _send_tp50_notification = _tp50._send_tp50_notification
@@ -1345,24 +1345,36 @@ def test_degraded_cash_source_triggers_invalid_even_when_no_field_is_none():
 # ======================================================================
 
 class _BoardKabuClient:
-    """get_board()のみ実装するテスト用スタブ。板情報(銘柄名/現在値)取得用。"""
+    """get_board()のみ実装するテスト用スタブ。板情報(銘柄名/現在値)取得用。
+    _lookup_symbol_display()はKabuBoardSource._fetch_one()経由でboard.rawの
+    生辞書（実kabu API応答と同じキー名: SymbolName/CurrentPrice/PreviousClose）
+    を読むため、rawをそのまま構築する（Board dataclassの個別属性は使わない）。"""
 
-    def __init__(self, board_map: dict, raise_error: bool = False, prev_close_map: dict | None = None):
+    def __init__(self, board_map: dict, raise_error: bool = False, prev_close_map: dict | None = None,
+                 call_log: list | None = None):
         self._board_map = board_map  # {code4: (name, price)}
         self._raise_error = raise_error
         self._prev_close_map = prev_close_map or {}
+        self._call_log = call_log
 
-    def get_board(self, code4: str):
+    def get_board(self, code4: str, exchange: int = 1):
+        if self._call_log is not None:
+            self._call_log.append(code4)
         if self._raise_error:
             raise ConnectionError("kabu API unreachable (test)")
         name, price = self._board_map.get(code4, (code4, None))
+        raw = {"SymbolName": name, "CurrentPrice": price}
+        if code4 in self._prev_close_map:
+            raw["PreviousClose"] = self._prev_close_map[code4]
 
         class _Board:
             symbol_name = name
             current_price = price
-            raw = {"PreviousClose": self._prev_close_map.get(code4)} if code4 in self._prev_close_map else {}
+            raw = None
 
-        return _Board()
+        b = _Board()
+        b.raw = raw
+        return b
 
 
 def _eleven_holdings():
@@ -1486,7 +1498,7 @@ def test_board_lookup_retries_once_on_transient_exception_then_gives_up():
     calls = {"n": 0}
 
     class _FlakyClient:
-        def get_board(self, code4):
+        def get_board(self, code4, exchange=1):
             calls["n"] += 1
             raise ConnectionError("transient (test)")
 
@@ -1494,6 +1506,123 @@ def test_board_lookup_retries_once_on_transient_exception_then_gives_up():
     assert price is None
     assert is_live is False
     assert calls["n"] == 2  # 通常1回 + 限定的retry1回 = 最大2回、それ以上は叩かない
+
+
+def _http_error(status_code: int, body: str = ""):
+    import requests
+    resp = MagicMock(status_code=status_code, text=body)
+    return requests.exceptions.HTTPError(response=resp)
+
+
+def _no_real_sleep(monkeypatch):
+    """KabuBoardSource（src.market_snapshot.source）のthrottle/backoff待機を
+    テストで実待機させない（動作自体はKabuBoardSource側で独立検証済み
+    — tests/market_snapshot/test_source.py）。"""
+    from src.market_snapshot import source as ms_source
+    monkeypatch.setattr(ms_source.time, "sleep", lambda s: None)
+
+
+# --- B. HTTP 429発生 → retry成功 -------------------------------------------
+def test_board_lookup_429_then_retry_succeeds(monkeypatch):
+    _no_real_sleep(monkeypatch)
+
+    class _Once429Client:
+        def __init__(self):
+            self.calls = 0
+
+        def get_board(self, code4, exchange=1):
+            self.calls += 1
+            if self.calls == 1:
+                raise _http_error(429, "rate limited")
+            b = MagicMock()
+            b.raw = {"SymbolName": "アクシスコンサルティング", "CurrentPrice": 1280.0}
+            return b
+
+    client = _Once429Client()
+    name, price, is_live = _tp50._lookup_symbol_display(client, "93440")
+    assert price == 1280.0
+    assert is_live is True
+    assert client.calls == 2  # 1回目429 → 429固有backoff後にretry成功
+
+
+# --- C. HTTP 429 → retry上限到達 → 取得不可（捏造しない） -------------------
+def test_board_lookup_429_exhausts_retry_then_unresolved_no_fabrication(monkeypatch, tmp_path):
+    _no_real_sleep(monkeypatch)
+
+    class _Always429Client:
+        def __init__(self):
+            self.calls = 0
+
+        def get_board(self, code4, exchange=1):
+            self.calls += 1
+            raise _http_error(429, "rate limited")
+
+    client = _Always429Client()
+    name, price, is_live = _tp50._lookup_symbol_display(client, "94500")
+    assert price is None
+    assert is_live is False
+    assert client.calls == 2  # 通常1回+限定的retry1回=2回、それ以上叩かない
+    # 失敗ログが永続化されている（AUDIT_DIRはtmp_pathへ隔離済み — autouse fixture）
+    failure_log = _tp50.AUDIT_DIR / "board_lookup_failures.jsonl"
+    records = [json.loads(l) for l in failure_log.read_text(encoding="utf-8").splitlines()]
+    rec = [r for r in records if r["symbol"] == "94500"][0]
+    assert rec["http_status"] == 429
+    assert rec["attempts"] == 2
+    assert rec["final_result"] == "取得不可"
+
+
+# --- G. 同一Dry Run内で同一銘柄への重複board API取得を防止 ------------------
+def test_holdings_table_does_not_fetch_same_symbol_twice(monkeypatch, tmp_path):
+    call_log = []
+    holdings = [
+        {"code": "93440", "entry_date": "2026-08-19", "entry_price": 1224.0, "qty": 100},
+        {"code": "93440", "entry_date": "2026-08-19", "entry_price": 1224.0, "qty": 100},  # 想定外の重複
+    ]
+    client = _BoardKabuClient({"9344": ("アクシスコンサルティング", 1280.0)}, call_log=call_log)
+    _write_holding_scores_fixture(monkeypatch, tmp_path, holdings, score=46.3)
+    _tp50._render_holdings_table(holdings, client)
+    assert call_log.count("9344") == 1  # 2件あっても実APIは1回のみ
+
+
+# --- H. API呼び出し間隔は5件/秒（CLAUDE.md rate_limit=5/s）を下回らない ------
+def test_board_source_uses_documented_rate_limit():
+    source = _tp50._new_board_source(MagicMock())
+    assert source._interval_sec == 1.0 / 5.0  # CLAUDE.md rate_limit=5/s と同一根拠
+    assert source._max_retries == 1  # 通常1回 + 限定的retry1回 = 最大2試行
+
+
+def test_holdings_table_shares_single_board_source_across_symbols(monkeypatch, tmp_path):
+    """11銘柄のループが同一KabuBoardSourceインスタンスを共有し、レート制限が
+    ループ全体に一貫して適用されることを確認する（毎回新規構築だと
+    スロットリング状態がリセットされ実質無制限連続GETに戻ってしまう）。"""
+    seen_sources = []
+    holdings = _eleven_holdings()
+    board = _board_map_for(holdings)
+    client = _BoardKabuClient(board)
+    _write_holding_scores_fixture(monkeypatch, tmp_path, holdings, score=50.0)
+
+    orig = _tp50._new_board_source
+
+    def _spy(c):
+        src = orig(c)
+        seen_sources.append(src)
+        return src
+
+    monkeypatch.setattr(_tp50, "_new_board_source", _spy)
+    _tp50._render_holdings_table(holdings, client)
+    assert len(seen_sources) == 1  # _render_holdings_table呼び出し1回につき1インスタンス
+
+
+# --- I. 取得失敗ログの永続化 -------------------------------------------------
+def test_board_lookup_failure_persists_symbol_status_and_result(tmp_path):
+    client = _BoardKabuClient({})  # 常にCurrentPrice/PreviousClose無し
+    name, price, is_live = _tp50._lookup_symbol_display(client, "78120")
+    assert price is None
+    failure_log = _tp50.AUDIT_DIR / "board_lookup_failures.jsonl"
+    records = [json.loads(l) for l in failure_log.read_text(encoding="utf-8").splitlines()]
+    rec = [r for r in records if r["symbol"] == "78120"][0]
+    assert rec["final_result"] == "現在値・前日終値ともに取得不可"
+    assert "attempts" in rec and "recorded_at" in rec
 
 
 # --- E. 現在値取得失敗 -----------------------------------------------------
