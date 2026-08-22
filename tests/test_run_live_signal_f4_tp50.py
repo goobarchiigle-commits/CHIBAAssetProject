@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import json
 import sys
+import time
 from pathlib import Path
 
 import pandas as pd
@@ -1623,6 +1624,37 @@ def test_board_lookup_failure_persists_symbol_status_and_result(tmp_path):
     rec = [r for r in records if r["symbol"] == "78120"][0]
     assert rec["final_result"] == "現在値・前日終値ともに取得不可"
     assert "attempts" in rec and "recorded_at" in rec
+
+
+# --- 最終Production Gate監査(2026-08-22): 429連続時の最大処理時間・有限retryの実測 ---
+def test_eleven_symbols_all_429_bounded_wall_clock_no_infinite_loop(monkeypatch, tmp_path):
+    """11銘柄全てがHTTP 429を返し続ける最悪ケースでも、有限retry
+    (max_retries=1 → 最大2試行/銘柄)により処理が有限時間で終了することを
+    実時間(sleepをmockしない)で検証する。理論上限:
+    銘柄あたり通常throttle(1/5秒) + 429固有backoff(2.0秒) ≈ 2.2秒/銘柄、
+    11銘柄で約24秒。安全マージンを見て60秒未満に収まることを確認する
+    （無限待機・無限retryでないことの直接証拠）。"""
+    holdings = _eleven_holdings()
+    _write_holding_scores_fixture(monkeypatch, tmp_path, holdings, score=50.0)
+
+    class _Always429Client:
+        def __init__(self):
+            self.calls = 0
+
+        def get_board(self, code4, exchange=1):
+            self.calls += 1
+            raise _http_error(429, "rate limited")
+
+    client = _Always429Client()
+    t0 = time.monotonic()
+    lines = _tp50._render_holdings_table(holdings, client)
+    elapsed = time.monotonic() - t0
+
+    assert client.calls == len(holdings) * 2  # 銘柄あたり最大2試行、それ以上は叩かない(無限retryでない)
+    assert elapsed < 60.0  # 理論上限(~24秒)に安全マージンを加えた閾値、無限待機でないことの直接証拠
+    for line in lines:
+        assert "取得不可" in line  # 捏造されたCurrentPriceが無い
+
 
 
 # --- E. 現在値取得失敗 -----------------------------------------------------
