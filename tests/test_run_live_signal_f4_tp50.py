@@ -1339,6 +1339,119 @@ def test_degraded_cash_source_triggers_invalid_even_when_no_field_is_none():
     assert _classify_tp50_notification(rs) == "error"  # だがcash_source degraded → error
 
 
+# ======================================================================
+# 2026-08-22 Daily Dry Run通知 最終仕様化: 【現在ポートフォリオ】全銘柄一覧
+# (コード/銘柄名/Score/Entry価格/現在値/損益率)。
+# ======================================================================
+
+class _BoardKabuClient:
+    """get_board()のみ実装するテスト用スタブ。板情報(銘柄名/現在値)取得用。"""
+
+    def __init__(self, board_map: dict):
+        self._board_map = board_map  # {code4: (name, price)}
+
+    def get_board(self, code4: str):
+        name, price = self._board_map.get(code4, (code4, None))
+
+        class _Board:
+            symbol_name = name
+            current_price = price
+
+        return _Board()
+
+
+def _eleven_holdings():
+    codes = ["11110", "17160", "17880", "34570", "378A0", "48260",
+             "73250", "73710", "77810", "78120", "93440", "94500"][:11]
+    return [{"code": c, "entry_date": "2026-08-19", "entry_price": 1000.0 + i * 10, "qty": 100}
+            for i, c in enumerate(codes)]
+
+
+def _board_map_for(holdings, price_fn=lambda entry: entry * 1.10):
+    board = {}
+    for p in holdings:
+        code4 = p["code"][:-1] if len(p["code"]) == 5 else p["code"]
+        board[code4] = (f"銘柄{p['code']}", price_fn(p["entry_price"]))
+    return board
+
+
+# --- A/B/C/D. 保有全件表示・コード+名前+Score・Entry=actual・損益率計算 -----
+def test_scenario_abcd_full_holdings_table_with_pnl():
+    holdings = _eleven_holdings()
+    board = _board_map_for(holdings)  # 現在値 = entry * 1.10 (+10%)
+    client = _BoardKabuClient(board)
+    score_map = {p["code"]: 55.0 for p in holdings}
+    rs = _base_result_summary(
+        live=False, cash_source="broker_live", positions_count=len(holdings),
+        current_holdings=holdings, market_value=1000000.0, last_equity=3000000.0,
+    )
+    with _no_prev_run():
+        body = _build_tp50_notification_body(rs, [], [], client=client, score_map=score_map)
+    portfolio_block = body.split("【現在ポートフォリオ】")[1].split("【SYSTEM】")[0]
+    for p in holdings:
+        assert p["code"] in portfolio_block  # A: 全件表示
+        assert f"銘柄{p['code']}" in portfolio_block  # B: 銘柄名
+    assert "Score:55.0" in portfolio_block  # B: Score
+    assert f"Entry:{_tp50._fmt_yen(holdings[0]['entry_price'])}" in portfolio_block  # C: actual entry
+    assert "損益:+10.0" in portfolio_block or "損益:+9.9" in portfolio_block  # D: 概ね+10%
+
+
+# --- E. 現在値取得失敗 -----------------------------------------------------
+def test_scenario_e_current_price_unavailable_shows_explicit_unresolved():
+    holdings = [{"code": "93440", "entry_date": "2026-08-19", "entry_price": 1224.0, "qty": 100}]
+    client = _BoardKabuClient({})  # get_boardは常にNoneを返す
+    rs = _base_result_summary(
+        live=False, cash_source="broker_live", positions_count=1, current_holdings=holdings,
+        market_value=100000.0, last_equity=3000000.0,
+    )
+    with _no_prev_run():
+        body = _build_tp50_notification_body(rs, [], [], client=client)
+    portfolio_block = body.split("【現在ポートフォリオ】")[1].split("【SYSTEM】")[0]
+    assert "現在値:取得不可" in portfolio_block
+    assert "損益:現在値取得不可のため計算不可" in portfolio_block
+
+
+# --- F. Entry価格取得失敗 ---------------------------------------------------
+def test_scenario_f_entry_price_unavailable_shows_explicit_unresolved():
+    holdings = [{"code": "93440", "entry_date": None, "entry_price": None, "qty": 100}]
+    board = {"9344": ("アクシスコンサルティング", 1300.0)}
+    client = _BoardKabuClient(board)
+    rs = _base_result_summary(
+        live=False, cash_source="broker_live", positions_count=1, current_holdings=holdings,
+        market_value=100000.0, last_equity=3000000.0,
+    )
+    with _no_prev_run():
+        body = _build_tp50_notification_body(rs, [], [], client=client)
+    portfolio_block = body.split("【現在ポートフォリオ】")[1].split("【SYSTEM】")[0]
+    assert "Entry:取得不可" in portfolio_block
+    assert "損益:Entry価格取得不可のため計算不可" in portfolio_block
+
+
+# --- G. Kabu API失敗 -> Current Portfolio UNAVAILABLE + Previous Known State
+def test_scenario_g_current_portfolio_unavailable_label_present():
+    rs = _base_result_summary(
+        live=False, cash_source="unavailable_dry_run_degraded",
+        available_cash=0.0, positions_count=0,
+        previous_known_positions=_prev_positions_fixture(),
+    )
+    with _no_prev_run():
+        body = _build_tp50_notification_body(rs, [], [])
+    assert "Current Portfolio: UNAVAILABLE" in body
+    assert "【Previous Known State】" in body
+
+
+# --- J. BUY候補: theoretical price であることを明記 -------------------------
+def test_scenario_j_buy_candidate_labels_price_as_theoretical():
+    rs = _base_result_summary(live=False, funded_detail=[
+        {"code": "48260", "estimated_fill_price": 521.0},
+    ])
+    with _no_prev_run():
+        body = _build_tp50_notification_body(rs, [], [])
+    today_block = body.split("【本日の判断】")[1].split("【現在ポートフォリオ】")[0]
+    assert "理論Entry価格" in today_block
+    assert "※BUY候補の価格は実約定価格ではない" in today_block
+
+
 def test_notification_body_never_contains_static_sending_label():
     """"Notification 送信中"は送信前に固定で書かれる自己言及的な誤表示のため撤去済み
     （2026-08-21朝 ユーザー指摘の回帰テスト）。"""

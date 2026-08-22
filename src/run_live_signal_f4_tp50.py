@@ -358,6 +358,43 @@ def _fmt_score(score_map, code5: str) -> str:
         return "N/A"
 
 
+def _render_holdings_table(positions: list[dict], client, score_map, *, reference_only: bool) -> list[str]:
+    """保有銘柄一覧を1銘柄1行で描画する: コード/銘柄名/Score/Entry価格/現在値/損益率。
+    2026-08-22朝 通知全面仕様化: 現在ポートフォリオ・Previous Known Stateの両方で
+    共有する（区別が必要な場合は呼び出し側が見出し・注意書きで明示する）。
+    Entry価格はpositions[i]["entry_price"]（呼び出し側でbroker実約定metadataから
+    構築済み——estimated_price/as_of由来の理論値を混ぜてはならない）をそのまま使い、
+    ここでは一切の推測を行わない。現在値はreference_only時も含め毎回board取得を
+    試みる（client切断時はNone・"現在値取得不可"に自然にフォールバックする）。"""
+    if not positions:
+        return ["0銘柄"]
+    lines = []
+    for p in positions:
+        code = p["code"]
+        name, current_price = _lookup_symbol_display(client, code)
+        name_part = code if name == code else f"{code} {name}"
+        score_part = f"Score:{_fmt_score(score_map, code)}"
+        entry_price = p.get("entry_price")
+        entry_part = f"Entry:{_fmt_yen(entry_price) if entry_price is not None else '取得不可'}"
+        if current_price is not None:
+            current_part = f"現在値:{_fmt_yen(current_price)}"
+        else:
+            current_part = "現在値:取得不可"
+        if entry_price is None:
+            pnl_part = "損益:Entry価格取得不可のため計算不可"
+        elif current_price is None:
+            pnl_part = "損益:現在値取得不可のため計算不可"
+        else:
+            pnl_pct = (current_price / entry_price) - 1.0
+            pnl_part = f"損益:{_fmt_pct(pnl_pct)}"
+        qty_part = f"{p.get('qty')}株" if reference_only else None
+        parts = [name_part, score_part, entry_part, current_part, pnl_part]
+        if qty_part:
+            parts.append(qty_part)
+        lines.append("  ".join(parts))
+    return lines
+
+
 def _order_for_symbol(results: list[dict] | None, symbol: str, side: str) -> dict | None:
     if not results:
         return None
@@ -486,8 +523,9 @@ def _render_buy_item(f: dict, order: dict | None, client, score_map, mode: str) 
         if order is not None and not order.get("success"):
             lines.append(f"⚠ 発注失敗  error={order.get('error')}")
     else:  # today_preview
-        lines.append(f"予定数量    {FIXED_LOT_SIZE}株")
-        lines.append(f"基準価格    {_fmt_yen(f.get('estimated_fill_price'))}")
+        lines.append(f"予定数量      {FIXED_LOT_SIZE}株")
+        lines.append(f"理論Entry価格 {_fmt_yen(f.get('estimated_fill_price'))}")
+        lines.append("※BUY候補の価格は実約定価格ではない")
         lines.append("")
         lines.append("→ LIVEならBUY")
     lines.append("")
@@ -740,22 +778,22 @@ def _build_dry_run_notification_body(result_summary: dict, client, score_map) ->
         lines.append(f"総資産      {_fmt_yen(result_summary.get('last_equity'))}")
         lines.append(f"DD          {_fmt_pct(risk.get('dd'))}")
         lines.append(f"保有銘柄    {result_summary.get('positions_count')}件")
+        lines.append("")
+        lines += _render_holdings_table(
+            result_summary.get("current_holdings") or [], client, score_map, reference_only=False,
+        )
     else:
         lines.append("⚠ Kabu APIから現在の証券口座状態を取得できませんでした")
         lines.append("")
+        lines.append("Current Portfolio: UNAVAILABLE")
+        lines.append("")
+        lines.append("【Previous Known State】")
         lines.append("以下は前回確定状態（参考情報）です。")
         lines.append("現在の実際の口座残高を保証するものではありません。")
         lines.append("")
         prev_positions = result_summary.get("previous_known_positions") or []
-        if not prev_positions:
-            lines.append("前回確定時点の保有銘柄記録なし（0銘柄）")
-        else:
-            for p in prev_positions:
-                lines.append(
-                    f"{_symbol_line(client, p['code'])} / Score {_fmt_score(score_map, p['code'])} "
-                    f"/ Entry {_fmt_yen(p.get('entry_price'))} ({p.get('entry_date') or '日付不明'}) "
-                    f"/ {p.get('qty')}株"
-                )
+        lines += _render_holdings_table(prev_positions, client, score_map, reference_only=True)
+        if prev_positions:
             lines.append(f"合計 {len(prev_positions)}銘柄")
     lines.append("")
 
@@ -1658,7 +1696,24 @@ def main() -> int:
     # キー不一致）。already_held_symbolsはcandidates_raw（内部5桁コード）との比較に
     # 使われるため、内部キー形式で返すheld_qty_by_internal_key()を使う。
     from src.portfolio.strategy_router import held_qty_by_internal_key
-    already_held_symbols = set(held_qty_by_internal_key(broker_positions, strategy_types, STRATEGY_TYPE).keys())
+    tp50_held_qty = held_qty_by_internal_key(broker_positions, strategy_types, STRATEGY_TYPE)
+    already_held_symbols = set(tp50_held_qty.keys())
+
+    # 現在ポートフォリオ（broker snapshot取得成功時のみ・"何を保有しているか"の
+    # Source of Truthはbroker実ポジション。entry_price/entry_dateはbroker実約定
+    # ベースのローカルmetadata（apply_fill_metadata_updates()参照）——estimated_price
+    # やas_of由来の理論値は絶対に使わない（2026-08-22朝 通知全面仕様化: 9344事故の
+    # 教訓の再発防止をDaily Report全体に適用）。現在値・Scoreは通知本文生成時に
+    # client/score_mapで解決する（board値は実行時点のスナップショットのため
+    # ログJSONへは永続化しない）。
+    current_holdings = sorted(
+        (
+            {"code": code, "entry_date": entry_dates.get(code), "entry_price": entry_prices.get(code),
+             "qty": qty}
+            for code, qty in tp50_held_qty.items()
+        ),
+        key=lambda p: p["code"],
+    )
 
     # ── 未約定注文との重複防止（InflightRegistry・E5/TP30/Fujikoと共有ファイル） ──
     registry = InflightRegistry(INFLIGHT_REGISTRY_FILE)
@@ -1804,6 +1859,7 @@ def main() -> int:
         "market_value": last_equity - available_cash,
         "positions_count": len(broker_positions),
         "previous_known_positions": previous_known_positions,
+        "current_holdings": current_holdings,
         "run_started_at": run_started_at.strftime("%Y-%m-%d %H:%M:%S"),
         "scheduled_trigger_hhmm": _TP50_SCHEDULED_TRIGGER_HHMM,
         "asof_staleness_bdays": _asof_staleness_bdays,
